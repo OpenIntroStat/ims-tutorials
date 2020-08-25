@@ -1,0 +1,56 @@
+---
+title: "Inference for categorical responses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<img style="float: right; margin: 0px 0px 20px 20px" src="../logo/openintro-hex.png" alt="Tutorial illustration" width="250" height="300">
+
+## Tutorial description
+
+Categorial data is all around us. 
+It's in the latest opinion polling numbers, in the data that lead to new breakthroughs in genomics, and in the troves of data that internet companies collect to sell products to you. 
+In this tutorial you'll learn techniques for parsing the signal from the noise; tools for identifying when structure in this data represents interesting phenomena and when it is just random noise.
+
+## Learning objectives
+
+* Construct a confidence interval on one proportion and the difference in two proportions.
+* Interpret a confidence interval in the context of a particular data set.
+* Conduct hypothesis tests for a single proportion and the difference in two proportions.
+* Carry out a Chi-squared Goodness of Fit Test and a Chi-squared Test of Independence.
+* Visualize the null distribution of a statistic and use it to calculate a p-value.
+* Interpret a p-value in the context of a particular problem.
+* Explain the distinction type of statistical errors analysts are susceptible to when carrying out a hypothesis test.
+
+
+
+## Lessons
+
+### 1 - [Inference for a single proportion](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-01/)
+
+In this lesson you will learn how to form a confidence interval on a single proportion using bootstrapping and an approximation-based method. You'll explore how the sample size and the true proportion effect the width of the interval.
+
+### 2 - [Hypothesis tests to compare proportions](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-02/)
+
+This lesson dives deeper into inference for a single parameter by performing hypothesis tests. Then, you'll extend this technique to the difference between two proportions. Finally, this lesson wraps up with an exploration of what happens when you know the null hypothesis is true and the types of statistical errors that are baked in to this approach.
+
+### 3 - [Chi-squared test of independence ](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-03/)
+
+This part of the tutorial will teach you how to use both bootstrapping and approximation methods to test for the independence of two categorical variables. This commonly-used method is called the chi-squared Test of Independence.
+
+### 4 - [Chi-squared goodness of fit test](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-04/)
+
+The tutorial wraps up with two case studies using election data. Here, you'll learn how to a second Chi-squared test to check the goodness of fit between your data and a hypothetical distribution. You'll study election results from Iran and Iowa and evaluate whether we can detect fraud using something called Benford's Law.
+
+## Instructor
+
+<img style="float: left; margin: 0px 20px 20px 0px" src="../instructor-photos/andrew.png" alt="Andrew Bray" width="150" height="150">
+
+### Andrew Bray
+
+#### Reed College
+
+Andrew Bray is an Assistant Professor of Statistics at Reed College and lover of all things statistics and R.

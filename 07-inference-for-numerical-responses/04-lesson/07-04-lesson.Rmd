@@ -1,0 +1,572 @@
+---
+title: "Lesson 4 - Comparing many means"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+# load packages ----------------------------------------------------------------
+
+library(learnr)
+library(tidyverse)
+library(infer)
+library(broom)
+library(emo)
+
+# knitr options ----------------------------------------------------------------
+
+knitr::opts_chunk$set(fig.align = "center", 
+                      fig.height = 3, 
+                      fig.width = 5,
+                      echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE)
+
+# data prep --------------------------------------------------------------------
+
+gss <- read_csv("data/gss_wordsum_class.csv")
+```
+
+## Vocabulary score vs. self identified social class
+
+### Vocabulary score and self identified social class
+
+So far in this tutorial, we discussed inference on a single mean as well as inference for comparing two means. Next we move on to comparing many means simultaneously.
+
+
+> - `wordsum`: 10 question vocabulary test (scores range from 0 to 10)
+> - `class`: self identified social class (lower, working, middle, upper)
+
+|   | `wordsum`|`class` |
+|:--|:---------|:-------|
+|1  |         6|MIDDLE  |
+|2  |         9|WORKING |
+|3  |         6|WORKING |
+|4  |         5|WORKING |
+|5  |         6|WORKING |
+|6  |         6|WORKING |
+|...|       ...|...     |
+|795|         9|MIDDLE  |
+
+
+Our motivating data comes from the General Social Survey. The two variables of interest are vocabulary score and self-identified social class.
+
+Vocabulary score is calculated based on a ten question vocabulary test, where a higher score means better vocabulary, and self-identified social class has 4 levels: lower, working, middle, and upper class.
+
+
+### Vocabulary score: `wordsum`
+
+
+> 1. SPACE (school, noon, captain, room, board, don't know)
+> 1. BROADEN (efface, make level, elapse, embroider, widen, don't know)
+> 3. EMANATE (populate, free, prominent, rival, come, don't know)
+> 4. EDIBLE (auspicious, eligible, fit to eat, sagacious, able to speak, don't know)
+> 5. ANIMOSITY (hatred, animation, disobedience, diversity, friendship, don't know)
+> 6. PACT (puissance, remonstrance, agreement, skillet, pressure, don't know)
+> 7. **CLOISTERED (miniature, bunched, arched, malady, secluded, don't know)**
+> 8. CAPRICE (value, a star, grimace, whim, inducement, don't know)
+> 9. ACCUSTOM (disappoint, customary, encounter, get used to, business, don't know)
+> 10. ALLUSION (reference, dream, eulogy, illusion, aria, don't know)
+
+
+The vocabulary test works as follows: respondents are given the following list of words, and are asked to choose a word from the list that comes closest to the meaning of the first word provided in the capital letters.
+
+For example, is CLOISTERED closest in meaning to miniature, bunched, arched, malady, secluded, or if you were the respondent on this survey would you mark don't know? If you're curious about the vocabulary test feel free to pause and work through the rest, but for the purpose of this example we're not going to be focusing on what these words mean, but instead we'll take a look at how people who took the survey did on the vocabulary test and whether their score is associated with their social class or not.
+
+
+
+### Distribution of vocabulary score
+
+```{r echo = TRUE}
+ggplot(data = gss, aes(x = wordsum)) +
+  geom_histogram(binwidth = 1)
+```
+
+The distribution of vocabulary scores is shown in this histogram. The scores range between 0 and 10. The distribution is centered at 5, and looks roughly symmetric.
+
+### Self identified social class: `class`
+
+
+*If you were asked to use one of four names for your social class, which would you say you belong in: the lower class, the working class, the middle class, or the upper class?*
+ 
+```{r echo=TRUE}
+ggplot(data = gss, aes(x = wordsum)) +
+  geom_histogram(binwidth = 1)
+```
+
+And the distribution of social class is shown in this bar plot.
+
+These visualizations tell us about the variables individually, but don't tell us much about their relationship.
+
+Time to put this into practice.
+
+### EDA for vocabulary score vs. social class
+
+Before we conduct inference, we should take a look at the distributions of vocabulary scores across the levels of (self identified) social class.
+
+
+
+- Using `gss`, plot the distribution of vocabulary scores, `wordsum`.
+- Make this a histogram, using an appropriate binwidth.
+- Facet this histogram, wrapping by social class level.
+- *Look at the plot! Compare the distributions of vocabulary scores across the levels of (self identified) social class.*
+
+
+```{r vocabulary-setup}
+```
+
+
+```{r vocabulary, exercise=TRUE}
+# Using gss, plot wordsum
+ggplot(___, mapping = ___) +
+  # Add a histogram layer
+  ___ +
+  # Facet by class
+  facet_wrap(___)
+```
+
+<div id="vocabulary-hint">
+**Hint:** 
+- Use `gss` as the plot's data argument, then call `aes()`, mapping `x` to `wordsum`.
+- Add a histogram layer with `geom_histogram()`. Vocabulary scores can only be whole numbers, so it doesn't make sense to have bins narrower than one point.
+- The faceting formula can be specified using `~ class`.
+</div>
+
+```{r vocabulary-solution}
+# Using gss, plot wordsum
+ggplot(data = gss, mapping = aes(x = wordsum)) +
+  # Add a histogram layer
+  geom_histogram(binwidth = 1) +
+  # Facet by class
+  facet_wrap(~ class)
+```
+
+### 
+
+Great start to the last lesson of the tutorial! Before you move on, make sure you've compared all attributes of the distributions: shape, center, spread, unusual observations.
+
+### Comparing many means, visually
+
+```{r quiz_1}
+question("Which of the following plots shows groups with means that are most and least likely to be significantly different from each other?",
+  correct = "Correct! The bars in facet `1` look different to each other, so they are more likely to be significantly different to each other.",
+  allow_retry = TRUE,
+  answer("Most likely: 1, least likely: 2", correct = TRUE),
+  answer("Most likely: 1, least likely: 3", message = "No. The bars in plot `2` look more alike than those in facet `3`, so they are less likely to be significantly different to each other."),
+  answer("Most likely: 2, least likely: 3", message = "No. The bars in facet `2` look alike, so they are less likely to be significantly different to each other."),
+  answer("Most likely: 2, least likely: 1", message = "No. Bars that look different to each other are more likely to be significantly different to each other.")
+)
+```
+
+```{r means-setup, echo=FALSE}
+set.seed(123)
+
+a1 <- rnorm(100, mean = 10, sd = 2)
+a2 <- rnorm(100, mean = 20, sd = 2)
+a3 <- rnorm(100, mean = 30, sd = 2)
+a <- c(a1, a2, a3)
+
+b1 <- rnorm(100, mean = 10, sd = 5)
+b2 <- rnorm(100, mean = 11, sd = 5)
+b3 <- rnorm(100, mean = 9, sd = 5)
+b <- c(b1, b2, b3)
+
+d1 <- rnorm(100, mean = 10, sd = 15)
+d2 <- rnorm(100, mean = 20, sd = 15)
+d3 <- rnorm(100, mean = 30, sd = 15)
+d <- c(d1, d2, d3)
+
+y <- c(a, b, d)
+x <- factor(rep(c(rep(1, 100), rep(2, 100), rep(3, 100)), 3))
+z <- c(rep("I", 300), rep("II", 300), rep("III", 300))
+
+df <- tibble(x = x, y = y, z = z)
+
+ggplot(df, aes(x = x, y = y)) +
+  geom_boxplot() +
+  facet_grid( ~ z)
+```
+
+
+## ANOVA
+
+
+In this lesson we'll formally introduce analysis of variance, in other words ANOVA.
+
+We're going to start our discussion with variability partitioning, which means considering different factors that contribute to variability in our response variable.
+
+
+
+### Marathon finishing times
+
+![](images/runners.001.png)
+
+Consider runners in a marathon. Not everybody is going to finish at the same time. The variability in their finishing times will likely be due to a variety of factors. One of them might be how much they trained for this marathon. However, there will certainly be other factors as well: physical characteristics, previous running experience, sleep, warm up exercises, and so on and so forth.
+
+Suppose we're interested in evaluating how strongly training is associated with finishing time. In order to do so we partition the total variability in finishing times as variability due to this variable, and variability due to all other factors. We're going to build up on this idea of variability partitioning, and the F statistic we introduced earlier, to work our way through the analysis of variance output.
+
+
+
+### ANOVA for vocabulary scores vs. self identified social class
+
+
+> $H\_0$: The average vocabulary score is the same across all social classes, $\mu\_{lower} = \mu\_{working} = \mu\_{middle} = \mu\_{upper}$.
+> 
+> $H\_A$: The average vocabulary scores differ between at least one pair of social classes.
+
+
+Let's quickly remind ourselves of the data we're working with from the General Social Survey on vocabulary scores, a numerical variable, and social class, a categorical variable with four levels.
+
+Our null hypothesis is that the average vocabulary score is the same across all social classes, and the alternative hypothesis is that average vocabulary scores differ between at least one pair of social classes.
+
+
+
+### Variability partitioning
+
+
+> Total variability in vocabulary score:
+> 
+> - Variability that can be attributed to differences in social class - **between group** variability 
+> 
+> - Variability attributed to all other factor - **within group** variability 
+
+
+Let's outline this idea of variability partitioning:
+
+The total variability in vocabulary scores times is basically the variance in vocabulary scores of all respondents to the general social survey.
+
+We partition the variability into two: 
+
+Variability that can be attributed to differences in social class,
+and variability attributed to all other factors.
+
+Variability attributed to social class is called "between group" variability, since social class is the grouping variable in our analysis.
+
+The other portion of the variability is what we're not interested in, and, in fact, it is somewhat of a nuisance factor for us since if everyone within a certain social class scored the same then we would have no variability attributed the other factors. This portion of the variability is called "within group variability".
+
+
+
+### ANOVA output
+
+Here is a look at ANOVA output. The first row is about the between group variability, and the second row is about the within group variability. We often refer to the first row as the "group" row, and the second row as the "error" row. Next we'll go through some of the values on the anova table and what they mean.
+
+
+```{r echo=TRUE}
+aov(wordsum ~ class, gss) %>%
+  tidy()
+```
+
+
+### Sum of squares
+
+```{r}
+aov(wordsum ~ class, gss) %>%
+  tidy()
+```
+
+> - $SST = 236.5644 + 2869.8003 = 3106.365$ - Measures the total variability in the response variable 
+> - Calculated very similarly to variance (except not scaled by the sample size) 
+> - Percentage of explained variability = $\frac{236.5644}{3106.365} = 7.6\%$ 
+
+Let's start with the Sum of Squares column. 
+
+These values measure the variability attributed to the two components: the variability in vocabulary scores explained by social class and the unexplained variability -- that is, unexplained by the explanatory variable in this particular analysis. 
+The sum of these two values would make up sum of squares total, which measures the total variability in the response variable, in this case this would be the total variability of the vocabulary scores. 
+This value is calculated very similarly to the variance, except that it's not scaled it by the same size. More specifically, this is calculated as the total squared deviation from the mean of the response variable.
+One statistic not presented on the ANOVA table that might be of interest is the percentage of the variability in vocabulary scores explained by the social class variable. We can find this as the ratio of the sum of squares for class divided by the total sum of squares. In this case, 7.6% of the variability in vocabulary scores is explained by self identified social class. This value is the R-squared value we would obtain if we set up this analysis as a regression predicting vocabulary score from social class.
+
+
+### F-statistic
+
+```{r}
+aov(wordsum ~ class, gss) %>%
+  tidy()
+``` 
+
+> F-statistic = 21.73467 = $\frac{between~group~var}{within~group~var}$
+
+![](images/wordsum_pval.png)
+
+The main values of interest on this table are the F-statistic, which is calculated as the ratio between the “between” and “within” group variabilities if in fact the means of all groups are equal, and 
+ the p-value, which is the area under the F-distribution beyond the observed F-statistic. We draw conclusions based on this p-value just like with any other hypothesis test we've seen so far.
+
+Time to put this into practice.
+
+### ANOVA for vocabulary score vs. (self identified) social class
+
+Let's conduct the ANOVA for evaluating whether there is a difference in the average vocabulary scores between the levels of (self identified) social class.
+
+- Run the ANOVA with the `aov()` function, and store the resulting object as `aov_wordsum_class`.
+- View a `tidy()` output of this object.
+- *Interpret the result in context of the data and the research question. Use a 5% significance level.*
+
+```{r vocabulary_2, exercise=TRUE}
+# Run an analysis of variance on wordsum vs. class
+aov_wordsum_class <- ___
+
+# Tidy the model
+tidy(aov_wordsum_class)
+```
+
+<div id="vocabulary_2-hint">
+**Hint:** 
+- Call `aov()`, passing a formula of `wordsum` versus `class` and setting `data` to `gss`.
+- Call `tidy()`, passing the AOV model.
+</div>
+
+```{r vocabulary_2-solution}
+# Run an analysis of variance on wordsum vs. class
+aov_wordsum_class <- aov(wordsum ~ class, data = gss)
+
+# Tidy the model
+tidy(aov_wordsum_class)
+```
+
+### 
+
+Great! What is the conclusion of the hypothesis test?
+
+### Conditions for ANOVA
+
+Just like any other statistical inference method we've encounter so far, there are conditions that need to be met for anova as well.
+
+> - **Independence:**
+>     - within groups: sampled observations must be independent 
+>     - between groups: the groups must be independent of each other (non-paired) 
+> - **Approximate normality:** distribution of the response variable should be nearly normal within each group
+> - **Equal variance:** groups should have roughly equal variability
+
+There are three main conditions for ANOVA. The first one is independence.
+Within groups the sampled observations must be independent of each other,
+and between groups the groups must be independent of each other as well
+We also need approximate normality, that is the distributions within each group should be nearly normal
+and constant variance, that is the variability of the distributions of the response variable within each group should have roughly equal variance.
+
+Next we'll discuss each condition in more detail.
+
+### Independence
+
+> - **Within groups:** Sampled observations must be independent of each other
+>     - Random sample / assignment
+>     - Each $n_j$ less than 10% of respective population always important, but sometimes difficult to check
+>      
+> - **Between groups:** Groups must be independent of each other  
+>     - Carefully consider whether the groups may be dependent 
+
+
+Let's start with the independence condition.
+
+Within groups we want the samples observations to be independent, which we can assume to the case if we have random sampling or assignment, and if each sample size is less than 10% of its respective population, if we have conducted a stratified sampling process without replacement. This condition is always important, but can be difficult to check if we don't have sufficient information on how the study was designed and data were collected.
+
+Between groups we want the groups to be independent of each other. This requires carefully considering whether there is a paired structure between the groups. if the answer is yes, this is not the end of the world, but it requires a different, slightly more advanced version of ANOVA, called repeated measures ANOVA, for a correct analysis of such data. So the ANOVA we are learning in this tutorial will only work in circumstances where the groups are independent.
+
+
+### Approximately normal
+
+We also need the distribution of the response variable within to be approximately normal. And this condition is especially important when the sample sizes are small. We can check this condition using appropriate visualizations, which you'll get to do in the following exercises.
+
+> - Distribution of response variable within each group should be approximately normal
+> - Especially important when sample sizes are small
+> - Check with visuals
+
+### Constant variance
+
+Lastly we need constant variance across groups, in other words variability should be consistent across groups. A commonly used term for this is homoscedasticity. This condition is especially important when the sample sizes differ between groups. We can use visualizations and/or summary statistics to check this condition.
+
+> - Variability should be consistent across groups (homoscedasticity)
+> - Especially important when sample sizes differ between groups
+
+Next we'll check the conditions for the vocabulary score vs. social class ANOVA that we have been working on.
+
+### Checking the normality condition
+
+```{r quiz_2}
+question("Which of the following provides the most complete information for checking the normality condition for the ANOVA for evaluating whether there are differences between the average vocabulary scores across social classes?",
+  correct = "Correct! A histogram shows you the shape of the distribution.",
+  allow_retry = TRUE,
+  answer("Histogram of vocabulary scores, faceted by social class", correct = TRUE),
+  answer("Box plot of vocabulary scores, faceted by social class", message = "No. A box plot only gives you 5 metrics about the distribution of a variable, plus the positions of the outliers."),
+  answer("Means and standard deviations of vocabulary scores in each social class", message = "No. This only gives you two metrics about the distribution of the scores, but doesn't tell you about the shape of the distribution."),
+  answer("Number of modes of vocabulary scores in each social class", message = "No. This only gives you details of the modality of the distribution of the scores, but doesn't show you the shape of the distribution.")
+)
+```
+
+### Checking the constant variance condition
+
+In addition to checking the normality of distributions of vocabulary scores across levels of social class, we need to check that the variances from each are roughly constant.
+
+
+
+- Group by social class.
+- Summarize to calculate the standard deviations of vocabulary scores, storing in a column named `std_dev_wordsum`. 
+- *Verify the constant variance condition.*
+
+
+```{r vocabulary_3-setup, include=FALSE}
+```
+
+```{r vocabulary_3, exercise=TRUE}
+gss %>%
+  # Group by class
+  ___ %>%
+  # Calculate the std dev of wordsum as std_dev_wordsum
+  ____
+```
+
+<div id="vocabulary_3-hint">
+**Hint:** 
+- Call `group_by()`, passing `class`.
+- Call `summarize()`, setting `std_dev_wordsum` to the standard deviation of `wordsum`.
+</div>
+
+```{r vocabulary_3-solution}
+gss %>%
+  # Group by class
+  group_by(class) %>%
+  # Calculate the std dev of wordsum as std_dev_wordsum
+  summarize(std_dev_wordsum = sd(wordsum))
+```
+
+### 
+
+So, what do you think? Is the constant variance condition met?
+
+## Post-hoc testing
+
+So far we've introduced ANOVA as a method for comparing many means to each other concurrently. Finding a statistically significant result at the end of an ANOVA however only tells us that at least one pair of means are different, but not which pair of means are different. Next, we set out to answer this follow up question.
+
+### Which means differ?
+
+> - Two sample t-tests for differences in each possible pair of groups
+> - Multiple tests → inflated Type 1 error rate
+> - Solution: use modified significance level
+
+And when doing so we're going to discuss how to control the Type I error rate that would be inflated by doing many pairwise tests in the quest for identifying the groups whose means are significantly different from each other.
+
+Remember that to determine whether two means are different from each other we use t-tests, with each test you incur a possibility of a Type 1 error. The probability of committing a Type 1 error is the significance level of the test, which is often set at 5%.
+
+When you do multiple tests to compare each possible pairing of groups to each other, then you inflate your overall Type 1 error rate, which is an undesirable outcome
+
+However there's a simple solution: use a modified significance level, that is, a lower significance level, for each pairwise test, so that the overall Type 1 error rate for the series of tests you have to do can still be held at a low rate.
+
+
+
+### Multiple comparisons
+
+
+> - Testing many pairs of groups is called multiple comparisons
+> - The Bonferroni correction suggests that a more stringent significance level is more appropriate for these tests 
+>     - Adjust $\alpha$ by the number of comparisons being considered 
+>     - $\alpha^\star = \frac{\alpha}{K}$, where $K = \frac{k (k-1)}{2}$ 
+
+Testing many pairs of groups is called multiple comparisons
+
+and a common modification we use when doing multiple comparisons is the Bonferroni correction which uses a more stringent significance level for each of the pairwise tests
+
+more specifically, we adjust our alpha by the number of comparisons we have to do
+
+the Bonferroni corrected significance level can be calculated as the original significance level divided by the number of pairwise comparisons to be carried out. This number can be calculated as k times k-1 divided by 2, where k is the number of groups in the ANOVA.
+
+
+
+### Pairwise comparisons
+
+
+> - Constant variance $\rightarrow$ re-think standard error and degrees of freedom: Use consistent standard error and degrees of freedom for all tests
+> - Compare the p-values from each test to the modified significance level
+
+
+There are a couple other considerations for these multiple comparisons following anova.
+
+First is related to the constant variance condition of ANOVA. Since to do the ANOVA in the first place this condition must be satisfied, we need to re-think the standard error and the degrees of freedom to be used in the multiple comparisons tests.
+
+And of course, since we now have a new modified significance level, we compare the resulting p-values to this significance level.
+
+
+Now it's your turn.
+
+### Calculate alpha*
+
+Which of the following is the correct modified significance value for the post hoc tests associated with ANOVA for evaluating whether there are differences between the average vocabulary scores across social classes?
+
+There are 4 social classes, and the original significance level was 5%.
+
+*Hint* For $k$ levels, there are $k * (k - 1) / 2$ pairwise comparisons.
+
+```{r quiz_3}
+question("",
+  correct = "Bonferroni would be so proud! The correction factor for $k$ classes is $k * (k - 1) / 2$.",
+  allow_retry = TRUE,
+  answer("0.05", message = "No. You need to correct for the multiple comparisons of pairs of social classes."),
+  answer("0.05 / 4", message = "No. You should correct for *pairwise* comparisons of social classes."),
+  answer("0.05 / 6", correct = TRUE),
+  answer("0.05 / 12", message = "No. Comparing class `A` to class `B` is the same as comparing class `B` to class `A`, so you need to halve the correction factor.")
+)
+```
+
+### Compare pairwise means
+
+Compare means of vocabulary scores using the `pairwise.t.test()` function for all pairings of social classes.
+
+
+
+- Conduct a pairwise t-test on vocabulary scores and social class. Set `p.adjust.method` to `"none"` (*we'll adjust the significance level, not the p-value*).
+- Tidy the result.
+- *Do the data provide convincing evidence of a difference in the average vocabulary scores of those who self identified as middle class and those who self identified as lower class?*
+
+
+```{r vocabulary_4-setup, include=FALSE}
+
+```
+
+```{r vocabulary_4, exercise=TRUE}
+# Run a pairwise t-test on wordsum and class, without adjustment
+t_test_results <- ___
+
+# Tidy the result
+___
+```
+
+<div id="vocabulary_4-hint">
+**Hint:** 
+- Call `pairwise.t.test()` passing the `wordsum` and `class` columns of `gss`, and setting `p.adjust.method` to `"none"`.
+- You can use dollar notation, `dataframe$column`, to get the appropriate columns.
+- Call `tidy()`, passing the t-test results.
+</div>
+
+```{r vocabulary_4-solution}
+# Run a pairwise t-test on wordsum and class, without adjustment
+t_test_results <- pairwise.t.test(gss$wordsum, gss$class, p.adjust.method = "none")
+
+# Tidy the result
+tidy(t_test_results)
+```
+
+### 
+
+Did you remember to compare your resulting p-value to the *modified* significance level?
+
+## Congratulations!
+
+You have successfully completed Lesson 2 in Tutorial 7: Inference for Numerical Responses.  
+
+You should now have a very good understanding of statistical inference for numerical data. In this tutorial you have learned about simulation based and central limit theorem based methods for doing statistical inference for a single numerical variable or for evaluating bivariate relationships between a numerical variable and a categorical variable, both with only two levels and with multiple levels. You have also been introduced to a "tidy" way of conducting such analyses using the infer package as well as packages from the tidyverse.
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 7: Inference for Numerical Responses](https://openintrostat.github.io/ims-tutorials/07-inference-for-numerical-responses/)
+
+`r emo::ji("one")` [Tutorial 7 - Lesson 1: Bootstrapping for estimating a parameter](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-01/)
+
+`r emo::ji("one")` [Tutorial 7 - Lesson 2: Introducing the t-distribution](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-02/)
+
+`r emo::ji("one")` [Tutorial 7 - Lesson 3: Inference for difference in two parameters](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-03/)
+
+`r emo::ji("one")` [Tutorial 7 - Lesson 4: Comparing many means](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-04/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)

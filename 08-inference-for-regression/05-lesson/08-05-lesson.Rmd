@@ -1,0 +1,636 @@
+---
+title: "Lesson 5 - Inference for Linear Regression in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(openintro)
+library(broom)
+library(knitr)
+library(infer)
+library(tidyverse)
+library(GGally)
+library(emo)
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# http://andrewpbray.github.io/data/LA.csv
+LAhomes <- read_csv("data/LAhomes.csv")
+restNYC <- read_csv("data/restNYC.csv")
+change <- read_csv("data/coins.csv")
+
+change <- change %>%
+  mutate(Small= Dimes + Nickels + Pennies) %>%
+  mutate(Amount = Dollars) %>%
+  dplyr::select(-Dollars)
+```
+
+This lesson covers topics that build on the basic ideas of inference in linear models, including multicollinearity and inference for multiple regression models.
+
+## Inference on transformed variables
+
+Note that when performing inferential analysis on transformed variables, an important aspect to keep in mind is the interpretation of the slope coefficients used in the transformed models.
+
+
+
+### Interpreting coefficients - linear
+
+
+$Y = \beta\_0 + \beta\_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+
+$E[Y\_X] = \beta\_0 + \beta\_1 \cdot X$
+
+$E[Y\_{X+1}] = \beta\_0 + \beta\_1 \cdot (X+1)$
+
+$\beta\_1 = E[Y\_{X+1}] - E[Y\_X]$
+
+
+Recall that in a simple linear model setting, the true population slope describes the change in expected response when X is one unit larger. That is, for every additional unit of X, we expect that the response variable, Y, is beta-1 units larger, on average.
+
+
+
+### Interpreting coefficients - nonlinear X
+
+
+$Y = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+
+$E[Y\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+
+$E[Y\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+
+$\beta\_1 = E[Y\_{\ln(X)+1}] - E[Y\_{\ln(X)}]$
+
+
+When X is non-linear, the slope coefficient gives the additional expected increase in non-linear units. Here, when the log of X goes up by one unit, the expected value of Y is beta-1 units larger. This interpretation would work for any function of X. That is, the slope represents the change average expected Y units for a one unit change in whatever function of X you are working with.
+
+
+
+### Interpreting coefficients - nonlinear Y
+
+
+$\ln(Y) = \beta\_0 + \beta\_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+
+$E[\ln(Y)\_X] = \beta\_0 + \beta\_1 \cdot X$
+
+$E[\ln(Y)\_{X+1}] = \beta\_0 + \beta\_1 \cdot (X+1)$
+
+$\beta\_1 = E[\ln(Y)\_{X+1}] - E[\ln(Y)\_X]$
+
+
+Similarly, when Y is non linear, you can interpret the slope coefficient by saying that a one unit increase in X provides an expected increase of beta-1 in log-Y units. The interpretation will again work for any functional transformation of Y in that the slope coefficient represents an average expected change in the new units given a one unit change in X.
+
+
+
+### Interpreting coefficients - both nonlinear
+
+
+$\ln(Y) = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+
+$E[\ln(Y)\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+
+$E[\ln(Y)\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+
+$\beta\_1 = E[\ln(Y)\_{\ln(X)+1}] - E[\ln(Y)\_{\ln{X}}]$
+
+
+When the variables have been transformed so that both are on a non-linear scale, you can again model your interpretation based on the units at hand:
+
+a one-unit increase in log-X is associated with an expected increase of beta-1 in log-Y.
+
+And again, the interpretation in transformed units will hold for any functional transformation of X and Y.
+
+
+
+### Interpreting coefficients - both natural log (special case)
+
+
+
+$\ln(Y) = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+
+$E[\ln(Y)\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+
+$E[\ln(Y)\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+
+$\beta\_1 = E[\ln(Y)\_{\ln(X)+1}] - E[\ln(Y)\_{\ln{X}}]$
+
+
+
+OR (when X and Y are both transformed using natural log):
+
+$\beta_1 =$ percent change in Y for each 1% change in X
+
+
+However, when both variables are transformed using natural log (as they are here), there is a special interpretation that usually holds. The derivation of the interpretation is beyond the scope of this class, but often in a natural log-log situation, the beta coefficient can be interpreted as the percent change in Y for each 1-percent change in X.
+
+###  
+
+Note that with the housing data, it is most appropriate to run a model with log transformed variables (so that the technical conditions hold). So now it's your turn to interpret the new transformed model.
+
+### Transformed model
+
+As you saw in the previous lesson, transforming the variables can often transform a model from one where the technical conditions are violated to one where the technical conditions hold. When technical conditions hold, you are able to accurately interpret the inferential output. In the two models below, note how the standard errors and p-values change (although in both settings the p-value is significant).
+
+
+- Run a linear regression on `price` versus `bed` for the `LAhomes` dataset, then tidy the output.
+- Do the same on log-transformed variables:  `log(price)` versus `log(bed)`.
+
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+LAhomes <- LAhomes %>%
+   filter(bed > 0)
+
+ggplot(LAhomes, aes(bed, price)) +
+  geom_point()
+```
+
+
+```{r ex51, exercise=TRUE}
+# Create a tidy model
+
+
+# Create a tidy model using the log of both variables
+
+```
+
+
+
+```{r ex51-hint}
+- Each time call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
+- To model the log of price, use `log(price)` in your formula.
+```
+
+
+```{r ex51-solution}
+# Create a tidy model
+lm(price ~ bed, data = LAhomes) %>% tidy()
+
+# Create a tidy model using the log of both variables
+lm(log(price) ~ log(bed), data = LAhomes) %>% tidy()
+```
+
+
+
+
+### Interpreting transformed coefficients
+
+
+Transforming variables is a powerful tool to use when running linear regressions. However the parameter estimates must be carefully interpreted in a model with transformed variables.
+
+
+You will need to run the linear model before answering the question:
+
+`lm(log(price) ~ log(sqft), data = LAhomes) %>% tidy()`
+
+```{r ex1, exercise=TRUE}
+
+```
+
+Consider data collected by Andrew Bray at Reed College on characteristics of LA Homes in 2010. The model is given below, and your task is to provide the appropriate interpretation of the coefficient on `log(sqft)`?  
+
+Note: you must be careful to avoid causative interpretations. Additional square footage does not necessarily cause the price of a specific house to go up. The interpretation of the coefficient describes the estimate of the average price of homes at a given square footage.
+
+
+```{r ex, exercise=TRUE}
+
+```
+
+```{r ex-hint}
+Remember that a log-log model has a special kind of interpretation.
+```
+
+```{r ex-solution}
+- Each additional square foot of house size produces an estimate of the average price which is $1.44 more.
+- Each additional square foot of house size produces an estimate of the average price which is $1,442 more.
+- Each additional square foot of house size produces an estimate of the average price which is 1.44% higher.
+- Each additional 1% of square footage produces an estimate of the average price which is $1.44 more.
+- Each additional 1% of square footage produces an estimate of the average price which is 1.44% higher.
+```
+
+
+
+## Multicollinearity
+
+
+Multicollinearity indicates that some of the explanatory variables are correlated and unusual things may happen in the regression model. Here we will discuss one problem that can occur when variables are correlated.
+
+
+### Regressing dollar amount on coins
+
+
+```{r eval=TRUE, echo=TRUE}
+head(change)
+```
+
+
+Consider the following dataset. Each row represents change in an individual's pocked. The information includes the breakdown of which coins as well as the total monetary amount of the coins. The coins column gives the total number of coins in the pocket, and the small column gives the total number of pennies, nickels and dimes. We've shown the first 6 rows of the dataset, corresponding to the amount of change in six different individual's pockets. Although not a random sample, these data were collected by Jeff Witmer at Oberlin College.
+
+
+
+### Amount vs. coins - plot
+
+
+```{r}
+ggplot(data=change, aes(x=Coins, y=Amount)) + 
+  geom_point()
+
+```
+
+The scatterplot on total amount of money versus total number of coins indicates that the amount of money seems to be linearly related to the number of coins.
+
+
+
+### Amount vs. coins - linear model
+
+
+```{r eval=FALSE, echo=TRUE}
+lm(Amount ~ Coins, data = change) %>% tidy()
+#          term estimate std.error statistic  p.value
+# 1 (Intercept)   0.1449    0.0902      1.61 1.13e-01
+# 2       Coins   0.0945    0.0063     14.99 6.01e-22
+```
+
+
+Indeed, the slope coefficient is quite statistically significant with a p-value of 6 times 10 to the negative 22.
+
+
+### Amount vs. small coins - plot
+
+```{r}
+ggplot(data=change, aes(x=Small, y=Amount)) + 
+  geom_point()
+```
+
+
+Additionally, the amount of money also seems to be linearly related to the number of small coins (here the x-axis represents the number of pennies, nickels and dimes in each individual's pocket).
+
+
+### Amount vs. small coins - linear model
+
+
+```{r echo=TRUE, eval=FALSE}
+lm(Amount ~ Small, data = change) %>% tidy()
+#          term estimate std.error statistic  p.value
+# 1 (Intercept)   0.4225    0.1244      3.40 1.22e-03
+# 2       Small   0.0989    0.0118      8.38 1.10e-11
+```
+
+
+The liner model on the number of small coins reinforces the previous plot with a positive and statistically significant slope coefficient.
+
+
+
+### Amount vs. coins and small coins
+
+
+
+$\hat{\text{Amount}} = -0.00554 + 0.25862 \cdot \text{Coins} - 0.21611 \cdot \text{Small Coins}$
+
+```{r echo=TRUE, eval=FALSE}
+lm(Amount ~ Coins + Small, data = change) %>% tidy()
+#          term estimate std.error statistic  p.value
+# 1 (Intercept) -0.00554   0.02735    -0.202 8.40e-01
+# 2       Coins  0.25862   0.00682    37.917 3.95e-43
+# 3       Small -0.21611   0.00864   -25.021 4.17e-33
+```
+
+
+
+However, when both the number of coins and the number of small coins are entered into the model, the coefficient associated with the number of small coins becomes NEGATIVE!  that is because with multiple variables in the model, each coefficient is interpreted while holding all of the other variables constant.
+
+Let's say we know that an individual has 10 coins in her pocket. The predicted amount of money is much lower if we know that 9 of the coins are small as compared to knowing that only 1 of them is small. That is, the more small coins she has out of 10, the LOWER we will predict her amount to be.
+
+The number of coins and number of small coins are highly correlated, which is why the model presents a surprising sign on the small coin coefficient. When variables are correlated, interpreting the coefficients can sometimes be difficult, and we call this a problem of multicollinearity.
+
+### LA Homes, multicollinearity (1)
+
+Let's practice interpreting models when the variables are correlated.
+
+In the next series of exercises, you will investigate how to interpret the sign (positive or negative) of the slope coefficient as well as the significance of the variables (p-value). You will continue to use the log transformed variables so that the technical conditions hold, but you will not be concerned here with the value of the coefficient.
+
+
+- Run a linear regression on log `price` versus log `sqft` for the `LAhomes` dataset, then tidy the output.
+- Look at the output. Is the relationship is positive or negative? Is relationship is significant?
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(LAhomes, aes(sqft, price)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+
+```{r ex52, exercise=TRUE}
+# Output the tidy model
+
+```
+
+
+```{r ex52-hint}
+Call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
+```
+
+```{r ex52-solution}
+# Output the tidy model
+lm(log(price) ~ log(sqft), data = LAhomes) %>% tidy()
+```
+
+
+
+
+### LA Homes, multicollinearity (2)
+
+
+
+Repeat the previous exercise, but this time regress the log transformed variable `price` on the new variable `bath` which records the number of bathrooms in a home.
+
+
+- Run a linear regression on log `price` versus log `bath` for the `LAhomes` dataset, then tidy the output.
+- Look at the output. Is the relationship is positive or negative? Is relationship is significant?
+
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+ggplot(LAhomes, aes(bath, price)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+
+```{r ex53, exercise=TRUE}
+# Output the tidy model
+
+```
+
+
+```{r ex53-hint}
+Call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
+```
+
+```{r ex53-solution}
+# Output the tidy model
+lm(log(price) ~ log(bath), data = LAhomes) %>% tidy()
+```
+
+
+
+
+### LA Homes, multicollinearity (3)
+
+
+Now, regress the log transformed variable `price` on the log transformed variables `sqft` AND `bath`. The model is a three dimensional linear regression model where you are predicting `price` as a plane (think of a piece of paper) above the axes including both `sqft` and `bath`.
+
+
+- Run a `tidy` `lm` on the log transformed variables `price` and both of `sqft` and `bath` from the dataset `LAhomes`. Use the formula: `log(price) ~ log(sqft) + log(bath)`.
+- Now look at the coefficients separately. What happened to the signs of each of the coefficients?  What happened to the significance of each of the coefficients?
+
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+ggpairs(LAhomes, columns = c("price", "sqft", "bath"))
+```
+
+
+```{r ex54, exercise=TRUE}
+# Output the tidy model
+
+```
+
+
+```{r ex54-hint}
+- Call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
+- In the formula, separate each of the explanatory variables with a plus.
+```
+
+```{r ex54-solution}
+# Output the tidy model
+lm(log(price) ~ log(sqft) + log(bath), data = LAhomes) %>% tidy()
+```
+
+## Multiple linear regression
+
+You have seen multiple linear regression in previous tutorials. And throughout this course, we have discussed inference in the simple linear model. Next we bring together those ideas by walking through the interpretation of the inference analysis on the multiple regression model.
+
+### Bathrooms negative coefficient
+
+```{r echo=TRUE}
+lm(log(price) ~  log(bath), data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)    12.23    0.0280     437.2  0.00e+00
+# 2   log(bath)     1.43    0.0306      46.6 9.66e-300
+
+
+lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)    2.514    0.2619     9.601  2.96e-21
+# 2   log(sqft)    1.471    0.0395    37.221 1.19e-218
+# 3   log(bath)   -0.039    0.0453    -0.862  3.89e-01
+```
+
+
+Recall from the previous exercise that - somewhat unexpectedly - the coefficient associated with number of bathrooms went from having a positive relationship with home price in the single variable model to having a negative relationship with home price when the size of the home was also included in the model.
+
+The reason for the switch in sign for the coefficients is similar to the example we saw with the coins. Here, for a house that has a given square feet, more bathrooms means that less of the square footage is used for bedrooms and other usable space (thus reflecting a lower average home price).
+
+
+### Bathrooms non-significant coefficient
+
+
+```{r echo=TRUE}
+lm(log(price) ~  log(bath), data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)    12.23    0.0280     437.2  0.00e+00
+# 2   log(bath)     1.43    0.0306      46.6 9.66e-300
+
+
+lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)    2.514    0.2619     9.601  2.96e-21
+# 2   log(sqft)    1.471    0.0395    37.221 1.19e-218
+# 3   log(bath)   -0.039    0.0453    -0.862  3.89e-01
+```
+
+(make p-values red)
+
+Notice also that the coefficient on bathrooms is not significant (and it was significant in the model containing only bathrooms).
+
+The significance changes because the hypothesis changes. In the first model on bathrooms only, the p-value describes the probability of the data if there is no relationship between bathrooms and price.
+
+In the second model, the p-value on bathrooms describes the probability of the data if there is no relationship between bathrooms and price GIVEN THAT SQFT IS IN THE MODEL. 
+
+We interpret the last p-value in the second model as information that the bathrooms variable is not needed if square feet is used in the linear model.
+
+
+
+### Price on bed and bath
+
+
+```{r echo=TRUE}
+lm(log(price) ~ log(bath) + bed, data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)   11.965    0.0384    311.67  0.00e+00
+# 2   log(bath)    1.076    0.0465     23.14 2.38e-102
+# 3         bed    0.189    0.0193      9.82  4.01e-22
+```
+
+
+Notice, that when we regress the log price of the homes on bath and bed (without square feet), both variables are significant.  That is, GIVEN BATH IS IN THE MODEL, THE NUMBER OF BEDROOMS IS A SIGNIFICANT PREDICTOR OF PRICE.
+
+Similarly, GIVEN THE NUMBER OF BEDROOMS IS IN THE MODEL, THE NUMBER OF BATHROOMS IS A SIGNIFICANT PREDICTOR OF PRICE.
+
+
+### Large model on price
+
+
+```{r echo=TRUE}
+lm(log(price) ~ log(sqft) + log(bath) + bed, data=LAhomes) %>% tidy()
+#          term estimate std.error statistic   p.value
+# 1 (Intercept)   1.5364    0.2894     5.310  1.25e-07
+# 2   log(sqft)   1.6456    0.0454    36.215 6.27e-210
+# 3   log(bath)   0.0165    0.0452     0.365  7.15e-01
+# 4         bed  -0.1236    0.0167    -7.411  2.03e-13
+```
+
+
+As we saw before, now each p-value is interpreted given ALL THE REMAINING VARIABLES. As we expect, bathrooms is not significant given square feet and bedrooms are in the model. 
+
+However, both other variables are significant predictors of log-price. That is, the number of bedrooms is a significant predictor of price, even when square feet and bathrooms are in the model.
+
+Square feet is a significant predictor of log price even when the number of bathrooms and bedrooms are in the model.
+
+###  
+
+We've only used the mathematical model to address significance in the multiple linear regression setting. That's because the permutation test is much harder to implement when working with multiple variables, and it is beyond the scope of this class. And now it's your turn to try some examples.
+
+### Inference on coefficients
+
+
+Using the NYC Italian restaurants dataset (compiled by Simon Sheather in *A Modern Approach to Regression with R*), `restNYC`, you will investigate the effect on the significance of the coefficients when there are multiple variables in the model. Recall, the p-value associated with any coefficient is the probability of the observed data given that the particular variable is independent of the response AND given that **all other variables are included in the model**.
+
+The following information relates to the dataset `restNYC` which is loaded into your workspace:
+- each row represents one customer survey from Italian restaurants in NYC
+- Price = price (in US$) of dinner (including tip and one drink)
+- Service = rating of the service (from 1 to 30)
+- Food = rating of the food (from 1 to 30)
+- Decor =  rating fo the decor (from 1 to 30)
+
+
+- Run a `tidy` `lm` regressing `Price` on `Service`.
+- Run a `tidy` `lm` regressing `Price` on `Service`, `Food`, and `Decor`.
+- What happened to the significance of `Service` when additional variables were added to the model?
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+ggpairs(restNYC, columns = c("Price", "Service", "Food", "Decor"))
+```
+
+
+
+```{r ex55, exercise=TRUE}
+# Output the first model
+
+
+# Output the second model
+
+```
+
+
+```{r ex55-hint}
+- Each time call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
+- In the formula, separate each of the explanatory variables with a plus.
+```
+
+
+```{r ex55-solution}
+# Output the first model
+lm(Price ~ Service, data = restNYC) %>% tidy()
+
+# Output the second model
+lm(Price ~ Service + Food + Decor, data = restNYC) %>% tidy()
+```
+
+
+
+### Interpreting coefficients
+
+
+What is the correct interpretation of the coefficient on `Service` in the linear model which regresses `Price` on `Service`, `Food`, and `Decor`?
+
+
+You will need to run the linear model before answering the question:
+`lm(Price ~ Service + Food + Decor, data=restNYC) %>% tidy()`
+
+
+```{r ex56, exercise=TRUE}
+
+```
+
+```{r ex56-hint}
+You have to consider the interpretation of a single variable while holding the other variables constant.
+```
+
+
+```{r ex56-solution}
+- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135.
+- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, given fixed values of `Food` and `Decor`.
+- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, for any possible value of `Food` and `Decor`.
+- Given that `Food` and `Decor` are in the model, `Service` is not significant, and we cannot know whether it has effect on modeling `Price`.
+```
+
+
+
+
+## Summary
+
+You've made it to the end of the tutorial! Let's summarize what you've learned.
+
+### Linear regression as model
+
+* it estimates an underlying population model 
+* it might be linear or might need variable transformations 
+* all of LINE conditions should be checked
+* other variable relationships should be carefully considered 
+
+As seen in other courses, linear regression is a modeling technique. And the model you estimate is one that describes a population. To have confidence in your estimate, the technical conditions need to be checked, and any other variable relationships that might impact your conclusions should also be considered.
+
+### Linear regression as an inferential technique
+
+* hypothesis testing using a mathematical model (t-tests)
+* hypothesis testing using randomization tests
+* confidence intervals using a mathematical model
+* confidence intervals using bootstrapping
+
+As with the other inferential methods covered in this course sequence, the inferential analysis of a linear model can be approached as a hypothesis test or a confidence interval. The mathematical model provides one framework for the analysis and computational modeling (that is, randomization tests and bootstrapping) give an alternative way of producing inferential analyses.
+
+All are valid methods to use, and you should feel comfortable at this point using all of them.
+
+## Congratulations!
+
+You have successfully completed Lesson 5 in Tutorial 8: Inference for Regression. 
+
+We hope you've had fun with inference on linear models and working through the examples.
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 8: Inference for Regression](https://openintrostat.github.io/ims-tutorials/08-inference-for-regression/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 1: Inference in regression](https://openintro.shinyapps.io/ims-08-inference-for-regression-01/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 2: Randomization test for slope](https://openintro.shinyapps.io/ims-08-inference-for-regression-02/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 3: t-test for slope](https://openintro.shinyapps.io/ims-08-inference-for-regression-03/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 4: Checking technical conditions for slope inference](https://openintro.shinyapps.io/ims-08-inference-for-regression-04/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-08-inference-for-regression-05/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)

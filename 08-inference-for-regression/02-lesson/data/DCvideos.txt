@@ -1,0 +1,113 @@
+Chapter1
+
+Video1: 
+## Variability in regression lines
+
+Introduction to the idea that lines vary from sample to sample, do both null and alternative scenarios, show plots of lines varying as well as histograms of the sampling distribution  (xbox ebay auctions: http://www.modelingonlineauctions.com/datasets ?  (bidrate vs bidtime? winner only?  or for only one item?  something about number of bids?)
+
+
+Video4:
+## Research question
+
+discussion of what kinds of questions we can ask (one vs two-sided), look at output --> including pointing out the estimates, SE, p-value
+
+next MC question uses #hrs studied & score on exam... then rail trails
+
+Video7:
+## Variability of coefficients
+
+reminder of the example, demonstration of sampling from a population with a variety of changes
+
+
+Chapter2
+Video1:
+## Simulation-based Inference
+
+if there is absolutely no  association between x and y, we can assume that the values were arbitrarily connected.  ideas of simulation distribution.  technical conditions (L and I)  (One data set that I really love for regression inference is Cyril Burt's IQ and twins data. It also has a nice postscript regarding fake data and scientific fraud.  https://andrewpbray.github.io/math-141-2016-fall/assets/week-12/simple_linear_regression_ii.html)
+
+Video6:
+## Simulation-based CI for slope
+
+Bootstrap ideas of sampling rows and creating the sampling distribution of the slope
+
+
+Chapter3
+Video1:
+## Mathematical approximation
+
+Approximating the simulation inference using the t-distribution.  Overlay t-distribution on the sampling distribution for the t-stat (or b1???).  Note the N and E technical conditions.
+
+
+Video7:
+## Intervals in regression
+
+Explicitly differentiating between CI for slope, CI for average response, and Prediction Interval for individual response
+
+Video10:
+## Different types of Intervals
+
+Throughout the different introductory courses, you have repeatedly seen confidence intervals which attempt to capture the true population parameter of interest.  In this case, beta1.  But now, we'll talk about intervals that capture the true mean response (which is also a parameter, actually) and also the predicted response.
+
+Add a video or 2 in chp 3 to break up the 5 coding exercises  (no more than 4 in a row)
+
+
+Chapter4
+Video1:
+## Technical conditions for linear regression
+
+LINE conditions and *why* we need them  (also info about residuals)  (see Amelia's post:  http://www.science.smith.edu/~amcnamara/sds291/labs/lab_residuals.html)
+
+
+Video7:
+## Effect of an outlier
+
+Note the extremely large outlier(s) in the i1 variable.  How does it affect the model and the inference?  when is it okay to remove the observation? (based on x but not based on y!!)
+
+
+Video11:
+## Moving forward when model assumptions are violated
+
+Lots of examples on violations, fixes, what the model becomes (e.g., w quadratic or log).   Note, transformations won't fix non-independence, but see courses on time series (random effects!) for one method of dealing with correlated data
+
+
+
+
+Chapter5
+Video1:
+## Inference on transformed variables
+
+How are the coefficients interpreted after the variable has been transformed? (If it's log(y) ~ log(x), then you have the '% change in y for each 1% change in x' interpretation... or: 'Once we get into transformations of the x and y, the linear 'unit increase' interpretation doesn't work: the relationship is now non-linear. However, the direction of the relationship is still interpretable: as x goes up, y goes up.')
+
+
+In the video, I'll use the housing data to show plots of logged and unlogged data (price vs sqft).  Can talk about the regression model being more / less appropriate...  and how we interpret the model in new units.  Also say something about the percent change but being beyond the scope of this class.
+
+In the exercises, price is the response and sqft is the explanatory (with bath at the end).
+
+
+Video4:
+## Multicollinearity
+
+Inference in the situation when two variables are highly correlated.  Use the LA houses example.
+
+
+Video8:
+## Multiple linear regression
+
+reflect on the LA homes so that they know why bathrooms became negative.
+
+what is the null model?  p-value means 'if everything else is in the model', even estimates are dependent on the other variables (Italian Restaurants)
+
+
+Italian restaurants:  price is response, I use service, food, and decor to talk about interpreting coefficients.
+
+Video11:
+## Summary
+
+Discussion of how linear regression is a modeling techniques (as seen in other chapters), but the "model" is still an estimate which describes a population.  As with numerical and categorical data, the ideas of inference apply equally to the linear model.
+
+
+
+
+
+
+

@@ -1,0 +1,1099 @@
+---
+title: "Lesson 1 - Inference for Linear Regression in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(openintro)
+library(broom)
+library(knitr)
+library(tidyverse)
+library(MASS)
+library(infer)
+library(mosaicData)
+library(emo)
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+starbucks <- read_delim("data/starbucks.txt", 
+                        "\t", 
+                        escape_double = FALSE, 
+                        trim_ws = TRUE)
+
+set.seed(4747)
+starbucks2 <- starbucks %>% 
+  sample_n(size=20) 
+starbucks3 <- starbucks %>%
+  sample_n(size=20)
+starbucks_many <- starbucks %>%
+  rep_sample_n(size = 20, replace = FALSE, reps = 50)
+
+ride_lm <- lm(volume ~ hightemp, data=RailTrail)
+
+set.seed(4747)
+railtrail_n10 <- RailTrail %>%
+  rep_sample_n(size=10, replace=FALSE, reps=50)
+railtrail_n50 <- RailTrail %>%
+  rep_sample_n(size=50, replace=FALSE, reps=50)
+
+railtrail_tight <- augment(ride_lm) %>%
+  mutate(resid2 = .resid/3) %>%
+  mutate(volume_tight = .fitted + resid2)
+
+set.seed(4747)
+railtrail_n50_tight <- railtrail_tight %>%
+  rep_sample_n(size = 50, replace = FALSE, reps = 50)
+
+railtrail_n50_lessx <- RailTrail %>%
+  filter(hightemp < 85) %>%
+  filter(hightemp > 55) %>%
+  rep_sample_n(size=50, replace=FALSE, reps=50)
+```
+
+
+## Welcome 
+
+Welcome to Inference for Linear Regression. We are assuming that you've already worked through the first few tutorials in this series.
+
+## Variability in regression lines
+
+
+### In this tutorial you will
+
+- Make inferential claims about models. 
+- Use least squares estimation.
+- Create confidence intervals for the slope. 
+
+In this tutorial, you will be building on your previous work to now make inferential (instead of descriptive) claims based on linear models.  In particular, we will use the least squares regression line to test whether or not there is a relationship between two continuous variables.  And we will also estimate confidence intervals which quantify the slope of the linear regression line.
+
+
+### Fat & calories: data
+
+
+
+```{r echo = FALSE}
+starbucks %>% 
+  ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") 
+```
+
+We will be working primarily with two continuous variables.  Consider the scatterplot here, fat and calories are plotted for a handful of items on the Starbucks menu.
+
+
+### Fat & calories: linear model
+
+```{r echo = FALSE}
+starbucks %>% 
+  ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") +
+  geom_smooth(method="lm", se=FALSE)
+```
+
+As you did in previous tutorials, the least squares regression line is fit to the sample of observations.  It seems like fat and calories have a reasonably strong positive linear association.
+
+### Fat & calories: sample 1 (n=20)
+
+
+```{r echo = FALSE}
+ggplot(starbucks2, aes(x=Fat, y=Calories)) + geom_point() + 
+  ggtitle("Fat vs. Calories for Starbucks Food Items") + 
+  geom_smooth(method="lm", se=FALSE)
+```
+
+
+A subset of size 20 items shows a similar positive trend between fat and calories, despite having fewer observations on the plot.
+
+
+
+### Fat & calories: sample 2 (n=20)
+
+
+```{r echo = FALSE}
+ggplot(starbucks2, aes(x=Fat, y=Calories)) + geom_point() + 
+  ggtitle("Fat vs. Calories for Starbucks Food Items") + 
+  geom_smooth(method="lm", se=FALSE)
+```
+
+
+Indeed, a second sample of size 20 also shows a positive linear trend.
+
+
+### Fat & calories: samples 1 and 2
+
+```{r echo = FALSE}
+ggplot(starbucks2, aes(x=Fat, y=Calories)) + geom_point(color="#569BBD") + 
+  ggtitle("Fat vs. Calories for Starbucks Food Items") + 
+  geom_smooth(method="lm", se=FALSE, color="#569BBD") + 
+  geom_point(data=starbucks3, color="#F05133") +
+  geom_smooth(data=starbucks3, method="lm", se=FALSE, color="#F05133")
+```
+
+When the two samples are plotted on the same figure, we see that the least squares regression lines are not identical.  That is, there is variability in the regression line from sample to sample.  The concept of sampling variability is something you've seen before, but in this lesson, you will focus on the variability of the line instead of the variability of a single statistic.
+
+### Sampling variability
+
+
+
+- Variability in the regression line 
+
+
+That is, there is variability in the regression line from sample to sample.  The concept of the sampling variability is something you've seen before, but in this lesson, you will focus on the variability of the line instead of the variability of a single statistic.
+
+
+
+### Fat & calories: many samples
+
+```{r echo = FALSE}
+ggplot(starbucks_many, aes(x=Fat, y=Calories, group=replicate)) + 
+  geom_point() + 
+  ggtitle("Fat vs. Calories for Starbucks Food Items") + 
+  geom_smooth(method="lm", se=FALSE)
+```  
+
+Indeed, when we take repeated samples of size 20 (here we took 50 different samples), every single line is different.  Notice that the `rep_sample_n` command let us take many samples of size 20 and ggplot fit the linear model separately for each of those samples.
+
+
+
+### Fat & calories: sampling distribution of slopes
+
+
+```{r echo = FALSE}
+starbucks_many_lm <- starbucks_many %>% 
+  group_by(replicate) %>% 
+  do(tidy(lm(Calories ~ Fat, data=.))) %>%
+  filter(term=="Fat")
+
+ggplot(starbucks_many_lm, aes(x=estimate)) + geom_density() +
+  xlim(5,20)
+```
+
+We can characterize the sampling distribution of the slopes by making a density plot (a smoothed histogram) showing the variability associated with the different slopes.
+
+
+### Interpret the density plot
+
+
+- Slopes between 8 and 17
+- None close to zero 
+- Strong evidence the association is positive
+
+
+
+
+We can characterize the sampling distribution of the slopes by making a density plot (a smoothed histogram) showing the variability associated with the different slopes.  The R code uses the `tidy` function in the **broom** package to pull out the slope coefficient for each of the separate models.  Using ggplot, we can plot the different slope estimates.
+
+We can see that the slopes vary from about 8 to about 17.  In no sample did the slope come anywhere close to zero.  that is, there is a lot of evidence that the relationship between fat and calories is positive.
+
+
+We can see that the slopes vary from about 9 to about 16.  In no sample did the slope come anywhere close to zero.  that is, there is a lot of evidence that the relationship between fat and calories is positive.
+
+
+
+### Fat & carbohydrates: many samples
+
+
+
+```{r echo = TRUE}
+ggplot(starbucks_many, aes(x=Fat, y=Carbs, group=replicate)) + geom_point() + 
+  ggtitle("Fat vs. Carbohydrates for Starbucks Food Items") + 
+  geom_smooth(method="lm", se=FALSE)
+```
+
+The same analysis can be done with different variables.  Here, consider fat and carbohydrates.  Again, for each of 50 samples of size 20, a different regression line (and different slope) is calculated.
+
+
+
+### Fat & carbohydrates: sampling distribution of slopes
+
+```{r echo = FALSE}
+starbucks_many_lm <- starbucks_many %>% 
+  group_by(replicate) %>% 
+  do(tidy(lm(Carbs ~ Fat, data=.))) %>%
+  filter(term=="Fat")
+
+ggplot(starbucks_many_lm, aes(x=estimate)) + geom_density() +
+  xlim(-1,2)
+```
+
+
+Unlike the relationship between fat & calories, however, some of the sample slopes describing fat & carbohydrates WERE close to zero (or even negative!).  Although the relationship is possibly positive, we are unable to make conclusions about fat and carbohydrates due to the large amount of sampling variability.
+
+
+
+### Interpreting the density plot
+
+
+- Some slopes close to zero
+- High variability 
+- We can't make any conclusions 
+
+
+
+The high sampling variability makes it impossible to make conclusions about the relationship between fat and carbohydrates.  Although the relationship is possibly positive, we are unable to make conclusions due to the large amount of sampling variability.
+
+
+
+### Time for some practice
+
+First you'll review how to run the linear model using the **broom** package, then you'll investigate how the lines change from sample to sample. 
+
+### Regression output: example I
+
+The following code provides two equivalent methods for calculating the most important pieces of the linear model output.  Recall that the p-value is the probability of the observed data (or more extreme) given the null hypothesis is true.  As with inference in other settings, you will need the sampling distribution for the statistic (here the slope) assuming the null hypothesis is true.  You will generate the null sampling distribution in later lessons, but for now, assume that the null sampling distribution is correct.   Additionally, notice that the standard error of the slope and intercept estimates describe the variability of those estimates.
+
+- Load the **mosaicData** package and load the `RailTrail` data. The `RailTrail` data contains information about the number of users of a trail in Florence, MA and the weather for each day.
+- Using the `lm()` function, run a linear model regressing the `volume` of riders on the `hightemp` for the day.  Assign the output of the `lm()` function to the object `ride_lm`.
+- Use the `summary()` function on the linear model output to see the inferential analysis (including the p-value for the slope).
+- Additionally, `tidy()` the linear model output to make it easier to use later.
+
+```{r ex, exercise=TRUE}
+# Fit a linear model
+ride_lm <- ___
+
+# View the summary of your model
+___
+
+# Print the tidy model output
+___
+```
+
+
+
+```{r ex-hint}
+- `lm()` takes a formula of the form `response_variable ~ explanatory_variable`, followed by the dataset.
+- `summary()` and `tidy()` both take the model object as their only input.
+```
+
+
+```{r ex-solution}
+# Fit a linear model
+ride_lm <- lm(volume ~ hightemp, data=RailTrail)
+
+# View the summary of your model
+summary(ride_lm)
+
+# Print the tidy model output
+tidy(ride_lm)
+```
+
+
+
+### First random sample, second random sample
+
+
+Now, you will dive in to understanding how linear models vary from sample to sample.  Here two random samples from a population are plotted onto the scatterplot.  The population data (called `popdata`) already exists and is pre-loaded, along with `ggplot` and **dplyr**.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+popdata <- data.frame(explanatory,response)
+```
+
+
+
+
+- Using the whole dataset, `popdata`, plot `response` vs. `explanatory`.
+- Add a point layer using `geom_point()`.
+- Add a smooth trend layer using `geom_smooth()`, with the linear regression method, `"lm"`, and no standard error ribbon, `se = FALSE`.
+
+
+
+
+```{r ex11, exercise=TRUE}
+# Using popdata, plot response vs. explanatory
+ggplot(___, aes(x = ___, y = ___)) + 
+  # Add a point layer
+  ___() + 
+  # Add a smooth trend layer, using lin. reg., no ribbon
+  ___(method = "___", se = ___) 
+```
+
+
+```{r ex11-hint}
+- Set the `data` argument of `ggplot()` to `popdata`. Inside `aes()`, map `x` to `explanatory` and `y` to `response`.
+- After the first plus, call `geom_point()` without arguments.
+- After the second plus, call `geom_smooth()`, setting `method` to `"lm"` and `se` to `FALSE`.
+```
+
+```{r ex11-solution}
+# Using popdata, plot response vs. explanatory
+ggplot(popdata, aes(x = explanatory, y = response)) + 
+  # Add a point layer
+  geom_point() + 
+  # Add a smooth trend layer, using lin. reg., no ribbon
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+
+
+
+
+
+- Using `sample_n()` from **dplyr**, randomly sample `50` rows of `popdata` without replacement.  Note that the function `sample_n` takes a random sample of observations (of the designated `size`) from the dataframe, without replacement.
+- Do the same sampling again for `sample2`.
+- Combine each random sample using `bind_rows()`. Pass it `sample1` and `sample2`, and set `.id` to `"replicate"`.
+
+
+```{r ex12, exercise=TRUE}
+# Set the random number generator seed for reproducibility
+set.seed(4747)
+
+# From popdata, randomly sample 50 rows without replacement
+sample1 <- ___ %>%
+   sample_n(size = ___)
+
+# Do the same again
+sample2 <- ___
+
+# Combine both samples
+both_samples <- ___(___, ___, .id = "___")
+
+# See the result
+glimpse(both_samples)
+```
+
+```{r ex12-hint}
+Each time, pipe `popdata` to `sample_n()`, setting `size` to `50`.
+```
+
+```{r ex12-solution}
+# Set the random number generator seed for reproducibility
+set.seed(4747)
+
+# From popdata, randomly sample 50 rows without replacement
+sample1 <- popdata %>%
+  sample_n(size = 50)
+
+# Do the same again
+sample2 <- popdata %>%
+  sample_n(size = 50)
+
+# Combine both samples
+both_samples <- bind_rows(sample1, sample2, .id = "replicate")
+
+# See the result
+glimpse(both_samples)
+```
+
+- Using `both_samples`, plot `response` vs. `explanatory`, colored by `replicate`.
+    - Add a point layer.
+    - Add a smooth trend layer using linear regression, without a standard error ribbon.
+
+```{r ex13, exercise=TRUE}
+# From previous step
+set.seed(4747)
+both_samples <- bind_rows(
+  popdata %>% sample_n(size = 50), 
+  popdata %>% sample_n(size = 50), 
+  .id = "replicate"
+)
+
+# Using both_samples, plot response vs. explanatory, colored by replicate
+___ + 
+  # Add a point layer
+  ___ + 
+  # Add a smooth trend layer, using lin. reg., no ribbon
+  ___
+```
+
+
+```{r ex13-hint}
+- Look at the code from the first step.
+- Use `both_samples` as the data argument.
+- Inside `aes()`, map `color` to `replicate`.
+```
+
+
+```{r ex13-solution}
+# From previous step
+set.seed(4747)
+both_samples <- bind_rows(
+  popdata %>% sample_n(size = 50), 
+  popdata %>% sample_n(size = 50), 
+  .id = "replicate"
+)
+
+# Using both_samples, plot response vs. explanatory, colored by replicate
+ggplot(both_samples, aes(x = explanatory, y = response, color = replicate)) + 
+  # Add a point layer, colored blue
+  geom_point() + 
+  # Add a smooth trend layer, using lin. reg., no ribbon
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+
+
+
+
+### Superimpose lines
+
+
+Building on the previous exercise, you will now repeat the sampling process 100 times in order to visualize the sampling distribution of regression lines generated by 100 different random samples of the population.
+
+Rather than repeatedly calling `sample_n()`, like you did in the previous exercise, `rep_sample_n()` from the **infer** package provides a convenient way to generate many random samples.  The function `rep_sample_n()` repeats the `sample_n()` command `reps` times.
+
+The function `do()` from **dplyr** will allow you to run the `lm` call separately for each level of a variable that has been `group_by`'ed.  Here, the group variable is the sampling replicate, so each `lm` is run on a different random sample of the data.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+popdata <- data.frame(explanatory, response)
+```
+
+
+
+
+- Pipe `popdata` to `rep_sample_n()`, setting the `size` of each sample to `50`, and generating `100` reps.
+
+
+```{r ex14, exercise=TRUE}
+# Set the seed for reproducibility
+set.seed(4747)
+
+# Repeatedly sample the population without replacement
+many_samples <- popdata %>%
+  ___
+
+# See the result
+glimpse(many_samples)
+```
+
+
+```{r ex14-hint}
+After the pipe, call `rep_sample_n()`, setting `size` to `50` and `reps` to `100`.
+```
+
+
+```{r ex14-solution}
+# Set the seed for reproducibility
+set.seed(4747)
+
+# Repeatedly sample the population without replacement
+many_samples <- popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# See the result
+glimpse(many_samples)
+```
+
+
+
+
+- Using `many_samples` (that you created in the previous step), plot `response` vs. `explanatory`, `group`ed by `replicate`.
+    - Add a point layer.
+    - Add a smooth trend layer using linear regression, without a standard error ribbon.
+
+```{r ex15, exercise=TRUE}
+# From previous step
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+
+# Using many_samples, plot response vs. explanatory, grouped by replicate
+___ + 
+  # Add a point layer
+  ___ + 
+  # Add a smooth trend line, using lin. reg., no ribbon
+  ___ 
+```
+
+
+```{r ex15-hint}
+- Set the `data` argument of `ggplot()` to `many_samples`. Inside `aes()`, map `x` to `explanatory`, `y` to `response`, and `group` to `replicate`.
+- After the first plus, call `geom_point()` without arguments.
+- After the second plus, call `geom_smooth()`, setting `method` to `"lm"` and `se` to `FALSE`.
+```
+
+```{r ex15-solution}
+# From previous step
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+
+# Using many_samples, plot response vs. explanatory, grouped by replicate
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  # Add a point layer
+  geom_point() + 
+  # Add a smooth trend line, using lin. reg., no ribbon
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+
+
+
+- Again, group `many_samples` by `replicate`.
+- For each replicate, run the model then tidy it. Inside `do()`, call `lm()` with the usual model formula: `response` vs. `explanatory`. The `data` argument is simply `.`. Pipe this to `tidy()`.
+- Filter for rows where `term` equals `"explanatory"`.
+
+
+
+```{r ex16, exercise=TRUE}
+# From previous step
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+
+many_lms <- many_samples %>% 
+  # Group by replicate
+  ___ %>% 
+  # Run the model on each replicate, then tidy it
+  do(___(___, data = ___) %>% ___) %>%
+  # Filter for rows where the term is explanatory
+  ___
+
+# See the result
+many_lms
+```
+
+
+```{r ex16-hint}
+- After the first pipe, call `group_by()`, passing `replicate`.
+- Inside `do()`, call `lm()`, setting the formula to `response ~ explanatory` and `data` to `.`, then pipe to `tidy()`, without arguments.
+- After the third pipe, call `filter()`, passing the condition `term == "explanatory"`.
+```
+
+
+
+
+```{r ex16-solution}
+# From previous step
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+
+many_lms <- many_samples %>% 
+  # Group by replicate
+  group_by(replicate) %>% 
+  # Run the model on each replicate, then tidy it
+  do(lm(response ~ explanatory, data = .) %>% tidy()) %>%
+  # Filter for rows where the term is explanatory
+  filter(term == "explanatory")
+
+# See the result
+many_lms
+```
+
+
+
+
+- Using `many_lms`, plot `estimate`.
+- Add a histogram layer using `geom_histogram()`.
+
+
+
+```{r ex17, exercise=TRUE}
+# From previous steps
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_lms <- many_samples %>% 
+  group_by(replicate) %>% 
+  do(lm(response ~ explanatory, data=.) %>% tidy()) %>%
+  filter(term == "explanatory")
+
+# Using many_lms, plot estimate
+___ +
+  # Add a histogram layer
+  ___
+```
+
+
+```{r ex17-hint}
+- Set the `data` argument of `ggplot()` to `many_lms`. Inside `aes()`, map `x` to `explanatory`.
+- After the first plus, call `geom_histogram()` without arguments.
+```
+
+```{r ex17-solution}
+# From previous steps
+set.seed(4747)
+many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_lms <- many_samples %>% 
+  group_by(replicate) %>% 
+  do(lm(response ~ explanatory, data=.) %>% tidy()) %>%
+  filter(term == "explanatory")
+
+# Using many_lms, plot estimate
+ggplot(many_lms, aes(x = estimate)) +
+  # Add a histogram layer
+  geom_histogram()
+```
+
+
+## Research question
+
+Consider a situation where you are interested in determining whether or not there is a linear model connecting protein and carbohydrates in the entire population of foods from Starbucks.  we will walk through the pieces of the linear model output, and then in the following lessons we will explore all the pieces of inference in further detail.
+
+### Protein & carbohydrates: research question
+
+
+### Consider possible research questions for the Starbucks data
+
+* Are protein and carbohydrates linearly associatedin the population?  (two-sided research question)
+* Are protein and carbohydrates linearly associated in a **positive** direction in the population?  (one-sided research question)
+
+```{r echo=TRUE}
+head(starbucks)
+```
+
+The variables in the Starbucks dataset include: calories, fat, carbohydrates, fiber, and protein.  If interest is in determining a linear relationship between two of the variables, we can approach the linear model investigation in two ways:  with a one sided or two sided hypothesis. 
+
+A two-sided research questions investigates whether the two variables are linearly associated.  A one-sided research question (in this scenario) investigates whether the two variables have a positive linear association.
+
+In order to avoid excessive false positives, the research question is always decided on before looking at the data.
+
+
+
+### Linear model output: estimates
+
+
+
+```{r echo=TRUE}
+summary(lm(Carbs ~ Protein, data = starbucks))
+```
+
+
+```{r echo=TRUE}
+lm(Carbs ~ Protein, data = starbucks) %>% tidy()
+``` 
+
+
+Note the two different (but similar) ways to output the linear model information.  recall that the estimates have been calculated using least squares optimization, the value for the slope (0.381) is exactly the same regardless of the format of the output.   
+
+
+As with the slope, the intercept (37.1) is given in the long or tidy format.
+
+
+
+### Linear model output: standard error
+
+
+```{r echo=TRUE}
+summary(lm(Carbs ~ Protein, data = starbucks))
+```
+
+
+The variability of both the intercept and the slope are given in the column called standard error.  the standard error represents how much the line varies in units associated with either the intercept (row 1) or the slope (row 2).
+
+
+
+### Linear model output: statistic
+
+```{r echo=TRUE}
+summary(lm(Carbs ~ Protein, data = starbucks))
+```
+
+In both outputs, there is a column labeled "statistic"  which combines the least squares estimate with the standard error.  the statistic is a standardized estimate, it measures the number of standard errors that the estimate is above zero.  as with the estimate and standard error columns, the intercept statistic is given in the first row (15.04) and the slope statistic is given in the second row (2.2).
+
+
+### Linear model output: p.value (two-sided)
+
+```{r echo=TRUE}
+summary(lm(Carbs ~ Protein, data = starbucks))
+```
+
+Last, the information for testing whether either the intercept or the slope is zero is given by the p-value in the last column of the output.  the default test is two-sided, and it is important to keep in mind that R doesn't know what your research question is.  for the model at hand, it is easy to reject the value of zero as a plausible value for the intercept.  That is, there is virtually no possible way for data like these to have come from a population with an intercept of zero.
+
+The slope, on the other hand, has a significant p-value of 0.03, but the p-value tells us that if there is no relationship between protein and carbs in the population, we would see data like these about 3 percent of the time.
+
+If the original research question had been one sided (that is, are protein and carbs positively associated), the p-value should be divided by two to arrive at a one sided p-value of about 0.015.  the data are substantially more significant when testing a one-sided hypothesis, although the one sided test should only happen if the original research question is one-sided.
+
+### Regression hypothesis
+
+A regression is run to investigate whether additional hours studied (the explanatory variable) is associated with a higher exam score (the response variable).  
+
+Recall that a two-sided hypothesis test answers the question "do these variables have any association?", while a one-sided test answers the question "do these variables have an association in a *specific direction*?"
+
+```{r letter-a, echo=FALSE}
+question("Should the researchers run a test with a one- or two-sided alternative hypothesis?",
+  answer("one-sided because the researchers know studying leads to higher test scores.", message="We cannot test causation, and the researchers don't know anything until they analyze the data!"),
+  answer("one-sided because the researchers are trying to demonstrate a positive association.", correct=TRUE, message="Right! If the researchers were interested in investigating whether exam scores were higher *or lower*, then they should use a two-sided alternative hypothesis."),
+  answer("two-sided because the researchers have no pre-conceived notion of whether or not studying is associated with test scores.", message="But they do have some idea of the association."),
+  answer("two-sided because the researchers don't want to perform data-snooping.", message="This isn't a bad idea in an exploratory study.  However, here the researchers are interested in a positive association."),
+  allow_retry = TRUE
+)
+```
+
+
+
+## Variability of coefficients
+
+
+In the previous example, you found the linear model output for a dataset regressing the volume of bicycle riders on the external high temperature.  As already pointed out, the variability associated with the slope is given in the output as the `std.error`.  
+
+In the next few exercises, we will investigate what parts of the model drive the variability of the sampling distribution of the slope.
+
+
+
+### RailTrails -- original data
+
+```{r echo = FALSE}
+RailTrail %>%
+  ggplot(aes(x = hightemp, y = volume)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, col = "#569BBD")
+```
+
+
+Using a dataset taken from a bike trail in Massachusetts (available in the mosaic package in R),  we've plotted the high temperature for the day and the volume of bicycle riders on the trail.
+
+The original regression of volume on high temperature shows a reasonably strong positive linear association.  However, there is likely some variability associated with the difference between the sample and the population.  The source of the sample variability is what we will investigate in the next few exercises.
+
+
+
+### RailTrails -- a change in sample size
+
+
+#### n=10
+
+
+```{r echo = FALSE}
+ggplot(data=railtrail_n10, aes(x=hightemp, y=volume, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750)+ xlim(40,100)
+```
+
+
+#### n=50
+
+
+```{r echo = FALSE}
+ggplot(data=railtrail_n50, aes(x=hightemp, y=volume, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750)+ xlim(40,100)
+
+```
+
+In the images above, we consider the RailTrail data again, but this time we've repeatedly sampled from the original data with smaller sample sizes (n=10 on the left and n=50 on the right).  We can see that with very small sample sizes like n=10 the variability of the lines is much higher than with samples of size n=50.  The original dataset has 90 observations and so is likely to be even less variable (in selecting from the population) than the image on the right.
+
+
+### RailTrails -- less variability around the line
+
+
+
+#### n=50, original data
+
+```{r echo = FALSE}
+ggplot(data=railtrail_n50, aes(x=hightemp, y=volume, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750)+ xlim(40,100)
+```
+
+#### n=50, tighter data
+
+```{r echo = FALSE}
+ggplot(data=railtrail_n50_tight, aes(x=hightemp, y=volume_tight, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750)+ xlim(40,100)
+
+```
+
+Here, the data themselves have been modified such that the "tighter" data is less variable around the line.  When samples of size 50 are taken from the tighter data, each sample is mostly representative of the same model, and so the lines vary much less than the lines given by samples from the original data.
+
+
+
+### RailTrails -- less variability in the x direction
+
+
+
+#### n=50, original data
+
+```{r echo = FALSE}
+ggplot(data=railtrail_n50, aes(x=hightemp, y=volume, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750)+ xlim(40,100)
+```
+
+
+#### n=50, less data in x-direction
+
+
+```{r echo = TRUE}
+ggplot(data=railtrail_n50_lessx, aes(x=hightemp, y=volume, group=replicate)) + geom_point() + 
+  geom_smooth(method="lm", se=FALSE, fullrange=TRUE) + ylim(125,750) + xlim(40,100)
+```
+
+
+Now the data have been modified to have fewer observations in the extreme range of the x-variable, high temperature.  That is, there are no days in the low 50s or high 80s.  The effect of a more narrow dataset is to cause the variability in the regression lines to increase.  Somewhat counter-intuitively, the variability in the slope increases as the variability in the high temperature decreases.  This is because the extreme values of high temperature no longer act as an anchor for the model.
+
+### 
+
+Next, you will work with a hypothetical population. The population will change in specific ways that demonstrate when the sampling distribution is more or less variable. 
+
+### Original population - change sample size
+
+In order to understand the sampling distribution associated with the slope coefficient, it is valuable to visualize the impact changes in the sample and population have on the slope coefficient.  Here, changing the sample size directly impacts how variable the slope is.
+
+```{r echo=FALSE}
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+popdata <- data.frame(explanatory,response)
+```
+
+- From `popdata`, take random samples of `size` `50`, replicated `100` times.
+- Using `many_samples`, plot `response` vs. `explanatory`, `group`ed by `replicate`.
+  - Add a point layer.
+  - Add a smooth trend layer using linear regression, without a standard error ribbon.
+
+```{r ex17-s, exercise=TRUE}
+set.seed(4747)
+
+# Generate 100 random samples of size 50
+many_samples <- ___
+
+# Using many_samples, plot response vs. explanatory, grouped by replicate
+___ + 
+  # Add a point layer
+  ___ + 
+  # Add a smooth  trend layer, using lin. reg., no ribbon 
+  ___
+```
+
+
+
+```{r ex17-s-hint}
+- Call `rep_sample_n()`, passing `popdata`, and setting `size` to `50` and `reps` to `100`.
+- Call `ggplot()`, mapping `x` to `explanatory`, `y` to `response`, and `group` to `replicate`.
+- Add `geom_point()`.
+- Add `geom_smooth()`, setting `method` to `"lm"` and `se` to `FALSE`.
+```
+
+
+```{r ex17-s-solution}
+set.seed(4747)
+
+# Generate 100 random samples of size 50
+many_samples <- popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Using many_samples, plot response vs. explanatory, grouped by replicate
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  # Add a point layer
+  geom_point() + 
+  # Add a smooth  trend layer, using lin. reg., no ribbon 
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+
+
+Edit the code for many samples to reduce the `size` from `50` to `10`.
+
+
+```{r ex18, exercise=TRUE}
+set.seed(4747)
+
+# Edit the code to take samples of size 10
+many_samples <- popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Draw the plot again; how is it different?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+
+```{r ex18-hint}
+In the call to `rep_sample_n()`, change `size` from `50` to `10`.
+```
+
+
+```{r ex18-solution}
+set.seed(4747)
+
+# Edit the code to take samples of size 10
+many_samples <- popdata %>%
+  rep_sample_n(size = 10, reps = 100)
+
+# Draw the plot again; how is it different?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+### Hypothetical population - less variability around the line
+
+
+
+In order to understand the sampling distribution associated with the slope coefficient, it is valuable to visualize the impact changes in the sample and population have on the slope coefficient.  Here, reducing the variance associated with the *response* variable around the line changes the variability associated with the slope statistics.
+
+
+- Look at the plot that has been drawn for you.
+- Swap `popdata` for `new_popdata` in the sampling code, and redraw the plot.
+- Look at the new plot. How is it different?
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+popdata <- data.frame(explanatory,response)
+
+manysamples <- popdata %>%
+rep_sample_n(size=50, reps=100)
+
+ggplot(manysamples, aes(x=explanatory, y=response, group=replicate)) + 
+  geom_point() + 
+  geom_smooth(method="lm", se=FALSE) 
+
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,5)
+new_popdata <- data.frame(explanatory,response)
+
+```
+
+
+```{r ex19, exercise=TRUE}
+# Update the sampling to use new_popdata
+many_samples <- popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Rerun the plot; how does it change?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+```{r ex19-hint}
+Just replace `popdata` with `new_popdata` and look at how the plots change.
+
+```
+
+
+```{r ex19-solution}
+# Update the sampling to use new_popdata
+many_samples <- new_popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Rerun the plot; how does it change?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) 
+```
+
+
+
+
+### Hypothetical population - less variability in x direction
+
+
+In order to understand the sampling distribution associated with the slope coefficient, it is valuable to visualize the impact changes in the sample and population have on the slope coefficient.  Here, reducing the variance associated with the *explanatory* variable around the line changes the variability associated with the slope statistics.
+
+
+- Look at the plot that has been drawn for you.
+- Swap `popdata` for `even_newer_popdata` in the sampling code, and redraw the plot.
+- Set the x-axis limits from -17 to 17 (so they are the same as before).
+- Look at the new plot. How is it different?
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 5)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+popdata <- data.frame(explanatory,response)
+
+manysamples <- popdata %>%
+rep_sample_n(size=50, reps=100)
+
+ggplot(manysamples, aes(x=explanatory, y=response, group=replicate)) + 
+geom_point() + xlim(-17,17) + 
+geom_smooth(method="lm", se=FALSE) 
+
+set.seed(4747)
+explanatory <- rnorm(1000, 0, 2)
+response <- 40 + explanatory*2 + rnorm(1000,0,10)
+even_newer_popdata <- data.frame(explanatory,response)
+```
+
+
+```{r ex110, exercise=TRUE}
+# Update the sampling to use even_newer_popdata
+many_samples <- popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Update and rerun the plot; how does it change?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  # Set the x-axis limit from -17 to 17
+  ___
+```
+
+
+```{r ex110-hint}
+- Replace `popdata` with `even_newer_popdata`.
+- Call `xlim()`, passing `-17` and `17`.
+
+```
+
+
+```{r ex110-solution}
+# Take 100 samples of size 50
+many_samples <- even_newer_popdata %>%
+  rep_sample_n(size = 50, reps = 100)
+
+# Update and rerun the plot; how does it change?
+ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  # Set the x-axis limit from -17 to 17
+  xlim(-17,17)
+```
+
+
+
+
+### What changes the variability of the coefficients?
+
+
+
+The last three exercises have demonstrated how the variability in the slope coefficient can change based on changes to the population and the sample.  Which of the following combinations *increases* the variability in the sampling distribution of the slope coefficient?
+
+
+```{r 111, exercise=TRUE}
+
+```
+
+
+
+```{r 111-hint}
+Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient.
+```
+
+
+```{r 111-solution}
+- Bigger sample size, larger variability around the line, increased range of explanatory variable.
+- Bigger sample size, larger variability around the line, decreased range of explanatory variable.
+- Smaller sample size, smaller variability around the line, increased range of explanatory variable.
+- Smaller sample size, larger variability around the line, decreased range of explanatory variable.
+- Smaller sample size, smaller variability around the line, decreased range of explanatory variable.
+```
+
+
+## Congratulations!
+
+You have successfully completed Lesson 1 in Tutorial 8: Inference for Regression.  
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 8: Inference for Regression](https://openintrostat.github.io/ims-tutorials/08-inference-for-regression/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 1: Inference in regression](https://openintro.shinyapps.io/ims-08-inference-for-regression-01/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 2: Randomization test for slope](https://openintro.shinyapps.io/ims-08-inference-for-regression-02/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 3: t-test for slope](https://openintro.shinyapps.io/ims-08-inference-for-regression-03/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 4: Checking technical conditions for slope inference](https://openintro.shinyapps.io/ims-08-inference-for-regression-04/)
+
+`r emo::ji("one")` [Tutorial 8 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-08-inference-for-regression-05/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)

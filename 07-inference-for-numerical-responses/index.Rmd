@@ -1,0 +1,53 @@
+---
+title: "Inference for numerical responses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<img style="float: right; margin: 0px 0px 20px 20px" src="../logo/openintro-hex.png" alt="Tutorial illustration" width="250" height="300">
+
+## Tutorial description
+
+This tutorial builds on statistical inference ideas we've learned about so far and applies them to situations where the response variable for our analysis is a numerical variable. 
+In this tutorial we will learn how to conduct statistical inference in such scenarios using both simulation based methods as well as methods based on the central limit theorem.  
+We will encounter several new point estimates and a couple new distributions. 
+In each case, the inference ideas remain the same: determine which point estimate or test statistic is useful, identify an appropriate distribution for the point estimate or test statistic, and apply the ideas of inference.
+
+## Learning objectives
+
+* Construct a confidence interval for a median using bootstrapping.
+* Construct a confidence interval for a mean using both bootstrapping and the t-distribution. 
+* Construct a confidence interval for the difference between two means using both bootstrapping and the t-distribution. 
+* Conduct inference on means when samples are dependent. 
+* Interpret all results within the context of your data and your research question.
+
+## Lessons
+
+### 1 - [Bootstrapping for estimating a parameter](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-01/)
+
+Construct confidence intervals for a median, mean, and any other statistic for the distribution of a numerical variable using bootstrapping. 
+
+### 3 - [Introducing the t-distribution](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-02/)
+
+Introduce the t-distribution for theoretical inference on means and constrast it to the normal distribution. 
+
+### 3 - [Inference for difference in two means](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-03/)
+
+Use simulation based and theoretical methods for inference in the difference of two means. 
+
+### 4 - [Comparing many means](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-04/)
+
+Compare many means using ANOVA. 
+
+## Instructor
+
+<img style="float: left; margin: 0px 20px 20px 0px" src="../instructor-photos/mine.png" alt="Mine Çetinkaya-Rundel" width="150" height="150">
+
+### Mine Çetinkaya-Rundel
+
+#### University of Edinburgh, Duke University, RStudio
+
+Mine Çetinkaya-Rundel is Senior Lecturer in the School of Mathematics at University of Edinburgh and Data Scientist and Professional Educator at RStudio. She is on leave from her Associate Professor of the Practice position at the Department of Statistical Science at Duke University. Mine’s work focuses on innovation in statistics and data science pedagogy, with an emphasis on computing, reproducible research, student-centered learning, and open-source education as well as pedagogical approaches for enhancing retention of women and under-represented minorities in STEM. Mine works on integrating computation into the undergraduate statistics curriculum, using reproducible research methodologies and analysis of real and complex datasets. She also organizes ASA DataFest, an annual two-day competition in which teams of undergraduate students work to reveal insights into a rich and complex data set. Mine works on the OpenIntro project, whose mission is to make educational products that are free, transparent, and lower barriers to education. As part of this project she co-authored three open-source introductory statistics textbooks. She is also the creator and maintainer of [datasciencebox.org](https://datasciencebox.org/) and she teaches the popular Statistics with R MOOC on Coursera. 
