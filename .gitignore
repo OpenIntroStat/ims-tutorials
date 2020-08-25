@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+*.key
+*lesson.html
+*lesson_files/
+rsconnect/
