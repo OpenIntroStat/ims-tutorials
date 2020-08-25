@@ -52,7 +52,7 @@ In this tutorial, we focus on steps 1 and 2 of this process.
   * Use R to make a contingency table
   * `group_by()` third variable and make table again to demonstrate Simpson's paradox
 
-### 3 - [Sampling strategies and Experimental design](https://openintro.shinyapps.io/ims-01-getting-started-with-data-03/)
+### 3 - [Sampling strategies and experimental design](https://openintro.shinyapps.io/ims-01-getting-started-with-data-03/)
 
 * Define simple random sample, stratified sample, cluster sample, multistage sample
 * Use R to obtain SRS and stratified sample
