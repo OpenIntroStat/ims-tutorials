@@ -154,7 +154,7 @@ We start with the `county_noDC` data frame and pipe it into the `slice_sample()`
 ```{r random-sample, exercise=TRUE}
 # Simple random sample of 150 counties
 county_srs <- county_noDC %>%
-  slice_sample(size = 150)
+  slice_sample(n = 150)
 
 # Glimpse
 glimpse(county_srs)
