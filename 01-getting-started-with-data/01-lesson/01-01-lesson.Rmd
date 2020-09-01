@@ -171,16 +171,16 @@ hsb2 %>%
 Strictly speaking, this is a categorical variable, though the labeling of this variable is likely not that useful since we would not use this variable in an analysis of relationships between the variables in the dataset. You can think of this variable as being an anonymized version to 
 having the names of the students in the dataset.
 
-The next variable is gender, a categorical variable, with levels male and
-female. It should be noted that the language of government surveys, such as High
-School and Beyond, is slow to change. So with these types of data, you will
+The next variable is gender, a categorical variable, with levels `"male"` and
+`"female"`. It should be noted that the language of government surveys, such as
+High School and Beyond, is slow to change. So with these types of data, you will
 continue to see variables mislabeled as "gender" when they in fact measure the
 biological sex (male, female) of the participant.  
 
 There is no inherent ordering to the levels of this variable, no matter what
 anyone tells you! So, this is just a categorical variable.The same is true for
-the race variable, which has levels of white, african american, hispanic, and
-asian.
+the race variable, which has levels of `"white"`, `"african american"`,
+`"hispanic"`, and `"asian"`.
 
 ```{r glimpse-hsb2-race-gender}
 hsb2 %>% 
@@ -188,7 +188,9 @@ hsb2 %>%
   glimpse()
 ```
 
-Socio-economic status, on the other hand, has three levels low, middle, and high that have an inherent ordering, hence this variable is an *ordinal* categorical variable.
+Socio-economic status, on the other hand, has three levels `"low"`, `"middle"`,
+and `"high"` that have an inherent ordering, hence this variable is an *ordinal*
+categorical variable.
 
 ```{r glimpse-hsb2-ses}
 hsb2 %>% 
@@ -450,7 +452,10 @@ med_num_char <- median(___)
 
 # Create num_char_cat variable in email50
 email50_updated <- email50 %>%
-  mutate(num_char_cat = if_else(num_char < med_num_char, ___, ___))
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "<VALUE IF TRUE>",
+                                "<VALUE IF FALSE>")
+         )
   
 # Count emails in each category
 email50_updated %>%
@@ -467,7 +472,10 @@ med_num_char <- median(email50$num_char)
 
 # Create num_char_cat variable in email50
 email50_updated <- email50 %>%
-  mutate(num_char_cat = if_else(num_char < med_num_char, "below median", "at or above median"))
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "below median",
+                                "at or above median")
+         )
   
 # Count emails in each category
 email50_updated %>%
@@ -481,35 +489,30 @@ Another common way of creating a new variable based on an existing one is by *co
 
 For now, do your best to understand the code we've provided to generate the plot. We will go through it in detail in the next section.
 
-For the `email50` dataset, the `number` variable has three levels, "none", "some", 
-and "big". We want to create a new variable that combines the levels "some" and
-"big" into one level named "yes", and keeps the "none" level separate as a level 
-named "no". In this exercise we will use the `case_when()` function, a cousin 
-of the `if_else()` function. The `case_when()` function behaves similarly to the 
-`if_else()` function, but where `if_else()` only accepts two options (what to 
-do when the comparison is `TRUE` and `FALSE`), `case_when()` accepts as many 
-options as you want to give it! 
+In the `email50` dataset, the `number` variable has three levels, `"none"`, 
+`"some"`, and `"big"`. We want to create a new variable (`number_cat`) that
+combines the levels `"some"` and `"big"` into one level named `"yes"`, and 
+keeps the `"none"` level separate as a level named `"no"`. This should sound
+similar to how we used the `if_else()` function previously, where the logical
+condition we want to check is whether the level of `number` is equal to
+(`==`) `"none"`.  
 
+Use what you know about the `mutate` and `if_else()` functions to: 
 
-
-- Create a new column in `email50` called `number_cat` that is `"no"` if there is no number in the email and `"yes"` otherwise. Use the `case_when()` function to accomplish this. 
+- Create a new column in `email50` called `number_cat` which discretizes the
+`number` variable into `"no"` and `"yes"`. 
 - Assign the resulting data frame to a new data frame named `email50_updated`.
 - Run the code provided to visualize the distribution of the `number_cat` variable.
 
 ```{r email50-fortified, exercise=TRUE}
 # Create number_cat column in email50
- email50_updated <- email50 %>%
-   mutate(<NAME OF NEW VARIABLE> = 
-            case_when(
-              # if number is "none", make number_cat "no"
-              <LOGICAL COMPARISON> ~ "<VALUE>",
-              # if number is "small", make number_cat "yes"
-              <LOGICAL COMPARISON> ~ "<VALUE>", 
-              # if number is "big", make number_cat "yes"
-              <LOGICAL COMPARISON> ~ "<VALUE>"
-              )
-          )
-   
+email50_updated <- email50 %>%
+  mutate(___ = if_else(___, 
+                          "<VALUE IF TRUE>", 
+                          "<VALUE IF FALSE>")
+            )
+
+
  
 # Visualize the distribution of number_cat
 ggplot(email50_updated, aes(x = number_cat)) +
@@ -517,37 +520,32 @@ ggplot(email50_updated, aes(x = number_cat)) +
 ```
 
 ```{r email50-fortified-hint-1}
-number_cat = case_when(
-       ___ ~ "___", 
-       ___ ~ "___"  
-     )
+number_cat = if_else(number == "none", 
+                     "<VALUE IF TRUE>", 
+                     "<VALUE IF FALSE>") 
 ```
 
 ```{r email50-fortified-hint-2}
-number_cat = case_when(
-       number == "none" ~ "no", 
-       ___ ~ "___"  
-     )
+number_cat = if_else(number == "none", 
+                     "no", 
+                     "<VALUE IF FALSE>") 
 ```
 
 ```{r email50-fortified-hint-3}
-number_cat <- case_when(
-  number == "none" ~ "no",
-  number != "none" ~ "yes"
-)
+number_cat = if_else(number == "none", 
+                     "no", 
+                     "yes") 
+
 ```
 
 ```{r email50-fortified-solution}
 # Create number_cat column in email50
- email50_updated <- email50 %>%
-   mutate(
-     number_cat = case_when(
-       # if number is "none", make number_cat "no"
-       number == "none" ~ "no", 
-       # if number is not "none", make number_cat "yes"
-       number != "none" ~ "yes"  
-     )
-   )
+email50_updated <- email50 %>%
+  mutate(number_cat = if_else(number == "none",
+                              "no", # if number is "none", make number_cat "no"
+                              "yes" # if number is not "none", make number_cat "yes"
+                              )
+         )
    
  
 # Visualize the distribution of number_cat
