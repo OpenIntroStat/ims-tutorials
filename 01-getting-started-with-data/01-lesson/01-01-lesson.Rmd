@@ -350,6 +350,8 @@ Now we will practice filtering and handling factors with a different categorical
 
 Categorical data are often stored as factors in R. Next, we'll practice working with a factor variable, `number`, from the `email50` dataset. This variable tells us what type of number (none, small, or big) an email contains.
 
+Modify the code below to: 
+
 - Create a new dataset called `email50_big` that is a subset of the original `email50` dataset containing only emails with `"big"` numbers. This information is stored in the `number` variable.
 - Report the dimensions of `email50_big` using the `glimpse()` function again. *How many emails contain big numbers?*
 
@@ -439,7 +441,7 @@ Next, we'll create a categorical version of the `num_char` variable in the `emai
 
 The median marks the 50th percentile, or midpoint, of a distribution, so half of the emails should fall in one category and the other half in the other. We will learn more about the median and other measures of center in the next tutorial in this series.
 
-The `email50` dataset is available in your workspace.
+The `email50` dataset is available in your workspace. Modify the code below to:
 
 - Find the median number of characters in emails, save the result to a variable named `med_num_char`.
 - Using `mutate()`, create a new column called `num_char_cat`, which discretizes the `num_char` variable into `"below median"` or `"at or above median"`.
@@ -453,8 +455,8 @@ med_num_char <- median(___)
 # Create num_char_cat variable in email50
 email50_updated <- email50 %>%
   mutate(num_char_cat = if_else(num_char < med_num_char,
-                                "<VALUE IF TRUE>",
-                                "<VALUE IF FALSE>")
+                                "[VALUE IF TRUE]",
+                                "[VALUE IF FALSE]")
          )
   
 # Count emails in each category
@@ -508,8 +510,8 @@ Use what you know about the `mutate` and `if_else()` functions to:
 # Create number_cat column in email50
 email50_updated <- email50 %>%
   mutate(___ = if_else(___, 
-                          "<VALUE IF TRUE>", 
-                          "<VALUE IF FALSE>")
+                          "[VALUE IF TRUE]", 
+                          "[VALUE IF FALSE]")
             )
 
 
@@ -521,14 +523,14 @@ ggplot(email50_updated, aes(x = number_cat)) +
 
 ```{r email50-fortified-hint-1}
 number_cat = if_else(number == "none", 
-                     "<VALUE IF TRUE>", 
-                     "<VALUE IF FALSE>") 
+                     "[VALUE IF TRUE]", 
+                     "[VALUE IF FALSE]") 
 ```
 
 ```{r email50-fortified-hint-2}
 number_cat = if_else(number == "none", 
                      "no", 
-                     "<VALUE IF FALSE>") 
+                     "[VALUE IF FALSE]") 
 ```
 
 ```{r email50-fortified-hint-3}
@@ -647,22 +649,22 @@ To do this we insert the name of the variable we want to convert to a factor
 
 ```{r email50-plot, exercise=TRUE}
 ggplot(email50, aes(x = ___, y = ___, color = ___)) +
-  ___
+  [GEOM]
 ```
 
 ```{r email50-plot-hint-1}
 ggplot(email50, aes(x = num_char, y = ___, color = ___)) +
-  ___
+  [GEOM]
 ```
 
 ```{r email50-plot-hint-2}
 ggplot(email50, aes(x = num_char, y = exclaim_mess, color = ___)) +
-  ___
+  [GEOM]
 ```
 
 ```{r email50-plot-hint-3}
 ggplot(email50, aes(x = num_char, y = exclaim_mess, color = factor(spam))) +
-  ___
+  {GEOM}
 ```
 
 ```{r email50-plot-solution}
