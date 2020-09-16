@@ -172,7 +172,7 @@ Consider the eight dots in the scatter plot below (the points happen to fall on 
 
 ![](images/simpson-paradox-plot.png){width="50%"}
 
-We'll explore Simpson's paradox further with another dataset, which comes from a study carried out by the graduate Division of the University of California, Berkeley in the early 70’s to evaluate whether there was a sex bias in graduate admissions. The data come from six departments. For confidentiality we'll call them A through F. We have information on whether the applicant identified as male or female and whether they were admitted or rejected. First, we will evaluate whether the percentage of males admitted is indeed higher than females, overall. Next, we will calculate the same percentage for each individual department.
+We'll explore Simpson's paradox further with another dataset, which comes from a study carried out by the graduate Division of the University of California, Berkeley in the early 70’s to evaluate whether there was a sex bias in graduate admissions. The data come from six departments. For confidentiality we'll call them A through F. The dataset contains information on whether the applicant identified as male or female, recorded as `Gender`, and whether they were admitted or rejected, recorded as `Admit`. First, we will evaluate whether the percentage of males admitted is indeed higher than females, overall. Next, we will calculate the same percentage for each individual department.
 
 ### Berkeley admission data
 
@@ -181,6 +181,11 @@ We'll explore Simpson's paradox further with another dataset, which comes from a
 Male   | 1198     | 1493
 Female | 557      | 1278
 
+> Note: At the time of this study, gender and sexual identities were not given distinct names. Instead, it
+> was common for a survey to ask for your "gender" and then provide you with the options of "male" and 
+> "female." Today, we better understand how an individual's gender and sexual identities are different 
+> pieces of who they are. To learn more about inclusive language surrounding gender and sexual identities 
+> see the (gender unicorn)[https://transstudent.org/gender/]. 
 
 Let's get started.
 
