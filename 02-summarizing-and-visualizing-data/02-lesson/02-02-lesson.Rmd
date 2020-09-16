@@ -23,6 +23,7 @@ library(grid)
 library(cowplot)
 library(patchwork)
 library(openintro)
+library(emo)
 
 cars <- read_csv("data/cars04.csv")
 ```
