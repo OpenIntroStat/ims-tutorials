@@ -72,10 +72,9 @@ Next, let's take a look at data from a different study on country characteristic
 
 ### Recap: Types of studies
 
-Let's take a look at data from a different study on country characteristics. The data come from the **gapminder** package and we can use functions from the **tidyverse** package to inspect it.
+Let's take a look at data from a different study on country characteristics. The data come from the **gapminder** package. 
 
-To view the top 10 rows of the data, simply type `gapminder`.
-You are welcomed to view the data using other functionality we have learned so far as well.
+To view the top 10 rows of the data, simply type `gapminder`. You are welcome to view the data using functions from the **tidyverse** package you have learned previously to inspect it.
 
 ```{r gapminder-final, exercise=TRUE}
 library(gapminder)
@@ -97,9 +96,9 @@ quiz(
 
 In this section, we'll clarify the difference between *random sampling* and *random assignment*, and more importantly, why we care about this difference.
 
-**Random sampling** occurs when _subjects are being selected for a study_. If subjects are selected randomly from the population, then the resulting sample is likely representative of the population and therefore the study's results can be generalizable to that population.
+**Random sampling** occurs when _subjects are being selected for a study_. If subjects are selected randomly from the population of interest, then the resulting sample is likely representative of that population and therefore the study's results can be generalizable to that population.
 
-**Random assignment** occurs only _in experimental settings where subjects are being assigned to various treatments_. Random assignment _allows for causal conclusions_.
+**Random assignment** occurs only _in experimental settings where subjects are being assigned to various treatments_. Random assignment _allows for causal conclusions_ about the relationship between the treatment and the response. 
 
 Here is a quick summary of how random sampling and random assignment affect the scope of inference of a study's results.
 
@@ -167,13 +166,13 @@ This is often a more realistic scenario since most real world relationships are 
 
 ![](images/explanatory-multivariate-example.png){width="50%"}
 
-Not considering an important variable when studying a relationship can result in what we call a **Simpson's paradox**, which illustrates the effect the omission of an explanatory variable can have on the measure of association between another explanatory variable and the response variable. In other words, the inclusion of a third variable in the analysis can change the apparent relationship between the other two variables. 
+Not considering an important variable when studying a relationship can result in what we call a **Simpson's paradox**. This paradox illustrates the effect the omission of an explanatory variable can have on the measure of association between another explanatory variable and the response variable. In other words, the inclusion of a third variable in the analysis can change the apparent relationship between the other two variables. 
 
 Consider the eight dots in the scatter plot below (the points happen to fall on the orange and blue lines). The trend describing the points when only considering `x1` and `y`, illustrated by the gray dashed line, is reversed when `x2`, the grouping variable, is also considered. If we don't consider `x2`, the relationship between `x1` and `y` is positive. If we do consider `x2`, we see that within each group the relationship between `x1` and `y` is actually negative.
 
 ![](images/simpson-paradox-plot.png){width="50%"}
 
-We'll explore Simpson's paradox further with another dataset, which comes from a study carried out by the graduate Division of the University of California, Berkeley in the early 70’s to evaluate whether there was a sex bias in graduate admissions. The data come from six departments. For confidentiality we'll call them A through F. We have information on whether the applicant was male or female and whether they were admitted or rejected. First, we will evaluate whether the percentage of males admitted is indeed higher than females, overall. Next, we will calculate the same percentage for each individual department.
+We'll explore Simpson's paradox further with another dataset, which comes from a study carried out by the graduate Division of the University of California, Berkeley in the early 70’s to evaluate whether there was a sex bias in graduate admissions. The data come from six departments. For confidentiality we'll call them A through F. The dataset contains information on whether the applicant identified as male or female, recorded as `Gender`, and whether they were admitted or rejected, recorded as `Admit`. First, we will evaluate whether the percentage of males admitted is indeed higher than females, overall. Next, we will calculate the same percentage for each individual department.
 
 ### Berkeley admission data
 
@@ -182,6 +181,11 @@ We'll explore Simpson's paradox further with another dataset, which comes from a
 Male   | 1198     | 1493
 Female | 557      | 1278
 
+> Note: At the time of this study, gender and sexual identities were not given distinct names. Instead, it
+> was common for a survey to ask for your "gender" and then provide you with the options of "male" and 
+> "female." Today, we better understand how an individual's gender and sexual identities are different 
+> pieces of who they are. To learn more about inclusive language surrounding gender and sexual identities 
+> see the (gender unicorn)[https://transstudent.org/gender/]. 
 
 Let's get started.
 
@@ -191,7 +195,7 @@ The goal of this exercise is to determine the numbers of male and female applica
 
 To do so we will use the `count()` function. In one step, `count()` groups the data and then tallies the number of observations in each level of the grouping variable. These counts are available under a new variable called `n`.
 
-Pass the gender and admission status columns to `count()` on the `ucb_admit` dataset (which is already pre-loaded) to count how many of each gender are admitted and how many are rejected.
+Pass the `Gender` and `Admit` columns from the `ucb_admit` dataset (which is already pre-loaded) into the `count()` function, to count how many students of each gender are admitted and how many are rejected.
 
 ```{r count-male, exercise=TRUE}
 # Count number of male and female applicants admitted
@@ -207,25 +211,66 @@ ucb_admit %>%
 
 ### Proportion of males admitted overall
 
-Next we'll calculate the percentage of males and percentage of females admitted, by creating a new variable, called `prop` (short for proportion) based off of the counts calculated in the previous exercise and using `mutate()`.
+Next we'll calculate the proportion of males and proportion of females admitted, by creating a new variable, called `prop` (short for proportion) based off of the counts calculated in the previous exercise and using the `mutate()` function.
 
-Proportions for each row of the data frame we created in the previous exercise can be calculated as `n / sum(n)`. Note that since the data are grouped by gender, `sum(n)` will be calculated for males and females separately.
+Proportions for each row of the data frame we created in the previous exercise can be calculated as `n / sum(n)`. However, it is important to note that since we are interested in the proportion of students admitted within each gender, we need for the data to be grouped by gender, so that `sum(n)` will be calculated for males and females separately. Luckily, the `group_by()` function can do this grouping for us! 
 
-The table of counts of gender and admission status you developed earlier is available as `ucb_admission_counts`.
+The `group_by()` function takes as arguments the column names of the **categorical** variables for which you want to perform grouped operations. We add this grouping into our data wrangling pipeline, by inserting a `group_by()` statement before we perform our subsequent tasks. For example, we could have found the same admission table as before, if we first grouped the data based on `Gender`, and then counted how many students were admitted and rejected. This process would look like this:  
 
-- Group the data by gender.
-- Create the new variable described above, `prop`, the proportion of males and females admitted.
-- Filter the data for those who are admitted so that the resulting data frame only contains proportions of males and females who are admitted.
-- *Which gender has a higher admission rate, male or female?*
+```{r grouped-count-male, exercise = TRUE}
+ucb_admit %>% 
+  group_by(Gender) %>% 
+  count(Admit)
+```
+
+Now, use this new function and your knowledge of creating new variables and filtering observations to calculate the proportion of males and proportion of females admitted. Note, the table of counts of gender and admission status you found earlier is available as `ucb_admission_counts`. 
+
+To accomplish this task you will need to take the following steps: 
+
+1. Group the data by gender.
+2. Create the a new variable, `prop`, as the proportion of males and females admitted. Remember, Proportions for each row of the data frame we create can be calculated as `n / sum(n)`! 
+3. Filter the data for those who are admitted so that the resulting data frame only contains the proportions of males and females who are admitted.
+
+Then answer the following question: *Which gender had a higher admission rate, male or female?*
 
 ```{r gender-male, exercise=TRUE}
 ucb_admission_counts %>%
   # Group by gender
   ___(___) %>%
   # Create new variable
-  mutate(___ = ___ / ___) %>%
+  mutate(prop = ___ / ___) %>%
   # Filter for admitted
   ___(___ == "___")
+```
+
+```{r gender-male-hint-1}
+ucb_admission_counts %>%
+  # Group by gender
+  group_by(Gender) %>%
+  # Create new variable
+  mutate(prop = ___ / ___) %>%
+  # Filter for admitted
+  ___(___ == "___")
+```
+
+```{r gender-male-hint-2}
+ucb_admission_counts %>%
+  # Group by gender
+  group_by(Gender) %>%
+  # Create new variable
+  mutate(prop = n / sum(n)) %>%
+  # Filter for admitted
+  ___(___ == "___")
+```
+
+```{r gender-male-hint-3}
+ucb_admission_counts %>%
+  # Group by gender
+  group_by(Gender) %>%
+  # Create new variable
+  mutate(prop = n / sum(n)) %>%
+  # Filter for admitted
+  filter(Admit == "Admitted")
 ```
 
 ```{r gender-male-solution}
@@ -240,9 +285,9 @@ ucb_admission_counts %>%
 
 ### Proportion of males admitted for each department
 
-Finally we'll make a table similar to the one we constructed earlier, except we'll first group the data by department. The goal is to compare the proportions of male admitted students across departments.
+Finally we'll make a table similar to the one we constructed earlier, except we'll first group the data by department. The goal is to compare the proportions of male students admitted across departments.
 
-Proportions for each row of the data frame we create can be calculated as `n / sum(n)`. Note that since the data are grouped by department and  gender, `sum(n)` will be calculated for males and females separately **for each department**.
+Proportions for each row of the data frame we create can be calculated as `n / sum(n)`. Note that since the data are grouped by department **and**  gender, `sum(n)` will be calculated for males and females separately **for each department**.
 
 ```{r prepare-gender2}
 ucb_admission_counts <- ucb_admit %>%
@@ -250,7 +295,7 @@ ucb_admission_counts <- ucb_admit %>%
   count(Dept, Gender, Admit)
 ```
 
-Assign `ucb_admission_counts` as the `count()` of `ucb_admit` by department, gender, and admission status.
+First, assign `ucb_admission_counts` as the `count()` of `ucb_admit` by department, gender, and admission status.
 
 ```{r gender-male2, exercise=TRUE, exercise.setup="prepare-gender2"}
 ucb_admission_counts <- ucb_admit %>%
@@ -270,9 +315,11 @@ ucb_admission_counts <- ucb_admit %>%
 ucb_admission_counts
 ```
 
-- Group `ucb_admission_counts` by department then gender.
-- Add a new column, `prop`, which is the ratio of those admitted or rejected by department and gender.
-- Filter the rows for males and for those who are admitted.
+Next, create a table with the proportions of male students admitted across departments, using the following steps: 
+
+1. Group `ucb_admission_counts` by department then gender.
+2. Add a new column, `prop`, which is the ratio of those admitted or rejected by department and gender.
+3. Filter the rows for those who are males **and** those who who were admitted.
 
 ```{r gender-male3, exercise=TRUE, exercise.setup="prepare-gender2"}
  ucb_admission_counts  %>%
@@ -282,6 +329,46 @@ ucb_admission_counts
   ___(prop = ___) %>%
   # Filter for male and admitted
   ___(___, ___)
+```
+
+```{r gender-male3-hint-1}
+ ucb_admission_counts  %>%
+  # Group by department, then gender
+  group_by(Dept, Gender) %>%
+  # Create new variable
+  ___(prop = ___) %>%
+  # Filter for male and admitted
+  ___(___, ___)
+```
+
+```{r gender-male3-hint-2}
+ ucb_admission_counts  %>%
+  # Group by department, then gender
+  group_by(Dept, Gender) %>%
+  # Create new variable
+  mutate(prop = n / sum(n)) %>%
+  # Filter for male and admitted
+  ___(___, ___)
+```
+
+```{r gender-male3-hint-3}
+ ucb_admission_counts  %>%
+  # Group by department, then gender
+  group_by(Dept, Gender) %>%
+  # Create new variable
+  mutate(prop = n / sum(n)) %>%
+  # Filter for male and admitted
+  filter(Gender == "Male", ___)
+```
+
+```{r gender-male3-hint-4}
+ ucb_admission_counts  %>%
+  # Group by department, then gender
+  group_by(Dept, Gender) %>%
+  # Create new variable
+  mutate(prop = n / sum(n)) %>%
+  # Filter for male and admitted
+  filter(Gender == "Male", Admit == "Admitted")
 ```
 
 ```{r gender-male3-solution}
@@ -308,8 +395,6 @@ perc_admit_by_dept <- ucb_admit %>%
   filter(Gender == "Male", Admit == "Admitted")
 ```
 
-The final result from the previous exercise is available in your workspace as `perc_admit_by_dept`. 
-
 ```{r quiz-gender}
 quiz(
   question("Which of the following best describes the relationship between admission status and gender?", correct = "Correct! Let's recap what we've learned in the next section.", allow_retry = TRUE,
@@ -318,6 +403,8 @@ quiz(
     answer("Within most departments, male and female applicants are equally likely to be admitted.", message = "Try again!")
 ), caption = "")
 ```
+
+The final result from the previous exercise is available in your workspace as `perc_admit_by_dept`. Feel free to inspect the table to address the question above.  
 
 ```{r gender-male4, exercise=TRUE, exercise.setup="prepare-gender3"}
 
@@ -330,23 +417,23 @@ quiz(
 
 We'll wrap up the lesson with a recap of our findings.
 
-Overall: males more likely to be admitted
+Overall: males were more likely to be admitted
 
-* Within most departments: females more likely
-* When controlling for department, relationship between gender and admission status is reversed
+* Within most departments: females were more likely
+* When controlling for department, relationship between gender and admission status was reversed
 * Potential reason:
-  + Women tended to apply to competitive departments with low admission rates
-  + Men tended to apply to less competitive departments with high admission rates
+  + Women tended to apply to competitive departments with lower admission rates
+  + Men tended to apply to less competitive departments with higher admission rates
 
-We saw that overall males are more likely to be admitted.
+We saw that overall males were more likely to be admitted.
 
 But when we consider the department information, within most departments actually females are more likely to be admitted.
 
-So when we control for department, the relationship between gender and admission status is reversed, which is what we call Simpson's paradox.
+So when we control for department, the relationship between gender and admission status was reversed, which is what we call Simpson's paradox.
 
-One reason that has been given for this paradox is that women tended to apply to competitive departments with low rates of admission even among qualified applicants, such as in the English Department, whereas men tended to apply to less competitive departments with high rates of admission among the qualified applicants, such as in engineering and chemistry.
+One potential reason for this paradox is that women tended to apply to competitive departments with lower rates of admission even among qualified applicants, such as in the English Department. Whereas, men tended to apply to less competitive departments with higher rates of admission among the qualified applicants, such as in engineering and chemistry.
 
-Note that we were only able to discover the contradictory finding once we incorporated the department information. Examples like this highlight the importance of good study design that considers and collects information on extraneous, but potentially confounding variables in a study.
+Note that we were only able to discover the contradictory finding once we incorporated information about the department of the application. Examples like this highlight the importance of a good study design that considers and collects information on extraneous, but potentially confounding variables in a study.
 
 ## Congratulations!
 
