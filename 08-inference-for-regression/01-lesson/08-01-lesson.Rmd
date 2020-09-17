@@ -112,7 +112,7 @@ A subset of size 20 items shows a similar positive trend between fat and calorie
 
 
 ```{r echo = FALSE}
-ggplot(starbucks2, aes(x=Fat, y=Calories)) + geom_point() + 
+ggplot(starbucks3, aes(x=Fat, y=Calories)) + geom_point() + 
   ggtitle("Fat vs. Calories for Starbucks Food Items") + 
   geom_smooth(method="lm", se=FALSE)
 ```
