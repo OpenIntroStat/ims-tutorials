@@ -431,9 +431,7 @@ You may have noticed in the last exercises that sometimes raw counts of cases ca
 
 Let's return to our table of counts of cases by identity and alignment. If we wanted to instead get a sense of the proportion of all cases that fell into each category, we can modify our previous table. We will need to add a column that calculates the proportion of total observations that were observed in each combination of `id` and `align`. 
 
-After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. 
-
-In the table, we see that the single largest category are characters that are bad and secret at about 29% of characters.
+After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument.  
 
 ```{r fctp, echo = TRUE, eval = FALSE}
 comics %>% 
@@ -460,6 +458,8 @@ comics %>%
   )
 
 ```
+
+In the table, we see that the single largest category are characters that are bad and secret at about 29% of characters.
 
 Also note that because these are all proportions out of the whole dataset, the sum of all of these proportions is 1.
 
