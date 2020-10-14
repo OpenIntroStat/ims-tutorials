@@ -481,11 +481,12 @@ comics %>%
               names_from = align, values_from = prop)
 ```
 
-```{r cpkable, echo=FALSE,out.width = 10}
+```{r cpkable, echo=FALSE}
 comics %>% 
   count(id, align) %>%
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
+  ungroup() %>%
   pivot_wider(id_cols = c(id, align, prop), 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
