@@ -158,11 +158,6 @@ one_poll <- all_polls %>%
 # Variability of p-hat
 ex1_props %>%
   summarize(sd(prop_yes))
-
-# A tibble: 1 × 1
-`sd(prop_yes)`
-<dbl>
-1 0.08523512
 ```
 
 ### Variability of $\hat{p}$ from the sample (bootstrapping)
@@ -179,7 +174,7 @@ Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.0869
 ```{r eval = TRUE}
 # Generate 1000 resamples of one poll
 one_poll_boot_30 <- one_poll %>%
-  oilabs::rep_sample_n(30, replace = TRUE, reps = 1000)
+  rep_sample_n(30, replace = TRUE, reps = 1000)
 
 # Compute p-hat for each resampled poll
 ex2_props <- one_poll_boot_30 %>%
@@ -188,11 +183,6 @@ ex2_props <- one_poll_boot_30 %>%
 # Variability of p-hat
 ex2_props %>%
   summarize(sd(prop_yes))
-
-# A tibble: 1 × 1
-`sd(prop_yes)`
-<dbl>
-1 0.08691885
 ```
 
 
@@ -689,6 +679,7 @@ As in the previous exercise, when discussing the variability of a statistic, the
 one_poll <- all_polls %>%
   filter(poll == 1) %>%
   select(vote)
+
 one_poll_boot <- one_poll %>%
   specify(response = vote, success = "yes") %>%
   generate(reps = 1000, type = "bootstrap") %>% 
@@ -907,19 +898,12 @@ one_poll_boot %>%
   visualize(endpoints = percentile_ci, direction = "between")
 ```
 
-
-
-
-
 Excellent! Again, the same caveat applies: because the two intervals were created using different methods, the intervals are expected to be a bit different as well. In the long run, however, the intervals should provide the same information.
-
-
 
 ## Interpreting CIs and technical conditions
 
 
 ### Creating CIs
-
 
 By using the bootstrapped $\hat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X.
 
@@ -929,18 +913,30 @@ The second interval used the natural variability of the resampled $\hat{p}$ valu
 
 We can see that the two intervals are different because they used different methods, but they are consistent because they are based on the same observations.
 
+```{r echo=FALSE}
+set.seed(47)
+one_poll <- all_polls %>%
+  filter(poll == 1) %>%
+  select(vote)
+one_poll_boot <- one_poll %>%
+  specify(response = vote, success = "yes") %>%
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "prop")
+```
+
+
 ```{r echo=TRUE}
 # Look at the bootstrap t-confidence interval for comparison
 one_poll_boot %>%
-  summarize(lower = p_hat - 2 * sd(prop_yes_boot),
-            upper = p_hat + 2 * sd(prop_yes_boot))
+  summarize(lower = stat - 2 * sd(stat),
+            upper = stat + 2 * sd(stat))
 
 one_poll_boot
 
 # Find the 2.5% and 97.5% of the p-hat values
 one_poll_boot %>%
-  summarize(q025_prop = quantile(prop_yes_boot, p = .025),
-            q975_prop = quantile(prop_yes_boot, p = .975))
+  summarize(q025_prop = quantile(stat, p = .025),
+            q975_prop = quantile(stat, p = .975))
 
 one_poll_boot
 ```
