@@ -8,6 +8,8 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
+set.seed(470)
+
 # load packages ----------------------------------------------------------------
 
 library(learnr)
@@ -331,7 +333,7 @@ Now that we have seen a visual representation of the null distribution, let's se
 
 ### One random permutation
 
-Using the `mutate()` and `sample()` functions, the vector of soda preference is mixed up, or permuted, such that whether someone is on the East or West Coast can't possibly be causing any difference in proportions. However, due to inherent natural variability, there is also no expectation that the soda preferences are exactly the same for any sample. 
+Using the `mutate()` and `sample()` functions, the vector of soda preference is mixed up, or permuted, such that whether someone is on the East or West Coast can't possibly be causing any difference in proportions. However, due to inherent natural variability, there is also no expectation that the soda preferences are exactly the same for any sample. We use the `sample()` function to create the shuffled soda preferences, and then save that shuffled dataset into a new variable named `drink_perm`, using the `mutate()` function. 
 
 ```{r one_random_permutation, echo = TRUE}
 soda %>%
@@ -339,24 +341,29 @@ soda %>%
   group_by(location) %>%
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
             prop_cola = mean(drink == "Cola")) %>%
-  summarize(diff_perm = diff(prop_cola_perm), diff_orig = diff(prop_cola))
+  summarize(diff_perm = diff(prop_cola_perm), 
+            diff_orig = diff(prop_cola))  # West - East
 ```
 
 After grouping by the `location` variable, `summarize()` calculates the proportion of each coast that prefers cola. 
 
-Note that `drink` equals “Cola” produces a vector of TRUEs and FALSEs, which R then coerces to ones and zeros when the `mean()` function is applied. Since a one represents an individual who prefers cola, the average of these ones and zeros represents the proportion of individuals who prefer cola.
+Note that `drink` equals “Cola” produces a vector of TRUEs and FALSEs, which R then coerces to ones (TRUE) and zeros (FALSE) when the `mean()` function is applied. Since a TRUE (one) represents an individual who prefers cola, the average of these ones and zeros represents the proportion of individuals who prefer cola.
 
-`summarize()` is used a second time to find the difference in proportion of cola preference across the two coastal groups. The `diff()` function is applied across the two coastal groups because the data have been summarized by location.
+`summarize()` is used a second time to find the difference in proportion of cola preference across the two coastal groups. The `diff()` function is applied across the two coastal groups because the data have been summarized by location (East and West). 
+
+We should note that the `diff()` function takes the difference between two numbers by subtracting the first number from the second number. In this shuffle, -0.02488688 is the result from subtracting the West coast proportion _from_ the East coast proportion. It is important to make sure that your order of subtraction is consistent! 
 
 Notice that the output gives a permuted difference of -0.02 as compared to the observed difference of -0.09. However, the permuted difference of -0.02 represents only one instance of the variability of soda preference under the null model. To get a sense of the degree of variability under the null model, it is necessary to permute the `drink` variable many times.
 
 ### Many random permutations
 
-By repeating the permuting and difference calculations five times, the permuted differences are seen to be sometimes positive, sometimes negative, sometimes close to zero, sometimes far from zero. However, five times isn't quite enough to capture all of the variability in the null differences.
+By repeating the permuting and difference calculations five times, the permuted differences are seen to be sometimes positive, sometimes negative, sometimes close to zero, sometimes far from zero. However, five times isn't quite enough to capture all of the variability in the null differences. 
+
+The `rep_sample_n()` function performs repeated sampling of a dataset, where the `size` of the sample is specified in the first argument and the number of repetitions is specified in the `reps` argument. We notice that the sample `size` is the same size as the soda dataset, since it equals the number of rows in the original dataset. We are also specifying that the sampling of the datset should be done without replacement (`replace = FALSE`), since we want each row to only be selected once. You can think of this as creating five copies of the original `soda` dataset. 
 
 ```{r many_random_permutations, echo = TRUE}
 soda %>%
-  rep_sample_n(size = nrow(soda), reps = 5) %>%
+  rep_sample_n(size = nrow(soda), reps = 5, replace = FALSE) %>%
   mutate(drink_perm = sample(drink)) %>%
   group_by(replicate, location) %>%
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
@@ -364,6 +371,8 @@ soda %>%
   summarize(diff_perm = diff(prop_cola_perm),
             diff_orig = diff(prop_cola)) # West - East
 ```
+
+Notice there is one additional variable we need to `group_by()` since we have more than one dataset we are calculating the permuted difference in proportions. This is why `replicate` appears in this `group_by()` statement. 
 
 ### Randomization distribution
 
@@ -414,7 +423,7 @@ names(NHANES)
  (2)
 
 - Using the `NHANES` data, create a bar plot of `HomeOwn` (fill color) broken down by `Gender` (x-axis).  
-- Set `position = "fill"` in `geom_bar()` to compare relative frequencies.
+- Set `position = "fill"` in `geom_bar()` to allow for use to compare relative frequencies.
 
 ```{r nhanes-plot, exercise=TRUE}
 # Create bar plot for Home Ownership by Gender
@@ -452,9 +461,9 @@ ggplot(NHANES, aes(x = Gender, fill = HomeOwn)) +
 
  (3)
 
-- Create a density plot for `SleepHrsNight` colored by `SleepTrouble` and faceted by `HealthGen`.
-- Since `SleepHrsNight` contains discrete values, the density should be smoothed a bit using `adjust = 2`.
+- Create a density plot for `SleepHrsNight` `color`ed by `SleepTrouble` and faceted by `HealthGen`.
 - Use `facet_wrap(~ HealthGen)` to visualize how the variables of interest vary by general health status.
+- Since `SleepHrsNight` contains discrete values, the density should be smoothed a bit using `adjust = 2`.
 
 
 ```{r density_plot_nhanes, exercise=TRUE}
@@ -523,7 +532,7 @@ mean(fruits %in% c("banana", "cherry"))
 
 The dplyr, ggplot2, infer, and NHANES packages have been loaded for you.
 
-- From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to `homes`.
+- From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to the dataset named `homes`.
 
 
 ```{r statistic_of_interest, exercise=TRUE}
@@ -563,10 +572,10 @@ homes <- NHANES %>%
 
  (2)
 
-- Find the observed difference in proportions of men who own and women who own.  
-- Group by `Gender`.
-- Compute the proportion of individuals who own a home. *Note that this will calculate proportions for both genders since you've grouped by the `Gender` variable in the line before it.*  The proportion is given by the `mean` of the `HomeOwn` variable who `"Own"`.
-- Using the `diff()` function, calculate the difference in proportion of home ownership.
+- Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
+1. Using the `homes` dataset, group by `Gender`.
+2. Summarize the proportion of individuals who own a home. *Note that this will calculate proportions for both genders since you've grouped by the `Gender` variable in the line before it.*  You can calculate the proportion by finding the `mean()` of the observations that equal `"Own"` in the `HomeOwn` variable.
+3. Finally, summarize the observed difference in proportions using the `diff()` function to calculate the difference in male and female home ownership.
 
 
 ```{r statistic_of_interest2, exercise=TRUE}
@@ -628,13 +637,25 @@ diff_orig
 
 ### Randomized data under null model of independence
 
-The infer package will allow you to model a particular null hypothesis and then randomize the data to calculate permuted statistics.  In this exercise, after specifying your null hypothesis you will permute the home ownership variable 10 times. By doing so, you will ensure that there is no relationship between home ownership and gender, so any difference in home ownership proportion for female versus male will be due only to natural variability.
+The **infer** package will allow you to model a particular null hypothesis and then randomize the data to calculate permuted statistics.  In this exercise, after specifying your null hypothesis you will permute the home ownership variable 10 times. By doing so, you will ensure that there is no relationship between home ownership and gender, so any difference in home ownership proportion for female versus male will be due only to natural variability.
 
 This exercise will demonstrate the first three steps from the infer package:
 
-- `specify()` will specify the response and explanatory variables.
-- `hypothesize()` will declare the null hypothesis.
-- `generate()` will generate resamples, permutations, or simulations.
+- `specify()` -- to specify the response and explanatory variables
+- `hypothesize()` -- to declare the null hypothesis
+- `generate()` -- to generate resamples, permutations, or simulations
+
+Using these steps in the context of creating a randomization distribution, looks
+like the following: 
+
+```{r, eval = FALSE}
+dataset_name %>%
+  specify(response_variable ~ explanatory_variable,
+          success = "[what value of the explanatory variable is a success]") %>% 
+  hypothesize(null = "independence") %>% 
+  generate(reps = 10, type = "permute") 
+```
+
 
 The dplyr, ggplot2, NHANES, and infer packages have been loaded for you and the `homes` dataset you created in the last exercise is available in your workspace.
 
@@ -751,10 +772,10 @@ By permuting the home ownership variable multiple times, you generate difference
 
 This exercise shows all four steps from the infer package:
 
-+ `specify()` will specify the response and explanatory variables.
-+ `hypothesize()` will declare the null hypothesis.
-+ `generate()` will generate resamples, permutations, or simulations.
-+ `calculate()` will calculate summary statistics.
+1. `specify()` will specify the response and explanatory variables.
+2. `hypothesize()` will declare the null hypothesis.
+3. `generate()` will generate resamples, permutations, or simulations.
+4. `calculate()` will calculate summary statistics.
 
 Each step will be covered throughout the tutorial; in this exercise you'll write code for `calculate()`.
 
@@ -771,7 +792,7 @@ homes <- NHANES %>%
 
 - Using the infer framework, step through specifying the null model and then performing 100 permutations to evaluate whether home ownership status (i.e. `HomeOwn`) differs between the `"female"` and `"male"` groups:
     + `specify()`, `hypothesize()`, and  `generate()` have been done for you.
-    + `calculate()` the `stat`istic `"diff in props"` with the order of `c("male", "female")`.
+    + `calculate()` the `stat`istic `"diff in props"` with the order of `c("male", "female")`, telling `R` that the female proportion should be subtracted from the male proportion.
 
 ```{r randomized_statistics, exercise=TRUE}
 # Perform 100 permutations
@@ -1031,12 +1052,10 @@ ggplot() +
 
 ### How extreme are the observed data?
 
-To be more precise, R can count the number of times the null data were more extreme than the observed data. Here, we identify that 38% of the null statistics are more extreme than the difference which was observed. Thirty-eight percent, in conjunction with the dot plot, give evidence that the data are consistent with the permuted distribution. We have no evidence that rates of cola preference differ by coast.
+To be more precise, R can count the number of times the null data were more extreme than the observed data. Here, we identify that about 30% of the null statistics are more extreme than the difference which was observed. Thirty percent, in conjunction with the dot plot, give evidence that the data are consistent with the permuted distribution. We have no evidence that rates of cola preference differ by coast.
 
 
 ```{r extreme_observe_data, echo = TRUE}
-set.seed(470)
-
 soda_perm <- soda %>%
   rep_sample_n(size = nrow(soda), reps = 100) %>%
   mutate(drink_perm = sample(drink)) %>%
@@ -1059,8 +1078,8 @@ In this exercise, you'll re-create this dotplot as a density plot and count the 
 
 The `homeown_perm` dataset is available in your workspace.
 
-- Using `geom_density()`, plot the permuted differences. 
-- Add a vertical red line with `geom_vline()` where the observed difference falls. `diff_orig` is provided in your workspace and represents the original value of the difference statistic.
+- Using `geom_density()`, plot the permuted differences (`diff_perm`). 
+- Add a vertical red line with `geom_vline()` where the observed difference falls. The `diff_orig` is provided in your workspace and represents the original value of the difference statistic. You should plot this value as the `xintercept` of `geom_vline()`. 
 - Count the number of permuted differences that were less than or equal to the observed difference.
 
 
