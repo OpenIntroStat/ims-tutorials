@@ -97,6 +97,8 @@ gender_discrimination %>%
   mutate(prop = n / sum(n))
 ```
 
+All of the pieces of this code you've seen before, but let's review them! First, we count the number of observations for each `gender` (male, female) and each `decision` (promoted, not) using the `count()` function. Next, we group these counts by `gender`, so that we can use `mutate()` to create a new variable that is the proportion of observations in each gender that received or didn't receive a promotion. 
+
 ### Fewer females were promoted
 
 That is to say, if we shuffle the data so that gender and promotion are not linked in any way, what sort of chance differences are observed? 
@@ -264,7 +266,7 @@ question(
 As the first step of any analysis, you should look at and summarize the data. 
 Categorical variables are often summarized using proportions, and it is always important to understand the denominator of the proportion.
 
-Do you want the proportion of women who were promoted or the proportion of promoted individuals who were women? Here, you want the first of these, so in your R code it's necessary to group by `gender` first.
+Do you want the proportion of women who were promoted or the proportion of promoted individuals who were women? Here, you want the first of these, so in your R code it's necessary to group by `gender` **before** you calculate the proportions! 
 
 The discrimination study data are available in your workspace as `gender_discrimination`.
 
@@ -329,7 +331,7 @@ In the code chunk below,
 - then we set our null hypothesis as `"independence"` (no gender discrimination), and 
 - finally we permute 5 times under the specification we outlined so far.
 
-```{r}
+```{r, echo = TRUE}
 gender_discrimination %>%
   specify(decision ~ gender, success = "promoted") %>%
   hypothesize(null = "independence") %>%
@@ -340,7 +342,7 @@ The resulting data frame has 240 rows: 48 observations per replicate (just like 
 
 In the next exercise, 
 
-- Re-generate a permutation just like above and save the result as `gender_discrimination_perm5`. This code is already provided for you.
+- Re-generate a permutation just like above and save the result as `gender_discrimination_perm5`. This code is already provided for you! 
 - Group `gender_discrimination_perm5` by the new `replicate` variable.
 - Count the variables of interest (`decision` within each `gender`) using `count()`.
 - Using `gender_discrimination_perm5`, `calculate()` the statistic of interest. Set `stat` to `"diff in props"` and `order` to `c("male", "female")` to subtract proportion of promoted females from proportion of males.
@@ -431,8 +433,7 @@ diff_orig <- gender_discrimination %>%
   # Summarize to calculate proportion promoted
   summarize(prop_promoted = mean(decision == "promoted")) %>%
   # Summarize to calculate difference
-  ___(stat = ___(___)) %>% 
-  pull()
+  ___(stat = ___(___))
     
 # See the result
 diff_orig
@@ -446,8 +447,7 @@ diff_orig <- gender_discrimination %>%
   # Summarize to calculate proportion promoted
   summarize(prop_promoted = mean(decision == "promoted")) %>%
   # Summarize to calculate difference
-  summarize(stat = diff(prop_promoted)) %>% 
-  pull()
+  summarize(stat = diff(prop_promoted))
   
 # See the result
 diff_orig
@@ -524,9 +524,9 @@ gender_discrimination_perm <- gender_discrimination %>%
 
 (2) Draw a histogram of permuted differences.
 
-- Using the permutation dataset, `gender_discrimination_perm` (which we already calculated), plot `stat`.
-- Add a histogram layer with `geom_histogram()`. The `binwidth` is set to `0.01`.
-- Add a vertical line with `geom_vline()`. The `xintercept` is at `diff_orig` (which we calculated earlier).
+- Using the permutation dataset, `gender_discrimination_perm` (which we already calculated), plot the distribution of test statistics (`stat`).
+- Specify a histogram layer with `geom_histogram()`, where the `binwidth` is set to `0.01`.
+- Add a vertical line with `geom_vline()`, and specify the `xintercept` as the `diff_orig` (which we calculated earlier).
 
 ```{r gender-discrimination-perm-plot, exercise=TRUE}
 # Using permutation data, plot stat
@@ -628,6 +628,8 @@ grid.lines(
 
 Using R, we can get the same quantile measurement that allow comparisons of the null statistics and the observed statistic. Given the previous simulations, we can see that 95% of the null differences are 0.208 or lower. These simulations give further evidence that the observed statistic is not consistent with the bulk of the null differences.
 
+The `quantile()` function often comes in handy! It is a function from "base R" that calculates the quantile of a numerical variable, where the quantile is specified by the `probs` argument. By specifying  `probs = 0.05`, you are telling R that you are interested in the value of `stat` where 5% of the are below it. Similarly for `probs = 0.95`, where 95% of the values of `stat` are below it. 
+
 ```{r echo = TRUE}
 gender_discrimination_perm %>%
   summarize(q.05 = quantile(stat, probs = 0.05),
@@ -636,7 +638,7 @@ gender_discrimination_perm %>%
 
 ### Critical region
 
-Often the quantiles describing the tails of the null distribution determine what is called the **critical region**. The critical region determines which observed statistics are consistent with the null distribution.
+Often the quantiles describing the tails of the null distribution determine what is called the **critical region**. The critical region determines which observed statistics are considered "consistent" with the null distribution.
 
 ```{r}
 gender_discrimination_perm %>%
@@ -958,7 +960,8 @@ Great work! The observed difference is consistent with differences you would see
 
 Using the randomization distributions with the small and big datasets, calculate different cutoffs for significance. Remember, you are most interested in a large positive difference in promotion rates, so you are calculating the upper quantiles of 0.90, 0.95, and 0.99.
 
-A function for calculating these quantiles, `calc_upper_quantiles()` is sown in the script.
+A function for calculating these quantiles, `calc_upper_quantiles()` is sown in the script. 
+We don't expect for you to learn how to write a function in R! Instead, the function is intended to demonstrate how we can automate the process of finding the 90%, 95%, and 99% quantiles of a test statistic. When you click on the "Run Code" button, you are able to use the function, simply by typing its name (`calc_upper_quantiles()`).  
 
 - As a reference point, run the call to `calc_upper_quantiles()` to calculate the relevant quantiles associated with the original dataset of 1000 permuted differences, `gender_discrimination_perm`.
 - Do the same for the small dataset, `gender_discrimination_small_perm` ...
@@ -1004,7 +1007,7 @@ calc_upper_quantiles(gender_discrimination_big_perm)
 ```
 
 
-Great work! Notice how the differences in proportions must be much larger to be significant if the sample size is small. With a big sample size, a small difference in proportions can be significant.
+Great work! Notice how the differences in proportions must be much larger to be "significant" if the sample size is small. With a big sample size, a small difference in proportions can be "significant."
 
 ## What is a p-value?
 
@@ -1048,22 +1051,33 @@ Recall that the 0.1 quantile is 0.125, the 0.05 quantile is 0.208, and the 0.01 
 
 ### Definition of p-value
 
-A p-value is the _probability of observing data as or more extreme than what we actually got, given that the null hypothesis is true_.
+A p-value is the _probability of observing data as or more extreme than what we actually got, assuming the null hypothesis is true_.
 
-In this example, the p-value is the _probability of observing a difference of 0.2917 or greater when promotion rates do not vary across gender = 0.03_.
+In this example, the p-value (0.03) is the _probability of observing a difference of 0.2917 or greater assuming that promotion rates do not vary across gender_.
 
 ### Calculating the p-values
 
 p-value measures the degree of disagreement between the data and the null hypothesis. Here, you will calculate the p-value for the original discrimination dataset as well as the small and big versions, `gender_discrimination_small` and `gender_discrimination_big`.
 
-The original differences in proportions are available in your workspace, `diff_orig`, `diff_orig_small`, and `diff_orig_big`, as are the permuted datasets, `gender_discrimination_perm`, `gender_discrimination_small_perm`, and `gender_discrimination_big_perm`.
+The original differences in proportions are available in your workspace, `diff_orig`, `diff_orig_small`, and `diff_orig_big`, as are the permuted datasets, `gender_discrimination_perm`, `gender_discrimination_small_perm`, and `gender_discrimination_big_perm`. 
 
-Recall that you're only interested in the one-sided hypothesis test here. That is, you're trying to answer the question, "Are men more likely to be promoted than women?"
+Recall that you're only interested in the one-sided hypothesis test here. That is, you're trying to answer the question, "Are men __more likely__ to be promoted than women?" 
+Thus, the p-value (which represents how often a null value is more *extreme*) would be calculated by counting the number of null values which are `greater` than the original difference. 
 
-- `visualize()` and `get_p_value()` using the built in infer functions. Remember that the null statistics are below the original difference, so the p-value (which represents how often a null value is more *extreme*) is calculated by counting the number of null values which are `greater` than the original difference. 
-- Repeat for the small dataset, `gender_discrimination_small_perm`, which has observed difference `diff_orig_small`.
-- Repeat for the big dataset, `gender_discrimination_big_perm`, which has observed difference `diff_orig_big`.
-- You can test your knowledge by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"` before submitting your answer.
+To retrieve the p-value, we can use the `get_p_value()` function, which comes in the infer package. 
+This function has three arguments (inputs): 
+
+1. a dataset with permuted statistics (output from `generate()`) 
+2. the observed statistic (`obs_stat`) 
+3. the direction of the alternative hypothesis ("greater", "less", or "two-sided")
+
+We can also use the `visualize()` function to visualize where the observed statistic falls in the distribution of permuted statsitics, and shade the direction that the p-value was calculated from. 
+The `visualize()` function has many inputs (find out more by typing `?visualize` in your console), but the most important ones are the __same__ as the `get_p_value()` function!  
+
+Now, use the `visualize()` and `get_p_value()` functions for the original, small, and big datasets. 
+First `visualize()` where the p-value lies on the distibution, and then calculate the p-value. 
+
+- You can test out the different methods for calculating the p-value by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"`. 
 
 ```{r pvalue, exercise=TRUE}
 # Visualize and calculate the p-value for the original dataset
@@ -1089,7 +1103,7 @@ ___ %>%
 ```
 
 <div id="pvalue-hint">
-**Hint:** Argument of the both functions should be `obs_stat = diff_orig, direction = "greater"`.
+**Hint:** Argument of the both functions should be `obs_stat = diff_orig, direction = "greater"`, but remember to use the correct dataset! 
 </div>
 
 ```{r pvalue-solution}
@@ -1115,21 +1129,21 @@ gender_discrimination_big_perm %>%
   get_p_value(obs_stat = diff_orig_big, direction = "greater")
 ```
 
-Well done! You may have noticed that the observed statistic is borderline significant (p-value = 0.03) for the original data. However, the same statistic would have been very consistent with the small dataset (p-value = 0.277 ) and extremely unusual for the large dataset (p-value = 0).
+Well done! You may have noticed that the observed statistic is borderline "significant" (p-value = 0.03) for the original data. However, the same statistic would have been very consistent with the small dataset (p-value = 0.277 ) and extremely unusual for the large dataset (p-value $\approx$ 0).
 
 ### Practice calculating p-values
 
 In the original dataset, 87.5% of the men were promoted and 58.3% of the women were promoted.
 
-Consider a situation where there are 24 men, 24 women, and 35 people are still promoted. But in this new scenario, 75% of the men are promoted and 70.8% of the women are promoted. Does the difference in promotion rates still appear to be statistically significant? That is, could this difference in promotion rates have come from random chance?
+Consider a situation where there are 24 men, 24 women, and 35 people are still promoted. But in this new scenario, 75% of the men are promoted and 70.8% of the women are promoted. Does the difference in promotion rates still appear to be "statistically significant"? That is, could this difference in promotion rates have come from random chance?
 
 You'll analyze these new data, contained in `gender_discrimination_new`, using the same permutation algorithm from before.
 
-The `gender_discrimination_perm` and `gender_discrimination_perm` datasets are available in your workspace.
+The `gender_discrimination_perm` and `gender_discrimination_perm` datasets are also available in your workspace.
 
- (1)
+  (1)
 - Run the code to recall the counts of `gender` and `decision` in the original dataset.
-- Get the counts in the new dataset, `gender_discrimination_new`.
+- Then, get these counts for the new dataset, `gender_discrimination_new`.
 
 
 ```{r pvalue_2, exercise=TRUE}
@@ -1137,7 +1151,7 @@ The `gender_discrimination_perm` and `gender_discrimination_perm` datasets are a
 gender_discrimination %>% 
   count(gender, decision)
 
-# Tabulate the new data
+# Count the promotions for each gender in the new data
 ___
 ```
 
@@ -1150,14 +1164,14 @@ ___
 gender_discrimination %>% 
   count(gender, decision)
 
-# Tabulate the new data
+# Count the promotions for each gender in the new data
 gender_discrimination_new %>% 
   count(gender, decision)
 ```
 
  (2)
-- Run the code to recall the histogram of the difference statistic in the original permutation dataset.
-- Draw the histogram with the new permutation dataset, `gender_discrimination_new_perm`. On this plot, set the x-axis intercept of the vertical line to `diff_orig_new`.
+- Run the code provided to recall the histogram of the statistics (differences in proportions) in the original permutation dataset.
+- Create a histogram of the new permutation dataset, `gender_discrimination_new_perm`. On this plot, use `geom_vline()` to specify a red x-axis intercept of `diff_orig_new`.
 
 
 ```{r pvalue_3, exercise=TRUE}
@@ -1183,8 +1197,8 @@ ggplot(gender_discrimination_new_perm, aes(x = stat)) +
 ```
 
  (3)
-- Run the code to recall the p-value of the difference statistic in the original permutation dataset.
-- Calculate the p-value with the new permutation dataset, `gender_discrimination_new_perm`, and the new observed difference, `diff_orig_new`.
+- Run the code provided to recall the p-value of the statistics (differences in proportions) in the original permutation dataset.
+- Calculate the p-value of the new permutation dataset, `gender_discrimination_new_perm`, and the new observed difference, `diff_orig_new`.
 
 
 ```{r pvalue_4, exercise=TRUE}
@@ -1207,11 +1221,13 @@ gender_discrimination_new_perm %>%
 ```
 
 
-Great work!  Notice that the permutation differences (the two histograms) are essentially the same regardless of whether the original or the new dataset is used.
+Great work!  Notice that the permutation differences (the two histograms) are essentially the same regardless of whether the original or the new dataset is used. Why do you think that is? 
+
+**Hint:** Does the null hypothesis depend on the dataset, or is it the same for both? 
 
 ### Calculating two-sided p-values
 
-What if the original research hypothesis had focused on *any* difference in promotion rates between men and women instead of focusing on whether men are more likely to be promoted than women?  In this case, a difference like the one observed would occur twice as often (by chance) because sometimes the difference would be positive and sometimes it would be negative.
+What if the original research hypothesis had focused on *any* difference in promotion rates between men and women instead of focusing on whether men are *more likely* to be promoted than women?  In this case, a difference like the one observed would occur twice as often (by chance) because sometimes the difference would be positive and sometimes it would be negative.
 
 When there is no directionality to the alternative hypothesis, the hypothesis and p-value are considered to be *two-sided*. In a two-sided setting, the p-value is double the one-sided p-value.
 
@@ -1219,8 +1235,9 @@ In this exercise, you'll calculate a two-sided p-value given the original random
 
 The observed difference is stored in `diff_orig` and the difference in each permutation is the `stat` column of `gender_discrimination_perm`.
 
+Use the `summarize()` function to calculate the two-sided p-value. 
+You will use the p-value calculation from the previous exercise, and make the modification that the p-value is equal to twice the value of the original. 
 
-Calculate the two-sided p-value. This is double the one-sided p-value that you calculated in previous exercises.
 
 ```{r pvalue_5, exercise=TRUE}
 # Calculate the two-sided p-value
@@ -1239,7 +1256,7 @@ gender_discrimination_perm %>%
   summarize(p_value = 2 * mean(diff_orig <= stat))
 ```
 
-Good job!  Notice, from the calculation, that the two-sided p-value is twice as big as the one-sided p-value. Often, two-sided p-values are preferred as a way of avoiding making false significance claims.
+Good job!  Notice, from the calculation, that the two-sided p-value is twice as big as the one-sided p-value. Two-sided p-values are often advocated for, as a way of avoiding making false "significance" claims.
 
 ## Summary of gender discrimination
 
@@ -1257,15 +1274,15 @@ ggplot(gender_discrimination_perm) +
 ```
   
 
-Pay special attention to how the p-value is computed here. First we identify permuted differences that are larger than or equal to the observed statistic and label those situations with a 1, all other permutations receiving a zero. By averaging the 0s and 1s, the mean gives the proportion of times the permuted difference is larger than or equal to the observed difference. 
+Pay special attention to how the p-value is computed here. First we identify permuted differences that are larger than or equal to the observed statistic and label those situations TRUE (or a value of 1), all other permutations FALSE (or a value of 0). By averaging the 0s and 1s, we can use the `mean()` to find the proportion of times the permuted difference is larger than or equal to the observed difference. 
 
-Because 0.03 is less than 0.05, we reject the null hypothesis and claim that men are promoted at a higher rate than women. That is, we conclude that it was not simply random variability which led to a higher proportion of men being promoted. A p-value of 0.03 is reasonably close to 0.05 which means we should be somewhat careful in making strong claims. We should take the results as a indication that more work should be done on the claims. Indeed, in 40 years since this research was published, many social scientists have been able to replicate research on gender discrimination in the workforce.
+Because 0.03 is less than 0.05, we decide to reject the null hypothesis in favor of the alternative, claiming that men are promoted at a higher rate than women. That is, we conclude that it was not simply random variability which led to a higher proportion of men being promoted. A p-value of 0.03 is reasonably close to 0.05 which means we should be somewhat careful in making strong claims. We should take the results as a indication that more work should be done on the claims. Indeed, in 40 years since this research was published, many social scientists have been able to replicate research on gender discrimination in the workforce.
 
 Because the study was randomized, that is, they randomly assigned the resumes to the managers, there is nothing systematically different about the two groups except the name on the resume. As an example, it wouldn't make sense to have given the female resumes to the first 24 managers who arrived at the training. Those early arriving individuals might be less inclined to promote anyone given their strict adherence to being on time.
 
 The only difference in the two groups, both the participants as well as the resumes, was the name on the top of the resume.
 
-Therefore, *any difference in promotion rates is due to the gender of the applicant*. That is, we can infer a causal connection between the gender of the applicant being male and a higher promotion rate.
+Therefore, we can conclude that *any difference in promotion rates is due to the gender of the applicant*. That is, we can infer a __causal__ connection between the gender of the applicant being male and a higher promotion rate.
 
 The 35 individuals in the sample were not randomly sampled from all possible American bank managers; they were at a management training session. In order to generalize the results of the study to a larger population, we would need more information about the study and careful thinking about who the study participants might represent.
 
