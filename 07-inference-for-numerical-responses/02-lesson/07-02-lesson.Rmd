@@ -586,7 +586,7 @@ Suppose instead of the mean, we want to estimate the median difference in prices
 First, for the price differences, generate 1000 bootstrap replicates and calculate their medians. Remember, for the test of a single mean you only need to `specify()` a `response` variable. 
 
 ```{r estimate_the_median_difference_in_textbook_prices, exercise=TRUE}
-# Calculate 500 bootstrap medians of diff
+# Calculate 1000 bootstrap medians of diff
 textdiff_med_ci <- textbooks %>%
   sepecify(response = ___) %>%
   generate(reps = ___, type = ___) %>%
@@ -602,7 +602,7 @@ textdiff_med_ci <- textbooks %>%
 </div>
 
 ```{r estimate_the_median_difference_in_textbook_prices-solution}
-# Calculate 500 bootstrap medians of diff
+# Calculate 10000 bootstrap medians of diff
 textdiff_med_ci <- textbooks %>%
   specify(response = diff) %>%
   generate(reps = 1000, type = "bootstrap") %>%
@@ -617,7 +617,7 @@ Then, calculate a 95% confidence interval for the bootstrap median price differe
 # From previous step
 textdiff_med_ci <- textbooks %>%
   specify(response = diff) %>%
-  generate(reps = 500, type = "bootstrap") %>%
+  generate(reps = 1000, type = "bootstrap") %>%
   calculate(stat = "median")
 
 ```
