@@ -883,7 +883,7 @@ Before we wrap up our discussion of comparing means across two groups, let's als
 
 First, we need independence. But independence of what?
 
-Observations in each sample should be independent of each other. We discussed earlier that this is a difficult condition to check, but that if the study employs random sampling and/or random assignment, and for studies that employ random sampling without replacement -- which is almost all observational studies like polls and surveys -- the sample sizes are less than 10% of their respective populations, we can be fairly certain that the observations in each of the samples are independent of each other. The American Community Survey employs random sampling, and our sample sizes are definitely less than 10% of all citizens and non citizens in the US.
+Observations in each sample should be independent of each other. We discussed earlier that this is a difficult condition to check, especially if the study didn't employ random sampling. Fortunately, American Community Survey employs random sampling, so it seems reasonable to infer that the observations in the sample are independent. 
 
 Also, observations across the two samples should be independent of each other, in other words, that the data should not be paired. 
 
