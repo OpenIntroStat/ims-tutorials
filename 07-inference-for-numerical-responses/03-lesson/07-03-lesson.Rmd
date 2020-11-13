@@ -496,7 +496,7 @@ And finally, calculate the p-value for the hypothesis test. Use the `get_p_value
 
 - Use the previously calculated difference in means stored inside `diff_mean_obs` as the observed statistic. 
 - Use a "two-sided" alternative hypothesis to calculate the two-sided p-value. 
-- Compare the two-sided p-value to the one-sided ("greater") p-value. Is the one-sided p-value half of the two-sided?  
+- Compare the two-sided p-value to the one-sided ("less") p-value. Is the one-sided p-value half of the two-sided?  
 
 ```{r smoking_4-setup, include = FALSE}
 # From previous steps
@@ -704,7 +704,6 @@ ncbirths_complete_habit_weeks <- ncbirths %>%
   filter(!is.na(habit), !is.na(weeks))
 ```
 
-
 ```{r smoking_bs_4, exercise=TRUE}
 # Generate 1500 bootstrap difference in medians
 diff_med_ci <- ncbirths_complete_habit_weeks %>%
@@ -855,7 +854,6 @@ Here, our null hypothesis alternative hypothesis says that there is a difference
 
 ```{r, echo = FALSE}
 acs12 <- acs12 %>% 
-  filter(!is.na(hrly_pay)) %>%
   mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"))
 ```
 
