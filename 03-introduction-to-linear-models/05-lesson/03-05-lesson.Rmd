@@ -16,6 +16,7 @@ library(tidyverse)
 library(openintro)
 library(Lahman)
 library(emo)
+library(gradethis)
 
 # knitr options ----------------------------------------------------------------
 
@@ -25,6 +26,11 @@ knitr::opts_chunk$set(fig.align = "center",
                       echo = FALSE, 
                       message = FALSE, 
                       warning = FALSE)
+
+tutorial_options(
+  exercise.timelimit = 60, 
+  exercise.checker = gradethis::grade_learnr
+  )
 
 # data prep --------------------------------------------------------------------
 
@@ -131,7 +137,9 @@ question("What does this mean?",
   answer("The typical difference between the observed poverty rate and the poverty rate predicted by the model is about 4.67%. "),
   answer("The model explains about 4.67% of the variability in poverty rate among counties."),
   answer("The model correctly predicted the poverty rate of 4.67% of the counties."),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  correct = "Correct!",
+  random_answer_order = TRUE
 )
 ```
 
@@ -181,6 +189,13 @@ mean(residuals(mod_wgt_hgt))
 
 # Compute RMSE
 sqrt(sum(residuals(mod_wgt_hgt)^2) / df.residual(mod_wgt_hgt))
+```
+
+```{r ex2-check}
+grade_result(
+  pass_if(~identical(floor(.result),9),"You have computed the RMSE correctly!")
+  fail_if(~TRUE, "Look at the hint, be sure to use the correct expression.")
+)
 ```
 
 ## Comparing model fits
@@ -348,6 +363,14 @@ bdims_augment_wgt_hgt %>%
   mutate(R_squared = 1 - var_e / var_y)
 ```
 
+```{r ex3-check}
+grade_result(
+  pass_if(~identical(round(.result$R_squared, digits =2), 0.51), "Your R^2 value is correct!"),
+  fail_if(~identical(floor(.result$R_squared), -2), "Did you perhaps use 1 - var_y / var_e? Look at the formula again."),
+  fail_if(~TRUE, "Make sure you are using the correct formula!")
+)
+```
+
 ### Interpretation of $R^2$
 
 The $R^2$ reported for the regression model for poverty rate of U.S. counties in terms of high school graduation rate is 0.464. 
@@ -363,7 +386,8 @@ question("How should this result be interpreted?",
   answer("46.4% of the variability in poverty rate among U.S. counties can be explained by high school graduation rate.", correct = TRUE, message = "Right! The $R^2$ represents the percentage of the variability of the response variable that can be explained by the explanatory variable."),
   answer("This model is 46.4% effective.", message = "Incorrect"),
   answer("The correlation between poverty rate and high school graduation rate is 0.464.", message = "Try again!"), 
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE
 )
 ```
 
@@ -429,12 +453,8 @@ glimpse(bdims_augment_wgt_hgt)
 ```{r ex4-setup}
 ```
 
-```{r ex4, exercise = TRUE}
+```{r ex4-1, exercise = TRUE}
 # Compute SSE for null model
-___ %>%
-  summarize(SSE = ___)
-
-# Compute SSE for regression model
 ___ %>%
   summarize(SSE = ___)
 ```
@@ -443,14 +463,36 @@ ___ %>%
 **Hint:** Residuals are `.resid` in the model output.
 </div>
 
-```{r ex4-solution}
+```{r ex4-1-solution}
 # Compute SSE for null model
 bdims_augment_null %>%
   summarize(SSE = var(.resid))
+```
 
+```{r ex4-1-check}
+grade_result(
+  pass_if(~identical(floor(.result$SSE), 178), "Your SSE is correct!"),
+  fail_if(~TRUE, "Look at the hint for help!")
+)
+```
+
+```{r ex4-2, exercise = TRUE}
+# Compute SSE for regression model
+___ %>%
+  summarize(SSE = ___)
+```
+
+```{r ex4-2-solution}
 # Compute SSE for regression model
 bdims_augment_wgt_hgt %>%
   summarize(SSE = var(.resid))
+```
+
+```{r ex4-2-check}
+grade_result(
+  pass_if(~identical(floor(.result$SSE), 86), "You have computed the SSE correclty!"),
+  fail_if(~TRUE, "Look at the hint for help!")
+)
 ```
 
 ### Unusual points
@@ -556,6 +598,10 @@ mod_slg_obp %>%
   head()
 ```
 
+<div id="ex5-hint">
+**Hint:** Use the `arrange` function for listing the leverage scores in descending order.
+</div>
+
 ```{r ex5-hint-1}
 # Rank points of high leverage
 mod_slg_obp %>%
@@ -578,6 +624,10 @@ mod_slg_obp %>%
   augment() %>%
   arrange(desc(.hat)) %>%
   head()
+```
+
+```{r ex5-check}
+grade_code("Your solution is correct!")
 ```
 
 ### Influence
@@ -612,6 +662,10 @@ mod_slg_obp %>%
   augment() %>%
   arrange(desc(.cooksd)) %>%
   head()
+```
+
+```{r ex6-check}
+grade_code("Your solution is correct!")
 ```
 
 ## Dealing with outliers
@@ -699,57 +753,97 @@ Nevertheless, we can demonstrate how removing him will affect our model.
 - View the `summary()` of the new model and compare the slope and $R^2$ to those of `mod`, the original model fit to the data on all players.
 - Visualize the new model with `ggplot()` and the appropriate `geom_*()` functions.
 
-```{r ex7, exercise = TRUE}
+```{r ex7-2-setup}
+nontrivial_players <- mlbbat10 %>%
+  filter(at_bat >= 10, obp < 0.5)
+
+mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
+```
+
+```{r ex7-1, exercise = TRUE}
 # Create nontrivial_players
-
-
-
-# Fit model to new data
-
-
-
-# View model summary
-
-
-
-# Visualize new model
-
-
 
 ```
 
-```{r ex7-hint-1}
+```{r ex7-1-hint-1}
 # Create nontrivial_players
 nontrivial_players <- mlbbat10 %>%
   filter(at_bat >= ___, ___)
 ```
 
-```{r ex7-hint-2}
+```{r ex7-1-hint-2}
 # Create nontrivial_players
 nontrivial_players <- mlbbat10 %>%
   filter(at_bat >= ___, obp < ___)
 ```
 
-```{r ex7-hint-3}
-# Fit model to new data
-mod_cleaner <- lm(___ ~ ___, data = nontrivial_players)
-```
-
-```{r ex7-solution}
+```{r ex7-1-solution}
 # Create nontrivial_players
 nontrivial_players <- mlbbat10 %>%
   filter(at_bat >= 10, obp < 0.5)
+```
 
+```{r ex7-1-check}
+grade_code("Your solution is correct!")
+```
+
+```{r ex7-2, exercise = TRUE}
+# Fit model to new data
+
+#View model summary
+
+```
+
+```{r ex7-2-hint}
+# Fit model to new data
+mod_cleaner <- lm(___ ~ ___, data = nontrivial_players)
+
+# View model summary
+summary(mod_cleaner)
+```
+
+```{r ex7-2-solution}
 # Fit model to new data
 mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
 
 # View model summary
 summary(mod_cleaner)
+```
 
+```{r ex7-2-check}
+grade_code("You have fit the model correctly!")
+```
+
+```{r ex7-3, exercise = TRUE, exercise.setup = "ex7-2-setup"}
+# Visualize new model
+
+
+```
+
+```{r ex7-3-hint-1}
+# Visualize new model
+ggplot(data = ___, aes(x = ___, y = ___)) +
+  geom_point() + 
+  geom___(method = ___)
+
+```
+
+```{r ex7-3-hint-2}
+# Visualize new model
+ggplot(data = nontrivial_players, aes(x = ___, y = ___)) +
+  geom_point() + 
+  geom_smooth(method = ___)
+```
+
+```{r ex7-3-solution}
 # Visualize new model
 ggplot(data = nontrivial_players, aes(x = obp, y = slg)) +
   geom_point() + 
   geom_smooth(method = "lm")
+```
+
+```{r ex7-3-check}
+grade_code("Your plot is correct!")
 ```
 
 ### High leverage points
@@ -810,6 +904,10 @@ mod %>%
   augment() %>%
   arrange(desc(.hat), .cooksd) %>%
   head()
+```
+
+```{r ex8-check}
+grade_code("Your solution is correct!")
 ```
 
 ## Congratulations!

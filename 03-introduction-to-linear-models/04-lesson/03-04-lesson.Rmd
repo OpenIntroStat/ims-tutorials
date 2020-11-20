@@ -14,6 +14,7 @@ library(openintro)
 library(grid)
 library(broom)
 library(emo)
+library(gradethis)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -22,7 +23,10 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE, 
                       message = FALSE)
 
-tutorial_options(exercise.eval = FALSE)
+tutorial_options(
+  exercise.timelimit = 60, 
+  exercise.checker = gradethis::grade_learnr
+  )
 
 textbooks$course <- as.character(textbooks$course) 
 
@@ -125,7 +129,9 @@ question("Which of the following is the correct interpretation of the slope coef
   answer("Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with about a 0.591 percentage point decrease in the poverty rate.", correct = TRUE, message = "Remember that the slope represents the estimated change in the response variable for a one unit change in the explanatory variable."),
   answer("Among U.S. counties, each additional percentage point increase in the high school graduation rate is associated with about a 0.591 percentage point increase in the poverty rate."),
   answer("Among U.S. counties, a 1% increase in the high school graduation rate is associated with about a 0.591% decrease in the poverty rate."),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -146,7 +152,9 @@ question("Which of the following mistakes in interpretation has the politician m
   answer("Confusing percentage change with percentage point change."),
   answer("All of the above.", correct = TRUE),
   answer("None of the above.", message = "A little skepticism would be good here! The politician has made more than one mistake in interpreting the relationship."),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -165,31 +173,87 @@ The `lm()` function return a model object having class `"lm"`. This object conta
 - Using the `mammals` dataset, create a linear model for the body weight of mammals as a function of their brain weight, after taking the natural log of both variables.
 
 
-```{r ex1, exercise = TRUE}
+```{r ex1-bdims, exercise = TRUE}
 # Linear model for weight as a function of height
 lm(___ ~ ___, data = ___)
-
-# Linear model for SLG as a function of OBP
-
-
-# Log-linear model for body weight as a function of brain weight
-
 ```
 
 <div id="ex1-hint">
 **Hint:** The formula `y ~ x` means `y` is a function of `x`.
 </div>
 
-```{r ex1-solution}
+```{r ex1-bdims-solution}
 # Linear model for weight as a function of height
 lm(wgt ~ hgt, data = bdims)
+```
 
+```{r ex1-bdims-check}
+grade_result(
+  pass_if(~identical(floor(.result$coefficients[1]),-106), "You have fitted the model correctly!"),
+  fail_if(~identical(floor(.result$coefficients[1]), 136), "We want a linear model where weight is a function of height, not the other way round. "),
+  fail_if(~TRUE, "Not quite, review the Slope & Intercept section where the lm function is introduced.")
+)
+```
+
+```{r ex1-mlb, exercise = TRUE}
+# Linear model for SLG as a function of OBP
+
+```
+
+
+```{r ex1-mlb-hint-1}
+Look at the previous exercise. They are pretty similar!
+
+```
+
+```{r ex1-mlb-hint-2}
+# Linear model for SLG as a function of OBP 
+lm(___ ~ ___, data = mlbbat10)
+```
+
+```{r ex1-mlb-solution}
 # Linear model for SLG as a function of OBP
 lm(slg ~ obp, data = mlbbat10)
+```
 
+```{r ex1-mlb-check}
+grade_result(
+  pass_if(~identical(round(.result$coefficients[2],digits =2), 1.11), "You have fitted the correct model!"),
+  fail_if(~identical(round(.result$coefficients[1],digits = 3), 0.064), "Make sure you are modelling slg as a function of obg, not the other way round."),
+  fail_if(~TRUE, "Check out the previous exercise. They are pretty similar!")
+)
+```
+
+```{r-ex1-mammals, exercise = TRUE}
+# Log-linear model for body weight as a function of brain weight
+
+```
+
+```{r-ex1-mammals-hint-1}
+# Log-linear model for body weight as a function of brain weight
+lm(___ ~ ___, data = ___)
+```
+
+```{r-ex1-mammals-hint-2}
+# Log-linear model for body weight as a function of brain weight
+lm(log(___) ~ log(___), data = ___)
+```
+
+```{r ex1-mammals-solution}
 # Log-linear model for body weight as a function of brain weight
 lm(log(body_wt) ~ log(brain_wt), data = mammals)
 ```
+
+```{r ex1-mammals-check}
+grade_result(
+  pass_if(~identical(round(.result$coefficients[1],digits = 1), -2.5), "You have fitted the correct model!"),
+  fail_if(~identical(floor(.result$coefficients[1]), -57), "Did you forget to apply the log function to your variables? Remember, we want a log-linear model."),
+  fail_if(~identical(round(.result$coefficients[1], digits =2), 2.13), "We want body weight as a function of brain weight, not the other way round."),
+  fail_if(~TRUE, "Not qite, look at the hints for help.")
+)
+
+```
+
 ### Units and scale
 
 In the previous examples, we fit two regression models:
@@ -206,7 +270,9 @@ question("Which of the following statements is **incorrect**?",
   answer("A person who is 170 cm tall is expected to weigh about 68 kg. "),
   answer("Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight. ", correct = TRUE, message = "If you plug in the values, a person who is 170 cm tall *is* expected to weigh about 68 kg."),
   answer("None of the above."),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  correct = "Correct!",
+  random_answer_order = TRUE
 )
 ```
 
@@ -300,11 +366,11 @@ Now, you will:
 - Use `coef()` to display the coefficients of `mod`.
 - Use `summary()` to display the full regression output of `mod`.
 
-```{r ex2-setup}
+```{r ex3-setup}
 mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
-```{r ex2, exercise = TRUE}
+```{r ex3, exercise = TRUE}
 # Show the coefficients
 
 
@@ -316,12 +382,16 @@ mod <- lm(wgt ~ hgt, data = bdims)
 **Hint:** Use `coef()` and `summary()` on the model object.
 </div>
 
-```{r ex2-solution}
+```{r ex3-solution}
 # Show the coefficients
 coef(mod)
 
 # Show the full output
 summary(mod)
+```
+
+```{r ex3-check}
+grade_code()
 ```
 
 ### Fitted values and residuals
@@ -374,6 +444,10 @@ mean(bdims$wgt) == mean(fitted.values(mod))
 mean(residuals(mod))
 ```
 
+```{r ex4-check}
+grade_code()
+```
+
 ### Tidying your linear model
 
 As you fit a regression model, there are some quantities (e.g. $R^2$) that apply to the model as a whole, while others apply to each observation (e.g. $\hat{y}_i$). If there are several of these per-observation quantities, it is sometimes convenient to attach them to the original data as new variables.
@@ -417,6 +491,10 @@ bdims_tidy <- augment(mod)
 
 # Glimpse the resulting data frame
 glimpse(bdims_tidy)
+```
+
+```{r ex5-check}
+grade_code()
 ```
 
 ## Using your linear model
@@ -532,6 +610,9 @@ ben
 predict(mod, newdata = ben)
 ```
 
+```{r ex6-check}
+grade_code("Your solution is correct!")
+```
 
 ### Adding a regression line to a plot manually
 
@@ -571,6 +652,9 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
               color = "dodgerblue")
 ```
 
+```{r ex7-check}
+grade_code("You have created the correct plot!")
+```
 
 ## Congratulations!
 

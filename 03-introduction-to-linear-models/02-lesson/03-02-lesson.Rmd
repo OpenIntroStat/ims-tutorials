@@ -12,6 +12,7 @@ library(learnr)
 library(tidyverse)
 library(openintro)
 library(emo)
+library(gradethis)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -25,6 +26,11 @@ anscombe <- anscombe %>%
   gather(key = "key", value = "val", -id) %>%
   separate(key, into = c("variable", "set"), sep = 1) %>%
   spread(key = variable, value = val)
+
+tutorial_options(
+  exercise.timelimit = 60, 
+  exercise.checker = gradethis::grade_learnr
+  )
 ```
 
 ## Strength of bivariate relationships
@@ -180,7 +186,9 @@ question("In a scientific paper, three correlations are reported with the follow
   answer("(3) is invalid.", message = "(3) is perfectly valid!"),
   answer("Both (1) and (2) are invalid.", message = "Wrong!"),
   answer("Both (2) and (3) are invalid.", message = "Incorrect!"),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -192,7 +200,9 @@ question("In a scientific paper, three correlations are reported with the follow
   answer("0.134", message = "This is the weakest correlation."),
   answer("-0.795", correct = TRUE, message = "Indeed, the closer to 1 or -1, the stronger the correlation."),
   answer("Can't tell!"),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -206,35 +216,73 @@ At the same time, the `cor()` function is very conservative when it encounters m
 - Use `cor()` to compute the correlation between the birthweight of babies in the `ncbirths` dataset and their mother's age. There is no missing data in either variable.
 - Compute the correlation between the birthweight and the number of weeks of gestation for all non-missing pairs.
 
-```{r ex1, exercise = TRUE}
+```{r ex1-a, exercise = TRUE}
 # Compute correlation
 ncbirths %>%
   summarize(N = n(), r = cor(___, ___))
+```
 
+```{r ex1-a-solution}
+ncbirths %>%
+  summarize(N = n(), r = cor(weight, mage))
+```
+
+```{r ex1-a-check}
+grade_result(
+  pass_if(~identical(round(.result$r,digits = 3),0.055),"Your solution is correct!"),
+  fail_if(~is.na(.result$r), "Did you perhaps use other variables instead of the weight and mother's age?"),
+  fail_if(~ TRUE, "Not quite. Make sure you are computing the correlation for variables `weight` and `mage`.")
+)
+```
+
+```{r ex1-b, exercise = TRUE}
 # Compute correlation for all non-missing pairs
 ncbirths %>%
   summarize(N = n(), r = cor(___, ___, use = ___))
 ```
 
-```{r ex1-hint-1}
-ncbirths %>%
-  summarize(N = n(), r = cor(weight, mage))
-```
-
-```{r ex1-hint-2}
+```{r ex1-b-hint}
 ncbirths %>%
   summarize(N = n(), r = cor(___, ___, use = "pairwise.complete.obs"))
 ```
 
-```{r ex1-solution}
-# Compute correlation
-ncbirths %>%
-  summarize(N = n(), r = cor(weight, mage))
-
+```{r ex1-b-solution}
 # Compute correlation for all non-missing pairs
 ncbirths %>%
   summarize(N = n(), r = cor(weight, weeks, use = "pairwise.complete.obs"))
 
+```
+
+```{r ex1-b-check}
+grade_result(
+  pass_if(~identical(round(.result$r,digits = 3),0.670),"Your solution is correct!"),
+  fail_if(~is.na(.result$r), "Make sure to set the `use` argument to 'pairwise.complete.obs'. "),
+  fail_if(~ TRUE, "Not quite. Look at the hint for help!")
+)
+```
+
+```{r ex1, exercise = TRUE}
+ncbirths %>%
+  summarize(N = n(), r = cor(weight, mage))
+
+ncbirths %>%
+  summarize(N = n(), r = cor(weight, weeks, use = "pairwise.complete.obs"))
+```
+
+```{r ex1-solution}
+ncbirths %>%
+  summarize(N = n(), r = cor(weight, mage))
+
+ncbirths %>%
+  summarize(N = n(), r = cor(weight, weeks, use = "pairwise.complete.obs"))
+
+```
+
+```{r ex1-check}
+grade_result(
+  pass_if(~identical(round(.result$r,digits=3),0.670)),
+  fail_if(~TRUE,"Not quite")
+)
 ```
 
 ## The Anscombe dataset
@@ -348,7 +396,18 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
   group_by(set) %>%
   summarize(
     N = n(), 
-    mean_of_x = mean(), 
+    mean_of_x = mean(___), 
+    ...
+  )
+```
+
+```{r ex2-hint-4}
+ anscombe %>%
+  group_by(set) %>%
+  summarize(
+    N = n(), 
+    mean_of_x = mean(x),
+    std_dev_0f_x = sd(___),
     ...
   )
 ```
@@ -365,6 +424,17 @@ anscombe %>%
     std_dev_of_y = sd(y), 
     correlation_between_x_and_y = cor(x, y)
   )
+```
+
+```{r ex2-check}
+grade_result_strict(
+  pass_if(~identical(.result$mean_of_x[1], 9)),
+  pass_if(~identical(floor(.result$std_dev_of_x[2]),3)),
+  pass_if(~identical(floor(.result$mean_of_y[3]),7)),
+  pass_if(~identical(floor(.result$std_dev_of_y[2]),2)),
+  pass_if(~identical(round(.result$correlation_between_x_and_y[1], digits = 3), 0.816)),
+  fail_if(~TRUE, "Not quite,look at the hints for help!")
+)
 ```
 
 ### Perception of correlation
@@ -385,7 +455,9 @@ question("Which of the following values is the correct correlation between pover
   answer("0.186", message = "Incorrect, the slope is not positive!"),
   answer("0.681", message = "Wrong, the relationship isn't positive!"),
   answer("0.861", message = "Try again!"),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -399,121 +471,186 @@ If you're having trouble recalling variable names, it may help to preview a data
 
 Draw the plot then calculate the correlation between `OBP` and `SLG` for all players in the `mlbbat10` dataset.
 
-```{r ex3, exercise = TRUE}
+```{r ex3-plot, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
   geom_point()
+```
 
+```{r ex3-plot-solution}
+# Run this and look at the plot
+ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
+  geom_point()
+```
+
+```{r ex3-plot-check}
+grade_code()
+```
+
+```{r ex3-cor, exercise = TRUE}
 # Correlation for all baseball players
 ___ %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3-hint-1}
+```{r ex3-cor-hint-1}
 ___ %>%
   summarize(N = n(), r = cor(___, ___))
 ```
 
-```{r ex3-hint-2}
+```{r ex3-cor-hint-2}
 ___ %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
 
-```{r ex3-solution}
-# Run this and look at the plot
-ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
-  geom_point()
-
+```{r ex3-cor-solution}
 # Correlation for all baseball players
 mlbbat10 %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
 
+```{r ex3-cor-check}
+grade_result(
+  pass_if(~identical(round(.result$r, digits = 1), 0.8), "You have computed the correct correlation!"),
+  fail_if(~TRUE, "Make sure you are using the right variable names.")
+)
+```
+
 Draw the plot then calculate the correlation between `OBP` and `SLG` for all players in the `mlbbat10` dataset with at least 200 at-bats.
 
-```{r ex4, exercise = TRUE}
+```{r ex4-plot, exercise = TRUE}
 # Run this and look at the plot
 mlbbat10 %>% 
   filter(at_bat > 200) %>%
   ggplot(aes(x = obp, y = slg)) + 
   geom_point()
+```
 
+```{r ex4-plot-solution}
+# Run this and look at the plot
+mlbbat10 %>% 
+  filter(at_bat > 200) %>%
+  ggplot(aes(x = obp, y = slg)) + 
+  geom_point()
+```
+
+```{r ex4-plot-check}
+grade_code()
+
+```
+
+```{r ex4-cor, exercise = TRUE}
 # Correlation for all players with at least 200 ABs
 ___ %>%
   filter(___) %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4-hint-1}
+```{r ex4-cor-hint-1}
 mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+  filter(at_bat ___) %>%
   summarize(N = n(), r = cor(___, ___))
 ```
 
-```{r ex4-hint-2}
+```{r ex4-cor-hint-2}
 mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+  filter(at_bat ___ 200) %>%
   summarize(N = n(), r = cor(obp, ___))
 ```
 
-```{r ex4-solution}
-# Run this and look at the plot
-mlbbat10 %>% 
-  filter(at_bat > 200) %>%
-  ggplot(aes(x = obp, y = slg)) + 
-  geom_point()
-
+```{r ex4-cor-solution}
 # Correlation for all players with at least 200 ABs
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
 
+```{r ex4-cor-check}
+grade_result_strict(
+  pass_if(~ identical(round(.result$r, digits = 2), 0.69), "You have computed the correct correlation!"),
+  pass_if(~ identical(.result$N, 329)),
+  fail_if(~ identical(.result$N, 327), "Did you perhaps use filter(at_bat > 200)? It should be at least 200, hence the inequality should be '>='."),
+  fail_if(~TRUE, "Make sure you are using the correct variable names.")
+)
+
+```
+
 Draw the plot then calculate the correlation between height and weight for each sex in the `bdims` dataset.
 
-```{r ex5, exercise = TRUE}
+```{r ex5-plot, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
   geom_point() 
+```
 
+```{r ex5-plot=solution}
+# Run this and look at the plot
+ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
+  geom_point() 
+```
+
+```{r ex5-plot-check}
+grade_code()
+```
+
+```{r ex5-cor, exercise = TRUE}
 # Correlation of body dimensions
 ___ %>%
   group_by(___) %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex5-hint-1}
+```{r ex5-cor-hint-1}
 ___ %>%
   group_by(sex) %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex5-hint-2}
+```{r ex5-cor-hint-2}
 ___ %>%
   group_by(sex) %>%
   summarize(N = n(), r = cor(___, ___))
 ```
 
-```{r ex5-solution}
-# Run this and look at the plot
-ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
-  geom_point() 
-
+```{r ex5-cor-solution}
 # Correlation of body dimensions
 bdims %>%
   group_by(sex) %>%
   summarize(N = n(), r = cor(hgt, wgt))
 ```
 
+```{r ex5-cor-check}
+grade_result_strict(
+  pass_if(~identical(.result$N[2],247)),
+  pass_if(~identical(round(.result$r[1], digits = 2), 0.43), "You have computed the correlation correctly!"),
+  fail_if(~identical(.result$N[3],34),"Did you perhaps group by age?"),
+  fail_if(~TRUE, "Are you using the correct variable names?")
+)
+
+```
+
 Draw the plot then calculate the correlation between body weight and brain weight for all species of `mammals`. Alongside this computation, compute the correlation between the same two quantities after taking their natural logarithms.
 
-```{r ex6, exercise = TRUE}
+```{r ex6-plot, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = mammals, aes(x = BodyWt, y = BrainWt)) +
   geom_point() + 
   scale_x_log10() + 
   scale_y_log10()
+```
 
+```{r ex6-plot-solution}
+ggplot(data = mammals, aes(x = BodyWt, y = BrainWt)) +
+  geom_point() + 
+  scale_x_log10() + 
+  scale_y_log10()
+```
+
+```{r ex6-plot-check}
+grade_code()
+```
+
+```{r ex6-cor, exercise = TRUE}
 # Correlation among mammals, with and without log
 ___ %>%
   summarize(N = ___, 
@@ -521,32 +658,34 @@ ___ %>%
             r_log = cor(log(___), log(___)))
 ```
 
-```{r ex6-hint-1}
+```{r ex6-cor-hint-1}
 ___ %>%
   summarize(N = n(), 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
-```{r ex6-hint-2}
+```{r ex6-cor-hint-2}
 ___ %>%
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
-```{r ex6-solution}
-# Run this and look at the plot
-ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
-  geom_point() + 
-  scale_x_log10() + 
-  scale_y_log10()
-
+```{r ex6-cor-solution}
 # Correlation among mammals, with and without log
 mammals %>%
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(body_wt), log(brain_wt)))
+```
+
+```{r ex6-cor-check}
+grade_result(
+  pass_if(~identical(round(.result$r_log, digits = 2), 0.96), "You have computed the correlations correctly!"),
+  fail_if(~TRUE, "Not quite. Look at the hints for help!"))
+)
+
 ```
 
 ## Interpretation of Correlation
@@ -759,17 +898,15 @@ noise <- data.frame(y = rnorm(n), x = rnorm(n), z = rep(1:k))
 ```{r ex7, exercise = TRUE}
 # Create faceted scatterplot
 
-
-
-
 # Compute correlations for each dataset
 noise_summary <- noise %>%
   group_by(___) %>%
-  summarize(N = n(), spurious_cor = cor(___, ___))
+  summarize(N = ___, spurious_cor = cor(___, ___))
 
 # Isolate sets with correlations above 0.2 in absolute strength
 noise_summary %>%
   filter(abs(___) > ___)
+
 ```
 
 ```{r ex7-hint-1}
@@ -803,6 +940,13 @@ noise_summary <- noise %>%
 # Isolate sets with correlations above 0.2 in absolute strength
 noise_summary %>%
   filter(abs(spurious_cor) > 0.2)
+```
+
+
+```{r ex7-check}
+grade_result(
+  pass_if(~identical(round(.result$spurious_cor[1], digits = 3)), round((noise_summary %>% filter(abs(spurious_cor)>0.2))$spurious_cor[1], digits = 3), "You have computed the correlation correctly!"),
+  fail_if(~ TRUE, "Not quite. Look at the hints for help!"))
 ```
 
 ## Congratulations!

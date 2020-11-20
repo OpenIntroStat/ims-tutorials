@@ -14,6 +14,7 @@ library(openintro)
 library(grid)
 library(png)
 library(emo)
+library(gradethis)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -22,7 +23,10 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning = FALSE)
 
-tutorial_options(exercise.eval = FALSE)
+tutorial_options(
+  exercise.timelimit = 60, 
+  exercise.checker = gradethis::grade_learnr
+  )
 ```
 
 
@@ -133,17 +137,24 @@ Using the `ncbirths` dataset, make a scatterplot using `ggplot()` to illustrate 
 
 ```{r ex1, exercise = TRUE}
 # Scatterplot of weight vs. weeks
-
+ggplot(data = ___, x = ___, y = ___) + 
+  geom_point()
 ```
 
 <div id="ex1-hint">
 **Hint:** In the plot `x` is `weeks` and `y` is `weight` from the `ncbirths` dataset.
 </div>
 
+
 ```{r ex1-solution}
 # Scatterplot of weight vs. weeks
 ggplot(data = ncbirths, aes(x = weeks, y = weight)) + 
   geom_point()
+```
+
+```{r ex1-check}
+grade_code("Your solution is correct!")
+
 ```
 
 ### Boxplots as discretized/conditioned scatterplots
@@ -157,13 +168,21 @@ Using the `ncbirths` dataset again, make a boxplot illustrating how the birth we
 ```{r ex2, exercise = TRUE}
 # Boxplot of weight vs. weeks
 ggplot(data = ___, 
-       aes(x = cut(___, breaks = ___), y = ___)) + 
-  ___
+       aes(x = cut(___, breaks  = ___), y = ___) + 
+  geom_boxplot()
 ```
 
 <div id="ex2-hint">
-**Hint:** In the plot `x` is `weeks` and `y` is `weight` from the `ncbirths` dataset.
+**Hint:** In the plot `x` is `weeks` (discretized into 6 intervals) and `y` is `weight` from the `ncbirths` dataset. Note that the number of breaks is the number of 'cut points' to produce 6 intervals. 
 </div>
+
+```{r ex2-hint-1}
+# Boxplot of weight vs. weeks
+ggplot(data = ncbirth, 
+       aes(x = cut(weeks, breaks = ___), y = ___)) + 
+  geom_boxplot()
+```
+
 
 ```{r ex2-solution}
 # Boxplot of weight vs. weeks
@@ -171,6 +190,11 @@ ggplot(data = ncbirths,
        aes(x = cut(weeks, breaks = 5), y = weight)) + 
   geom_boxplot()
 ```
+
+```{r ex2-check}
+grade_code("Your plot is correct!")
+```
+
 
 ## Characterizing bivariate relationships
 
@@ -271,8 +295,18 @@ Using the `mammals` dataset, create a scatterplot illustrating how the brain wei
 
 ```
 
-```{r ex3-hint}
-ggplot(data = ___, aes(x = body_wt, y = brain_wt)) +
+<div id="ex2-hint">
+**Hint:**For a hint, refer to the exercise where you created a scatterplot for the 'ncbirths' dataset. It's pretty similar!
+</div>
+
+
+```{r ex3-hint-1}
+ggplot(data = ___, aes(x = ___, y = ___))
++ geom____()
+```
+
+```{r ex3-hint-2}
+ggplot(data = mammals, aes(x = ___, y = ___)) +
   geom_point()
 ```
 
@@ -282,17 +316,22 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point()
 ```
 
+```{r ex3-check}
+grade_code("That's one good looking plot!")
+```
 
 Using the `mlbbat10` dataset, create a scatterplot illustrating how the slugging percentage (SLG) of a player varies as a function of his on-base percentage (OBP).
 
-```{r ex4-setup}
-```
 
 ```{r ex4, exercise = TRUE}
 # Baseball player scatterplot
 ```
 
-```{r ex4-hint}
+<div id="ex1-hint">
+**Hint:** Use `?mlbbat10` to access the description for the dataset and obtain the names for the x and y variables. 
+</div>
+
+```{r ex4-hint-1}
 ggplot(data = ___, aes(x = obp, y = slg)) +
   geom_point()
 ```
@@ -303,17 +342,33 @@ ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
   geom_point()
 ```
 
-Using the `bdims` dataset, create a scatterplot illustrating how a person's weight varies as a function of their height. Use color to separate by sex, which you'll need to coerce to a factor with `factor()`.
-
-```{r ex-setup}
+```{r ex4-check}
+grade_code("Your solution is correct!")
 ```
+
+Using the `bdims` dataset, create a scatterplot illustrating how a person's weight varies as a function of their height. Use color to separate by sex, which you'll need to coerce to a factor with `factor()`.
 
 ```{r ex5, exercise = TRUE}
 # Body dimensions scatterplot
 ```
 
-```{r ex5-hint}
-ggplot(data = bdims, aes(x = ___, y = ___, color = ___)_ +
+```{r ex5-hint-1}
+"Recall the basic form for creating a scatterplot with `ggplot()`:
+
+# Basic scatterplot
+ggplot(data = my_df, aes(x = var1, y = var2)) +
+  geom_point()
+
+You will need to add the `color` argument in aes()"
+```
+
+```{r ex5-hint-2}
+ggplot(data = bdims, aes(x = ___, y = ___, color = ___) +
+  geom_point()
+```
+
+```{r ex5-hint-3}
+ggplot(data = bdims, aes(x = ___, y = ___, color = factor(sex))) +
   geom_point()
 ```
 
@@ -323,27 +378,35 @@ ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
   geom_point()
 ```
 
-Using the `smoking` dataset, create a scatterplot illustrating how the amount that a person smokes on weekdays varies as a function of their age.
-
-```{r ex6-setup}
+```{r ex5-check}
+grade_code("You have produced the correct plot!")
 ```
+
+Using the `smoking` dataset, create a scatterplot illustrating how the amount that a person smokes on weekdays varies as a function of their age.
 
 ```{r ex6, exercise = TRUE}
 # Smoking scatterplot
 ```
 
-```{r ex6-hint}
-"Recall the basic form for creating a scatterplot with `ggplot()`:
-
-# Basic scatterplot
+```{r ex6-hint-1}
+"Basic scatterplot
 ggplot(data = my_df, aes(x = var1, y = var2)) +
   geom_point()"
+```
+
+```{r ex6-hint-2}
+ggplot(data = ___, aes(x = ___, y = ___))+
+  ___
 ```
 
 ```{r ex6-solution}
 # Smoking scatterplot
 ggplot(data = smoking, aes(x = age, y = amt_weekdays)) +
   geom_point()
+```
+
+```{r ex6-check}
+grade_code("Your solution is correct!")
 ```
 
 ### Characterizing scatterplots
@@ -361,7 +424,9 @@ question("Describe the form, direction, and strength of this relationship",
   answer("Linear, negative, weak", message = "Is it weak? Looks moderately strong to me."),
   answer("Linear, negative, moderately strong", correct = TRUE, message = "The scatterplot shows a linear and negative relationship!"),
   answer("Non-linear, negative, strong", message = "Is it non-linear?"),
-  allow_retry = TRUE
+  correct = "Correct!",
+  allow_retry = TRUE,
+  random_answer_order = TRUE
 )
 ```
 
@@ -383,18 +448,28 @@ Use `coord_trans()` to create a scatterplot showing how a mammal's brain weight 
 # Scatterplot with coord_trans()
  ggplot(data = ___, aes(x = ___, y = ___)) +
   geom_point() + 
-  ___(x = "log10", y = "log10")
+  ___(x = "log10", y = ___)
 ```
 
 <div id="ex7-hint">
 **Hint:** `coord_trans()`!
 </div>
 
+```{r ex7-hint-1}
+ ggplot(data = ___, aes(x = body_wt, y = ___)) +
+  geom_point() + 
+  coord_trans(x = "log10", y = ___)
+```
+
 ```{r ex7-solution}
 # Scatterplot with coord_trans()
 ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() + 
   coord_trans(x = "log10", y = "log10")
+```
+
+```{r ex7-check}
+grade_code("Great job transforming the axes!")
 ```
 
 Use `scale_x_log10()` and `scale_y_log10()` to achieve the same effect but with different axis labels and grid lines.
@@ -417,6 +492,10 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() +
   scale_x_log10() + 
   scale_y_log10()
+```
+
+```{r ex8-check}
+grade_code("It's always better to know two ways of doing things!")
 ```
 
 ## Outliers
@@ -471,7 +550,7 @@ Recall that in the baseball example earlier in the lesson, most of the points we
 
 Both OBP and SLG are known as *rate* statistics, since they measure the frequency of certain events (as opposed to their *count*). In order to compare these rates sensibly, it makes sense to include only players with a reasonable number of opportunities, so that these observed rates have the chance to approach their long-run frequencies.
 
-In Major League Baseball, batters qualify for the batting title only if they have 3.1 plate appearances per game. This translates into roughly 502 plate appearances in a 162-game season. The `mlbbat10` dataset does not include plate appearances as a variable, but we can use at-bats (`AB`) - which constitute a subset of plate appearances - as a proxy.
+In Major League Baseball, batters qualify for the batting title only if they have 3.1 plate appearances per game. This translates into roughly 502 plate appearances in a 162-game season. The `mlbbat10` dataset does not include plate appearances as a variable, but we can use at-bats (`at_bat`) - which constitute a subset of plate appearances - as a proxy.
 
 
 - Use `filter()` to keep only players who had at least 200 at-bats, assigning to `ab_gt_200`.
@@ -484,7 +563,7 @@ ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
 ```
 
 ```{r ex9, exercise = TRUE}
-# Filter for AB greater than or equal to 200
+# Filter for at_bat greater than or equal to 200
 ab_gt_200 <- mlbbat10 %>%
   filter(___) 
 
@@ -508,7 +587,7 @@ ab_gt_200 %>%
 ```
 
 ```{r ex9-solution}
-# Filter for AB greater than or equal to 200
+# Filter for at_bat greater than or equal to 200
 ab_gt_200 <- mlbbat10 %>% 
   filter(at_bat >= 200)
 
@@ -519,6 +598,10 @@ ggplot(ab_gt_200, aes(x = obp, y = slg)) +
 # Identify the outlying player
 ab_gt_200 %>%
   filter(obp < 0.2)
+```
+
+```{r ex9-check}
+grade_code("You have identified the outlying players correctly!")
 ```
 
 ## Congratulations!

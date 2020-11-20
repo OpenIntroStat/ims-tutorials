@@ -12,6 +12,7 @@ library(emo)
 library(learnr)
 library(tidyverse)
 library(openintro)
+library(gradethis)
 
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
@@ -19,8 +20,10 @@ knitr::opts_chunk$set(echo = FALSE,
                       fig.width = 5,
                       warning = FALSE, 
                       message = FALSE)
-
-tutorial_options(exercise.eval = FALSE)
+tutorial_options(
+  exercise.timelimit = 60, 
+  exercise.checker = gradethis::grade_learnr
+  )
 ```
 
 ## Visualization of  Linear Models
@@ -116,6 +119,10 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
+```{r ex1-check}
+grade_code("Your solution is correct!")
+```
+
 ### Uniqueness of least squares regression line
 
 The least squares criterion implies that the slope of the regression line is unique. In practice, the slope is computed by R. In this exercise, you will experiment with trying to find the optimal value for the regression slope for weight as a function of height in the `bdims` dataset via trial-and-error.
@@ -163,6 +170,10 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
 ```{r ex2-solution}
 # Estimate optimal value of my_slope
 add_line(my_slope = 1)
+```
+
+```{r ex2-check}
+grade_code(correct = "You have found the right slope value", incorrect = "Try a few values for the slope in the low single digits.")
 ```
 
 ## Understanding Linear Models
@@ -276,7 +287,8 @@ question("The slope coefficient is:",
   answer("2", message = "Try again! 2 represents the y-intercept."),
   answer("3", correct = TRUE, message = "The $X$ represents the explanatory variables and the $\beta_0$ represents the y-intercept."),
   answer("4", message = "Wrong! That represents the disturbance term."),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -297,7 +309,9 @@ question("In Hampshire County in western Massachusetts, the high school graduati
   answer("exactly 10.0%", message = "Not quite!"),
   answer("expected to be about 10.0%", correct = TRUE, message = "Solve for poverty by plugging in 92.4 as hs_grad in the equation!"),
   answer("expected to be about 11.7%", message = "Did you plug 92.4 into the equation?"),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  random_answer_order = TRUE,
+  correct = "Correct!"
 )
 ```
 
@@ -357,6 +371,15 @@ bdims_summary
 bdims_summary %>%
   mutate(slope = r * sd_wgt / sd_hgt, 
          intercept = mean_wgt - slope * mean_hgt)
+```
+
+```{r ex3-check}
+grade_result(
+  pass_if(~identical(floor(.result$intercept), -106), "You have computed the slope and intercept correctly."),
+  fail_if(~identical(floor(.result$intercept), 100), "Did you perhaps use intercept = mean_hgt - slope * mean_wgt? We want body weight as a function of height, not the other way round."),
+  fail_if(~identical(round(.result$slope, digits = 3), 0.506), "Recall that the slope can be found using r*sd_Y/sd_X, not r*sd_X/sd_Y."),
+  fail_if(~TRUE, "Not quite, look at the hint for help!")
+)
 ```
 
 <!--
@@ -459,6 +482,9 @@ ggplot(data = Galton_women, aes(x = mother, y = height)) +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
+```{r ex4-check}
+grade_code("You have produce the correct plot!")
+```
 
 ### "Regression" in the parlance of our time
 
@@ -474,7 +500,8 @@ question("The author is arguing that...",
   answer("Because of regression to the mean, an outstanding basketball player is likely to have sons that are not good at basketball.", message = "Not quite!  Think about the previous example concerning the children of very tall parents."),
   answer("Because of regression to the mean, an outstanding basketball player is likely to have sons that are good at basketball, but not as good as him.", correct = TRUE, message ="That's right!  Basketball skill is likely similar to the previous example concerning the children of very tall parents."),
   answer("Linear regression is incapable of evaluating musical or athletic talent.", message = "Incorrect!"),
-  allow_retry = TRUE
+  allow_retry = TRUE,
+  correct = TRUE,
 )
 ```
 
