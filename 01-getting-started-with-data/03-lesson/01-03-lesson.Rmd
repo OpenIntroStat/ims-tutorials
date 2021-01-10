@@ -22,6 +22,9 @@ load("data/us_regions.RData")
 county_noDC <- county %>%
   filter(state != "District of Columbia") %>%
   droplevels()
+
+county_srs <- county_noDC %>%
+  slice_sample(n = 150)
 ```
 
 
@@ -149,9 +152,9 @@ county_noDC <- county %>%
 
 Suppose our limited resources require that we collect data from only _150_ of the over _3000_ counties in the United States.
 
-One option is to take a simple random sample. We will use the `slice_sample()` function in dplyr to do this.
+One option is to take a simple random sample. We will use the `slice_sample()` function in dplyr (a package included in the tidyverse) to do this.
 
-We start with the `county_noDC` data frame and pipe it into the `slice_sample()` function, setting the size (`n`) argument to 150. We will call the data frame containing this simple random sample **county underscore srs**.
+We start with the `county_noDC` data frame and pipe it into the `slice_sample()` function, setting the size (`n`) argument to 150. We will call the data frame containing this simple random sample *`county_srs`*.
 
 ```{r random-sample, exercise=TRUE}
 # Simple random sample of 150 counties
@@ -162,11 +165,11 @@ county_srs <- county_noDC %>%
 glimpse(county_srs)
 ```
 
-A quick `glimpse()` at county srs shows that there are indeed _150_ observations in this data frame. Note that your sample will look different than someone else's sample, even though you're running the exact same code. We are taking a random sample here, so your sample will be different than mine, just by random chance. However, the sample size should be the same since that is something we specified in the `slice_sample()` function.
+A quick `glimpse()` shows that there are indeed _150_ observations in this data frame. Note that your sample will look different than someone else's sample, even though you're running the exact same code. We are taking a random sample here, so your sample will be different than mine, just by random chance. However, the sample size should be the same since that is something we specified in the `slice_sample()` function.
 
 ### SRS state distribution
 
-If our goal was to take a sample of any 150 counties, we have accomplished this goal. However, if we wanted to obtain equal numbers of counties from each state that is three counties per state a simple random sample won't ensure that.
+If our goal was to take a sample of any 150 counties, we have accomplished this goal. However, if we wanted to obtain equal numbers of counties from each state (that is, three counties per state) a simple random sample won't ensure that.
 
 We can confirm this by counting the number of counties per state. 
 
@@ -179,13 +182,13 @@ county_srs %>%
   count()
 ```
 
-The resulting output shows that this sampling approach yielded data from only _45_ states and the number of counties sampled varies from state to state.
+The resulting output shows that this sampling approach yielded data from less than _50_ states and the number of counties sampled varies from state to state.
 
 If we instead want to sample three counties per state to make up our sample of 150 counties, we should use stratified sampling.
 
 ### Stratified sample
 
-The code looks very similar to how we selected the simple random sample, *except* that before sampling we first group by state and then sample three observations per group.
+The code looks very similar to how we selected the simple random sample, except that *before* sampling we __first__ group by state and __then sample__ three observations per group.
 
 A quick glimpse at the resulting data frame confirms that we indeed have _150_ observations in this sample.
 
@@ -237,9 +240,15 @@ In the previous exercise, we took a simple random sample of eight states. Howeve
 
 The dplyr package has been loaded and `us_regions` is still available in your workspace.
 
-- Use stratified sampling to select a total of eight states, two from each stratum, where each stratum is a region of the country. Save this sample in a data frame called `states_str`.
-- Count the number of states from each region in your sample to confirm that each region is represented equally in your sample.
+For this exercise you should use stratified sampling to select a total of eight states, two from each stratum, where each stratum is a region of the country. We can break this down into three steps: 
 
+1. group the dataset by region (using `group_by()`) 
+2. sample two states from each region (using `slice_sample()`)
+3. save the sample in a new data frame called `states_str` (using `<-` -- the assignment arrow).
+
+
+Once you've collected your sample, count the number of states from each region 
+in your sample to confirm that each region is represented equally in your sample.
 
 ```{r stratified-sample4, exercise=TRUE}
 # Stratified sample
@@ -247,7 +256,7 @@ states_str <- ___ %>%
   group_by(___) %>%
   slice_sample(___)
 
-# Count states by region
+# Use the states_str data to count states by region
 ___ %>%
   ___ %>%
 ```
