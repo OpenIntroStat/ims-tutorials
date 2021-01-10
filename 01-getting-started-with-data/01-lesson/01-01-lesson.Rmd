@@ -20,9 +20,6 @@ hsb2_public <- hsb2 %>%
   filter(schtyp == "public")
 
 avg_read <- mean(hsb2$read)
-
-hsb2 <- hsb2 %>%
-  mutate(read_cat = if_else(read < avg_read, "below average", "at or above average"))
 ```
 
 ## Welcome

@@ -185,7 +185,7 @@ Female | 557      | 1278
 > was common for a survey to ask for your "gender" and then provide you with the options of "male" and 
 > "female." Today, we better understand how an individual's gender and sexual identities are different 
 > pieces of who they are. To learn more about inclusive language surrounding gender and sexual identities 
-> see the (gender unicorn)[https://transstudent.org/gender/]. 
+> see the [gender unicorn](https://transstudent.org/gender/). 
 
 Let's get started.
 
@@ -227,9 +227,9 @@ Now, use this new function and your knowledge of creating new variables and filt
 
 To accomplish this task you will need to take the following steps: 
 
-1. Group the data by gender.
-2. Create the a new variable, `prop`, as the proportion of males and females admitted. Remember, Proportions for each row of the data frame we create can be calculated as `n / sum(n)`! 
-3. Filter the data for those who are admitted so that the resulting data frame only contains the proportions of males and females who are admitted.
+1. Use `group_by()` to group the data by gender.
+2. Use `mutate()` to create the a new variable named`prop`, calculated as the proportion of males and females admitted. Remember, proportions for each row of the data frame we create can be calculated as `n / sum(n)`! 
+3. Use `filter()` to keep the data only for those who were admitted so that the resulting data frame only contains the proportions of males and females who were admitted.
 
 Then answer the following question: *Which gender had a higher admission rate, male or female?*
 
@@ -295,11 +295,11 @@ ucb_admission_counts <- ucb_admit %>%
   count(Dept, Gender, Admit)
 ```
 
-First, assign `ucb_admission_counts` as the `count()` of `ucb_admit` by department, gender, and admission status.
+First, let's make a new object named `ucb_admission_counts` to store the `count()`s of `ucb_admit` by department, gender, and admission status. In this case, it doesn't matter what order you place `Dept`, `Gender`, or `Admit` inside of `count()`! 
 
 ```{r gender-male2, exercise=TRUE, exercise.setup="prepare-gender2"}
 ucb_admission_counts <- ucb_admit %>%
-  # Counts by department, then gender, then admission status
+  # Counts by department, gender, and admission status
   ___(___, ___, ___)
 
 # See the result
@@ -317,9 +317,9 @@ ucb_admission_counts
 
 Next, create a table with the proportions of male students admitted across departments, using the following steps: 
 
-1. Group `ucb_admission_counts` by department then gender.
-2. Add a new column, `prop`, which is the ratio of those admitted or rejected by department and gender.
-3. Filter the rows for those who are males **and** those who who were admitted.
+1. Use `group_by()` to group the `ucb_admission_counts` first by department then by gender.
+2. Use `mutate()` to add a new column named `prop`, which is the ratio of those admitted or rejected by department and gender. Remember the calculation you used previously for row proportions! 
+3. Use `filter()` to filter the rows for those who are males **and** those who who were admitted. To "join" our filters we insert a comma between the filters we are interested (e.g. `filter(grade == "middle school", class == "Music"))`). 
 
 ```{r gender-male3, exercise=TRUE, exercise.setup="prepare-gender2"}
  ucb_admission_counts  %>%
