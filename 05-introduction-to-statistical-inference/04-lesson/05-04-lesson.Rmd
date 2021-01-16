@@ -45,12 +45,12 @@ For example, “under which diet plan will participants lose more weight on aver
 
 Or another example is the comparative question: “which of two car manufacturers are drivers more likely to recommend to their friends?” Hypothesis testing is used to analyze that question. But: “what percent of users are likely to recommend Subaru to their friends” is an estimation problem and we use confidence intervals to answer that question.
 
-One more, the comparative question: “are education level and average income linearly related” is addressed with a hypothesis test. The estimation question: “for each additional year of education, what is the predicted average income” uses a confidence interval. OK, you see the pattern.
+One more, the comparative question: “are education level and average income linearly related” is addressed with a hypothesis test. The estimation question: “for each additional year of education, what is the predicted change in average income” uses a confidence interval. OK, you see the pattern.
 
 ### Parameter
 
 
-For each of the estimation problems, we need to understand what a parameter is. A parameter is a _numerical value from the population_. So in the first example, the parameter is the true average amount that all dieters will lose on a particular program. In the second example, the parameter is the proportion of individuals in the population who recommend Subaru cars. And the last parameter is the average income of all individuals in the population with a particular education level.
+For each of the estimation problems, we need to understand what a parameter is. A parameter is a _numerical value from the population_. So in the first example, the parameter is the true average amount that all dieters will lose on a particular program. In the second example, the parameter is the proportion of individuals in the population who recommend Subaru cars. And the last parameter is the change in average income of all individuals in the population when increasing education by one year. 
 
 ### Confidence interval
 
@@ -148,7 +148,7 @@ The **standard error**, which describes how variable the statistic is around the
 # Compute p-hat for each poll
 ex1_props <- all_polls %>%
   group_by(poll) %>%
-  summarize(prop_yes = mean(vote))
+  summarize(prop_yes = mean(vote == "yes"))
 
 # Select one poll from which to resample
 one_poll <- all_polls %>%
@@ -158,11 +158,6 @@ one_poll <- all_polls %>%
 # Variability of p-hat
 ex1_props %>%
   summarize(sd(prop_yes))
-
-# A tibble: 1 × 1
-`sd(prop_yes)`
-<dbl>
-1 0.08523512
 ```
 
 ### Variability of $\hat{p}$ from the sample (bootstrapping)
@@ -174,25 +169,20 @@ It turns out that the variability of the statistic $\hat{p}$ can be measured wit
 
 Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical.
 
-Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.0869, which is very close to the number 0.0852 from the previous, unrealistic slide.
+Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.085 from the previous, unrealistic slide.
 
 ```{r eval = TRUE}
 # Generate 1000 resamples of one poll
 one_poll_boot_30 <- one_poll %>%
-  oilabs::rep_sample_n(30, replace = TRUE, reps = 1000)
+  rep_sample_n(30, replace = TRUE, reps = 1000)
 
 # Compute p-hat for each resampled poll
 ex2_props <- one_poll_boot_30 %>%
-  summarize(prop_yes = mean(vote))
+  summarize(prop_yes = mean(vote == "yes"))
 
 # Variability of p-hat
 ex2_props %>%
   summarize(sd(prop_yes))
-
-# A tibble: 1 × 1
-`sd(prop_yes)`
-<dbl>
-1 0.08691885
 ```
 
 
@@ -216,7 +206,7 @@ We have created 1000 random samples, each of size 30, from the population. The r
 
 - Compute the sample proportion for each of the 1000 original samples, assigning to `ex1_props`.
     - Group by `poll`.
-    - Summarize to calculate `stat` as the `mean()` of cases of `vote` equaling `"yes"`.
+    - Summarize to calculate `stat` as the `mean()` of cases of `vote` that equal `"yes"`.
 
 ```{r resampling, exercise=TRUE}
 # Compute p-hat for each poll
@@ -258,9 +248,9 @@ ex1_props
 (2) 
 
 - Select one poll from which to resample, as `one_poll`.
-    - Filter for the first poll. That is, when `poll` equals `1`.
+    - Filter out data for every poll except the first poll. That is, only keep `poll` when `poll` equals `1`.
     - Select the `vote` column.
-- Compute $\hat{p}^*$ for each resampled poll, as `ex2_props`.
+- Compute $\hat{p}^*$ for each resampled poll, as `ex2_props`, using tolls from the infer package.
     - Specify the `response` as `vote`. The `success` value is `"yes"`.
     - Generate `1000` replicates of type `"bootstrap"`.
     - Calculate the `"prop"`ortion summary statistic.
@@ -343,6 +333,7 @@ ex2_props <- one_poll %>%
 ex1_props <- all_polls %>% 
   group_by(poll) %>% 
   summarize(stat = mean(vote == "yes"))
+
 ex2_props <- all_polls %>%
   filter(poll == 1) %>%
   select(vote) %>%
@@ -396,9 +387,9 @@ In order to compare the variability of the sampled $\hat{p}$ and $\hat{p}^*$ val
 
  (1)
 
-- Combine data from both experiments by calling `bind_rows()`, passing `ex1_props` and `ex2_props`. Call this `both_ex_props`. A dataset ID column named `experiment` will be created.
+- Combine data from both experiments using the function `bind_rows()`, with inputs `ex1_props` and `ex2_props`. Call this new dataset `both_ex_props`. The code specifies thatn an ID column named `experiment` should be created.
 - Using `both_ex_props`, plot `stat` colored by `experiment`.
-- Add a density curve using `geom_density()`, setting the bandwidth argument, `bw`, to `0.1`.
+- Add a density curve using `geom_density()`, setting the bandwidth argument (`bw`), to `0.1`.
 
 ```{r variability_phat-setup}
 # Select one poll from which to resample
@@ -445,7 +436,7 @@ ggplot(both_ex_props, aes(stat, color = experiment)) +
   geom_density(bw = 0.1)
 ```
 
-Note that the curves are quite similar in shape.  The sampled $\\hat{p}$ values are centered around the true (typically **unknown** parameter) parameter (black); the resampled $\\hat{p}^*$ values are centered around the estimate from the very first poll (green). Great work!
+Note that the curves are quite similar in shape.  The sampled $\hat{p}$ values are centered around the true (typically **unknown** parameter) parameter (black); the resampled $\hat{p}^*$ values are centered around the estimate from the very first poll (green). Great work!
 
 ### Always resample the original number of observations
 
@@ -499,7 +490,7 @@ The variability of the $\hat{p}$ statistics gives a measure for how far apart an
 
 Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\hat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\hat{p}$ values from the population.
 
-```{r}
+```{r, fig.width=8}
 data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) %>% 
 ggplot() + 
   geom_line(aes(x = ex, y = samp, col = "sample from population")) +
@@ -533,7 +524,7 @@ We can use the value of the standard error to count the number of sample $\hat{p
 
 It turns out that because the distribution of $\hat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\hat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions.
 
-```{r}
+```{r, fig.width=8}
 data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) %>% 
 ggplot() + 
   geom_line(aes(x = ex, y = samp, col = "sample from population")) +
@@ -566,7 +557,7 @@ Note that in the exercises, we refer to the intervals created from the empirical
 
 Here, in red, we see all the sample $\hat{p}$ values that are close to the true parameter. If our data is one of the red dots, our confidence interval will correctly capture the true parameter.
 
-```{r}
+```{r, fig.width=6}
 set.seed(4747)
 all_polls %>%
   group_by(poll) %>%
@@ -585,7 +576,7 @@ ggplot() +
   scale_color_manual(values = c(COL[1,1], COL[4,1])) +
   scale_fill_manual(values = c(COL[1,1], COL[4,1])) +
   geom_label(label = "approximately 95% of\n samples will produce\n p-hats that are within\n 2SE of the center",
-             x = .8, y = .7, color = openintro::COL[5,1])
+             x = .8, y = .8, color = openintro::COL[5,1])
 ```
 
 
@@ -625,17 +616,19 @@ true_prop_yes <- 0.6
 # Proportion of polls within 2SE
 props %>%
   # Add column: is prop_yes in 2SE of 0.6
-  mutate(is_in_conf_int = ___(___ - ___) < ___ * ___(___)) %>%
+  mutate(is_in_conf_int = abs(___ - ___) < ___ * sd(___)) %>%
   # Calculate  proportion in conf int
   summarize(prop_in_conf_int = ___(___))
 ```
 
-```{r emperical_rule_1-hint}
-- Inside the call to `mutate()`, calculate `is_in_conf_int` using the following. The difference from truth is `abs(prop_yes - true_prop_yes)` and the limit of the confidence interval is `2 * sd(prop_yes)`.
+<div id="emperical_rule_1-hint">
+**Hint:** 
+Inside the call to `mutate()`, calculate `is_in_conf_int` using the following: 
+
+- The difference from truth is `abs(prop_yes - true_prop_yes)`. 
+- The limit of the confidence interval is `2 * sd(prop_yes)`.
 - Inside the call to `summarize()`, calculate `prop_in_conf_int` as `mean(is_in_conf_int)`.
-
-```
-
+</div>
 
 ```{r emperical_rule_1-solution}
 # Proportion of yes votes by poll
@@ -679,7 +672,7 @@ As in the previous exercise, when discussing the variability of a statistic, the
 
 
 
-- Calculate $\hat{p}$ and assign the result to `p_hat`. In the call to `summarize()`, calculate `stat` as the mean of `vote` equaling `"yes"`.
+- Calculate $\hat{p}$ and assign the result to `p_hat`. In the call to `summarize()`, calculate `stat` as the `mean()` of `vote`s that equal `"yes"`.
 - Find an interval of values that are plausible for the true parameter by calculating $\hat{p} \pm 2SE$.
     - The `lower` bound of the confidence interval is `p_hat` minus twice the standard error of `stat`. Use `sd()` to calculate the standard error.
     - The `upper` bound is `p_hat` plus twice the standard error of `stat`.
@@ -689,6 +682,7 @@ As in the previous exercise, when discussing the variability of a statistic, the
 one_poll <- all_polls %>%
   filter(poll == 1) %>%
   select(vote)
+
 one_poll_boot <- one_poll %>%
   specify(response = vote, success = "yes") %>%
   generate(reps = 1000, type = "bootstrap") %>% 
@@ -696,15 +690,14 @@ one_poll_boot <- one_poll %>%
   
 p_hat <- one_poll %>%
   # Calculate proportion of yes votes
-  summarize(stat = ___) %>%
-  pull()
+  summarize(stat = ___)
 
 # Create an interval of plausible values
 one_poll_boot %>%
   summarize(
-    # Lower bound is p_hat minus 2 std errs
+    # Lower bound is p_hat minus 2 std errors
     lower = ___,
-    # Upper bound is p_hat plus 2 std errs
+    # Upper bound is p_hat plus 2 std errors
     upper = ___
   )
 ```
@@ -725,15 +718,14 @@ one_poll_boot <- one_poll %>%
   
 p_hat <- one_poll %>%
   # Calculate proportion of yes votes
-  summarize(stat = mean(vote == "yes")) %>%
-  pull()
+  summarize(stat = mean(vote == "yes"))
 
 # Create an interval of plausible values
 one_poll_boot %>%
   summarize(
-    # Lower bound is p_hat minus 2 std errs
+    # Lower bound is p_hat minus 2 std errors
     lower = p_hat - 2 * sd(stat),
-    # Upper bound is p_hat plus 2 std errs
+    # Upper bound is p_hat plus 2 std errors
     upper = p_hat + 2 * sd(stat)
   )
 ```
@@ -742,7 +734,7 @@ one_poll_boot %>%
  
 
 
-Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter.  Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Nice job
+Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter.  Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Luckily!
 
 
 
@@ -778,8 +770,8 @@ one_poll_boot <- one_poll %>%
 
 - Run the code to remind yourself of the t-interval from the previous exercise.
 - Calculate the `95` percent interval of the bootstrapped $\hat{p}^*$ values contained in `one_poll_boot`.
-    - Summarize to calculate the lower end at the 2.5% quantile of `stat` by setting `p` to `0.025`.
-    - Calculate the upper end in a similar way.
+    - Summarize to calculate the lower end at the 2.5% `quantile()` of `stat` by setting `p` to `0.025`.
+    - Calculate the upper 97.5% `quantile()` in a similar way.
 
 
 ```{r bootstrap_percentile, exercise=TRUE}
@@ -798,13 +790,12 @@ one_poll_boot %>%
   )
 ```
 
-```{r bootstrap_percentile-hint}
+<div id="bootstrap_percentile-hint">
+**Hint:** 
 
 - Inside the `summarize()` call, calculate `lower` as the `0.025` `quantile()` of stat.
 - Calculate `upper` as the `0.975` quantile of `stat`.
-
-```
-
+</div>
 
 ```{r bootstrap_percentile-solution}
 # From previous exercise: bootstrap t-confidence interval
@@ -833,7 +824,7 @@ Excellent! Note that the two intervals were created using different methods. Bec
  (2)
 
 
-Perform the same calculation using infer's convenience function, `get_confidence_interval()`.  For the interval, use `level = 0.95`, and call the output `percentile_ci`.
+Perform the same calculation using infer's convenience function, `get_confidence_interval()`. This function has two arguments (inputs), (1) a dataset with calculated statistics, and (2) the level to be used to create the confidence interval. For the interval call the output `percentile_ci`, and use `level = 0.95`.
 
 
 ```{r bootstrap_percentile_2, exercise=TRUE}
@@ -851,11 +842,11 @@ percentile_ci <- one_poll_boot %>%
 # Review the value
 percentile_ci
 ```
-```{r bootstrap_percentile_2-hint}
 
-After the pipe, get the confidence interval by calling `get_confidence_interrval()` and setting `level` to `0.95`.
+<div id="bootstrap_percentile_2-hint">
+**Hint:** After the pipe, get the confidence interval by calling `get_confidence_interrval()` and setting `level` to `0.95`.
+</div>
 
-```
 
 ```{r bootstrap_percentile_2-solution}
 # From previous step
@@ -877,9 +868,9 @@ percentile_ci
  (3)
 
 
-- `visualize()` the distribution of bootstrapped proportions with the middle 95 percent highlighted.  
-    - Set the `endpoints` of the highlighted region to `percentile_ci`.
-    - Set `direction` to `"between"` to highlight in-between those endpoints.
+- Finally, use the `visualize()` function to plot the distribution of bootstrapped proportions with the middle 95 percent highlighted.  
+    - Set the `endpoints` argument to be `percentile_ci`.
+    - Set the `direction` of the shading to `"between"`, to highlight in-between those endpoints.
 
 
 ```{r bootstrap_percentile_3, exercise=TRUE}
@@ -892,10 +883,9 @@ one_poll_boot %>%
   ___
 ```
 
-```{r bootstrap_percentile_3-hint}
-After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
-
-```
+<div id="bootstrap_percentile_3-hint">
+**Hint:** After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
+</div>
 
 ```{r bootstrap_percentile_3-solution}
 # From previous step
@@ -907,19 +897,12 @@ one_poll_boot %>%
   visualize(endpoints = percentile_ci, direction = "between")
 ```
 
-
-
-
-
 Excellent! Again, the same caveat applies: because the two intervals were created using different methods, the intervals are expected to be a bit different as well. In the long run, however, the intervals should provide the same information.
-
-
 
 ## Interpreting CIs and technical conditions
 
 
 ### Creating CIs
-
 
 By using the bootstrapped $\hat{p}$ values in the previous exercises, you were able to find two different intervals for the true parameter of interest, the proportion of the population who will vote for candidate X.
 
@@ -929,20 +912,30 @@ The second interval used the natural variability of the resampled $\hat{p}$ valu
 
 We can see that the two intervals are different because they used different methods, but they are consistent because they are based on the same observations.
 
+```{r echo=FALSE}
+set.seed(47)
+one_poll <- all_polls %>%
+  filter(poll == 1) %>%
+  select(vote)
+one_poll_boot <- one_poll %>%
+  specify(response = vote, success = "yes") %>%
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "prop")
+```
+
+
 ```{r echo=TRUE}
 # Look at the bootstrap t-confidence interval for comparison
 one_poll_boot %>%
-  summarize(lower = p_hat - 2 * sd(prop_yes_boot),
-            upper = p_hat + 2 * sd(prop_yes_boot))
+  summarize(lower = stat - 2 * sd(stat),
+            upper = stat + 2 * sd(stat))
 
 one_poll_boot
 
 # Find the 2.5% and 97.5% of the p-hat values
 one_poll_boot %>%
-  summarize(q025_prop = quantile(prop_yes_boot, p = .025),
-            q975_prop = quantile(prop_yes_boot, p = .975))
-
-one_poll_boot
+  summarize(q025_prop = quantile(stat, p = .025),
+            q975_prop = quantile(stat, p = .975))
 ```
 
 ### Motivating CIs
@@ -960,7 +953,7 @@ Because we don't know whether the sample is close to the population or far from 
 
 In this lesson, we have provided two ways for creating bootstrap confidence intervals.
 
-These methods work for any statistic and parameter, as long as the following technical conditions hold: 1) the distribution of the statistic is reasonably symmetric and bell-shaped and 2) the sample size is reasonably large
+These methods work for __any__ statistic and parameter, as long as the following technical conditions hold: (1) the distribution of the statistic is reasonably symmetric and bell-shaped, (2) the sample size is reasonably large, and (3) the sample was representative of the population. 
 
 A plot of the bootstrap $\hat{p}^*$ values will give a good indication for whether the technical conditions are valid.
 
@@ -978,8 +971,8 @@ Here, you will use the *incorrect* standard error (based on the incorrect sample
 
 
 
-- A function for calculating the bootstrapped t-confidence interval, `calc_t_conf_int()`, is shown is the script. Read the code and try to understand it.
-- Call `calc_t_conf_int()` on `one_poll_boot` to calculate the correct t-confidence interval.
+- A function for calculating the bootstrapped t-confidence interval, `calc_t_conf_int()`, is shown is the script. Read the code and try to understand what it is doing. You can use the function by typing `calc_t_conf_int()` in the code. 
+- Use the `calc_t_conf_int()` function on `one_poll_boot` to calculate the correct t-confidence interval.
 - Do the same on `one_poll_boot_300`, to find an incorrect interval for the resamples of size 300.
 - Do the same on `one_poll_boot_3`, to find an incorrect interval for the resamples of size 3.
 
@@ -1063,9 +1056,11 @@ Notice how the resampled interval with size 300 was way too small and the resamp
 One additional element that changes the width of the confidence interval is the sample parameter value, $\hat{p}$.  
 Generally, when the true parameter is close to 0.5, the standard error of $\hat{p}$ is larger than when the true parameter is closer to 0 or 1.  When calculating a bootstrap t-confidence interval, the standard error controls the width of the CI, and here (given a true parameter of 0.8) the sample proportion is higher than in previous exercises, so the width of the confidence interval will be narrower.
 
-- `calc_p_hat()` is shown in the script to calculate the sample proportions. `calc_t_conf_int()` from the previous exercise has been updated to now use any value of `p_hat` as an argument. Read their definitions and try to understand them.
+- The function `calc_p_hat()` is shown in the script, and can be used to calculate the sample proportions.
+- The `calc_t_conf_int()` function from the previous exercise has been updated to now use any value of `p_hat` as an argument! Read the function and try to understand what it's doing. 
 - Run the code to calculate the bootstrap t-confidence interval for the original population.
-- Consider a new population where the true parameter is 0.8, `one_poll_0.8`.  Calculate $\hat{p}$ of this new sample, using the same technique as with the original dataset. Call it `p_hat_0.8`.
+- Consider a new population where the true parameter is 0.8, saved as the dataset `one_poll_0.8`. 
+- Calculate $\hat{p}$ of this new sample, using the same technique as with the original dataset. Assign it to the variable `p_hat_0.8`.
 - Find the bootstrap t-confidence interval using the new bootstrapped data, `one_poll_boot_0.8`, and the new $\hat{p}$. *Notice that it is narrower than previously calculated.*
 
 
@@ -1117,20 +1112,21 @@ p_hat
 calc_t_conf_int(one_poll_boot, p_hat)
 
 # Find proportion of yes votes from new population
-p_hat_0.8 <- ___
+p_hat_0.8 <- calc_p_hat(___)
   
 # Review the value
 p_hat_0.8  
   
 # Calculate the bootstrap t-confidence interval (new 0.8 param)
-___
+calc_t_conf_int(___, ___)
 ```
 
-```{r bootstrap_ci_2-hint}
+<div id="bootstrap_ci_2-hint">
+**Hint:**   
+
 - `p_hat_0.8` is calculated in the same way as `p_hat`, but starting with `one_poll_0.8`.
 - To calculate the new confidence interval, call `calc_t_conf_int()`, passing `one_poll_boot_0.8` and `p_hat_0.8`.
-
-```
+</div>
 
 ```{r bootstrap_ci_2-solution}
 calc_p_hat <- function(dataset) {
@@ -1188,7 +1184,8 @@ The previous bootstrapped $\hat{p}^*$ values have been loaded for you and are av
 - Calculate a 95% percentile interval by calling `get_confidence_interval()`, setting `level` to `0.95`.  
 - Do the same for a 99% interval,
 - ... and a 90% interval.
-- The results you just got are stored in a dataframe called `conf_int_data`. With this dataset, plot `ci_endpoints` (vertical axis) vs. `ci_percent` (horizontal axis), and add a line layer using `geom_line()`.
+- The results you just got have been stored in a dataframe called `conf_int_data`. With this dataset, plot `ci_endpoints` (y-axis) vs. `ci_percent` (x-axis). 
+- And add a line layer using `geom_line()`.
 
 ```{r bootstrap_ci_3-setup}
 set.seed(47)
@@ -1235,12 +1232,13 @@ ggplot(conf_int_data, aes(___, ___)) +
   # Add a line layer
   ___()
 ```
-```{r bootstrap_ci_3-hint}
+
+<div id="bootstrap_ci_3-hint">
+**Hint:** 
 
 - Call `get_confidence_interval()` with `level = p`, replacing `p` with `0.95` then `0.99` then `0.9`.
 - Inside the call to `aes()`, map `x` to `ci_percent` and `y` to `ci_endpoints`.
-
-```
+</div>
 
 ```{r bootstrap_ci_3-solution}
 # Calculate a 95% bootstrap percentile interval

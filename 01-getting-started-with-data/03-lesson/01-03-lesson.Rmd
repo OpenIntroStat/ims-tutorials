@@ -35,7 +35,7 @@ In the previous lesson, when we defined observational studies and experiments, w
 
 First, taking a census requires a lot more resources than collecting data from a sample of the population.
 
-Second, certain individuals in your population might be hard to locate or collect data from. If these individuals that are missed in the census are different from those in the rest of the population, the census data will be biased. For example, in the US census, illegal immigrants are often not recorded properly since they tend to be reluctant to fill out census forms with the concern that this information could be shared with immigration. However, these individuals might have characteristics different than the rest of the population and hence, not getting information from them might result in unreliable data from geographical regions with high concentrations of illegal immigrants.
+Second, certain individuals in your population might be hard to locate or collect data from. If these individuals that are missed in the census are different from those in the rest of the population, the census data will be biased. For example, in the US census, undocumented immigrants are often not recorded properly since they tend to be reluctant to fill out census forms with the concern that this information could be shared with immigration. However, these individuals might have characteristics different than the rest of the population and hence, not getting information from them might result in unreliable data from geographical regions with high concentrations of undocumented immigrants.
 
 Lastly, populations are constantly changing. Even if you do have the required resources and manage to collect data from everyone in the population, tomorrow your population will be different and so the hard work required to collect such data may not pay off.
 
@@ -133,9 +133,11 @@ library(tidyverse)
 
 Next we'll work with the `county` data from the usdata package.
 
-This data frame contains data from counties in all 50 states plus the District of Columbia, or DC, as it's commonly referred to. Since DC is not a state by definition, we'll first remove it from the dataset. We can do this with the `filter()` function that you learned about earlier in the tutorial.
+This data frame contains data from counties in all 50 states plus the District of Columbia, or DC, as it's commonly referred to. Since DC is not a state by definition, we'll first remove it from the dataset. We can do this with the `filter()` function that you learned about earlier in these tutorials.
 
-That is, we will create a new data frame, called `county_noDC` that `filter()`s out the observation where state is DC. We'll also `droplevels()` for good measure, so that the level District of Columbia is removed completely from the data frame.
+That is, we will create a new data frame, called `county_noDC` that `filter()`s out the observation where state is DC. Notice that to filter DC out of the data frame we are using `!=`. You can think of the `!` as negating what comes after it. Here, the `!` negates the `=` sign, meaning we want the `state` to **not** be equal to the District of Columbia. 
+
+We'll also `droplevels()` for good measure, so that the level District of Columbia is removed completely from the data frame.
 
 ```{r remove-dc, exercise=TRUE}
 county_noDC <- county %>%
@@ -149,7 +151,7 @@ Suppose our limited resources require that we collect data from only _150_ of th
 
 One option is to take a simple random sample. We will use the `slice_sample()` function in dplyr to do this.
 
-We start with the `county_noDC` data frame and pipe it into the `slice_sample()` function, setting the size argument to 150. We will call the data frame containing this simple random sample **county underscore srs**.
+We start with the `county_noDC` data frame and pipe it into the `slice_sample()` function, setting the size (`n`) argument to 150. We will call the data frame containing this simple random sample **county underscore srs**.
 
 ```{r random-sample, exercise=TRUE}
 # Simple random sample of 150 counties
@@ -166,9 +168,9 @@ A quick `glimpse()` at county srs shows that there are indeed _150_ observations
 
 If our goal was to take a sample of any 150 counties, we have accomplished this goal. However, if we wanted to obtain equal numbers of counties from each state that is three counties per state a simple random sample won't ensure that.
 
-We can confirm this by counting the number of counties per state.
+We can confirm this by counting the number of counties per state. 
 
-To do so we will start with the `county_srs` data frame: first group these data by state and then, count the number of observations per state.
+To do so we will start with the `county_srs` data frame: first group these data by state, then count the number of observations per state.
 
 ```{r random-sample3, exercise=TRUE}
 # State distribution of SRS counties
@@ -235,7 +237,7 @@ In the previous exercise, we took a simple random sample of eight states. Howeve
 
 The dplyr package has been loaded and `us_regions` is still available in your workspace.
 
-- Use stratified sampling to select a total of eight states, where each stratum is a region. Save this sample in a data frame called `states_str`.
+- Use stratified sampling to select a total of eight states, two from each stratum, where each stratum is a region of the country. Save this sample in a data frame called `states_str`.
 - Count the number of states from each region in your sample to confirm that each region is represented equally in your sample.
 
 
@@ -308,15 +310,15 @@ Now it's time to practice these experimental design concepts.
 
 ### Identifying components of a study
 
-A researcher designs a study to test the effect of light and noise levels on exam performance of students. The researcher also believes that light and noise levels might have different effects on males and females, so she wants to make sure both genders are represented equally under different conditions.
+A researcher designs a study to test the effect of light and noise levels on exam performance of students. The researcher also believes that light and noise levels might have different effects on males and females, so she wants to make sure both sexes are represented equally under different conditions.
 
 ```{r quiz-identify-study-components}
 quiz(
   question("Which of the below is correct?", correct = "Nice job!", allow_retry = TRUE,
-    answer("There are 3 explanatory variables (light, noise, gender) and 1 response variable (exam performance).", message = "Close, but gender is thought to be a confounding variable, not an explanatory one!"),
-    answer("There is 1 explanatory variable (gender) and 3 response variables (light, noise, exam performance).", message = "Not quite!"),
-    answer("There are 2 blocking variables (light and noise), 1 explanatory variable (gender), and 1 response variable (exam performance).", message = "Incorrect!"),
-    answer("There are 2 explanatory variables (light and noise), 1 blocking variable (gender), and 1 response variable (exam performance).", correct = TRUE)), caption = "")
+    answer("There are 3 explanatory variables (light, noise, sex) and 1 response variable (exam performance).", message = "Close, but sex is thought to be a confounding variable, not an explanatory one!"),
+    answer("There is 1 explanatory variable (sex) and 3 response variables (light, noise, exam performance).", message = "Not quite!"),
+    answer("There are 2 blocking variables (light and noise), 1 explanatory variable (sex), and 1 response variable (exam performance).", message = "Incorrect!"),
+    answer("There are 2 explanatory variables (light and noise), 1 blocking variable (sex), and 1 response variable (exam performance).", correct = TRUE)), caption = "")
 ```
 
 ### Experimental design terminology
