@@ -8,13 +8,11 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message = FALSE, warning = FALSE,	include = FALSE}
+library(learnr)
 library(tidyverse)
 library(openintro)
-library(grid)
 library(gapminder)
-library(learnr)
 library(gt)
-library(stringr)
 library(patchwork)
 library(emo)
 
@@ -38,145 +36,154 @@ What do we mean by a typical observation? For example, it sounds perfectly fine 
 
 ### County demographics
 
-Researchers in public health have compiled data on the demographics of every county in the US. We see here that we have 4 variables: the state name, the county name, then the average life expectancy, and the median income. Let's focus on the life expectancy in the first 11 counties in this dataset, all in the state of Alabama.
-
+Researchers in public health have compiled data on the demographics of every county in the US. We see here that we have 4 variables: the state name, the county name, then the average life expectancy, and the median income. 
 
 ```{r life}
 life
 ```
 
-### Center: mean
+### Massachusetts
 
-We're going to simplify and extract those 11 numbers by rounding the values of expectancy, when looking at the first 11 cases. The result, what we can call $x$, is 11 integers, all in the mid 70s.
+We're going to focus on the state of Massachusetts, which happens to have 14 counties. Let's filter the data for counties from that state, and name the resulting data frame `life_ma`. To make the rest of the conversation simpler we'll also round the life expectancy values to whole numbers for this state.
 
-OK, so let's ask the question again: what is a typical value for $x$?
-
-```{r xlife}
-x <- head(round(life$expectancy), 11)
-x
+```{r life-ma-filter, echo = TRUE}
+life_ma <- life %>%
+  filter(state == "Massachusetts") %>%
+  mutate(expectancy = round(expectancy)) %>%
+  select(county, expectancy)
 ```
 
-```{r baseplot}
+Here is a look at those counties.
 
-x <- head(round(life$expectancy), 11)
-x <-  data.frame(x)
+```{r life-ma-view}
+life_ma
+```
 
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
+```{r life-exp-mean}
+life_ma_summary <- life_ma %>%
+  summarise(
+    mean = round(mean(expectancy), 1),
+    med = round(median(expectancy), 1),
+    mode = 80,
+    var = round(var(expectancy), 2),
+    sd = round(sd(expectancy), 2),
+    iqr = round(IQR(expectancy), 2)
+  )
+```
+
+### Mean
+
+Let's take a closer look at the life expectancies for counties in Massachusetts. We'll arrange them in ascending order to make it a bit easier to to answer the question "What is a typical value for life expectancies in Massachusetts counties?"
+
+```{r life-ma-view2}
+life_ma %>%
+  arrange(expectancy) %>%
+  print(n = 14)
+```
+
+Here is another look at these values, as a dot plot.
+
+```{r life-ma-plot}
+ggplot(data = life_ma, aes(x = expectancy)) +
+  geom_dotplot() +
+  theme(axis.text.y = element_blank(),
         axis.title.y = element_blank())
-
-x <- x$x
 ```
 
-The most common answer is the mean, which is the sum of all of the observations divided by the number of observations. We learn that the mean life expectancy in these 11 counties is around 74.5 years. We can also use the built-in function mean.
-
-```{r sum, echo = TRUE}
-sum(x)/11
-```
+To answer this question, we need to think about what "typical" means. One statistic we commonly use to describe a typical observation is the **mean**, or in other words, the arithmetic average. The average life expectancy for counties in Massachusetts is `r life_ma_summary$mean` years.
 
 ```{r mean, echo = TRUE}
-mean(x)
+life_ma %>%
+  summarise(mean = mean(expectancy))
 ```
 
-If we visualize $x$ as a dot plot, we can represent the mean as a vertical red line.
-Another measure of "typical" or "center" is the median.
+Let's add that value as a red, dashed line to our dot plot.
 
-```{r plot1}
-
-x <- head(round(life$expectancy), 11)
-x <-  data.frame(x)
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank())+
-  geom_vline(xintercept = mean(x$x), color = "red", lwd = 1)
-
-x <- x$x
+```{r life-ma-plot-mean}
+ggplot(data = life_ma, aes(x = expectancy)) +
+  geom_dotplot() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  geom_vline(xintercept = life_ma_summary$mean, color = COL[4,1], linetype = "longdash", size = 1)
 ```
 
-### Center: mean, median
+### Median
 
-The median is the middle value in the sorted dataset. So if we sort x, the middle value is 74. We can also use the built-in function median. Let's draw that line in blue.
+Another measure of "typical" or "center" is the **median**. 
+The median is the 50th percentile, i.e. the middle value in the sorted data. Let's take another look at the sorted life expectancies.
 
-```{r sort, echo = TRUE}
-sort(x)
+```{r}
+life_ma %>%
+  arrange(expectancy) %>%
+  pull(expectancy)
 ```
+
+The value that cuts the data in half is `r life_ma_summary$med`. We can also calculate this using the `median()` function.
 
 ```{r median, echo = TRUE}
-median(x)
+life_ma %>%
+  summarise(median = median(expectancy))
 ```
 
-```{r plot2}
+Let's add that value as a blue, solid line to our dot plot.
 
-x <- head(round(life$expectancy), 11)
-x <-  data.frame(x)
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank())+
-  geom_vline(xintercept = mean(x$x), color = "red", lwd = 1)+
-  geom_vline(xintercept = median(x$x), color = "blue", lwd = 1)
-
+```{r life-ma-plot-mean-med}
+ggplot(data = life_ma, aes(x = expectancy)) +
+  geom_dotplot() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  geom_vline(xintercept = life_ma_summary$mean, color = COL[4,1], linetype = "longdash", size = 1) +
+  geom_vline(xintercept = life_ma_summary$med, color = COL[1,1], size = 1)
 ```
 
-### Center: mean, median, mode
+The mean can be thought of as the balance point of the data and it tends to be drawn towards the longer tail of a distribution. This highlights an important feature of the mean: its sensitivity to extreme values. For this reason, when working with skewed distributions, the median is often a more appropriate measure of center.
 
-The mode is the highest point on a plot of the distribution. While the median divides the dataset into a lower half and an upper half, the mode symbolizes the number that occurs the most frequently in the dataset. In this case, those values are the same, but that is often not the case. The mean can be thought of as the balance point of the data and it tends to be drawn towards the longer tail of a distribution. This highlights an important feature of the mean: its sensitivity to extreme values. For this reason, when working with skewed distributions, the median is often a more appropriate measure of center.
+### Mode
 
-```{r plot3}
+The **mode** is yet another measure of center. The mode is the number that occurs the most frequently in the dataset. To find the mode, we can `count()` the life expectancy values, and identify the most frequent one.
 
-x <- head(round(life$expectancy), 11)
-x <-  data.frame(x)
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank())+
-  geom_vline(xintercept = mean(x$x), color = "red", lwd = 1)+
-  geom_vline(xintercept = median(x$x), color = "blue", lwd = 1)+
-  geom_vline(xintercept = 74.1, color = "yellow", lwd = 1)
+```{r mode}
+life_ma %>%
+  count(expectancy, sort = TRUE)
 ```
 
-There isn't a built-in function to find the mode, but we can use the `count()` function to see that the greatest number of observations was at 74. Let's plot the mode right next to the median in yellow.
+In this case, the median and the mode are the same (both `r life_ma_summary$mode`), but that is often not the case.
 
-```{r table}
-x %>% 
-count(x)
+Let's plot the mode right on top of the median as a yellow, dotted line.
+
+```{r life-ma-plot-mean-med-mod}
+ggplot(data = life_ma, aes(x = expectancy)) +
+  geom_dotplot() +
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  geom_vline(xintercept = life_ma_summary$mean, color = COL[4,1], linetype = "longdash", size = 1) +
+  geom_vline(xintercept = life_ma_summary$med, color = COL[1,1], size = 1) +
+  geom_vline(xintercept = life_ma_summary$mode, color = COL[3,1], linetype = "dashed")
 ```
 
-Now that we have some sensible measures of center, we can answer questions like: is the typical county life expectancy on the West Coast similar to the typical life expectancy in the rest of the country?
+Now that we have some sensible measures of center, we can answer questions like: Is the typical county life expectancy in Massachusets similar to the typical life expectancy in the rest of the country?
 
-## Groupwise means
+## Group means
 
 To answer this question we start by using `mutate()` to create a new variable that will be TRUE if the state value is either "California", "Oregon", or "Washington", and FALSE otherwise. This process uses some of the tools we've seen before, namely the `if_else()` function and the `%in%` operator, and puts them together. 
 
-In the code below, we make a new variable named `west_coast` and specify how that variable is calculated. The condition we use inside of the `if_else()` function states that if the state associated with an observation is included in "California, Oregon, or Washington, the `west_coast` variable should have a value of `TRUE`. If the state of an observation is not included in this list, then the `west_coast` variable should have a value of `FALSE`. 
+In the code below, we make a new variable named `coast` and specify how that variable is calculated. The condition we use inside of the `if_else()` function states that if the state associated with an observation is included in "California, Oregon, or Washington, the `coast` variable should have a value of `"west"`. If the state of an observation is not included in this list, then the `coast` variable should have a value of `"east"`. 
 
-Notice the `life <- life %>%` line in the code below. This line is telling R that we are updating the original `life` dataset with a new dataset that contains the `west_coast` variable. 
+Notice the `life <- life %>%` line in the code below. This line is telling R that we are updating the original `life` dataset with a new dataset that contains the `coast` variable. 
 
 ```{r life-mutate, echo = TRUE}
 life <- life %>%
-  mutate(west_coast = if_else(state %in% c("California", "Oregon", "Washington"), 
-                              TRUE, 
-                              FALSE)
-         )
+  mutate(coast = if_else(state %in% c("California", "Oregon", "Washington"), 
+    "west",
+    "east"
+  ))
 ```
-
-
 
 To compute means for the two groups (west coast and the rest of the country), we pipe this updated dataset into the `group_by()` function, and indicate how we would like to make the groups. Then we can `summarize()` those groups, West Coast counties and non-West Coast counties, by taking the `mean()` and `median()` of their life expectancies. 
 
 ```{r life-groupby, echo = TRUE}
 life %>%
-  group_by(west_coast) %>%
+  group_by(coast) %>%
   summarize(mean(expectancy),
             median(expectancy))
 ```
@@ -218,9 +225,9 @@ life %>%
 
 ### With `group_by()`
 
-If we add a line to `group_by()` `west_coast`, it's effectively breaking the dataset into two groups and calculating the `mean()` of the expectancy variable for each one separately.
+If we add a line to `group_by()` `coast`, it's effectively breaking the dataset into two groups and calculating the `mean()` of the expectancy variable for each one separately.
 
-```{r life-gr-sum-gt,}
+```{r life-gr-sum-gt}
 life %>%
   slice(240:247) %>%
   gt() %>%
@@ -231,7 +238,7 @@ life %>%
       ),
     locations = cells_body(
       columns = vars(expectancy),
-      rows = west_coast == TRUE)
+      rows = coast == TRUE)
   ) %>%
     tab_style(
     style = list(
@@ -240,14 +247,14 @@ life %>%
       ),
     locations = cells_body(
       columns = vars(expectancy),
-      rows = west_coast == FALSE)
+      rows = coast == FALSE)
   )
 ```
 
 ```{r life-gr-sum}
 life %>%
   slice(240:247) %>%
-  group_by(west_coast) %>%
+  group_by(coast) %>%
   summarize(mean(expectancy))
 ```
 
@@ -257,7 +264,7 @@ As seen in the example above, `group_by()` and `summarize()` open up lots of pos
 
 In the exercises for this lesson, you'll be working with similar data, but on a global scale, in the Gapminder data.
 
-### Choice of center measure
+### Choice of center
 
 The choice of measure for center can have a dramatic impact on what we consider to be a typical observation, so it is important that you consider the shape of the distribution before deciding on the measure.
 
@@ -282,12 +289,11 @@ question("Which set of measures of central tendency would be *worst* for describ
 )
 ```
 
-### Calculate center measures
+### Calculate centers
 
 Throughout this lesson, you will use data from `gapminder`, which tracks demographic data in countries of the world over time. To learn more about it, you can bring up the help file with `?gapminder`.
 
 For this exercise, focus on how the life expectancy differs from continent to continent. This requires that you conduct your analysis not at the country level, but aggregated up to the continent level. This is made possible by the one-two punch of `group_by()` and `summarize()`, a very powerful syntax for carrying out the same analysis on different subsets of the full dataset.
-
 
 - Create a dataset called `gap2007` that contains only data from the year 2007.
 - Using `gap2007`, calculate the mean and median life expectancy for each continent. Don't worry about naming the new columns produced by `summarize()`.
@@ -358,168 +364,183 @@ gap2007 %>%
 
 How do you summarize the variability that you see in a set of numbers?
 
-Let's consider the life expectancies in those first 11 counties in the US county-level dataset, which we saved to the object $x$. Most methods have us thinking about variability as how much the data is spread out from its center.
+Let's consider the life expectancies in Massachusetts again. We think about variability in a dataset as the spread of the data around its center. 
 
-```{r plotdots}
-x <- head(round(life$expectancy), 11)
-x <- data.frame(x)
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank())
-
-x <- x$x
+```{r ref.label = "life-ma-plot"}
 ```
 
+### Variance and standard deviation
 
-Let's choose to define the center by the mean and then, quantify the distance from the mean by taking the difference between each observation and that mean. 
+We'll first define the center as the mean and quantify the distance from the mean by taking the difference between each observation and that mean. 
 
-```{r plotdots1}
-
-x <- head(round(life$expectancy), 11)
-x <-  data.frame(x)
-# base plot
-ggplot(data = x, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        axis.title.y = element_blank())+
-  geom_vline(xintercept = mean(x$x), color = "red", lwd = 1)
-
-x <- x$x
+```{r ref.label = "life-ma-plot-mean"}
 ```
 
-That results in 11 differences, some positive, some negative. 
+That results in `r nrow(life_ma)` differences, some positive, some negative. 
 
-```{r x1, echo = TRUE}
-x - mean(x)
+```{r ma-deviation}
+life_ma %>%
+  mutate(deviation = expectancy - life_ma_summary$mean)
 ```
 
-We'd like to reduce all of these differences to a single measure of variability, so let's add them up. 
+We'd like to reduce all of these differences to a single measure of variability, and one option is to add them up. But if we do that the positives and negatives will cancel each other. To avoid that (and also to give higher weight to deviations from the mean that are larger), we square each difference.
 
-```{r x2, echo = TRUE}
-sum(x - mean(x))
+```{r ma-deviation-sq}
+life_ma %>%
+  mutate(
+    deviation = expectancy - life_ma_summary$mean,
+    deviation_sq = deviation^2
+    )
 ```
 
-This result is R's scientific notation, saying the sum is -1.42 times 10 to the -14, a number that is essentially zero. Clearly something has gone wrong because we can tell that there is variability in this dataset, but our measure hasn't detected it. The problem is that the positives and negatives have canceled each other out. 
+And then we sum them up.
 
-This is easy to fix: you can square each difference to get rid of the negatives.
-
-
-```{r x3, echo = TRUE}
-sum((x - mean(x))^2)
+```{r ma-deviation-sq-sum}
+life_ma %>%
+  mutate(
+    deviation = expectancy - life_ma_summary$mean,
+    deviation_sq = deviation^2
+    ) %>%
+  summarise(sum_sq_deviation = sum(deviation_sq))
 ```
 
+### 
 
-This new measure is better, but it has an undesirable property: it will just keep getting bigger the more data that you add. You can fix this unconstrained growth by dividing this measure by the number of observations, 11. Now, the quantity is a useful measure found by the following steps: 
+This new measure is better, but it has an undesirable property: it will just keep getting bigger the more data that you add. You can fix this unconstrained growth by dividing this measure by the number of observations, `r nrow(life_ma)`. Now, the quantity is a useful measure found by the following steps: 
 
-1. find the center (mean) of the data
-2. then find the squared distance between each observation and the mean
-3. divide the total squared distance by the number of observations in the dataset
+1. Find the center (mean) of the data
+2. Then find the squared distance between each observation and the mean
+3. Divide the total squared distance by the number of observations ($n$) in the dataset
 
-
-```{r x4, echo = TRUE}
-## Find the length of the x vector (similar to dim for matrices)
-n <- length(x)
-sum((x - mean(x))^2)/n
+```{r ma-deviation-sq-mean-pop}
+life_ma %>%
+  mutate(
+    deviation = expectancy - life_ma_summary$mean,
+    deviation_sq = deviation^2
+    ) %>%
+  summarise(mean_sq_deviation = sum(deviation_sq) / nrow(life_ma))
 ```
 
+If you change the $n$ to an $n - 1$, you get what's called the *sample variance*, one of the most useful measures of the spread of a distribution. 
 
-If you change the n to an n-1, you are left with what's called the *sample variance*, one of the most useful measures of the spread of a distribution. 
-
-```{r x5, echo = TRUE}
-sum((x - mean(x))^2)/(n - 1)
+```{r ma-deviation-sq-mean-samp, echo = TRUE}
+life_ma %>%
+  mutate(
+    deviation = expectancy - life_ma_summary$mean,
+    deviation_sq = deviation^2
+    ) %>%
+  summarise(mean_sq_deviation = sum(deviation_sq) / (nrow(life_ma) - 1))
 ```
 
-In R, you can use the built-in `var()` function to calculate the sample variance. 
+### 
 
-```{r x6, echo = TRUE}
-var(x)
-```
-
-
-Another useful measure is the square root of the *sample variance*, which is called the *sample standard deviation* or just `sd()` in R. The convenient thing about the sample standard deviation is that, once computed, it is in the same units as the original data. In this case we can say that the standard deviation of the 11 counties' life expectancies is 1.69 years. 
-
-
-```{r sd, echo = TRUE}
-sd(x)
-```
-
-By comparison, the variance of this sample is 2.87 years squared, which is a unit that we have no real intuition about.
+In R, you can use the built-in `var()` function to calculate the sample variance.
 
 ```{r var, echo = TRUE}
-var(x)
+life_ma %>%
+  summarise(var = var(expectancy))
 ```
+
+Another useful measure is the square root of the *sample variance*, which is called the *sample standard deviation* or just `sd()` in R. The convenient thing about the sample standard deviation is that, once computed, it is in the same units as the original data. In this case we can say that the standard deviation of the `r nrow(life_ma)` counties' life expectancies is `r life_ma_summary$sd` years. 
+
+```{r sd, echo = TRUE}
+life_ma %>%
+  summarise(sd = sd(expectancy))
+```
+
+By comparison, the variance of this sample is `r life_ma_summary$var` years squared, which is a unit that we have no real intuition about.
 
 ### Innerquartile range
 
-There are two more measures of spread that are good to know about. The interquartile range, or IQR, is the distance between the two numbers that cut-off the middle 50% of your data. This should sound familiar from the discussion of boxplots: the height of the box is exactly the IQR. We can either get the first and third quartiles from the `summary()` function and take their difference or we can use the built-in `IQR()` function.
+There are two more measures of spread that are good to know about. The **interquartile range**, or **IQR**, is the distance between the two numbers that cut-off the middle 50% of your data. This should sound familiar from the discussion of boxplots: the height of the box is exactly the IQR. We can either calculate the first and third quartiles using the `quantile()` function and take their difference...
 
-```{r summary, echo = TRUE}
-summary(x)
+```{r quartile, echo = TRUE}
+life_ma %>%
+  summarise(
+    q1 = quantile(expectancy, 0.25),
+    q3 = quantile(expectancy, 0.75),
+    iqr = q3 - q1
+  )
 ```
 
+... or we can use the built-in `IQR()` function.
 
 ```{r iqr, echo = TRUE}
-IQR(x) 
+life_ma %>%
+  summarise(iqr = IQR(expectancy))
 ```
 
 ### Range 
 
-The final measure is simply the range of the data: the distance between the maximum and the minimum. The `range()` function is a bit different from the other functions we have worked with, in that it gives two numbers in its output. The first number in the output is the minimum and the second number is the maximum. We can use the `diff()` function to find the difference between these two numbers. 
+The final measure is simply the **range** of the data: the distance between the maximum and the minimum.
 
-```{r difran, echo = TRUE}
-range(x)
-
-diff(range(x))
+```{r range, echo = TRUE}
+life_ma %>%
+  summarise(
+    min = min(expectancy),
+    max = max(expectancy),
+    range = max - min
+  )
 ```
 
 ### Choosing a measure of spread 
 
 For any dataset, you can compute all four of these statistics, but which ones are the most meaningful? The most commonly used in practice is the standard deviation, so that's often a good place to start. But what happens if the dataset has some extreme observations?
 
-```{r img14}
-x[2] <- 97
-x_new <- x
+Let's say that Hampden County, Massachusetts, the county with a life expectancy around 78, instead had a life expectancy of 97. We'll create a new dataset with that value and call it `life_ma_extreme`.
+
+```{r life-ma-extreme, echo = TRUE}
+life_ma_extreme <- life_ma %>%
+  mutate(expectancy = if_else(county == "Hampden County", 97, expectancy))
 ```
 
-Let's say that Baldwin County, Alabama, the county with a life expectancy around 78, instead had a life expectancy of 97. 
+Below is a look at the data with such a made up extreme value.
 
-```{r x-new,}
-x_new <- data.frame(x_new)
+```{r life-ma-extreme-view}
+life_ma_extreme
+```
 
-# base plot
-ggplot(data = x_new, aes(x = x)) +
-  geom_dotplot(binwidth = 0.75) +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
+And the following is a dot plot of the data with the made up extreme value.
+
+```{r life-ma-extreme-plot}
+ggplot(data = life_ma_extreme, aes(x = expectancy)) +
+  geom_dotplot() +
+  theme(axis.text.y = element_blank(),
         axis.title.y = element_blank())
-
-x_new <- x_new$x_new
 ```
+
+### 
 
 If you recompute the variance and the standard deviation, you see that they've both gone through the roof. These measures are sensitive to extreme values, because they both rely on the mean as their measure of center! 
 
-```{r new2, echo = TRUE}
-sd(x_new) 
+```{r sd-var-extreme, echo = TRUE}
+life_ma_extreme %>%
+  summarise(
+    var = var(expectancy),
+    sd  = sd(expectancy)
+  )
 ```
 
-```{r new3, echo = TRUE}
-var(x_new) 
-```
+### 
 
 If you recompute the range, it will certainly increase because it is completely determined by the extreme values. For this reason, the range is not often used.
 
-```{r new4, eval=FALSE, include=TRUE}
-diff(range(x_new))
+```{r range-extreme, echo = TRUE}
+life_ma_extreme %>%
+  summarise(
+    min = min(expectancy),
+    max = max(expectancy),
+    range = max - min
+  )
 ```
+
+### 
 
 However, if you recompute the IQR, you would see that it hasn't budged. Because that observation is still the highest life expectancy in the set, the quartiles didn't move. This reveals a good situation for using the IQR: when your dataset is heavily skewed or has extreme observations.
 
-```{r new5}
-IQR(x_new) 
+```{r iqr-extreme, echo = TRUE}
+life_ma_extreme %>%
+  summarise(iqr = IQR(expectancy))
 ```
 
 ## Your turn! 
@@ -550,7 +571,6 @@ question("Which set of measures of spread would be *worst* for describing the tw
 ### Calculate spread measures
 
 Let's extend the powerful `group_by()` and `summarize()` syntax to measures of spread. If you're unsure whether you're working with symmetric or skewed distributions, it's a good idea to consider a robust measure like IQR in addition to the usual measures of variance or standard deviation.
-
 
 The `gap2007` dataset that you created in an earlier exercise is available in your workspace.
 
@@ -704,7 +724,7 @@ It's difficult to compare these distributions because they are both heavily righ
 
 
 ```{r inc, echo = TRUE}
-ggplot(life, aes(x = income, fill = west_coast)) +
+ggplot(life, aes(x = income, fill = coast)) +
   geom_density(alpha = 0.3)
 ```
 
@@ -713,7 +733,7 @@ ggplot(life, aes(x = income, fill = west_coast)) +
 Since income has a heavy right skew, either the square-root or log-transform will do a good job of drawing in the right tail and spreading out the lower values so that we can see what's going on. We can perform the transformation by wrapping income in the `log()` function, which will take the natural log (ln). 
 
 ```{r inc2, echo = TRUE}
-ggplot(life, aes(x = log(income), fill = west_coast)) +
+ggplot(life, aes(x = log(income), fill = coast)) +
   geom_density(alpha = 0.3)
 ```
 
@@ -847,23 +867,23 @@ We've discussed three different aspects of a distribution that are important to 
 
 When conducting an exploratory data analysis: center, variability, and shape. A fourth and final thing to look for are outliers. These are observations that have extreme values far from the bulk of the distribution. They're often very interesting cases, but they're also good to know about before proceeding with more formal analysis.
 
-We saw some extreme values when we plotted the distribution of income for counties on the West Coast. What are we to make of this blip of counties? One thing we can do is display the data using a boxplot. To make the boxplot a bit easier to compare with a density plot, you can specify the categorical variable (`west_coast`) as the y-variable. This option creates vertically stacked boxplots rather than horizontally stacked boxplots. 
+We saw some extreme values when we plotted the distribution of income for counties on the West Coast. What are we to make of this blip of counties? One thing we can do is display the data using a boxplot. To make the boxplot a bit easier to compare with a density plot, you can specify the categorical variable (`coast`) as the y-variable. This option creates vertically stacked boxplots rather than horizontally stacked boxplots. 
 
 ```{r, echo = TRUE, eval = FALSE}
-ggplot(life, aes(x = income, fill = west_coast)) +
+ggplot(life, aes(x = income, fill = coast)) +
   geom_density(alpha = 0.5)
 
-ggplot(life, aes(x = income, y = west_coast, color = west_coast)) +
+ggplot(life, aes(x = income, y = coast, color = coast)) +
   geom_boxplot(alpha = 0.5) + 
   theme(legend.position = "hide")
 ```
 
 
 ```{r coast-income, fig.width = 7}
-p1 <- ggplot(life, aes(x = income, fill = west_coast)) +
+p1 <- ggplot(life, aes(x = income, fill = coast)) +
   geom_density(alpha = 0.5)
 
-p2 <- ggplot(life, aes(x = income, y = west_coast, color = west_coast)) +
+p2 <- ggplot(life, aes(x = income, y = coast, color = coast)) +
   geom_boxplot(alpha = 0.5) + 
   theme(legend.position = "hide")
 
@@ -887,7 +907,6 @@ A useful tool when inspecting outliers is to filtering the dataset to only inclu
 life %>%
   filter(is_outlier) %>%
   arrange(desc(income))
-
 ```
 
 
@@ -900,20 +919,20 @@ To do this, we form a pipeline where the first step is to filter on those counti
 ```{r, echo = TRUE, eval = FALSE}
 life %>%
   filter(!is_outlier) %>%  
-  ggplot(aes(x = income, fill = west_coast)) +
+  ggplot(aes(x = income, fill = coast)) +
   geom_density(alpha = 0.3)
 
-ggplot(life, aes(x = income, fill = west_coast)) +
+ggplot(life, aes(x = income, fill = coast)) +
   geom_density(alpha = 0.3)
 ```
 
 ```{r, fig.width = 8}
 p1 <- life %>%
   filter(!is_outlier) %>%  
-  ggplot(aes(x = income, fill = west_coast)) +
+  ggplot(aes(x = income, fill = coast)) +
   geom_density(alpha = 0.3)
 
-p2 <- ggplot(life, aes(x = income, fill = west_coast)) +
+p2 <- ggplot(life, aes(x = income, fill = coast)) +
   geom_density(alpha = 0.3)
 
 p1 + p2
