@@ -71,7 +71,7 @@ Finally, we notice the `geom_dotplot()` function is used to add dots to the plot
 This function has an optional argument (input) of `dotsize`, which specifies how large the dots should be (values closer to 0 are smaller, values closer to 1 are larger). 
 
 
-```{r dotplot-cars}
+```{r dotplot-cars, echo = TRUE}
 ggplot(data = cars, aes(x = weight)) +
   geom_dotplot(dotsize = 0.4)
 ```
@@ -87,7 +87,7 @@ Because of the binning, it's not possible to perfectly reconstruct the dataset, 
 
 Notice, the only aspect of the code that changes is the transition from `geom_dotplot()` to `geom_histogram()`. 
 
-```{r hist, message=TRUE, warning=TRUE}
+```{r hist, message=TRUE, warning=TRUE, echo = TRUE}
 ggplot(data = cars, aes(x = weight)) +
   geom_histogram()
 ```
