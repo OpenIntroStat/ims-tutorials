@@ -130,7 +130,7 @@ Let's walk through a few parts of the code below. First, we have added `alpha = 
 
 ```{r boxdot, echo = TRUE}
 ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
-  geom_boxplot(alpha = 0) +
+  geom_boxplot(outlier.alpha = 0) +
   geom_jitter(color = "sky blue", width = 0.2)
 ```
 
