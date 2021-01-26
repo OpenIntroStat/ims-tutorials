@@ -14,18 +14,14 @@ library(openintro)
 library(grid)
 library(broom)
 library(emo)
-
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
                       fig.height = 3, 
                       fig.width = 5,
                       warning = FALSE, 
                       message = FALSE)
-
 tutorial_options(exercise.eval = FALSE)
-
 textbooks$course <- as.character(textbooks$course) 
-
 ```
 
 ## Data set-up
@@ -37,7 +33,6 @@ We've spent some time building our graphical intuition about regression, as well
 Data were collected on 73 textbooks required for a few randomly selected courses at UCLA. For each textbook, we know the retail price at both the UCLA bookstore and on Amazon.com. We also know the department and course number for each corresponding course, and the ISBN of the book. 
 
 > What factors are associated with the price of each book at the UCLA bookstore?
-
 ```{r 1, echo = TRUE}
 glimpse(textbooks)
 ```
@@ -113,7 +108,6 @@ Here, we create a new variable for the price at Amazon in cents, and re-fit the 
 ```{r 6, echo = TRUE}
 textbooks <- textbooks %>%
   mutate(amaz_new_cents = amaz_new * 100) 
-
 lm(ucla_new ~ amaz_new_cents, data = textbooks)
 ```
 
@@ -146,7 +140,6 @@ question("Which of the following is the correct interpretation of the slope coef
 A politician interpreting the relationship between poverty rates and high school graduation rates implores his constituents:
 
 > If we can lower the poverty rate by 59%, we'll double the high school graduate rate in our county (i.e. raise it by 100%). 
-
 ```{r mc2}
 question("Which of the following mistakes in interpretation has the politician made?",
   answer("Implying that the regression model establishes a cause-and-effect relationship."),
@@ -178,12 +171,8 @@ For this exercise, fit the following regression models:
 ```{r ex1, exercise = TRUE}
 # Linear model for weight as a function of height
 lm(___ ~ ___, data = ___)
-
 # Linear model for SLG as a function of OBP
-
-
 # Log-linear model for body weight as a function of brain weight
-
 ```
 
 <div id="ex1-hint">
@@ -193,10 +182,8 @@ lm(___ ~ ___, data = ___)
 ```{r ex1-solution}
 # Linear model for weight as a function of height
 lm(wgt ~ hgt, data = bdims)
-
 # Linear model for SLG as a function of OBP
 lm(slg ~ obp, data = mlbbat10)
-
 # Log-linear model for body weight as a function of brain weight
 lm(log(body_wt) ~ log(brain_wt), data = mammals)
 ```
@@ -227,17 +214,16 @@ question("Which of the following statements is **incorrect**?",
 
 ## A linear model object
 
-Previously, we learned how to fit a regression model using the `lm()` command. However, we didn't do much with it---we only displayed the fitted coefficients in the console. The output from `lm()` is an object, and there are a lot of useful things that you can do with that object. To get started, we need to store the output from `lm()` as an object in our environment, in this case aptly named `mod`. 
+Previously, we learned how to fit a regression model using the `lm()` command. However, we didn't do much with it---we only displayed the fitted coefficients in the console. The output from `lm()` is an object, and there are a lot of useful things that you can do with that object. To get started, we need to store the output from `lm()` as an object in our environment, in this case aptly named `books_mod`. 
 
 ```{r 11, echo = TRUE}
-mod <- lm(ucla_new ~ amaz_new, data = textbooks)
-
+books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
 ```
 
-Note that `mod` is of class `lm`. This object contains all of the information needed to fit our regression model, including (by default) the relevant data, and lots of other pieces of information that we can extract in various ways. It's worth repeating that `mod` is an object of type `lm`---it's not a `data.frame`, or a `function`, or a `matrix`, or a `vector`.
+Note that `mod` is of class `lm`. This object contains all of the information needed to fit our regression model, including (by default) the relevant data, and lots of other pieces of information that we can extract in various ways. It's worth repeating that `books_mod` is an object of type `lm`---it's not a `data.frame`, or a `function`, or a `matrix`, or a `vector`.
 
 ```{r 12, echo = TRUE}
-class(mod)
+class(books_mod)
 ```
 
 ### Print
@@ -245,7 +231,7 @@ class(mod)
 By default, when you try to output an `lm` object, you see the "call" (the formula used to fit the model), as well as the fitted coefficients.
 
 ```{r 13, echo = TRUE}
-mod
+books_mod
 ```
 
 ### Fitted coefficients
@@ -253,7 +239,7 @@ mod
 You can also return just the fitted coefficients as a vector using the `coef()` function. This function takes a `lm` object as an input and outputs the coefficients from the model. For our purposes, these are the pieces of information that we are most interested in. 
 
 ```{r 14, echo = TRUE}
-coef(mod)
+coef(books_mod)
 ```
 
 ### Summary
@@ -263,17 +249,17 @@ In this tutorial, we treat regression as a descriptive statistical technique---t
 However, we won't dive into this at the moment. 
 
 ```{r 15, echo = TRUE}
-summary(mod)
+summary(books_mod)
 ```
 
 ### Fitted values
 
-Since the object `mod` contains everything R knows about our model, we can ask R for the fitted values, using the `fitted.values()` function. This returns a vector containing the $\hat{y}$ values for each observation in our dataset.
+Since the object `books_mod` contains everything R knows about our model, we can ask R for the fitted values, using the `fitted.values()` function. This returns a vector containing the $\hat{y}$ values for each observation in our dataset.
 
 In general, the length of the vector of fitted values is the same as the number of rows in the original data frame, since each observation corresponds to exactly one value of $\hat{y}$. However, if there were any observations with missing data, those will be automatically discarded by R when the model is fit, and thus, the length of the vector of fitted values may not be a large as the number of rows in the original data frame. 
 
 ```{r 16, echo = TRUE}
-fitted.values(mod)
+fitted.values(books_mod)
 ```
 
 ### Residuals
@@ -281,7 +267,7 @@ fitted.values(mod)
 Similarly, each fitted value generates a residual. This residual is the difference between the actual observed value of the response variable, and the expected value of the response according to our model. These residuals can be retrieved using the `residuals()` function, which returns the vectors of residuals. 
 
 ```{r 17, echo = TRUE}
-residuals(mod)
+residuals(books_mod)
 ```
 
 ### the broom package
@@ -291,7 +277,7 @@ The R ecosystem is constantly evolving. In this tutorial---and series of tutoria
 By loading the **broom** package and then running the `augment()` function on our `lm` model object, we recover a `data.frame` that contains our original response and explanatory variable, along with the fitted values, residuals, leverage scores, and several other pieces of information relevant to each observation. Working with these tidy data frames can simplify some of the work we do with our models after they are fit. 
 
 ```{r 18, echo = TRUE}
-augment(mod)
+augment(books_mod)
 ```
 
 In the next series of exercises, you'll work with your own linear model objects. 
@@ -302,39 +288,35 @@ An `"lm"` object contains a host of information about the regression model that 
 
 The `coef()` function displays only the values of the coefficients. Conversely, the `summary()` function displays not only that information, but a bunch of other information, including the associated standard error and p-value for each coefficient, the $R^2$, adjusted $R^2$, and the residual standard error. The summary of an `"lm"` object in R is very similar to the output you would see in other statistical computing environments (e.g. Stata, SPSS, etc.)
 
-We have already created the `mod` object, a linear model for the weight of individuals as a function of their height, using the `bdims` dataset and the code
+We have already created the `hgt_wgt_mod` object, a linear model for the weight of individuals as a function of their height, using the `bdims` dataset and the code
 
 ```{r 19, echo = TRUE}
-mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
 Now, you will:
 
-- Use `coef()` to display the coefficients of `mod`.
-- Use `summary()` to display the full regression output of `mod`.
+- Use `coef()` to display the coefficients of `hgt_wgt_mod`.
+- Use `summary()` to display the full regression output of `hgt_wgt_mod`.
 
 ```{r ex2-setup}
-mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
 ```{r ex2, exercise = TRUE}
 # Show the coefficients
-
-
 # Show the full model output
-
 ```
 
 <div id="ex1-hint">
-**Hint:** Use `coef()` and `summary()` on the model object.
+**Hint:** Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
 </div>
 
 ```{r ex2-solution}
 # Show the coefficients
-coef(mod)
-
+coef(hgt_wgt_mod)
 # Show the full model output
-summary(mod)
+summary(hgt_wgt_mod)
 ```
 
 ### Fitted values and residuals
@@ -350,36 +332,35 @@ The least squares fitting procedure guarantees that the mean of the residuals is
 In this exercise, we will confirm these two mathematical facts by accessing the fitted values and residuals with the `fitted.values()` and `residuals()` functions, respectively, for the following model:
 
 ```{r 20, eval = FALSE, echo = TRUE}
-mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
-`mod` (defined above) is available in your workspace. We will use the `all.equal()` function to confirm that the mean of the body weights equals the mean of the fitted values of `mod`. This function takes two inputs (separated by a comma) that you would like to check if they are equal (up to a tolerance of 1.5e-8). 
+`mod` (defined above) is available in your workspace. We will use the `all.equal()` function to confirm that the mean of the body weights equals the mean of the fitted values of `hgt_wgt_mod`. This function takes two inputs (separated by a comma) that you would like to check if they are equal (up to a tolerance of 1.5e-8). 
+
 *Hint*: Remember, you can extract a specific column of a `data.frame` using the `$`. 
 
-Next, compute the mean of the residuals of `mod` and check if it is equal to 0.
+Next, compute the mean of the residuals of `hgt_wgt_mod` and check if it is equal to 0.
 
 ```{r ex4-setup}
-mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
 ```{r ex4, exercise = TRUE}
 # Mean of weights equal to mean of fitted values?
 all.equal(___, ___) 
-
 # Mean of the residuals
 ___(residuals(___))
 ```
 
 ```{r ex4-hint-1}
-all.equal(mean(bdims$wgt), mean(fitted.values(mod))) 
+all.equal(mean(bdims$wgt), mean(fitted.values(hgt_wgt_mod))) 
 ```
 
 ```{r ex4-solution}
 # Mean of weights equal to mean of fitted values?
-all.equal(mean(bdims$wgt), mean(fitted.values(mod)))
-
+all.equal(mean(bdims$wgt), mean(fitted.values(hgt_wgt_mod)))
 # Mean of the residuals
-mean(residuals(mod))
+mean(residuals(hgt_wgt_mod))
 ```
 
 ### Tidying your linear model
@@ -388,24 +369,19 @@ As you fit a regression model, there are some quantities (e.g. $R^2$) that apply
 
 The `augment()` function from the **broom** package (which is already loaded for you) does exactly this. It takes a model object as an argument and returns a data frame that contains the data on which the model was fit, along with several quantities specific to the regression model, including the fitted values, residuals, leverage scores, and standardized residuals.
 
-The same linear model from the last exercise, `mod`, is available in your workspace.
+The same linear model from the last exercise, `hgt_wgt_mod`, is available in your workspace.
 
-- Create a new data frame called `bdims_tidy` that is the `augment`ation of the `mod` linear model. 
-- View the `bdims_tidy` data frame using `glimpse()`.
+- Create a new data frame called `hgt_wgt_tidy` that is the `augment`ation of the `hgt_wgt_mod` linear model. 
+- View the `hgt_wgt_tidy` data frame using `glimpse()`.
 
 ```{r ex5-setup}
-mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
 ```{r ex5, exercise = TRUE}
 # Load the broom package
-
-
-# Create bdims_tidy
-
-
+# Create hgt_wgt_tidy
 # Glimpse the resulting data frame
-
 ```
 
 ```{r ex5-hint-1}
@@ -419,12 +395,10 @@ glimpse(___)
 ```{r ex5-solution}
 # Load the broom package
 library(broom)
-
 # Create bdims_tidy
-bdims_tidy <- augment(mod)
-
+hgt_wgt_tidy <- augment(hgt_wgt_mod)
 # Glimpse the resulting data frame
-glimpse(bdims_tidy)
+glimpse(hgt_wgt_tidy)
 ```
 
 ## Using your linear model
@@ -434,7 +408,7 @@ glimpse(bdims_tidy)
 Recall our previous example about textbooks at the UCLA bookstore. We fit the regression model using the `lm()` command, and stored the resulting model object. 
 
 ```{r lm1, echo = TRUE}
-mod <- lm(ucla_new ~ amaz_new, data = textbooks)
+books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
 ```
 
 ### Examining residuals
@@ -442,7 +416,7 @@ mod <- lm(ucla_new ~ amaz_new, data = textbooks)
 By examining the residuals, we can learn about whether particular textbooks appear to be under- or over-priced. In this case, the most overpriced book cost $197 at the UCLA bookstore, but just $131 on Amazon---a markup of $66! The model predicts a cost of $158, resulting in a residual of $39. 
 
 ```{r lm2, echo = TRUE}
-augment(mod) %>%
+augment(books_mod) %>%
   arrange(desc(.resid)) %>%
   head()
 ```
@@ -482,8 +456,7 @@ Here, we create a `data.frame` with one variable and one observation for the ISR
 
 ```{r lm4, echo = TRUE}
 new_data <- data.frame(amaz_new = 8.49)
-
-predict(mod, newdata = new_data)
+predict(books_mod, newdata = new_data)
 ```
 
 The model returns that the expected price at the UCLA bookstore is $11.11. We don't actually know what it sells for at UCLA, but at Smith College it is selling for $11.40, a slightly steeper markup. 
@@ -493,8 +466,7 @@ The model returns that the expected price at the UCLA bookstore is $11.11. We do
 Alternatively, the `augment()` function from **broom** will also take a `newdata` argument. However, this function will return a `data.frame`. This is useful if you want to do a bit more with your predictions. Here, we first use `augment()` to create a new `data.frame` of predicted values, and then use `geom_point()` to put those observations on the scatterplot of the original data. Here the single observation for the ISRS book is shown in red.
 
 ```{r lm5, echo = TRUE}
-isrs <- augment(mod, newdata = new_data)
-
+isrs <- augment(books_mod, newdata = new_data)
 ggplot(data = textbooks, aes(x = amaz_new, y = ucla_new)) + 
   geom_point() + 
   geom_smooth(method = "lm") +
@@ -507,7 +479,7 @@ Now it's time for you to make some of your own predictions.
 
 The `fitted.values()` function or the `augment()`-ed data frame provides us with the fitted values for the observations that were in the original data. However, once we have fit the model, we may want to compute expected values for observations that were **not** present in the data on which the model was fit. These types of predictions are called *out-of-sample* predictions. 
 
-The `ben` data frame contains a height and weight observation for one person. The `mod` object contains the fitted model for weight as a function of height for the observations in the `bdims` dataset. We can use the `predict()` function to generate expected values for the weight of new individuals. We must pass the data frame of new observations through the `newdata` argument.
+The `ben` data frame contains a height and weight observation for one person. The `hgt_wgt_mod` object contains the fitted model for weight as a function of height for the observations in the `bdims` dataset. We can use the `predict()` function to generate expected values for the weight of new individuals. We must pass the data frame of new observations through the `newdata` argument.
 
 The same linear model, `mod`, is defined in your workspace.
 
@@ -515,28 +487,24 @@ The same linear model, `mod`, is defined in your workspace.
 - Use `predict()` with the `newdata` argument to compute the expected weight of the individual in the `ben` data frame.
 
 ```{r ex6-setup}
-mod <- lm(wgt ~ hgt, data = bdims)
+wgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ben <- data.frame(wgt = 74.8, hgt = 182.8)
 ```
 
 ```{r ex6, exercise = TRUE}
 # Print ben
-
-
 # Predict the weight of ben
-
 ```
 
 ```{r ex6-hint}
-predict(mod, newdata = ___)
+predict(hgt_wgt_mod, newdata = ___)
 ```
 
 ```{r ex6-solution}
 # Print ben
 ben
-
 # Predict the weight of ben
-predict(mod, newdata = ben)
+predict(hgt_wgt_mod, newdata = ben)
 ```
 
 
@@ -546,11 +514,11 @@ The `geom_smooth()` function makes it easy to add a simple linear regression lin
 
 The `coefs` dataframe contains the model estimates retrieved from `coef()` function. Passing this to `geom_abline()` as the `data` argument will enable you to draw a straight line on your scatterplot.
 
-Use `geom_abline()` to add a line defined in the `coefs` data frame to a scatterplot of weight vs. height for individuals in the `bdims` dataset.
+Use `geom_abline()` to add a line defined in the `hgt_wgt_coefs` data frame to a scatterplot of weight vs. height for individuals in the `bdims` dataset.
 
 ```{r ex7-setup}
-mod <- lm(wgt ~ hgt, data = bdims)
-coefs <- coef(mod) %>%
+hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
+hgt_wgt_coefs <- coef(hgt_wgt_mod) %>%
   t() %>%
   as.data.frame()
 ```
@@ -565,14 +533,14 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
 ```
 
 <div id="ex7-hint">
-**Hint:** The `hgt` variable in the `coefs` data frame indicates the slope.
+**Hint:** The `hgt` variable in the `hgt_wgt_coefs` data frame indicates the slope.
 </div>
 
 ```{r ex7-solution}
 # Add the line to the scatterplot
 ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
   geom_point() + 
-  geom_abline(data = coefs, 
+  geom_abline(data = hgt_wgt_coefs, 
               aes(intercept = `(Intercept)`, slope = hgt),  
               color = "dodgerblue")
 ```
