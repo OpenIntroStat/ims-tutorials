@@ -33,11 +33,7 @@ anscombe <- anscombe %>%
 
 In the previous lesson, we learned how to visually assess the *strength* of the relationship between two variables by examining a scatterplot. Correlation is a way to quantify the strength of that linear relationship.  
 
-- correlation coefficient between -1 and 1
-- sign of the correlations shows direction
-- magnitude of the correlation shows strength
-
-The correlation coefficient is a number between -1 and 1 that indicates the strength of a linear relationship. The *sign* of the correlation coefficient corresponds to the direction---positive or negative. The *magnitude* of the correlation corresponds to the strength. A correlation coefficient of close to 1 indicates near-perfect positive correlation, as we see in this plot.
+The correlation coefficient is a number between -1 and 1 that indicates the strength of a linear relationship. The *sign* of the correlation coefficient corresponds to the direction---positive or negative. The *magnitude* of the correlation corresponds to the strength--values near 0 are weaker and values near 1 or -1 are stronger. 
 
 ### Near perfect correlation
 
@@ -47,11 +43,13 @@ A correlation coefficient of close to 1 indicates near-perfect positive correlat
 n <- 100
 # http://blog.revolutionanalytics.com/2016/08/simulating-form-the-bivariate-normal-distribution-in-r-1.html
 # Target parameters for univariate normal distributions
-mu1 <- 1; s1 <- 2
-mu2 <- 1; s2 <- 8
+mu1 <- 1
+s1 <- 2
+mu2 <- 1
+s2 <- 8
 
 # Parameters for bivariate normal distribution
-mu <- c(mu1,mu2) # Mean 
+mu <- c(mu1, mu2) # Mean 
 
 cor_plot <- function(n, rho) {
   sigma <- matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2), 2) # Covariance matrix
@@ -93,7 +91,7 @@ cor_plot(n, rho = 0.2)
 
 ### Zero
 
-If there really is no linear relationship between the two variables, then the correlation coefficient will be close to zero. This scatterplot shows two variables that are uncorrelated. Note how knowing one of the $x$ values gives you almost no information about what the corresponding value of $y$ will be. 
+If there really is no linear relationship between the two variables, then the correlation coefficient will be close to zero. This scatterplot shows two variables that are relatively uncorrelated. Note how knowing one of the $x$ values gives you very little information about where the corresponding value of $y$ will be. 
 
 ```{r cor4}
 cor_plot(n, rho = 0)
@@ -101,15 +99,15 @@ cor_plot(n, rho = 0)
 
 ### Negative
 
-Of tutorial, when the direction of the relationship is negative, the value of the correlation coefficient is as well.
+Alternatively, when the direction of the relationship is negative, the value of the correlation coefficient is negative as well.
 
 ```{r cor5}
 cor_plot(n, rho = -0.5)
 ```
 
-### Non-linear
+## Non-linear relationships
 
-It is crucial to remember that the correlation coefficient only captures the strength of the *linear* relationship between two variables. It is quite common to encounter variables that are strongly-related, but in a non-linear way. Blindly computing and reporting the correlation between such variables is not likely to yield meaningful results. 
+It is crucial to remember that the correlation coefficient only captures the strength of the *linear* relationship between two variables. It is quite common to encounter variables that are strongly-related, but in a non-linear way. Blindly computing and reporting the correlation between such variables **does not** yield meaningful results. 
 
 ```{r plot2}
 sim <- data.frame(x = rnorm(n)) %>%
@@ -121,7 +119,7 @@ ggplot(sim, aes(x = x, y = y)) +
             label = round(cor(sim$x, sim$y), 3), size = 10)
 ```
 
-This scatterplot shows a clear, quadratic relationship. To simply interpret the low correlation coefficient as evidence that $x$ and $y$ are unrelated would be plainly incorrect. Here, $x$ and $y$ are closely related---just not in a linear fashion.
+Here, this scatterplot shows a clear, quadratic relationship. To simply interpret the low correlation coefficient as evidence that $x$ and $y$ are unrelated would be plainly incorrect. Here, $x$ and $y$ are very closely related---just not in a linear fashion.
 
 ### Non-linear correlation
 
@@ -134,24 +132,25 @@ run09 %>%
   geom_point()
 ```
 
-```{r code2}
-run09 %>%
+```{r}
+cor <- run09 %>%
   filter(div_place <= 10) %>%
-  summarize(cor(pace, age))
+  summarize(cor(pace, age)) %>% 
+  pull()
 ```
 
-The value of the correlation coefficient here is about 0.68, but we have some intuitive sense that pace and age are more closely-related than the figure indicates. 
+The value of the correlation coefficient here is about `r round(cor, 3)`, but we have some intuitive sense that pace and age are more closely-related than the figure indicates. 
 
-### Pearson Product-Moment Correlation
+## Calculating the Correlation 
 
 There are several different ways that correlation can be defined in statistics, but by far the most common is the **Pearson Product-Moment correlation**. When we say "correlation" we are talking about this value, but you should be aware that there are other definitions that are preferred in other contexts. 
 
 $$
-  r(x,y) = \frac{Cov(x, y)}{\sqrt{SXX \cdot SYY}} 
+  r(x,y) = \frac{Cov(x, y)}{\sqrt{S_{XX} \cdot S_{YY}}} 
 $$
 
 
-Correlation is most often denoted with the letter $r$, and it is a function of two variables, most commonly $x$ and $y$. The definition in terms of covariance - which we haven't defined - and the sums of the squares is shown here. 
+Correlation is most often denoted with the letter $r$, and it is a function of two variables, most commonly $x$ and $y$. The definition in terms of covariance and the sums of squares of $x$ and $y$, which we haven't defined.
 
 ### Pearson Product-Moment Correlation
 
@@ -162,13 +161,11 @@ $$
   r(x,y) = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2 \cdot \sum_{i=1}^n (y_i - \bar{y})^2}
 $$
 
-In practice, we always have R do these computations for us, so memorizing the formulas is not important. For some of you, the mathematics may help reinforce your intuition about what the correlation coefficient actually measures. For others, it may simply be a confusing blur of symbols that can be safely ignored. Having a solid conceptual understanding of what correlation is is the important thing.
+In practice, we always have R do these computations for us, so memorizing the formulas is not important. For some of you, the mathematics may help reinforce your intuition about what the correlation coefficient actually measures. For others, it may simply be a confusing blur of symbols that can be safely ignored. Having a solid conceptual understanding of correlation is the important thing.
 
 You'll get some more practice computing correlation in the next set of exercises. 
 
-### Understanding correlation scale
-
-Choose the correct interpretation of these findings.
+### 
 
 ```{r mc1}
 question("In a scientific paper, three correlations are reported with the following values:
@@ -187,7 +184,7 @@ question("In a scientific paper, three correlations are reported with the follow
 ### Understanding correlation sign
 
 ```{r mc2}
-question("In a scientific paper, three correlations are reported with the following values. Which of these values represents the strongest correlation?",
+question("In a scientific paper, three correlations are reported: 0.582, 0.134, -0.795. Which of these values represents the strongest correlation?",
   answer("0.582"),
   answer("0.134", message = "This is the weakest correlation."),
   answer("-0.795", correct = TRUE, message = "Indeed, the closer to 1 or -1, the stronger the correlation."),
@@ -197,43 +194,54 @@ question("In a scientific paper, three correlations are reported with the follow
 ```
 
 
-### Computing correlation
+### Using R to compute the correlation
 
-The `cor(x, y)` function will compute the Pearson product-moment correlation between variables, `x` and `y`. Since this quantity is symmetric with respect to `x` and `y`, it doesn't matter in which order you put the variables. 
+The `cor()` function will compute the Pearson product-moment correlation between variables, `x` and `y`. Since this quantity is symmetric with respect to `x` and `y`, it doesn't matter which order you input the variables. 
 
-At the same time, the `cor()` function is very conservative when it encounters missing data (e.g. `NA`s). The `use` argument allows you to override the default behaviour of returning `NA` whenever any of the values encountered is `NA`. Setting the `use` argument to `"pairwise.complete.obs"` allows `cor()` to compute the correlation coefficient for those observations where the values of `x` and `y` are both not missing.
+At the same time, the `cor()` function is very conservative when it encounters missing data (e.g. `NA`s). If either variable (x or y) has missing values, the `cor()` function will output `NA`. 
 
-- Use `cor()` to compute the correlation between the birthweight of babies in the `ncbirths` dataset and their mother's age. There is no missing data in either variable.
-- Compute the correlation between the birthweight and the number of weeks of gestation for all non-missing pairs.
+The `use` argument allows you to override the default behavior of returning `NA` whenever any of the values encountered is `NA`. Setting the `use` argument to `"pairwise.complete.obs"` allows `cor()` to compute the correlation coefficient for those observations where the values of `x` and `y` are both not missing.
+
+### 
+
+In this exercise, you will use `cor()` to compute the correlation between the birthweight of babies (`weight`) in the `ncbirths` dataset and their mother's age (`mage`). There is no missing data in either variable, so you can use the plain `cor()` function to do this. 
+
+Then, you will use `cor()` to compute the correlation between the birthweight (`weight`) and the number of weeks of gestation (`weeks`) for all non-missing pairs of observations
 
 ```{r ex1, exercise = TRUE}
-# Compute correlation
+# Compute correlation of birthweight and mother's age
 ncbirths %>%
-  summarize(N = n(), r = cor(___, ___))
+  summarize(N = n(), 
+            r = cor(___, ___))
 
-# Compute correlation for all non-missing pairs
+# Compute correlation of birthweight and gestation for all non-missing pairs
 ncbirths %>%
-  summarize(N = n(), r = cor(___, ___, use = ___))
+  summarize(N = n(), 
+            r = cor(___, ___, use = ___))
 ```
 
 ```{r ex1-hint-1}
 ncbirths %>%
-  summarize(N = n(), r = cor(weight, mage))
+  summarize(N = n(), 
+            r = cor(weight, mage))
 ```
 
 ```{r ex1-hint-2}
 ncbirths %>%
-  summarize(N = n(), r = cor(___, ___, use = "pairwise.complete.obs"))
+  summarize(N = n(), 
+            r = cor(___, ___, use = "pairwise.complete.obs"))
 ```
 
 ```{r ex1-solution}
 # Compute correlation
 ncbirths %>%
-  summarize(N = n(), r = cor(weight, mage))
+  summarize(N = n(), 
+            r = cor(weight, mage))
 
 # Compute correlation for all non-missing pairs
 ncbirths %>%
-  summarize(N = n(), r = cor(weight, weeks, use = "pairwise.complete.obs"))
+  summarize(N = n(), 
+            r = cor(weight, weeks, use = "pairwise.complete.obs"))
 
 ```
 
@@ -269,7 +277,7 @@ anscombe %>%
   geom_point()
 ```
 
-In the third data set, we have an outlier. Here again, our eyes tell us that with the exception of the outlier, the correlation between $x$ and $y$ is perfect, and in this case, it is linear. However, the presence of the outlier has lowered the value of the correlation coefficient, and - as you will learn later - the slope of the regression line. 
+In the third data set, we have an outlier. Here again, our eyes tell us that with the exception of the outlier, the correlation between $x$ and $y$ is perfect, and in this case, it is linear. However, the presence of the outlier has lowered the value of the correlation coefficient, and (as you will learn later) the slope of the regression line. 
 
 
 ```{r ans4}
@@ -279,7 +287,7 @@ anscombe %>%
   geom_point()
 ```
 
-Finally, in the fourth data set we see a pathological example with almost the opposite problem. In the previous plot, we saw that the presence of a single outlier had lowered the correlation from 1 to 0.82. In this plot, the presence of a single outlier raises the correlation from undefined to 0.82. Note that here, with the exception of the outlier, knowing $x$ doesn't tell you anything about $y$. It is only the outlier that gives you the appearance of a correlation, but that correlation is specious. 
+Finally, in the fourth data set we see a pathological example with almost the opposite problem. In the previous plot, we saw that the presence of a single outlier had lowered the correlation from 1 to 0.82. In this plot, the presence of a single outlier raises the correlation from undefined to 0.82. Note that here, with the exception of the outlier, knowing $x$ doesn't tell you anything about $y$. It is only the outlier that gives you the appearance of a correlation, but that correlation is very spurious! 
 
 ```{r ans5}
 anscombe %>%
@@ -292,9 +300,9 @@ The Anscombe datasets are fabricated, but they help to illustrate some propertie
 
 Now it's your turn to explore the Anscombe data set. 
 
-### Exploring Anscombe
+## Your turn! 
 
-In 1973, Francis Anscombe famously created four datasets with remarkably similar numerical properties, but obviously different graphic relationships. The `anscombe` dataset contains the `x` and `y` coordinates for these four datasets, along with a grouping variable, `set`, that distinguishes the quartet. 
+In 1973, Francis Anscombe famously created four datasets with remarkably similar numerical properties, but obviously different graphic relationships. The `anscombe` dataset contains the `x` and `y` coordinates for these four datasets, along with a grouping variable, `set`, that distinguishes which quartet the observations belong to (e.g. 1, 2, 3, or 4). 
 
 It may be helpful to remind yourself of the graphic relationship by viewing the four scatterplots:
 
@@ -348,7 +356,7 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
   group_by(set) %>%
   summarize(
     N = n(), 
-    mean_of_x = mean(), 
+    mean_of_x = mean(x), 
     ...
   )
 ```
@@ -367,7 +375,7 @@ anscombe %>%
   )
 ```
 
-### Perception of correlation
+## Perception of correlation
 
 Recall the scatterplot between the poverty rate of counties in the United States and the high school graduation rate in those counties from the previous lesson. 
 
@@ -390,46 +398,40 @@ question("Which of the following values is the correct correlation between pover
 ```
 
 
-Estimating the value of the correlation coefficient between two quantities from their scatterplot can be tricky. [Statisticians have shown that](https://statistics.stanford.edu/sites/default/files/EFS%20NSF%20206.pdf) people's perception of the strength of these relationships can be influenced by design choices like the x and y scales. 
+Estimating the value of the correlation coefficient between two quantities from their scatterplot can be tricky. [Statisticians have shown that](https://statistics.stanford.edu/sites/default/files/EFS%20NSF%20206.pdf) people's perception of the strength of these relationships can be influenced by design choices like the x and y scales. Nevertheless, with some practice your perception of correlation will improve. 
 
-Nevertheless, with some practice your perception of correlation will improve. Toggle through the four scatterplots in the plotting window, each of which you've seen in a previous exercise. Jot down your best estimate of the value of the correlation coefficient between each pair of variables. Then, compare these values to the actual values you compute in this exercise.
+We are going to recreate scatterplots from the previous tutorial, jot down your best estimate of the value of the correlation coefficient between each pair of variables, and compare these values to the actual values you compute. 
 
-If you're having trouble recalling variable names, it may help to preview a dataset in the console with `glimpse()`.
-
-
-Draw the plot then calculate the correlation between `OBP` and `SLG` for all players in the `mlbbat10` dataset.
+First, we will start with the relationship between `OBP` and `SLG` for all players in the `mlbbat10` dataset.
 
 ```{r ex3, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
   geom_point()
 
-# Correlation for all baseball players
+# Find the correlation for all baseball players
 ___ %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex3-hint-1}
-___ %>%
-  summarize(N = n(), r = cor(___, ___))
+mlbbat10 %>%
+  summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex3-hint-2}
-___ %>%
-  summarize(N = n(), r = cor(obp, slg))
+mlbbat10 %>%
+  summarize(N = n(), r = cor(___, ___))
 ```
 
 ```{r ex3-solution}
-# Run this and look at the plot
-ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
-  geom_point()
-
-# Correlation for all baseball players
 mlbbat10 %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
 
-Draw the plot then calculate the correlation between `OBP` and `SLG` for all players in the `mlbbat10` dataset with at least 200 at-bats.
+### 
+
+Next, let's look at the plot of the filtered `mlbbat10` data, with only the players with at least 200 at-bats.
 
 ```{r ex4, exercise = TRUE}
 # Run this and look at the plot
@@ -446,70 +448,79 @@ ___ %>%
 
 ```{r ex4-hint-1}
 mlbbat10 %>%
-  filter(at_bat >= 200) %>%
-  summarize(N = n(), r = cor(___, ___))
+  filter(___) %>%
+  summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex4-hint-2}
+mlbbat10 %>%
+  filter(at_bat >= 200) %>%
+  summarize(N = n(), r = cor(, ___))
+```
+
+```{r ex4-hint-3}
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(obp, ___))
 ```
 
 ```{r ex4-solution}
-# Run this and look at the plot
-mlbbat10 %>% 
-  filter(at_bat > 200) %>%
-  ggplot(aes(x = obp, y = slg)) + 
-  geom_point()
-
-# Correlation for all players with at least 200 ABs
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
 
-Draw the plot then calculate the correlation between height and weight for each sex in the `bdims` dataset.
+### 
+
+Next, using the `bdims` dataset, draw the plot then calculate the correlation between height (`hgt`) and weight (`wgt`) *separately for each sex*. 
 
 ```{r ex5, exercise = TRUE}
 # Run this and look at the plot
-ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
+ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
   geom_point() 
 
 # Correlation of body dimensions
 ___ %>%
   group_by(___) %>%
-  summarize(N = ___, r = cor(___, ___))
+  summarize(N = ___, 
+            r = cor(___, ___))
 ```
 
 ```{r ex5-hint-1}
-___ %>%
-  group_by(sex) %>%
-  summarize(N = ___, r = cor(___, ___))
+bdims %>%
+  group_by(___) %>%
+  summarize(N = ___, 
+            r = cor(___, ___))
 ```
 
 ```{r ex5-hint-2}
-___ %>%
+bdims %>%
   group_by(sex) %>%
-  summarize(N = n(), r = cor(___, ___))
+  summarize(N = ___, 
+            r = cor(___, ___))
+```
+
+```{r ex5-hint-3}
+bdims %>%
+  group_by(sex) %>%
+  summarize(N = n(), 
+            r = cor(___, ___))
 ```
 
 ```{r ex5-solution}
-# Run this and look at the plot
-ggplot(data = bdims, aes(x = hgt, y = wgt, color = factor(sex))) +
-  geom_point() 
-
-# Correlation of body dimensions
 bdims %>%
   group_by(sex) %>%
-  summarize(N = n(), r = cor(hgt, wgt))
+  summarize(N = n(), 
+            r = cor(hgt, wgt))
 ```
 
-Draw the plot then calculate the correlation between body weight and brain weight for all species of `mammals`. Alongside this computation, compute the correlation between the same two quantities after taking their natural logarithms.
+### 
+
+Finally, draw the plot then calculate the correlation between body weight (`body_wt`) and brain weight (`brain_wt`) for all species of `mammals`. Alongside this computation, compute the correlation between the same two quantities after taking their natural logarithms (using the `log()` function).
 
 ```{r ex6, exercise = TRUE}
 # Run this and look at the plot
-ggplot(data = mammals, aes(x = BodyWt, y = BrainWt)) +
+ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   geom_point() + 
   scale_x_log10() + 
   scale_y_log10()
@@ -522,27 +533,27 @@ ___ %>%
 ```
 
 ```{r ex6-hint-1}
-___ %>%
-  summarize(N = n(), 
+mammals %>%
+  summarize(N = ___, 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-2}
-___ %>%
+mammals %>%
+  summarize(N = n(), 
+            r = cor(body_wt, brain_wt), 
+            r_log = cor(log(___), log(___)))
+```
+
+```{r ex6-hint-3}
+mammals %>%
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-solution}
-# Run this and look at the plot
-ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
-  geom_point() + 
-  scale_x_log10() + 
-  scale_y_log10()
-
-# Correlation among mammals, with and without log
 mammals %>%
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
@@ -561,6 +572,8 @@ For example, consider the following article from the New York Times about the co
 knitr::include_graphics("images/nytimes_beer.png")
 ```
 
+</br> 
+
 After discussing some relatable scenarios, the lead-in raises the question of causation: "But whether exercise encourages people to drink and, likewise, whether drinking encourages people to exercise has been in dispute."
 
 ### Exercise and Beer (cont'd)
@@ -571,11 +584,13 @@ But causation is not really the goal here. Notice how in the next two paragraphs
 knitr::include_graphics("images/nytimes_beer2.png")
 ```
 
+</br> 
+
 In the end, this article is worded fairly carefully. Although many different possible connections between exercising and drinking are explored, the author has taken steps not to imply that the research demonstrates that exercising causes one to drink, nor that drinking causes one to exercise. The best interpretation is quoted from the actual study: "people drank more than usual on the same days that they engaged in more physical activity than usual."
 
 Note how this statement makes it clear that *an association was observed*, but does not try to imply causality. 
 
-In observational studies---which are especially common in nutritional science, health, and epidemiology---one must always be careful not to erroneously suggest that correlation implies causation. 
+In observational studies--which are especially common in nutritional science, health, and epidemiology--one must always be careful not to erroneously suggest that correlation implies causation. 
 
 ```{r img3, out.width=600}
 knitr::include_graphics("images/nytimes_beer3.png")
@@ -583,7 +598,7 @@ knitr::include_graphics("images/nytimes_beer3.png")
 
 ### NFL arrests
 
-Here is another interesting use of correlation from the New York Times. The article examines the arrest records of National Football League players, and---among other things---considers whether certain franchises tend to have more or fewer players arrested consistently over time. This use of correlation---often called serial correlation or autocorrelation---checks to see whether a single numeric variable is highly correlated with past measurements of itself. 
+Here is another interesting use of correlation from the New York Times. The article examines the arrest records of National Football League players, and considers whether certain franchises tend to have more or fewer players arrested consistently over time. This use of correlation---often called *serial correlation* or *autocorrelation*---checks to see whether a single numeric variable is highly correlated with past measurements of itself. 
 
 ```{r, include=FALSE, eval=FALSE}
 webshot(url = "https://www.nytimes.com/2014/09/13/upshot/what-the-numbers-show-about-nfl-player-arrests.html", 
@@ -616,7 +631,6 @@ knitr::include_graphics("images/nytimes_nfl2.png")
 
 Sometimes journalists can leave statistical concepts lost in translation. The first sentence of this article reports that no correlation was found between economic growth and lower tax rates at the top of the income bracket. This is a politically-sensitive finding, and indeed much of the article discusses attempts by Senate Republicans to bury these findings, which run counter to their ideological position on macroeconomic issues. 
 
-
 ```{r, include=FALSE, eval=FALSE}
 webshot(url = "http://www.nytimes.com/2012/11/02/business/questions-raised-on-withdrawal-of-congressional-research-services-report-on-tax-rates.html", 
   file = "images/nytimes_tax.png", 
@@ -627,14 +641,13 @@ webshot(url = "http://www.nytimes.com/2012/11/02/business/questions-raised-on-wi
 knitr::include_graphics("images/nytimes_tax.png")
 ```
 
-Of greater interest to us is that the word "correlation" here is not being used in its precise statistical sense. The link to the actual report reveals that the findings are based on a multiple regression model, not a simple correlation. Multiple regression models are the subject of the next tutorial, but for now, it is enough to know that multiple regression is a technique that extends regression such that more than one explanatory variable can be taken into account. This is impossible to do with correlation, which is a simple bivariate statistic. 
+Of greater interest to us is that the word "correlation" here is not being used in its precise statistical sense. The link to the actual report reveals that the findings are based on a multiple regression model, not a simple correlation. Multiple regression models are the subject of the next tutorial, but for now, it is enough to know that multiple regression is a technique that extends regression such that more than one explanatory variable can be taken into account. Although you can extend regression to include more than one explanatory variable, this is impossible to do with correlation. 
 
 ### Can you plot a correlation?
 
+Finally, it is not uncommon to encounter references to a "plot" of a correlation. This doesn't quite make sense. In this tutorial you've seen that a scatterplot is a graphical presentation of two variables, and the strength of a linear relationship shown in a scatterplot can be neatly summarized by a correlation. In this case, the article refers to a table of correlations between several variables--often called a *correlation matrix*--as a "plot" of a correlation. 
 
-Finally, it is not uncommon to encounter references to a "plot" of a correlation. This doesn't quite make sense. Of tutorial, a scatterplot may be a graphical presentation of two variables, and the strength of the linear relationship shown can be neatly summarized by a correlation. In this case, the article refers to a table of correlations between several variables - often called a **correlation matrix** - as a "plot" of a correlation. The conclusion that there is no correlation between voting for Brexit and racism is supported by these small correlation values. 
-
-What other evidence would you want to see in order to have confidence in these findings?
+The authors reached the conclusion that there was no correlation between voting for Brexit and racism, based on the small correlation values. What other evidence would you want to see in order to have confidence in these findings?
 
 ```{r, include=FALSE, eval=FALSE}
 webshot(url = "http://heatst.com/world/no-correlation-between-voting-for-brexit-and-racism-study-finds/", 
@@ -646,22 +659,13 @@ webshot(url = "http://heatst.com/world/no-correlation-between-voting-for-brexit-
 knitr::include_graphics("images/heatst_brexit.png")
 ```
 
-
-
-### Value of Education
-
-[The Value of College: It’s Not Just Correlation](http://www.nytimes.com/2014/05/28/upshot/the-value-of-college-its-not-just-correlation.html)
+## Your turn! 
 
 The next few exercises will test your ability to interpret correlation like a pro. 
 
-### Interpreting correlation in context
-
-Recall that you previously determined the value of the correlation coefficient between the poverty rate of counties in the United States and the high school graduation rate in those counties was -0.681. 
+Recall that you previously determined the value of the correlation coefficient between the poverty rate of counties in the United States and the high school graduation rate in those counties was `r cor(county_complete$hs_grad_2010, county_complete$poverty_2010)`. 
 
 ```{r mc4-pre}
-county_complete %>% 
-  summarize(cor(hs_grad_2010, poverty_2010))
-
 ggplot(data = county_complete, 
        aes(x = hs_grad_2010, y = poverty_2010)) + 
   geom_point()
@@ -696,18 +700,16 @@ question("Which of the following conclusions **is not** a valid statistical inte
 
 ## Spurious correlations
 
-### Spurious over time
-
 Above all else, we must always remember that correlation does not imply causation. That is, just because two variables appear to move together does not mean that changes in one are causing changes in the other. There are many potential confounders that can cloud our ability to determine cause-and-effect. 
 
-Remarkable - but nonsensical - correlations are called "spurious." In fact, there is an entire blog devoted to them. Here is how the number of films Nicolas Cage has appeared in correlates with the number of people who drowned by falling into a pool.
+Remarkable--but nonsensical--correlations are called "spurious." In fact, there is an entire blog devoted to them. Here is how the number of films Nicolas Cage has appeared in correlates with the number of people who drowned by falling into a pool.
 
 
 ```{r img8, out.width=600}
 knitr::include_graphics("http://tylervigen.com/images/spurious-correlations-share.png")
 ```
 
-Are these two variables related by any substantive means? Of tutorial not.
+Are these two variables related by any substantive means? Of course not.
 
 ### Spurious over time
 
@@ -721,7 +723,7 @@ In each of these cases, the correlation was illustrated as two variables that se
 
 ### Spurious over space
 
-This webcomic from XKCD illustrates how space can also be present in spurious correlations. Colored maps - called choropleths - can be visually arresting ways of conveying information, but they can also reveal spurious correlations. Many things occur more often in places where there are more people, so failure to control for the confounding influence of population can lead to spurious correlations. 
+This webcomic from XKCD illustrates how space can also be present in spurious correlations. Colored maps--called choropleths--can be visually arresting ways of conveying information, but they can also reveal spurious correlations. Many things occur more often in places where there are more people, so failure to control for the confounding influence of population can lead to spurious correlations. 
 
 ```{r img10, out.width=500}
 knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
@@ -729,9 +731,7 @@ knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
 
 ### Spurious for whatever reason
 
-In other cases it may not be so obvious what confounding variables are driving the spurious correlation. This plot shows that as the number of lemons imported into the U.S. from Mexico has increased over time, the number of U.S. highway fatalities has decreased. The relationship appears to be strong, but of tutorial, there is no plausible causative mechanism that could explain the relationship. This is most likely simply due to chance. 
-
-The scrupulous statistician must always be on the lookout for such spurious correlations. 
+In other cases it may not be so obvious what confounding variables are driving the spurious correlation. This plot shows that as the number of lemons imported into the U.S. from Mexico has increased over time, the number of U.S. highway fatalities has decreased. The relationship appears to be strong, but there is no plausible causative mechanism that could explain the relationship. 
 
 ```{r img11, out.width=500}
 knitr::include_graphics("http://www.tutor2u.net/_legacy/blog/files//blog-correlation-291209.gif")
@@ -739,68 +739,87 @@ knitr::include_graphics("http://www.tutor2u.net/_legacy/blog/files//blog-correla
 
 Now it's time for you to get your hands dirty with some truly spurious correlations.
 
-### Spurious correlation in random data
+## Your turn! 
 
 Statisticians must always be skeptical of potentially spurious correlations. Human beings are very good at seeing patterns in data, sometimes when the patterns themselves are actually just random noise. To illustrate how easy it can be to fall into this trap, we will look for patterns in truly random data.
 
-The `noise` dataset contains 20 sets of `x` and `y` variables drawn at random from a standard normal distribution. Each set, denoted as `z`, has 50 observations of `x`, `y` pairs. Do you see any pairs of variables that might be meaningfully correlated? Are all of the correlation coefficients close to zero?
+The `noise` dataset contains 20 sets of `x` and `y` variables drawn at random from a standard normal distribution. Each set, denoted as `z`, has 50 `x`, `y` pairs. A preview of the `noise` dataset is shown below. 
 
-- Create a faceted scatterplot that shows the relationship between each of the 20 sets of pairs of random variables `x` and `y`. You will need the `facet_wrap()` function for this.
-- Compute the actual correlation between each of the 20 sets of pairs of `x` and `y`.
-- Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
-
-```{r ex7-setup}
+```{r}
+set.seed(1234)
 n <- 1000
 k <- 20
-set.seed(1234)
 noise <- data.frame(y = rnorm(n), x = rnorm(n), z = rep(1:k))
 ```
 
+```{r, echo = TRUE}
+glimpse(noise)
+```
+
+We will use these simulated data to explore if any pairs of variables might be meaningfully correlated or if the correlation coefficients close to zero. To do this take the following steps: 
+
+1. Create a scatterplot that shows the relationship between `x` and `y`, faceted by the set (`z`). 
+
 ```{r ex7, exercise = TRUE}
 # Create faceted scatterplot
+ggplot(data = noise, aes(x = x, y = y)) + 
+  geom_point() + 
+  ___
+```
 
+```{r ex7-solution}
+ggplot(data = noise, aes(x = x, y = y)) +
+  geom_point() + 
+  facet_wrap(vars(z))
+```
 
+2. Compute the correlation between each set of `x` and `y`.  
 
-
+```{r ex8, exercise = TRUE}
 # Compute correlations for each dataset
 noise_summary <- noise %>%
   group_by(___) %>%
-  summarize(N = n(), spurious_cor = cor(___, ___))
+  summarize(N = n(), 
+            spurious_cor = cor(___, ___))
 
+noise_summary
+```
+
+```{r ex8-hint-1}
+noise_summary <- noise %>%
+  group_by(z) %>%
+  summarize(N = n(), 
+            spurious_cor = cor(___, ___))
+```
+
+```{r ex8-hint-2}
+noise_summary <- noise %>%
+  group_by(z) %>%
+  summarize(N = n(), 
+            spurious_cor = cor(x, y))
+```
+
+3. Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
+
+```{r ex9-setup}
+noise_summary <- noise %>%
+  group_by(z) %>%
+  summarize(N = n(), 
+            spurious_cor = cor(x, y))
+```
+
+```{r ex9, exercise = TRUE}
 # Isolate sets with correlations above 0.2 in absolute strength
 noise_summary %>%
   filter(abs(___) > ___)
 ```
 
-```{r ex7-hint-1}
-ggplot(data = ___, aes(x = x, y = y)) +
-  geom_point() + 
-  facet_wrap(~ ___)
-```
-
-```{r ex7-hint-2}
-noise_summary <- noise %>%
-  group_by(z) %>%
-  summarize(N = n(), spurious_cor = cor(___, ___))
-```
-
-```{r ex7-hint-3}
+```{r ex9-hint}
 noise_summary %>%
   filter(abs(spurious_cor) > ___)
 ```
 
-```{r ex7-solution}
-# Create faceted scatterplot
-ggplot(data = noise, aes(x = x, y = y)) +
-  geom_point() + 
-  facet_wrap(~ z)
-
-# Compute correlations for each dataset
-noise_summary <- noise %>%
-  group_by(z) %>%
-  summarize(N = n(), spurious_cor = cor(x, y))
-
-# Isolate sets with correlations above 0.2 in absolute strength
+```{r ex9-solution}
 noise_summary %>%
   filter(abs(spurious_cor) > 0.2)
 ```
