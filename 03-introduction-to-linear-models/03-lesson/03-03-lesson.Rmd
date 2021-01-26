@@ -23,94 +23,112 @@ knitr::opts_chunk$set(echo = FALSE,
 tutorial_options(exercise.eval = FALSE)
 ```
 
-## Visualization of  Linear Models
-### Possums
+## Visualization of linear models
 
 Before we get into the mathematical specification for a regression model, let's build some intuition about what a regression line is.  
 
 In this scatterplot, we see the relationship between the total length of a possum, and the corresponding length of its tail. Clearly there is not a perfect relationship here: the total length of the possum varies even for possums with the same tail length. But we still have some intuitive desire to describe the relationship with a line. 
 
-```{r 1, message=FALSE}
+```{r 1, echo = TRUE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
   geom_point()
 ```
 
+## Picking a line of best fit
+
 ### Through the origin
 
-This line goes through the origin - that is, the point where both $x$ and $y$ are equal to zero - and has a slope of 2.5 centimeters (of total length) per centimeter (of tail length). In some sense, it does go "through" the points, but doesn't capture the general trend as best we could imagine. 
+In the plot below, we've superimposed a line that goes through the origin - that is, the point where both $x$ and $y$ are equal to zero. The line has a slope of 2.5 centimeters (of total length) per centimeter (of tail length). We notice that, in some sense, the line does go "through" the points, but doesn't capture the general trend as best we could imagine. 
 
 ```{r 2, message=FALSE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
-  geom_point() + geom_abline(intercept = 0, slope = 2.5)
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 2.5) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
 ```
 
 ### Through the origin, better fit
 
-This line also goes through the origin, but has a gentler slope. It seems like a "better" fit, since it cuts through the points in a more central way.  
+This line also goes through the origin, but has a gentler slope of 2.3 cm (of total length) per cm (of tail length). It seems like a "better" fit, since it cuts through the points in a more central way.  
 
 ```{r 3, message=FALSE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
-  geom_point() + geom_abline(intercept = 0, slope = 2.3)
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 2.3) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
 ```
 
 ### Not through the origin
 
-But why should we force the line to go through the origin? Here is a line that has a $y$-intercept of 40 cm, and an even gentler slope of 1.3 cm (of total length) per cm (of tail length). It seems like an even better fit still. 
+But why should we force the line to go through the origin? Here is a line that has a $y$-intercept of 40 cm, and an even gentler slope of 1.3 . It seems like an even better fit still. 
 
 Do you think you could find an even better fit? In order to do so, you need some criteria for judging which line fits better. In particular, you need a numerical measurement of how good the fit of each possible line is. 
 
 ```{r 4, message=FALSE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
-  geom_point() + geom_abline(intercept = 40, slope = 1.3)
+  geom_point() + 
+  geom_abline(intercept = 40, slope = 1.3) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
 ```
 
 ### The "best" fit line
 
-In regression, we use the least squares criterion to determine the best fit line. Statisticians have proven that (apart from pathological examples) if we seek the line that tries to minimize the sum of the squared distances between the line and a set of data points, a unique line exists. That line is called the least squares regression line. We can add the line to our plot using the `geom_smooth()` function and specifying the `method` argument to be `lm`, which stands for "linear model". 
+The simple linear regression model for a numeric response as a function of a numeric explanatory variable can be visualized on the corresponding scatterplot by a straight line. 
 
-```{r 5, message=FALSE}
+In regression, we use the least squares criterion to determine the best fit line. Statisticians have proven that (apart from pathological examples) if we seek the line that tries to minimize the sum of the squared distances between the line and a set of data points, a unique line exists. That line is called the "least squares regression line." 
+
+We might consider linear regression to be a specific example of a larger class of *smooth* models. The `geom_smooth()` function allows you to draw such models over a scatterplot of the data itself. This technique is known as visualizing the model *in the data space*. The `method` argument to `geom_smooth()` allows you to specify what class of smooth model you want to see. Since we are exploring linear models, we'll set this argument to the value `"lm"`.
+
+We can add the line to our plot using the `geom_smooth()` function and specifying the `method` argument to be `"lm"`, which stands for "linear model". 
+
+```{r 5, echo = TRUE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
-  geom_point() + geom_smooth(method = "lm")
+  geom_point() + 
+  geom_smooth(method = "lm")
 ```
 
 ### Ignore standard errors
 
-Note that by default, this will draw the regression line in blue, with gray shading for the standard error associated with the line. That should not concern us just yet, so we can turn it off by setting the `se` argument to `FALSE` or to 0. 
+Note that by default, this will draw the regression line in blue, with gray shading for the standard error associated with the line. That should not concern us just yet, so we can turn it off by setting the `se` argument to `FALSE`. 
 
-```{r 6, message=FALSE}
+```{r 6, echo = TRUE}
 ggplot(data = possum, aes(y = total_l, x = tail_l)) +
-  geom_point() + geom_smooth(method = "lm", se = FALSE)
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
 ```
 
-You'll explore the "best fit" line on your own in these next exercises.
+You'll explore the "best fit" line on your own in these next exercise.
 
-### The "best fit" line
+## Your turn! 
 
-The simple linear regression model for a numeric response as a function of a numeric explanatory variable can be visualized on the corresponding scatterplot by a straight line. This is a "best fit" line that cuts through the data in a way that minimizes the distance between the line and the data points. 
+Using the `bdims` dataset, create a scatterplot of body weight (`bwt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
 
-We might consider linear regression to be a specific example of a larger class of *smooth* models. The `geom_smooth()` function allows you to draw such models over a scatterplot of the data itself. This technique is known as visualizing the model *in the data space*. The `method` argument to `geom_smooth()` allows you to specify what class of smooth model you want to see. Since we are exploring linear models, we'll set this argument to the value `"lm"`.
-
-Note that `geom_smooth()` also takes an `se` argument that controls the standard error, which we will ignore for now.
-
-
-Create a scatterplot of body weight as a function of height for all individuals in the `bdims` dataset with a simple linear model plotted over the data.
+Then, add a linear regression line on top of the scatterplot. 
 
 
 ```{r ex1, exercise = TRUE}
-# Scatterplot with regression line
  ggplot(data = ___, aes(x = ___, y = ___)) + 
   ___ + 
   ___(method = ___, se = FALSE)
 ```
 
-```{r ex1-hint}
- ggplot(data = ___, aes(x = ___, y = ___)) + 
+```{r ex1-hint-1}
+ ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
   geom_point() + 
   ___(method = ___, se = FALSE)
 ```
 
+```{r ex1-hint-2}
+ ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+  geom_point() + 
+  geom_smooth(method = ___, se = FALSE)
+```
+
+
 ```{r ex1-solution}
-# Scatterplot with regression line
 ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
@@ -120,10 +138,9 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
 
 The least squares criterion implies that the slope of the regression line is unique. In practice, the slope is computed by R. In this exercise, you will experiment with trying to find the optimal value for the regression slope for weight as a function of height in the `bdims` dataset via trial-and-error.
 
-To help, we've built a custom function for you called `add_line()`, which takes a single argument: the proposed slope coefficient.
+We've built a custom function for you called `add_line()`, which takes a single argument: the proposed slope coefficient and plots it on the scatterplot of height and weight. 
 
-
-The `bdims` dataset is available in your workspace. Experiment with different values (to the nearest integer) of the `my_slope` parameter until you find one that you think fits best.
+Use the code chunk below to experiment with different values (to the nearest integer) of the `my_slope` parameter until you find one that you think fits best.
 
 ```{r ex2-setup}
 add_line <- function (my_slope) {
@@ -152,12 +169,11 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
 ```
 
 ```{r ex2, exercise = TRUE}
-# Estimate optimal value of my_slope
  add_line(my_slope = ___)
 ```
 
 <div id="ex2-hint">
-**Hint:** Try a few values for the slope in the low single digits.
+**Hint:** Input your best guess for the slope of the regression line between height and weight. 
 </div>
 
 ```{r ex2-solution}
@@ -167,9 +183,7 @@ add_line(my_slope = 1)
 
 ## Understanding Linear Models
 
-### Generic statistical model
-
-Models are ubiquitous in statistics. In many cases, we assume that the value of our response variable is some function of our explanatory variable, plus some random noise. The latter term is important, and in a philosophical sense, is the signal of statistical thinking.
+Models are ubiquitous in statistics. In many cases, we assume that the value of our response variable is some function of our explanatory variable, plus some random noise. The latter term is important, and in a philosophical sense, is the focus of statistical thinking.
 
 What we are saying here is that there is some mathematical function $f$, which can translate values of one variable into values of another, except that there is some randomness in the process. What often distinguishes statisticians from other quantitative researchers is the way that we try to model that random noise. 
 
@@ -177,9 +191,9 @@ $$
   response = f(explanatory) + noise
 $$
 
-### Generic linear model
+### Linear model
 
-For a linear regression model, we simply assume that $f$ takes the form of a linear function. Thus, our model describes the value of the response variable in terms of an intercept and a slope. 
+For a linear regression model, we simply assume that $f$ takes the form of a linear function. Thus, our model describes the value of the response variable in terms of what creates a line (an intercept and a slope). 
 
 $$
   response = intercept + slope \cdot explanatory + noise
@@ -187,7 +201,9 @@ $$
 
 ### Regression model
 
-Mathematically, we usually call the intercept $\beta_0$, and the slope $\beta_1$. The noise term is often denoted $\epsilon$. In a regression model, we specify that the distribution of the noise is normal, with mean 0 and a fixed standard deviation. Again, understanding the specification of this noise term is crucial to thinking like a statistician. 
+In a regression model, we use Greek letters for the intercept and slope, indicating that they are population parameters which we hope to estimate with our sample. 
+
+The intercept is notated as $\beta_0$ and the slope is notated as $\beta_1$. The noise term in a regression is often denoted $\epsilon$. In a regression, we assume that the noise terms have a Normal distribution, centered at 0 with a known standard deviation of $\sigma_\epsilon$. The equation below is what we call our "population" regression equation, symbolizing that it is for the population we are interested in studying. 
 
 $$
   Y = \beta_0 + \beta_1 \cdot X + \epsilon \,, \qquad \epsilon \sim N(0, \sigma_\epsilon)
@@ -195,7 +211,16 @@ $$
 
 ### Fitted values
 
-The part of the function aside from the noise term consists of a linear function that produces the fitted values. These are usually denoted with $\hat{Y}$. The difference between $Y$ and $\hat{Y}$, is that $Y$ is the actual observed values of the response, while $\hat{Y}$ is the expected values of the response based on the model. 
+When we estimate our population regression equation with data, we need to indicate that our intercept and slope values are estimates for the *true* population intercept and slope. 
+
+We do this by changing our equation in four ways: 
+
+1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response 
+2. the error terms ($\epsilon$) are removed, as we are no longer modeling individual responses 
+3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept 
+4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope 
+
+The resulting model looks like: 
 
 $$
   \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 \cdot X
@@ -203,9 +228,9 @@ $$
 
 ### Residuals
 
-The difference between those two quantities are called residuals. The order of the terms here matters, so that observations that exceed their expected value of the response variable will have positive residuals, while those that don't reach their expected value will have negative residuals. 
+The difference between what was observed in the data and what was predicted from the regression line is what we call a "residual." Obervations that lie above the regression line exceeded their predicted value and have a positive residual. Values below the regression line are less than their predicted value and have a negative residual. 
 
-The residuals are the realization of the noise term. While $\epsilon$ and $e$ play analogous roles in the regression equation, $\epsilon$ is an unknown, true quantity, while $e$ is a known, estimate of that quantity. 
+The residuals are the realization of the noise term from the population regression equation. While $\epsilon$ and $e$ play analogous roles in the regression equation, $\epsilon$ is an unknown, true quantity, while $e$ is a known, estimate of that quantity. 
 
 $$
   e = Y - \hat{Y}
@@ -213,45 +238,35 @@ $$
 
 ### Fitting procedure
 
-While we won't delve into the specifics of the least squares fitting procedure, we will outline what it does. Given $n$ observations of $(x,y)$-pairs, the procedure finds estimates for the intercept and slope that minimize the sum of the squared residuals. The estimated intercept and slope are usually denoted $\hat{\beta}_0$ and $\hat{\beta}_1$, respectively. Note that here again, the $\hat{\cdot}$ indicates an estimated---rather than a true---quantity. 
+While we won't delve into the specifics of the least squares fitting procedure, we will outline what it does. It is intuitive that we would want a line that has small residuals. As discussed in the [Introduction to Modern Statistics textbook](https://openintro-ims.netlify.app/intro-linear-models.html#least-squares-regression), it is common practice to choose a line that minimizes the sum of squared residuals. 
 
-Mathematically, the steps of the process will be:
-
-1. Given $n$ observations of pairs $(x_i, y_i)$
-2. Find $\hat{\beta}_0, \hat{\beta}_1$ that minimize $\sum_{i=1}^n e_i^2$
+In this procedure, the residual for each observation is squared and all of the squared residuals are added up. You can think of the use of the squared error as saying that "a residual twice as large as another residual is more than twice as bad." In other words, overestimating by 4 is more than twice as bad as overestimating by 2. 
 
 ### Least squares
 
-Actually computing the fitted coefficients is usually a messy business for which the computer is much better suited than we are, so we won't discuss that here. You should know that the least squares fitting procedure is a well-understood, relatively straightforward, deterministic process that can be computed efficiently. It will always return a unique solution, except in rare, unrealistic cases. The residuals are guaranteed to sum to 0, and the point $(\bar{x}, \bar{y})$ is guaranteed to lie on the regression line. Given your understanding of correlation, it should not surprise you to learn that the regression slope and the correlation coefficient are closely-related. In fact, they are proportional to one another. 
+Actually computing the fitted coefficients is usually a messy business for which the computer is much better suited than we are, so we won't discuss that here. You should know that the least squares fitting procedure is a well-understood, relatively straightforward, deterministic process that can be computed efficiently. It will always return a unique solution, except in rare, unrealistic cases. 
 
-To summarize, some aspects of the least squares are:
-- Easy, deterministic, unique solution
-- Residuals sum to zero
-- Line must pass through $(\bar{x}, \bar{y})$
-- Slope proportional to correlation
-- Other criteria exist---just not in this tutorial
+Your regression line will always have two attributes, (1) the residuals will always sum to 0, and (2) the point $(\bar{x}, \bar{y})$ is guaranteed to lie on the regression line.
+Given your understanding of correlation, it should not surprise you to learn that the regression slope and the correlation coefficient are closely-related. In fact, they are proportional to one another. 
 
-You should also be aware that other criteria---apart from least squares---exist, but we won't talk about them in this tutorial.
+You should also be aware that there are other criteria---apart from least squares---for choosing a line of "best" fit, but we won't talk about them in this tutorial.
 
 ### Key concepts
 
-It's worth reviewing some key concepts about regression models. First, the fitted values $\hat{Y}$ are the *expected* values given the corresponding value of $X$. It's not the case that $X$ will always translate into $\hat{Y}$; it's just that $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$. 
+It's worth reviewing some key concepts about regression models. 
 
-In the same way that the fitted intercept and slope are estimates of the true, unknown intercept and slope, the residuals are estimates of the true, unknown noise. 
-
-Speaking of which, you may hear these noise terms referred to as "errors". We tend to shy away from this terminology, since it suggests that something is "wrong" with your model. But there is not necessarily anything wrong---it's just that physical processes are subject to some random variation. All we are hoping to do is accurately capture that random noise. 
-
-To summarize:
-
-- $\hat{Y}$ is *expected* value given corresponding $X$
+- $\hat{Y}$ is the mean value of the response, for a given value of $X$
+  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$
 - $\hat{\beta}$'s are estimates of true, unknown $\beta$'s
+  * the estimated intercept and slope our best guess of the true value of $\beta_0$ and $\beta_1$
 - Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s
-- "Error" may be misleading term---better: *noise*
+  * the residuals are estimates of the true, unknown noise
+  * "error" may be misleading term---better: *noise*
 
 
 You'll put your understanding of regression to use in these next exercises. 
 
-### Regression model terminology
+## Your turn! 
 
 Consider a linear regression model of the form:
 
@@ -271,7 +286,7 @@ The slope coefficient is:
 
 
 ```{r mc}
-question("The slope coefficient is:",
+question("",
   answer("1", message = "Not quite! 1 represents the response variable."),
   answer("2", message = "Try again! 2 represents the y-intercept."),
   answer("3", correct = TRUE, message = "The $X$ represents the explanatory variables and the $\beta_0$ represents the y-intercept."),
@@ -291,7 +306,7 @@ $$
 
 
 ```{r mc1}
-question("In Hampshire County in western Massachusetts, the high school graduation rate is 92.4%. These two facts imply that the poverty rate in Hampshire County is ___.
+question("In Hampshire County in western Massachusetts, the high school graduation rate is 92.4%. These two facts imply that the mean poverty rate in Hampshire County is ___.
 ",
   answer("exactly 11.7%", message = "Incorrect, try again."),
   answer("exactly 10.0%", message = "Not quite!"),
@@ -302,11 +317,12 @@ question("In Hampshire County in western Massachusetts, the high school graduati
 ```
 
 
-### Fitting a linear model "by hand"
+## Fitting a linear model "by hand"
 
 Recall the simple linear regression model:
+
 $$
-    Y = b_0 + b_1 \cdot X
+    y = b_0 + b_1 \cdot x
 $$
 
 Two facts enable you to compute the slope $b_1$ and intercept $b_0$ of a simple linear regression model from some basic summary statistics.
@@ -314,18 +330,31 @@ Two facts enable you to compute the slope $b_1$ and intercept $b_0$ of a simple 
 First, the slope can be defined as:
 
 $$
-    b_1 = r_{X,Y} \cdot \frac{s_Y}{s_X}
+    b_1 = r_{x,y} \cdot \frac{s_y}{s_x}
 $$
 
-where $r_{X,Y}$ represents the correlation (`cor()`) of $X$ and $Y$ and $s_X$ and $s_Y$ represent the standard deviation (`sd()`) of $X$ and $Y$, respectively.
+where $r_{x,y}$ represents the correlation (`cor()`) of $x$ and $y$ and $s_x$ and $s_y$ represent the standard deviation (`sd()`) of $x$ and $y$, respectively.
 
 Second, the point $(\bar{x}, \bar{y})$ is *always* on the least squares regression line, where $\bar{x}$ and $\bar{y}$ denote the average of $x$ and $y$, respectively.
 
-The `bdims_summary` data frame contains all of the information you need to compute the slope and intercept of the least squares regression line for body weight ($Y$) as a function of height ($X$). You might need to do some algebra to solve for $b_0$!
+In this exercise, you will find the slope and intercept of the least squares regression line for body weight ($y$) as a function of height ($x$). But, you might need to do some algebra to solve for $b_0$!
+
+The `bdims_summary` table has been added to your workspace. Use the `glimpse()` function to preview what the table looks like! 
+
+```{r preview-setup}
+bdims_summary <- bdims %>%
+  summarize(N = n(), r = cor(hgt, wgt),  
+            mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
+            mean_wgt = mean(wgt), sd_wgt = sd(wgt))
+```
+
+```{r preview, exercise = TRUE}
+# Print bdims_summary
 
 
-- Print the `bdims_summary` data frame.
-- Use `mutate()` to add the `slope` and `intercept` to the `bdims_summary` data frame.
+```
+
+Now, use `mutate()` and some algebra to add the `slope` and `intercept` to the `bdims_summary` table.
 
 ```{r ex3-setup}
 bdims_summary <- bdims %>%
@@ -335,25 +364,30 @@ bdims_summary <- bdims %>%
 ```
 
 ```{r ex3, exercise = TRUE}
-# Print bdims_summary
-
-
-# Add slope and intercept
 bdims_summary %>%
   mutate(slope = ___, 
          intercept = ___)
 ```
 
-<div id="ex3-hint">
-**Hint:** In order to calculate the `intercept`, we first calculate `slope`, then solve $Y = b_0 + b_1 \cdot X$ 
-for $b_0$.
-</div>
+```{r ex3-hint-1}
+## Remember the slope can be calculated from 
+## 1. the correlation 
+## 2. the sd of height and weight
+bdims_summary %>%
+  mutate(slope = r  * (sd_wgt / sd_hgt), 
+         intercept = ___)
+```
+
+```{r ex3-hint-2}
+## Remember that x-bar and y-bar lie on the regression line! 
+
+bdims_summary %>%
+  mutate(slope = r  * (sd_wgt / sd_hgt), 
+         intercept = mean_wgt  - ___)
+```
+
 
 ```{r ex3-solution}
-# Print bdims_summary
-bdims_summary
-
-# Add slope and intercept
 bdims_summary %>%
   mutate(slope = r * sd_wgt / sd_hgt, 
          intercept = mean_wgt - slope * mean_hgt)
