@@ -14,18 +14,14 @@ library(openintro)
 library(grid)
 library(broom)
 library(emo)
-
 knitr::opts_chunk$set(echo = FALSE, 
                       fig.align = "center", 
                       fig.height = 3, 
                       fig.width = 5,
                       warning = FALSE, 
                       message = FALSE)
-
 tutorial_options(exercise.eval = FALSE)
-
 textbooks$course <- as.character(textbooks$course) 
-
 ```
 
 ## Data set-up
@@ -37,7 +33,6 @@ We've spent some time building our graphical intuition about regression, as well
 Data were collected on 73 textbooks required for a few randomly selected courses at UCLA. For each textbook, we know the retail price at both the UCLA bookstore and on Amazon.com. We also know the department and course number for each corresponding course, and the ISBN of the book. 
 
 > What factors are associated with the price of each book at the UCLA bookstore?
-
 ```{r 1, echo = TRUE}
 glimpse(textbooks)
 ```
@@ -113,7 +108,6 @@ Here, we create a new variable for the price at Amazon in cents, and re-fit the 
 ```{r 6, echo = TRUE}
 textbooks <- textbooks %>%
   mutate(amaz_new_cents = amaz_new * 100) 
-
 lm(ucla_new ~ amaz_new_cents, data = textbooks)
 ```
 
@@ -146,7 +140,6 @@ question("Which of the following is the correct interpretation of the slope coef
 A politician interpreting the relationship between poverty rates and high school graduation rates implores his constituents:
 
 > If we can lower the poverty rate by 59%, we'll double the high school graduate rate in our county (i.e. raise it by 100%). 
-
 ```{r mc2}
 question("Which of the following mistakes in interpretation has the politician made?",
   answer("Implying that the regression model establishes a cause-and-effect relationship."),
@@ -178,12 +171,8 @@ For this exercise, fit the following regression models:
 ```{r ex1, exercise = TRUE}
 # Linear model for weight as a function of height
 lm(___ ~ ___, data = ___)
-
 # Linear model for SLG as a function of OBP
-
-
 # Log-linear model for body weight as a function of brain weight
-
 ```
 
 <div id="ex1-hint">
@@ -193,10 +182,8 @@ lm(___ ~ ___, data = ___)
 ```{r ex1-solution}
 # Linear model for weight as a function of height
 lm(wgt ~ hgt, data = bdims)
-
 # Linear model for SLG as a function of OBP
 lm(slg ~ obp, data = mlbbat10)
-
 # Log-linear model for body weight as a function of brain weight
 lm(log(body_wt) ~ log(brain_wt), data = mammals)
 ```
@@ -231,7 +218,6 @@ Previously, we learned how to fit a regression model using the `lm()` command. H
 
 ```{r 11, echo = TRUE}
 books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
-
 ```
 
 Note that `mod` is of class `lm`. This object contains all of the information needed to fit our regression model, including (by default) the relevant data, and lots of other pieces of information that we can extract in various ways. It's worth repeating that `books_mod` is an object of type `lm`---it's not a `data.frame`, or a `function`, or a `matrix`, or a `vector`.
@@ -319,10 +305,7 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 
 ```{r ex2, exercise = TRUE}
 # Show the coefficients
-
-
 # Show the full model output
-
 ```
 
 <div id="ex1-hint">
@@ -332,7 +315,6 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```{r ex2-solution}
 # Show the coefficients
 coef(hgt_wgt_mod)
-
 # Show the full model output
 summary(hgt_wgt_mod)
 ```
@@ -366,7 +348,6 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```{r ex4, exercise = TRUE}
 # Mean of weights equal to mean of fitted values?
 all.equal(___, ___) 
-
 # Mean of the residuals
 ___(residuals(___))
 ```
@@ -378,7 +359,6 @@ all.equal(mean(bdims$wgt), mean(fitted.values(hgt_wgt_mod)))
 ```{r ex4-solution}
 # Mean of weights equal to mean of fitted values?
 all.equal(mean(bdims$wgt), mean(fitted.values(hgt_wgt_mod)))
-
 # Mean of the residuals
 mean(residuals(hgt_wgt_mod))
 ```
@@ -400,13 +380,8 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 
 ```{r ex5, exercise = TRUE}
 # Load the broom package
-
-
 # Create hgt_wgt_tidy
-
-
 # Glimpse the resulting data frame
-
 ```
 
 ```{r ex5-hint-1}
@@ -420,10 +395,8 @@ glimpse(___)
 ```{r ex5-solution}
 # Load the broom package
 library(broom)
-
 # Create bdims_tidy
 hgt_wgt_tidy <- augment(hgt_wgt_mod)
-
 # Glimpse the resulting data frame
 glimpse(hgt_wgt_tidy)
 ```
@@ -483,7 +456,6 @@ Here, we create a `data.frame` with one variable and one observation for the ISR
 
 ```{r lm4, echo = TRUE}
 new_data <- data.frame(amaz_new = 8.49)
-
 predict(books_mod, newdata = new_data)
 ```
 
@@ -495,7 +467,6 @@ Alternatively, the `augment()` function from **broom** will also take a `newdata
 
 ```{r lm5, echo = TRUE}
 isrs <- augment(books_mod, newdata = new_data)
-
 ggplot(data = textbooks, aes(x = amaz_new, y = ucla_new)) + 
   geom_point() + 
   geom_smooth(method = "lm") +
@@ -522,10 +493,7 @@ ben <- data.frame(wgt = 74.8, hgt = 182.8)
 
 ```{r ex6, exercise = TRUE}
 # Print ben
-
-
 # Predict the weight of ben
-
 ```
 
 ```{r ex6-hint}
@@ -535,7 +503,6 @@ predict(hgt_wgt_mod, newdata = ___)
 ```{r ex6-solution}
 # Print ben
 ben
-
 # Predict the weight of ben
 predict(hgt_wgt_mod, newdata = ben)
 ```
@@ -551,7 +518,6 @@ Use `geom_abline()` to add a line defined in the `hgt_wgt_coefs` data frame to a
 
 ```{r ex7-setup}
 hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
-
 hgt_wgt_coefs <- coef(hgt_wgt_mod) %>%
   t() %>%
   as.data.frame()
