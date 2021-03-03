@@ -35,9 +35,7 @@ stem_cell <- stem_cell %>%
 
 ```
 
-## Hypothesis testing for comparing two means
-
-### Hypothesis testing for comparing two means via simulation
+## Hypothesis testing for a differnece in two means via simulation
 
 In this lesson we demonstrate setting up and conducting a hypothesis test to compare means from two independent distributions using simulation.
 
@@ -59,13 +57,14 @@ Let's try to answer using the `stem_cell` data from the **openintro** package.
 
 The motivating question is whether use of embryonic stem cells help improve heart function following a heart attack. The data can be found in the openintro package.
 
-These data were collected as part of a study in which sheep that have had a heart attack were randomly assigned to the embryonic stem cell therapy (labeled as "esc" in the data) or to a traditional therapy as a control. The researchers measured the heart pumping capacity of these sheep before and after the study. If a sheep's heart pumping capacity increased from before to after the study, this indicates a stronger recovery. In our analysis we want to evaluate the effect of the embryonic stem cell therapy on heart pumping capacity relative to the control group.
+These data were collected as part of a study in which sheep that have had a heart attack were randomly assigned to the embryonic stem cell therapy (labeled as `"esc"` in the data) or to a traditional therapy as a control (labeled as `"ctrl"`). The researchers measured the heart pumping capacity of these sheep before and after the study. If a sheep's heart pumping capacity increased from before to after the study, this indicates a stronger recovery. In our analysis we want to evaluate the effect of the embryonic stem cell therapy on heart pumping capacity relative to the control group.
 
 
 ### Analysis outline
 
+In order to do this we will first calculate the difference between before treatment and after treatment heart pumping capacities for each sheep. We call this variable `"change"`. 
+We want to evaluate whether the data suggest that average change is *higher*, on average, for the treatment group.
 
-> Step 1. Calculate `change` for each sheep: difference between before and after heart pumping capacities for each sheep.
 
 |trmt | before| after| change |
 |:----|:-----:|:----:|:----:|
@@ -75,135 +74,127 @@ These data were collected as part of a study in which sheep that have had a hear
 |...  |   ... |  ... | ...  |
 |esc  |  53.75| 51.00|  ?   |
 
-In order to do this we will first calculate the difference between before treatment and after treatment heart pumping capacities for each sheep. We call this variable "change". 
-We want to evaluate whether the data suggest that average change is higher, on average, for the treatment group.
 
+> Step 1 Summary: Calculate `change` for each sheep -- the difference between before and after heart pumping capacities for each sheep.
 
 
 ### 
 
-> Step 2. Set the hypotheses:  
+Next, we set our hypotheses.
+
+Our null hypothesis should state the status quo, in other words, "there is nothing going on."
+In context, this means no difference between the average change in the sheeps' heart pumping capacity between the treatment and control groups.
+
+The alternative hypothesis says that the average change in the heart pumping capacity is higher for the sheep in the (`"esc"`) treatment group versus the sheep in the control (`"ctrl"`) group.
+
+> Step 2 Summary: Set the hypotheses:  
 > $H_0: \mu_{esc} = \mu_{ctrl}$; There is no difference between average change in heart pumping capacity between the treatment and control groups.  
 > $H_A: \mu_{esc} > \mu_{ctrl}$; The sheep receiving the embryonic stem cell therapy have a larger change in heart pumping capacity compared to the sheep receiving the control. 
 
-Then, we set our hypotheses.
-
-Our null hypothesis should state the status quo, in other words, "there is nothing going on". In context, this means no difference between the average change in the sheeps' heart pumping capacity between the treatment and control groups.
-
-The alternative hypothesis says that the average change in the heart pumping capacity is higher for the sheep in the (esc) treatment group versus the sheep in the control group.
 
 ### 
 
-> Step 3. Conduct the hypothesis test.  
-> - Write the values of `change` on 18 index cards.   
+Finally, we conduct the hypothesis test.
+
+Conceptually here is how we go about it:
+
+First, we write the values of "change" on 18 index cards, one card for each sheep.
+
+Then we shuffle these cards and randomly split them into two equal sized decks, one representing treatment and other representing control. Note: the decks are equally sized because in the original study there were the same number of sheep in the treatment and control groups!
+
+We then calculate and record the test statistic: difference in average change between the treatment and control groups. At this point we have no control over which card ended up in which pile. Since the cards are randomly shuffled into the two decks, we would not expect to see a difference in the average change values between the two decks. In other words, we would expect the simulated difference between the two sample means to be around 0. But of course, this number will not be exactly 0. Just by random chance it can be just a bit different than 0, or quite different than 0. That's what we need simulation to figure out! 
+
+We repeat the simulation many times in order to get a sense of how much the simulated difference in means varies from sample to sample.
+
+Finally we calculate the p-value as the percentage of simulations where the test statistic is at least as extreme as the observed difference in sample means.
+
+> Step 3 Summary: Conduct the hypothesis test  
+> - Write the values of `change` on 18 index cards (one card per sheep).   
 > - (1) Shuffle the cards and randomly split them into two equal sized decks: treatment and control.   
 > - (2) Calculate and record the test statistic: difference in average `change` between treatment and control.   
 > - Repeat (1) and (2) many times to generate the sampling distribution of the difference in means under the null hypothesis.    
 > - Calculate p-value as the percentage of simulations where the test statistic is at least as extreme as the observed difference in sample means.   
-
-
-Finally, we conduct the hypothesis test.
-
-Conceptually here is how we go about it.
-
-First, we write the values of "change" on 18 index cards, one card for each sheep.
-
-Then we shuffle these cards and randomly split them into two equal sized decks, one representing treatment and other representing control. Note: the decks are equally sized because there were the same number of sheep in the treatment and control groups. 
-
-We then calculate and record the test statistic: difference in average change between the treatment and control groups. At this point we have no control over which card ended up in which pile. Since the cards are randomly shuffled into the two decks, we would not expect to see a difference in the average change values betweent the two decks. In other words, we would expect the simulated difference between the two sample means to be around 0. But of course, this number will not be exactly 0. Just by random chance it can be just a bit different than 0, or quite different than 0. That's what we need simulation to figure out! 
-
-We repeat the simulation many times in order to get a sense of how much the simulated difference in means varies.
-
-Finally we calculate the p-value as the percentage of simulations where the test statistic is at least as extreme as the observed difference in sample means.
 
 But, obviously, we don't actually do this by shuffling index cards...
 
 
 ### Hypothesis test: get started
 
-> Use the **infer** package to conduct the test:
+Instead, we'll use the **infer** package to conduct the test. 
 
 ```{r eval=FALSE, echo=TRUE}
 library(infer)
 ```
 
-Instead, we use computation to conduct this simulation, specifically using the infer package in R.
+### Step 1: specify the model
 
-### Hypothesis test: specify the model
-
-> Start with the data frame and **specify** the model:
+We start with the data frame containing our variables of interest, and specify our model as response vs. explanatory. In our example the response variable is `change` and the explanatory variable is treatment (`trmt`) group.
 
 ```{r eval=FALSE, echo=TRUE}
 diff_ht_mean <- stem_cell %>%
   specify(__) %>%   # Use the form: y-variable ~ x-variable
-  ...
 ```
 
-We start with the data frame containing our variables of interest, and specify our model as response vs. explanatory. In our example the response variable is `change` and the explanatory variable is treatment (`trmt`) group.
 
-### Hypothesis test: hypothesize
+### Step 2: declare the null hypothesis
 
-> **Declare null hypothesis**, i.e. no difference between means:
-
+We then declare the null hypothesis. For a difference in means, the null hypothesize should be specified as `"independence"`, which indicates that we are assuming the change in heart pumping capacity is independent of the treatment group the sheep was in. 
 ```{r eval=FALSE, echo=TRUE}
 diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                    # Use the form: y-variable ~ x-variable
+  specify(__) %>%                    # The same step from above! 
   hypothesize(null = __) %>%         # Use a hypothesis of "independence" 
   
 ```
 
-We then declare the null hypothesis. For a difference in means, the null hypothesize should be specified as `"independence"`, which indicates that we are assuming the change in heart pumping capacity is independent of the treatment group the sheep was in. 
 
-### Hypothesis test: generate resamples
 
-> **Generate** resamples assuming $H_0$ is true:
+### Step 3: generate new samples assuming $H_0$ is true:
+
+Then, using the data, the model we specified, and the null hypothesis we declared, we generate many new samples by permuting the labels of the two groups.
 
 ```{r eval=FALSE, echo=TRUE}
 diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                    # Use the form: y-variable ~ x-variable
-  hypothesize(null = __) %>%         # Use a hypothesis of "independence"
+  specify(__) %>%                    # Same step from above!
+  hypothesize(null = __) %>%         # Same step from above!
   generate(reps = __, type = __) %>% # Generate permutation ("permute") statistics and specify how many (at least 1000)
   ...
 ```
 
-Then, using the data, the model we specified, and the null hypothesis we declared, we generate many new samples by permuting the labels of the two groups.
 
-### Hypothesis test: calculate the test statistic
-
-> **Calculate** test statistic:
-
-```{r eval=FALSE, echo=TRUE}
-diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                     # Use the form: y-variable ~ x-variable
-  hypothesize(null = __) %>%          # Use a hypothesis of "independence" 
-  generate(reps = _N_, type = __) %>% # Generate permutation ("permute") statistics and specify how many (at least 1000)
-  calculate(stat = "diff in means", order = c("trmt", "ctrl")   # Specify to calculate a difference in means and what order of subtraction to use
-```
+### Step 4: calculate the test statistic for each sample
 
 Finally, we calculate the test statistic for each of our permutations. The statistic we're interested in is the difference in means and we want to use $\mu_{esc} - \mu_{ctrl}$ as our order of subtraction. 
 
 Since we're testing for a difference, the order in which we subtract matters. We can specify it using the `order` argument in the `calculate()` function. For example, to achieve `group1 - group2` use `order = c("group1", "group2")`.
 
+```{r eval=FALSE, echo=TRUE}
+diff_ht_mean <- stem_cell %>%
+  specify(__) %>%                     # Same step from above! 
+  hypothesize(null = __) %>%          # Same step from above! 
+  generate(reps = __, type = __) %>% # Same step from above! 
+  calculate(stat = "diff in means", order = c("trmt", "ctrl")   # Specify to calculate a difference in means and what order of subtraction to use
+```
 
-### Hypothesis test: calculate the p-value
 
+### Calculate the p-value
+
+Using the simulated sample statistics, we calculate the p-value as the proportion of simulations where the simulated difference between the sample means is at least as extreme as the one observed.
 
 > Calculate the p-value as the proportion of simulations where the simulated difference between the sample means is at least as extreme as the observed  
 > $$ \frac{ \text{number of permutations} \ge (\bar{x}_{esc, obs} - \bar{x}_{ctrl, obs})}{ \text{number of reps generated}} $$
 
 
-Using the simulated sample statistics, we calculate the p-value as the proportion of simulations where the simulated difference between the sample means is at least as extreme as the one observed.
-
-
 We've walked you through the steps, now it's your turn!
 
-### Evaluating the effectiveness of stem cell treatment
+## Your turn! 
+
+__Evaluating the effectiveness of stem cell treatment__
 
 The `stem_cell` data frame gives us the pumping capacity of the heart before and after the experiment. So first we need to find the difference between these for each experimental unit, and then use these `change` values to calculate the observed difference in mean change between the treatment and control groups.
 
 ###
 
-First, add a column to `stem_cell` named `change`, equal to the difference between the `after` and `before` columns.
+First, use the `mutate()` function to add a column to `stem_cell` named `change`, equal to the difference between the `after` and `before` columns.
 
 ```{r stem_cell, exercise=TRUE}
 # Calculate difference between before and after
@@ -212,7 +203,7 @@ stem_cell <- stem_cell %>%
 ```
 
 <div id="stem_cell-hint">
-**Hint:** Call `mutate()`, setting `change` to `after` minus `before`.
+**Hint:** Call `mutate()`, setting `change` equal to `after` minus `before`.
 </div>
 
 ```{r stem_cell-solution}
@@ -224,7 +215,8 @@ stem_cell <- stem_cell %>%
 ### 
 
 Then, calculate observed difference in means between treatment groups, using the infer package. 
-Here, since we aren't hypothesizing or permuting we only need to functions, `specify()` and `calculate()`. 
+
+Here, since we aren't hypothesizing or generating new samples we only need to functions, `specify()` and `calculate()`. 
 
 First, use the `specify()` function to specify the explanatory (`trmt`) and response (`change`) variables. 
 
@@ -242,7 +234,7 @@ diff_mean <- stem_cell %>%
   # Calculate observed difference in means 
   calculate(___)
 
-# See the result
+# Inspect the result
 diff_mean
 ```
 
@@ -343,21 +335,19 @@ diff_mean_ht <- stem_cell %>%
 
 ```{r stem_cell_4, exercise=TRUE}
 diff_mean_ht %>%
-  # use diff_mean as the observed statistic, and "greater" as the direction
-  get_p_value(___) 
+  get_p_value(___)   # use diff_mean as the observed statistic, and "greater" as the direction
 
 ```
 
 ```{r stem_cell_4-solution}
 diff_mean_ht %>%
-  # use diff_mean as the observed statistic, and "greater" as the direction
   get_p_value(obs_stat = diff_mean, direction = "greater") 
 ```
 
 ### Conclusion of the hypothesis test
 
 
-The p-value of the previous test was found to be 0.002. Suppose the significance level of the test is 1%. Fill in the blanks: 
+The p-value of the previous test was found to be approximately 0. Suppose the significance level of the test is 1%. Fill in the blanks: 
 
 ```{r quiz_1}
 quiz(
@@ -372,13 +362,17 @@ quiz(
 )
 ```
 
-### Evaluating the relationship between smoking during pregnancy and birth weight
+## A New Application 
+
+__Evaluating the relationship between smoking during pregnancy and birth weight__ 
 
 The state of North Carolina released to the public a large data set containing information on births recorded in this state. This data set has been of interest to medical researchers who are studying the relation between habits and practices of expectant mothers and the birth of their children. `ncbirths` is a random sample of 1000 cases from this data set. We want to evaluate whether there is a difference between weights of babies born to smoker and non-smoker mothers.
 
 ### 
 
-First, filter `ncbirths` for rows where `habit` is non-missing.
+First, filter `ncbirths` for rows where `habit` is non-missing. 
+
+Use the `is.na()` function to specify that you want values of `habit` that are not missing (where `is.na()` is FALSE).
 
 ```{r smoking, exercise=TRUE}
 # Filter for subjects with non-missing habit
@@ -386,9 +380,13 @@ ncbirths_complete_habit <- ncbirths %>%
   filter(___)
 ```
 
-<div id="smoking-hint">
-**Hint:** Call `filter()`, using `!` and `is.na()` to create a condition where `habit` is not `NA`.
-</div>
+```{r smoking-hint}
+filter(is.na(habit) == FALSE)
+
+# OR 
+
+filter(!is.na(habit))  
+```
 
 ```{r smoking-solution}
 # Filter for subjects with non-missing habit
@@ -408,7 +406,6 @@ ncbirths_complete_habit <- ncbirths %>%
 ```
 
 ```{r smoking_2, exercise=TRUE}
-
 # Calculate observed difference in means
 diff_mean_obs <- ncbirths_complete_habit %>%
   # Specify the response and explanatory variables
@@ -545,18 +542,11 @@ diff_mean_ht <- ncbirths_complete_habit %>%
 
 Wonderful! What does your p-value suggest about the relationship between smoking during pregnancy and birth weight?
 
-## Bootstrap CI for difference in two means
+## Confidence interval for a difference in two means via simulation
 
 A natural next step in your analysis would be to quantify the difference between the two population means using a confidence interval. 
 Next, we outline the bootstrap scheme for estimating the difference between the two numerical population parameters. 
 The following exercises will reveal that implementing this scheme in `R` takes only a few tweaks to the pipelines using the infer package that we have been using for doing simulation based inference.
-
-### Bootstrap CI for a difference
-
-> 1. Take a bootstrap sample *of each sample* - a random sample taken with replacement from each of the original samples, of the same size as each of the original sample.
-> 2. Calculate the bootstrap statistic - a statistic such as *difference* in means, medians, proportion, etc. computed based on the bootstrap sample.
-> 3. Repeat steps (1) and (2) many times to create a bootstrap distribution - a sampling distribution of bootstrap statistics.
-> 4. Calculate the a confidence interval for the population parameter using the percentile or the standard error method.
 
 Constructing a bootstrap interval for the difference in two means is quite similar to constructing a bootstrap interval for a single mean. The only difference is that now we have two samples to bootstrap from. 
 
@@ -568,13 +558,18 @@ We then repeat steps 1 and 2 many times to create a bootstrap distribution.
 
 Lastly, we calculate the interval using the percentile or the standard error method we learned earlier in the tutorial.
 
-Now let's try some exercises.
+> 1. Take a bootstrap sample *of each sample* - a random sample taken with replacement from each of the original samples, of the same size as each of the original sample.
+> 2. Calculate the bootstrap statistic - a statistic such as *difference* in means, medians, proportion, etc. computed based on the bootstrap sample.
+> 3. Repeat steps (1) and (2) many times to create a bootstrap distribution - a sampling distribution of bootstrap statistics.
+> 4. Calculate the a confidence interval for the population parameter using the percentile or the standard error method.
+
+Now let's try some exercises.  
+
+##
 
 ### Smoking during pregnancy and birth weight
 
 Let's construct a bootstrap interval for the difference in mean weights of babies born to smoker and non-smoker mothers. The `ncbirths_complete_habit` data frame you created earlier is available to use.
-
-### 
 
 First, generate 1500 bootstrap differences in means for birth weight by smoking habit.
 
@@ -587,7 +582,6 @@ First, generate 1500 bootstrap differences in means for birth weight by smoking 
 ncbirths_complete_habit <- ncbirths %>%
   filter(!is.na(habit))
 ```
-
 
 ```{r smoking_bs, exercise=TRUE}
 # Generate 1500 bootstrap difference in means
@@ -665,8 +659,9 @@ diff_mean_ci %>%
 
 Great! How would you interpret this interval?
 
+## Your turn! 
 
-### Smoking during pregnancy and length of gestation
+__Smoking during pregnancy and length of gestation__
 
 Let's turn our attention to another variable, `weeks`, indicating the length of the pregnancy. Construct a bootstrap interval for the difference in median lengths of pregnancies of smoker and non-smoker mothers.
 
@@ -778,7 +773,6 @@ Well done! Quick mental check before you move on: What do we mean when we say we
 
 In this lesson we return to the American Community Survey data and compare average pay for citizens and non-citizens.
 
-
 ### A (more) standard measure of pay
 
 
@@ -800,7 +794,6 @@ acs12 <- acs12 %>%
 
 > Do the data provide convincing evidence of a difference between the average hourly rate of citizens and non-citizens in the US?
 
- 
 > Let $\mu$ represent the true average hourly pay
 > 
 > $H_0: \mu_{citizen} = \mu_{non-citizen}$
@@ -885,15 +878,19 @@ Before we wrap up our discussion of comparing means across two groups, let's als
 
 First, we need independence. But independence of what?
 
-Observations in each sample should be independent of each other. We discussed earlier that this is a difficult condition to check, but that if the study employs random sampling and/or random assignment, and for studies that employ random sampling without replacement -- which is almost all observational studies like polls and surveys -- the sample sizes are less than 10% of their respective populations, we can be fairly certain that the observations in each of the samples are independent of each other. The American Community Survey employs random sampling, and our sample sizes are definitely less than 10% of all citizens and non citizens in the US.
+Observations in each sample should be independent of each other. We discussed earlier that this is a difficult condition to check, but there are a few "simple" checks we can make. First, did the study use random sampling? If so, the observations can be assumed to be independent! Second, did the study use random assignment? If so, the observations between groups can be assumed to be independent. Third, did the study use random sampling without replacement (almost all observational studies do this) and is the sample less than 10% of their respective populations? If so, we can also be fairly comfortable assuming that the observations are independent. 
 
-Also, observations across the two samples should be independent of each other, in other words, that the data should not be paired. 
+The American Community Survey employs random sampling, and our sample sizes are definitely less than 10% of all citizens and non citizens in the US. Also, observations across the two samples should be independent of each other, as it would be impossible for an individual to be both a citizen and an non-citizen. 
 
-Lastly, if the population distributions are skewed, we need larger sample sizes. A side-by-side box plot of the two distributions show a fair amount of skew in each sample, but the sample sizes are pretty large as well (58 and 901). Hence we should be able to assume that the sampling distribution of difference in sample means is fairly normal.
+The distributions of each group's hourly rate appears skewed, but they do exhibit similar spread. Both groups have values from close to 0 to values close to 200. There is one observation in the citizen group with a pay of $300, but the condition is not violated from one observation! 
+
+Lastly, we need to assess if the distributions of each group appear approximately normal. Indeed, there is a substantial skew to each distribution which may be concerning. However, for larger sample sizes, we can assume that the distribution of differences in means are normal, even if the distributions of the groups are not. Here, we have sample sizes of 58 (non-citizen) and 901 (citizen) which aids us in assuming that the distribution of difference in sample means can be assumed to be fairly normal.
 
 Time to put this into practice.
 
-### Hourly pay vs. citizenship status
+## Your turn! 
+
+__Hourly pay vs. citizenship status__
 
 Using the `acs12` data, and specifically the variables `income`, `hrs_work`, and `citizen`, summarize, visualize, and compare the distributions of hourly pay rate for citizens and non-citizens.
 
@@ -904,7 +901,7 @@ First, filter `acs12` for rows where hourly pay (`hrly_pay`) and U.S. citizenshi
 ```{r citizens, exercise=TRUE}
 # Filter for non-missing hrly_pay and non-missing citizen
 acs12_complete_hrlypay_citizen <- acs12 %>%
-  filter(___)
+  filter(___, ___)
 ```
 
 <div id="citizens-hint">
@@ -919,63 +916,6 @@ acs12_complete_hrlypay_citizen <- acs12 %>%
   filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
-### 
-
-Then, 
-
-- Use `nrow()` to find the number of rows in the full dataset, `acs12`.
-- Compare that to the number of rows in the filtered dataset, `acs12_complete_hrlypay_citizen`.
-- Calculate the number of rows where at least one of `hrly_pay` and `citizen` obervations was missing.
-- Finally, calculate the proportion of missing rows where at least one of `hrly_pay` and `citizen` was missing.
-
-```{r citizens_2-setup, include = FALSE}
-acs12_complete_hrlypay_citizen <- acs12 %>%
-  filter(!is.na(hrly_pay), !is.na(citizen))
-```
-
-
-```{r citizens_2, exercise=TRUE}
-# Get number of rows in full dataset
-rows_all <- ___
-
-# Get number of rows in filtered dataset
-rows_non_missing <- ___
-
-# Calculate number missing (total minus non-missing)
-rows_missing <- ___
-
-# Calculate proportion missing (missing divided by total)
-prop_missing <- ___
-
-# See the result
-prop_missing
-```
-
-<div id="citizens_2-hint">
-**Hint:** 
-
-- Use `nrow()` to get the number of rows from a data frame.
-- The number of missing values is the total number of rows minus the number of non-missing rows (`rows_all - rows_non_missing`).
-- The proportion of missing rows is the number of missing rows divided by the total number of rows (`rows_missing / rows_all`). 
-</div>
-
-```{r citizens_2-solution}
-
-# Get number of rows in full dataset
-rows_all <- nrow(acs12)
-
-# Get number of rows in filtered dataset
-rows_non_missing <- nrow(acs12_complete_hrlypay_citizen)
-
-# Calculate number missing (total minus non-missing)
-rows_missing <- rows_all - rows_non_missing
-
-# Calculate proportion missing (missing divided by total)
-prop_missing <- rows_missing / rows_all
-
-# See the result
-prop_missing
-```
 
 ### 
 
@@ -1041,10 +981,11 @@ acs12_complete_hrlypay_citizen <- acs12 %>%
 ```
 
 ```{r citizens_4, exercise=TRUE}
-# Using acs12_complete_hrlypay_citizen, plot hrly_pay
-___ +
+acs12_complete_hrlypay_citizen %>% 
+  # Using acs12_complete_hrlypay_citizen, plot hrly_pay
+  ggplot(___) +
   # Add a histogram layer
-  ___ +
+  geom_XXX___ +
   facet_wrap(vars(___))
 ```
 
