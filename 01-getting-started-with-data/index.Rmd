@@ -56,15 +56,15 @@ In this tutorial, we focus on steps 1 and 2 of this process.
 
 * Define simple random sample, stratified sample, cluster sample, multistage sample
 * Use R to obtain SRS and stratified sample
-	* `sample_n()`
-	* `group_by()` %>% `sample_n()`
+	* `slice_sample()`
+	* `group_by()` %>% `slice_sample()`
 * Discuss benefits and drawbacks of choosing one sampling scheme over another
 
 * Identify the principles of experimental design 
 * Discuss the purpose of each principle
 * Use R to do random assignment and random assignment after blocking
-	* `sample_n()`
-	* `group_by()` %>% `sample_n()`
+	* `slice_sample()`
+	* `group_by()` %>% `slice_sample()`
 
 ### 4 - [Case study](https://openintro.shinyapps.io/ims-01-getting-started-with-data-04/)
 
