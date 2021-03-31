@@ -157,7 +157,7 @@ The `cls_students` variable in `evals` tells you the number of students in the c
 
 ```{r type-of-variable, exercise=TRUE}
 # Recode cls_students as cls_type
-evals_fortified <- evals %>%
+evals <- evals %>%
   mutate(
     ___ = case_when(
       ___ ~ "small",
@@ -169,7 +169,7 @@ evals_fortified <- evals %>%
 
 ```{r type-of-variable-solution}
 # Recode cls_students as cls_type
-evals_fortified <- evals %>%
+evals <- evals %>%
   mutate(
     cls_type = case_when(
       cls_students <= 18                      ~ "small",
