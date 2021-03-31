@@ -82,13 +82,13 @@ hsb2
 
 ### Loading data into R
 
-There are many ways of loading data into R depending on where your data are stored. In this lesson we're using a dataset that is included in an R package so we can access this dataset by loading the package with the `library()` function. Other commonly used formats of data are plain test, comma separated values (CSV), Excel files (XLS or XLSX), or RData (the file format R uses to store data). 
+There are many ways of loading data into R depending on where your data are stored. In this lesson we're using a dataset that is included in an R package so we can access this dataset by loading the package with the `library()` function. Other commonly used formats of data are plain text, comma separated values (CSV), Excel files (XLS or XLSX), or RData (the file format R uses to store data). 
 
 In many of the tutorials in these series we will use data from existing R packages, so you won't need to worry about the myriad ways of loading data into R. However, learning more about loading data into R is very important for when you're working on an analysis with your own data. A resource we recommend for learning more about importing data into R is the Data Import chapter in [R 4 Data Science](https://r4ds.had.co.nz/data-import.html) by Grolemund and Wickham. 
 
 ### Take a peek
 
-When you wan to work with data in R, a good first step is to take a peek at what
+When you want to work with data in R, a good first step is to take a peek at what
 the data look like. The `glimpse()` function is one good way of doing this. Click 
 on the blue "Run Code" button to run the code below, and take a look at the 
 output of the `glimpse()` function. 
@@ -329,7 +329,7 @@ In R, variables that are categorical use characters (rather than numbers) for
 values. To indicate to R that you want 
 your logical test to compare the values of a categorical variable to a specific
 level of that variable, you need to surround the name of the level in quotations
-(e.g. `schtyp == "public"). The quotations tell R that the value of the variable 
+(e.g. `schtyp == "public"`). The quotations tell R that the value of the variable 
 is a character, not a number. If you forget to use quotations, R will give you 
 an error message!
 
