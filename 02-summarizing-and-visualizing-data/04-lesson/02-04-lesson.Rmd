@@ -53,10 +53,6 @@ Here, you'll use the `email` dataset to settle that question.
 
 As you explore the association between spam and the length of an email, we'll use the **tidyverse** package for building data pipelines and visualisations and the **openintro** package that contains the `email`. These are loaded for you below.
 
-```{r load-pkg}
-library(tidyverse)
-library(openintro)
-```
 
 Using the `email` dataset:
 
