@@ -927,7 +927,7 @@ We can use the `count()` function to do this!
 The code below should look familiar, with one addition: a second variable as an input to the `count()` function.
 When we add a second variable, the `count()` function will count the number of observations at the intersection of each of the two variables (e.g. non-rear wheel drive pickups). 
 
-```{r}
+```{r echo = TRUE}
 cars %>% 
   count(rear_wheel, pickup)
 ```
