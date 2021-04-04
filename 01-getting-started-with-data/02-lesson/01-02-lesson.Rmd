@@ -168,7 +168,7 @@ This is often a more realistic scenario since most real world relationships are 
 
 Not considering an important variable when studying a relationship can result in what we call a **Simpson's paradox**. This paradox illustrates the effect the omission of an explanatory variable can have on the measure of association between another explanatory variable and the response variable. In other words, the inclusion of a third variable in the analysis can change the apparent relationship between the other two variables. 
 
-Consider the eight dots in the scatter plot below (the points happen to fall on the orange and blue lines). The trend describing the points when only considering `x1` and `y`, illustrated by the gray dashed line, is reversed when `x2`, the grouping variable, is also considered. If we don't consider `x2`, the relationship between `x1` and `y` is positive. If we do consider `x2`, we see that within each group the relationship between `x1` and `y` is actually negative.
+Consider the eight dots in the scatter plot below (the points happen to fall on the orange and blue lines). The trend describing the points when only considering `x1` and `y`, illustrated by the black dashed line, is reversed when `x2`, the grouping variable, is also considered. If we don't consider `x2`, the relationship between `x1` and `y` is positive. If we do consider `x2`, we see that within each group the relationship between `x1` and `y` is actually negative.
 
 ![](images/simpson-paradox-plot.png){width="50%"}
 
@@ -211,7 +211,7 @@ ucb_admit %>%
 
 ### Proportion of males admitted overall
 
-Next we'll calculate the proportion of males and proportion of females admitted, by creating a new variable, called `prop` (short for proportion) based off of the counts calculated in the previous exercise and using the `mutate()` function.
+Next we'll calculate the proportion of males and proportion of females admitted, by creating a new variable, called `prop` (short for proportion) based on the counts calculated in the previous exercise and using the `mutate()` function.
 
 Proportions for each row of the data frame we created in the previous exercise can be calculated as `n / sum(n)`. However, it is important to note that since we are interested in the proportion of students admitted within each gender, we need for the data to be grouped by gender, so that `sum(n)` will be calculated for males and females separately. Luckily, the `group_by()` function can do this grouping for us! 
 
