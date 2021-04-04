@@ -258,7 +258,7 @@ states_str <- ___ %>%
 
 # Use the states_str data to count states by region
 ___ %>%
-  ___ %>%
+  ___
 ```
 
 ```{r stratified-sample4-solution}
