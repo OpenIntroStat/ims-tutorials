@@ -178,9 +178,7 @@ The `email` dataset is still available in your workspace.
 
 ```
 
-<div id="ex2-hint">
-**Hint:** Take a look at how we calculated the summary statistics for `num_char` with the `median()` and `IQR()` functions in the `summarize()` call earlier.
-</div>
+
 
 ```{r ex2-solution}
 # Compute center and spread for exclaim_mess by spam
@@ -209,6 +207,38 @@ email %>%
   ggplot(aes(x = log_exclaim_mess, fill = spam)) +
   geom_density(alpha = 0.3)
 ```
+
+
+### Solution
+
+```{r}
+# Compute center and spread for exclaim_mess by spam
+email %>%
+  group_by(spam) %>%
+  summarize(median(exclaim_mess),
+            IQR(exclaim_mess))
+
+# Create plot for spam and exclaim_mess
+email %>%
+  mutate(log_exclaim_mess = log(exclaim_mess + 0.01)) %>%
+  ggplot(aes(x = log_exclaim_mess)) +
+  geom_histogram() +
+  facet_wrap(~ spam)
+
+# Alternative plot: side-by-side box plots
+email %>%
+  mutate(log_exclaim_mess = log(exclaim_mess + 0.01)) %>%
+  ggplot(aes(x = 1, y = log_exclaim_mess)) +
+  geom_boxplot() +
+  facet_wrap(~ spam)
+
+# Alternative plot: Overlaid density plots
+email %>%
+  mutate(log_exclaim_mess = log(exclaim_mess + .01)) %>%
+  ggplot(aes(x = log_exclaim_mess, fill = spam)) +
+  geom_density(alpha = 0.3)
+```
+
 
 ### Spam and !!! interpretation
 
@@ -280,7 +310,7 @@ To do so we create a new variable, we'll call it `zero` and use it to color in o
 ```{r facet}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
-  ggplot(aes(x = zero)) +
+  ggplot(aes(x = zero, fill = zero)) +
   geom_bar() +
   facet_wrap(~spam)
 ```
@@ -291,7 +321,7 @@ In the resulting plot, yes, we've lost a lot of information. But it's become ver
 
 Another way that we've seen is using a stacked bar chart. For that plot, you move the second variable from the facet layer to the fill argument inside the aesthetics function. 
 
-```{r}
+```{r echo=TRUE}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
   ggplot(aes(x = zero, fill = spam)) +

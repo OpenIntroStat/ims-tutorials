@@ -83,7 +83,7 @@ As we progress in our plotting abilities, we could choose to hide the y axis or 
 ## Histogram
 
 One of the most common plots to use is a *histogram*, which solves this problem by aggregating the dots into bins on the x axis, then mapping the height of the bar to the number of cases that fall into that bin. 
-Because of the binning, it's not possible to perfectly reconstruct the dataset, but it allows us to gain is a bigger picture of the shape of the distribution.
+Because of the binning, it's not possible to perfectly reconstruct the dataset, but it allows us to gain a bigger picture of the shape of the distribution.
 
 Notice, the only aspect of the code that changes is the transition from `geom_dotplot()` to `geom_histogram()`. 
 
@@ -93,8 +93,8 @@ ggplot(data = cars, aes(x = weight)) +
 ```
 
 *Note*: When we run the code above, we get a message. 
-The message letting us know that it has picked a `binwidth` for us and a warning that there were 14 missing values. 
-This is **not** an error, it is a message that `ggplot()` is providing you! 
+The message lets us know that it has picked a `binwidth` for us and a warning that there were 14 missing values. 
+This is **not** an error; it is a message that `ggplot()` is providing you! 
 
 ### Histogram bins 
 
@@ -696,7 +696,7 @@ There are two main methods for incorporating a second variable into the plots we
 
 ## Faceted histograms
 
-Let's use a histogram to look at the distribution of highway mileage, with separate plots for whether or not the car is a pickup truck or not. 
+Let's use a histogram to look at the distribution of highway mileage, with separate plots for whether or not the car is a pickup truck. 
 We can make these separate plots by adding a `facet_wrap()` layer to our `ggplot()`. 
 The variable you want to facet by goes inside the `facet_wrap()` function, and needs to be specified with the `vars()` function.
 The `vars()` function selects variables from the dataset with the name provided. 
@@ -741,7 +741,7 @@ It is a bit easier to compare the variability with density plots overlaid.
 Notice, we have two new aspects to our plot, (1) the `fill` aesthetic, and (2) the `alpha` option.   
 
 The `fill` aesthetic maps a color to the categorical variable given to it. 
-You can think of this a "filling" the density plots with different colors for trucks and non-trucks. 
+You can think of this as a "filling" the density plots with different colors for trucks and non-trucks. 
 The `alpha` argument changes the transparency of the density plots. 
 Ordinarily, it would be impossible to see the area where these plots overlap. 
 However, by making them more transparent (an `alpha` less than 1), we can see the overlapping areas. 
@@ -757,7 +757,7 @@ The mileage of a car tends to be associated with the size of its engine (as meas
 To explore the relationship between these two variables, you could stick to using histograms, but in this exercise you'll try your hand at two alternatives: the boxplot and the density plot.
 
 First, let's see how many unique values number of cylinders there are in the dataset. 
-We can use the `count()` function to find the unique values for an variable and also see how many observations there are for each value. 
+We can use the `count()` function to find the unique values for a variable and also see how many observations there are for each value. 
 
 ```{r echo = TRUE}
 cars %>%
@@ -896,7 +896,7 @@ One simple extension that allows you to plot the association between three varia
 Similar to its `facet_wrap()` counterpart, the `facet_grid()` function creates subplots based on the levels of the variable(s) input.
 However, unlike the `facet_wrap()` function, `facet_grid()` can facet by more than one variable, creating a matrix of subplots.
 
-Let's see how this works by build a plot that explores `msrp`, the manufacturer's suggested retail price. Since that variable is numerical, there are several plots we could use, but let's go with a density plot.
+Let's see how this works by building a plot that explores `msrp`, the manufacturer's suggested retail price. Since that variable is numerical, there are several plots we could use, but let's go with a density plot.
 By adding a `facet_grid()` layer, we can break that distribution down by two categorical variables, each specified with the `vars()` function.
 In the end, we will have multiple density plots of the `msrp` variable!
 
