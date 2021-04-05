@@ -478,7 +478,7 @@ ggplot(data = mlbbat10, aes(x = stolen_base, y = home_run)) +
 
 Another approach is add some jitter to the plot, just like what we did with the boxplots!
 
-```{r hr_jitter}
+```{r hr_jitter, echo = TRUE}
 ggplot(data = mlbbat10, aes(x = stolen_base, y = home_run)) +
   geom_jitter(alpha = 0.5)
 ```
@@ -487,7 +487,7 @@ ggplot(data = mlbbat10, aes(x = stolen_base, y = home_run)) +
 
 In this plot, there are two points that stand out as potential outliers: the one in the lower-right hand corner, and the one at the very top. We will discuss later in the course how to handle these outliers, but for now, it is enough to simply identify them and investigate them. In this case, we can use the `filter()` function to identify those players with **at least** 60 stolen bases or **at least** 50 home runs. As it turns out, the player in the lower-right hand corner is Juan Pierre, who is one of the speediest and least powerful hitters in recent memory. The player at the top is Jose Bautista, one of the game's most revered sluggers.
 
-```{r}
+```{r id-outliers, echo = TRUE}
 mlbbat10 %>%
   filter(stolen_base > 60 | home_run > 50) %>%
   select(name, team, position, stolen_base, home_run)
