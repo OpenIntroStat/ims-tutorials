@@ -197,7 +197,7 @@ ggplot(data = ___,
 
 ```{r ex2-solution}
 ggplot(data = ncbirths,
-       aes(x = , y = weight)) +
+       aes(x = weeks_cut, y = weight)) +
   geom_boxplot()
 ```
 
