@@ -117,7 +117,7 @@ ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
 
 ### Boxplot
 
-This type of dotplot is not standard. What is more common is to create side-by-side boxplots of the distribution of these points. If we change from `geom_point()` to `gome_boxplot()`, we will get this more "standard" visualization.
+This type of dotplot is not standard. What is more common is to create side-by-side boxplots of the distribution of these points. If we change from `geom_point()` to `geom_boxplot()`, we will get this more "standard" visualization.
 
 ```{r 6, message=FALSE, echo = TRUE}
 ggplot(data = possum, aes(y = total_l, x = tail_cut)) +
@@ -503,11 +503,11 @@ Recall that in the baseball example earlier in the lesson, most of the points we
 
 Both OBP and SLG are known as *rate* statistics, since they measure the frequency of certain events over time (as opposed to their *count*). In order to compare these rates sensibly, it makes sense to include only players with a reasonable number of opportunities, so that these observed rates have the chance to approach what we might expect from a player's long-run rate.
 
-In Major League Baseball, batters qualify for the batting title only if they have 3.1 plate appearances per game. This translates into roughly 502 plate appearances in a 162-game season. The `mlbbat10` dataset does not include plate appearances as a variable, but we can use at-bats (`AB`)--which constitute a subset of plate appearances--as a proxy.
+In Major League Baseball, batters qualify for the batting title only if they have 3.1 plate appearances per game. This translates into roughly 502 plate appearances in a 162-game season. The `mlbbat10` dataset does not include plate appearances as a variable, but we can use at-bats (`at_bat`)--which constitute a subset of plate appearances--as a proxy.
 
 Let's make a scatterplot of the same relationship as before, but only for players with at least 200 at-bats. To do this, we'll need to carry out the following steps:
 
-1. Create a new dataset named `at_gt_200` which contains only the players who had at least 200 at-bats.
+1. Create a new dataset named `ab_gt_200` which contains only the players who had at least 200 at-bats.
 2. Using `ab_gt_200`, create a scatterplot for `slg` as a function of `obp`.
 
 ```{r ex9, exercise = TRUE}
