@@ -48,6 +48,19 @@ The purpose of this lesson is to give you an opportunity to apply and practice w
 
 Inspect the `evals` data frame using techniques you learned in previous lessons. Use an approach that shows you how many observations and variables are included in the dataset. This data is in the **openintro** package and we will use functions from the **tidyverse** for our analysis. You can read more about the data [here](http://openintrostat.github.io/openintro/reference/evals.html). 
 
+Note that for the purposes of this analysis we have added an additional variable to the dataset, `cls_type`. This variable classifies classes as small, midsize, or large, depending on the number of students in the class. This was done using the following.
+
+```{r echo = TRUE}
+evals <- evals %>%
+  mutate(cls_type = case_when(
+    cls_students <= 18                      ~ "small",
+    cls_students >= 19 & cls_students <= 59 ~ "midsize",
+    cls_students >= 60                      ~ "large"
+    )
+  )
+```
+
+
 ```{r inspect-data, exercise=TRUE, exercise.lines=5}
 # Inspect evals
 ```
@@ -157,7 +170,7 @@ The `cls_students` variable in `evals` tells you the number of students in the c
 
 ```{r type-of-variable, exercise=TRUE}
 # Recode cls_students as cls_type
-evals_fortified <- evals %>%
+evals <- evals %>%
   mutate(
     ___ = case_when(
       ___ ~ "small",
@@ -169,7 +182,7 @@ evals_fortified <- evals %>%
 
 ```{r type-of-variable-solution}
 # Recode cls_students as cls_type
-evals_fortified <- evals %>%
+evals <- evals %>%
   mutate(
     cls_type = case_when(
       cls_students <= 18                      ~ "small",
