@@ -911,7 +911,7 @@ Specify align as the x aesthetic, then facet by gender within facet_wrap().
 ```
 
 ```{r ex6-solution}
-ggplot(comics, aes(x = align)) + 
+ggplot(comics_updated, aes(x = align)) + 
   geom_bar() +
   facet_wrap(~ gender)
 ```
