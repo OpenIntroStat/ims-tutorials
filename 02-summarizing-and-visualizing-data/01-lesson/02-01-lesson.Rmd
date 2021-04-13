@@ -961,22 +961,16 @@ pies_updated <- pies %>%
 # Create barchart of flavor
 # Using plot flavor on y-axis so label text fits
 ggplot(___, aes(y = ___)) + 
-  geom_bar(fill = ___) + 
+  geom_bar(fill = ___) 
 ```
 
-```{r ex7-hint-1}
+```{r ex7-solution}
 # Create barchart of flavor
 # Using plot flavor on y-axis so label text fits
 ggplot(pies_updated, aes(y = flavor)) + 
   geom_bar(fill = "chartreuse") 
 ```
 
-
-```{r ex7-solution}
-# Create barchart of flavor
-ggplot(pies, aes(y = flavor)) + 
-  geom_bar(fill = "chartreuse") 
-```
 
 ## Congratulations!
 
