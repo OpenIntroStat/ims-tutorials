@@ -842,6 +842,7 @@ Once you've reordered the `align` variable, create a barchart of counts of the
 comics_updated <- comics %>% 
   mutate(align = factor(___, 
                        levels = c("___", "___", "___"))
+  )
 
 # Create plot of the updated align variable
 ggplot(___, aes(x = ___)) + 
@@ -853,6 +854,7 @@ ggplot(___, aes(x = ___)) +
 comics_updated <- comics %>% 
   mutate(align = factor(align, 
                        levels = c("___", "___", "___"))
+  )
 ```
 
 ```{r ex5-hint-2}
@@ -860,6 +862,7 @@ comics_updated <- comics %>%
 comics_updated <- comics %>% 
   mutate(align = factor(align, 
                        levels = c("Good", "Neutral", "Bad"))
+  )
 
 # Create plot of align
 ggplot(___, aes(x = ___)) + 
