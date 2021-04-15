@@ -40,6 +40,11 @@ The dataset that we'll be working with is one that has information on the cars t
 
 In this lesson, you'll be working with the `cars` dataset, which records characteristics on all of the new models of cars for sale in the US in a certain year.
 We can learn more about each variable using the `glimpse()` function.
+
+```{r glimpse-cars, echo = TRUE}
+glimpse(cars)
+```
+
 We learn that we have 428 observations, or cases, and 19 variables. 
 Unlike most displays of data, the glimpse function puts each of the variables as a row, with its name followed by its data type, followed by the first several values.
 
@@ -52,9 +57,7 @@ So, it actually behaves a bit like categorical variable.
 
 Let's construct some plots to help us explore this data.
 
-```{r glimse-cars, echo = TRUE}
-glimpse(cars)
-```
+
 
 ## Dotplot
 
@@ -93,7 +96,7 @@ ggplot(data = cars, aes(x = weight)) +
 ```
 
 *Note*: When we run the code above, we get a message. 
-The message letting us know that it has picked a `binwidth` for us and a warning that there were 14 missing values. 
+The message lets us know that it has picked a `binwidth` for us and a warning that there were 14 missing values. 
 This is **not** an error, it is a message that `ggplot()` is providing you! 
 
 ### Histogram bins 
