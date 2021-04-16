@@ -788,7 +788,7 @@ Here you'll focus on the population variable, which exhibits strong right skew, 
 
 Using the `gap2007` data:
 
-- Create a density plot of the population variable (`var`).
+- Create a density plot of the population variable (`pop`).
 - Use `mutate()` to create a new variable called `log_pop` that is the natural log of the population, and
 save this new variable back into `gap2007`.
 - Create the same density plot as before with your transformed variable.
