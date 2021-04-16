@@ -958,8 +958,8 @@ gap2007 %>%
 Next, we'll build a plot with that country removed. The `gap2007` is still available in your workspace. To carry out this process we need to use the following steps: 
 
 1. Use `filter()` to retain only observations from Asia
-2. Use `mutate()` to create a new variable called `is_outlier`
-3. Use `if_else()` to specify how the `is_outlier` variable should be made, where countries with a life expectancy less than 50 should get a value of `TRUE` and everyone else should get a value of `FALSE`
+2. Use `mutate()` to create a new variable called `is_outlier` to identify countries with a life expectancy less than 50
+3. Use `filter()` again to exclude all outliers
 4. Create a boxplot of the life expectancies of the non-outlier countries
 
 ```{r ex5-setup}
@@ -987,10 +987,10 @@ gap2007 %>%
 ```
 
 ```{r ex5-hint-2}
-## Next, create a new variable named is_outlier using the if_else function
+## Next, create a new variable named is_outlier for countries with a life expectancy less than 50
 gap2007 %>% 
   filter(country == "Asia") %>%
-  mutate(is_outlier = if_else(lifeExp < 50, TRUE, FALSE)) %>% 
+  mutate(is_outlier = lifeExp < 50) %>%  
   filter(___) %>%
   ggplot(aes(x = ___)) +
   geom_boxplot()
@@ -1000,7 +1000,7 @@ gap2007 %>%
 ## Next, use the is_outlier variable to filter out the observations flagged as outliers
 gap2007 %>% 
   filter(country == "Asia") %>%
-  mutate(is_outlier = if_else(lifeExp < 50, TRUE, FALSE)) %>% 
+  mutate(is_outlier = lifeExp < 50) %>%  
   filter(!is_outlier) %>%
   ggplot(aes(x = ___)) +
   geom_boxplot()
@@ -1010,7 +1010,7 @@ gap2007 %>%
 ## Finally, make a boxplot of the life expectancies! 
 gap2007 %>% 
   filter(country == "Asia") %>%
-  mutate(is_outlier = if_else(lifeExp < 50, TRUE, FALSE)) %>% 
+  mutate(is_outlier = lifeExp < 50) %>% 
   filter(!is_outlier) %>%
   ggplot(aes(x = lifeExp)) +
   geom_boxplot()
