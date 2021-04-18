@@ -49,7 +49,7 @@ Let's get started.
 
 In this tutorial, you'll be exploring data from a wide range of contexts. The first dataset comes from comic books. Two publishers, Marvel and DC, have created a host of superheroes that have made their way into popular culture. You're probably familiar with Batman and Spiderman, but what about Mor the Mighty?
 
-The comics dataset has information on all comic characters that have been introduced by DC and Marvel. If we type the name of the dataset at the console, we get the first few rows and columns. Here we see that each row, or case, is a different character and each column, or variable, is a different observation made about that character. At the top the output tell us the dimensions of this dataset: over 23,000 cases and 11 variables. Right under the variable names, we see that the first three variables are characters, or the `chr` data type. These are variables that we could potentially consider categorical, as they all have a finite number of levels. The first case in the dataset is Peter Parker, alias: Spiderman, where his alias and character name are included in the first variable `name`. The second column, `id`, shows that Peter Parker's personal identity is kept secret, and the third column tell us that his `align`ment is good; that he's a superhero, not a super villain. At the bottom we see that there are 8 additional variables that aren't shown here, including eye color and hair color, almost all of which are also characters.
+The comics dataset has information on all comic characters that have been introduced by DC and Marvel. If we type the name of the dataset at the console, we get the first few rows and columns. Here we see that each row, or case, is a different character and each column, or variable, is a different observation made about that character. At the top the output tell us the dimensions of this dataset: over 23,000 cases and 11 variables. Right under the variable names, we see that the first three variables are characters, or the `chr` data type. These are variables that we could potentially consider categorical, as they all have a finite number of levels. The first case in the dataset is Peter Parker, alias: Spiderman, where his alias and character name are included in the first variable `name`. The second column, `id`, shows that Peter Parker's personal identity is kept secret, and the third column tell us that his `align`ment is good; that he's a superhero, not a super villain. If you scroll the table to the right side, you will see several additional variables, including eye color and hair color, almost all of which are also characters.
 
 ```{r comics, echo=FALSE}
 comics 
@@ -842,6 +842,7 @@ Once you've reordered the `align` variable, create a barchart of counts of the
 comics_updated <- comics %>% 
   mutate(align = factor(___, 
                        levels = c("___", "___", "___"))
+  )
 
 # Create plot of the updated align variable
 ggplot(___, aes(x = ___)) + 
@@ -853,6 +854,7 @@ ggplot(___, aes(x = ___)) +
 comics_updated <- comics %>% 
   mutate(align = factor(align, 
                        levels = c("___", "___", "___"))
+  )
 ```
 
 ```{r ex5-hint-2}
@@ -860,6 +862,7 @@ comics_updated <- comics %>%
 comics_updated <- comics %>% 
   mutate(align = factor(align, 
                        levels = c("Good", "Neutral", "Bad"))
+  )
 
 # Create plot of align
 ggplot(___, aes(x = ___)) + 
@@ -911,7 +914,7 @@ Specify align as the x aesthetic, then facet by gender within facet_wrap().
 ```
 
 ```{r ex6-solution}
-ggplot(comics, aes(x = align)) + 
+ggplot(comics_updated, aes(x = align)) + 
   geom_bar() +
   facet_wrap(~ gender)
 ```
@@ -961,22 +964,16 @@ pies_updated <- pies %>%
 # Create barchart of flavor
 # Using plot flavor on y-axis so label text fits
 ggplot(___, aes(y = ___)) + 
-  geom_bar(fill = ___) + 
+  geom_bar(fill = ___) 
 ```
 
-```{r ex7-hint-1}
+```{r ex7-solution}
 # Create barchart of flavor
 # Using plot flavor on y-axis so label text fits
 ggplot(pies_updated, aes(y = flavor)) + 
   geom_bar(fill = "chartreuse") 
 ```
 
-
-```{r ex7-solution}
-# Create barchart of flavor
-ggplot(pies, aes(y = flavor)) + 
-  geom_bar(fill = "chartreuse") 
-```
 
 ## Congratulations!
 
