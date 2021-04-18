@@ -901,7 +901,7 @@ life <- life %>%
   mutate(is_outlier = income > 75000)
 ```
 
-A useful tool when inspecting outliers is to filtering the dataset to only include outliers, and then arranging them in decreasing order. Because we didn't save this resulting dataset to a new object, it just outputs the sorted outliers. Based on the output, we learn that the top income county is actually Teton County, in the Grand Tetons of Wyoming, and that three of the other top ten counties are in Texas and two are in Nebraska.
+A useful tool when inspecting outliers is to filtering the dataset to only include outliers, and then arranging them in decreasing order. Let's do that next.
 
 ```{r, echo = TRUE}
 life %>%
@@ -909,6 +909,7 @@ life %>%
   arrange(desc(income))
 ```
 
+Based on the output, we learn that the top income county is actually Teton County, in the Grand Tetons of Wyoming, and that three of the other top ten counties are in Texas and two are in Nebraska. Note that we didn't save this result to a new object, we're only viewing the output to investigate the outliers, but we're not removing them from the dataset (at least not yet).
 
 ### Plotting without outliers
 
