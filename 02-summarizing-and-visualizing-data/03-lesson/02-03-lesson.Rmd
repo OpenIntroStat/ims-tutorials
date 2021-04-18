@@ -914,7 +914,7 @@ life %>%
 
 We can also try rebuilding the density plots without the outliers.
 
-To do this, we form a pipeline where the first step is to filter on those counties that are not outliers. Recall that is outlier is a vector of `TRUE`s and `FALSE`s. We can simply state that we are not interested in any of the values that are `TRUE` by adding an exclamation point (`!`) before the name of the variable. We can then pipe this filtered dataset into the same `ggplot()` code we used for the original overlaid density plots.
+To do this, we form a pipeline where the first step is to filter on those counties that are not outliers. Recall that `is_outlier` is a vector of `TRUE`s and `FALSE`s. We can simply state that we are not interested in any of the values that are `TRUE` by adding an exclamation point (`!`) before the name of the variable. We can then pipe this filtered dataset into the same `ggplot()` code we used for the original overlaid density plots.
 
 ```{r, echo = TRUE, eval = FALSE}
 life %>%
