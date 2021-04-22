@@ -280,7 +280,7 @@ To do so we create a new variable, we'll call it `zero` and use it to color in o
 ```{r facet}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
-  ggplot(aes(x = zero)) +
+  ggplot(aes(x = zero, fill = zero)) +
   geom_bar() +
   facet_wrap(~spam)
 ```
