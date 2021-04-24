@@ -23,6 +23,8 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.width = 5,
                       fig.align = "center")
 
+options(max.print=4000)
+
 email <- email %>%
   mutate(spam = if_else(spam == 0, "not spam", "spam"))
 
@@ -34,7 +36,7 @@ comics <- read_csv("data/comics.csv") %>%
 
 In this lesson, you'll get a chance to put to use what you know about exploratory data analysis in exploring a new dataset. 
 
-The `email` dataset contains information on all of the emails received by a single email account in a single month. Each email is a case, so we see that this email account received 3,921 emails. Twenty-one different variables were recorded on each email, some of which are numerical, others are categorical. Of primary interest is the first column, a categorical variable indicating whether or not the email is `spam`. This was created by actually reading through each email individually and deciding if it looked like spam or not. The subsequent columns were easier to create. `to_multiple` is TRUE if the email was addressed to more than one recipient and FALSE otherwise. `image` is the number of images attached in the email. It's important that you have a full sense of what each of the variables mean, so you'll want to start your exercises by reading about them in the help file.
+The `email` dataset contains information on all of the emails received by a single email account in a single month. Each email is a case, so we see that this email account received 3,921 emails. Twenty-one different variables were recorded on each email, some of which are numerical, others are categorical. Of primary interest is the first column, a categorical variable indicating whether or not the email is `spam`. This was created by actually reading through each email individually and deciding if it looked like spam or not. The subsequent columns were easier to create. `to_multiple` is TRUE if the email was addressed to more than one recipient and FALSE otherwise. `image` is the number of images attached in the email. It's important that you have a full sense of what each of the variables mean, so you'll want to start your exercises by reading about them in the [data set description](https://www.openintro.org/data/index.php?data=email).
 
 ```{r email}
 email
