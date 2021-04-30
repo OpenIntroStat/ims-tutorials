@@ -288,7 +288,7 @@ email %>%
   facet_wrap(~spam)
 ```
 
-In the resulting plot, yes, we've lost a lot of information. But it's become very clear that spam is more likely to contain no exclamation marks, while in spam, the opposite is true.
+In the resulting plot, yes, we've lost a lot of information. But it's become very clear that spam is more likely to contain no exclamation marks, while in regular mail (not spam mail), the opposite is true.
 
 ### Bar plot options
 
