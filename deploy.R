@@ -31,7 +31,7 @@ tutorial_dirs <- dir_info(recurse = 1) %>%
 
 # tutorials to deploy ----------------------------------------------------------
 
-which_tutorials <- 1:8
+which_tutorials <- 1
 which_tutorials_chr <- paste0("0", which_tutorials)
 which_tutorials_regex <-paste0("^", which_tutorials_chr, collapse = "|")
 dirs_to_deploy <- str_subset(tutorial_dirs, which_tutorials_regex)
@@ -42,7 +42,6 @@ tutorials <- tibble(dir_to_deploy = dirs_to_deploy, lesson = dirs_to_deploy) %>%
   separate(col = lesson, into = c("tutorial", "lesson"), sep = "/") %>%
   mutate(lesson = str_remove(lesson, "-lesson")) %>%
   mutate(title = glue("ims-{tutorial}-{lesson}"))
-
 
 # deploy all -------------------------------------------------------------------
 

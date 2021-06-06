@@ -1,0 +1,537 @@
+---
+title: "Regression modeling: 3 - Simple linear regression"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+library(emo)
+library(learnr)
+library(tidyverse)
+library(openintro)
+
+knitr::opts_chunk$set(echo = FALSE, 
+                      fig.align = "center", 
+                      fig.height = 3, 
+                      fig.width = 5,
+                      warning = FALSE, 
+                      message = FALSE)
+
+tutorial_options(exercise.eval = FALSE)
+```
+
+## Visualization of linear models
+
+Before we get into the mathematical specification for a regression model, let's build some intuition about what a regression line is.  
+
+In this scatterplot, we see the relationship between the total length of a possum, and the corresponding length of its tail. Clearly there is not a perfect relationship here: the total length of the possum varies even for possums with the same tail length. But we still have some intuitive desire to describe the relationship with a line. 
+
+```{r 1, echo = TRUE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point()
+```
+
+## Picking a line of best fit
+
+### Through the origin
+
+In the plot below, we've superimposed a line that goes through the origin - that is, the point where both $x$ and $y$ are equal to zero. The line has a slope of 2.5 centimeters (of total length) per centimeter (of tail length). We notice that, in some sense, the line does go "through" the points, but doesn't capture the general trend as best we could imagine. 
+
+```{r 2, message=FALSE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 2.5) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
+```
+
+### Through the origin, better fit
+
+This line also goes through the origin, but has a gentler slope of 2.3 cm (of total length) per cm (of tail length). It seems like a "better" fit, since it cuts through the points in a more central way.  
+
+```{r 3, message=FALSE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 2.3) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
+```
+
+### Not through the origin
+
+But why should we force the line to go through the origin? Here is a line that has a $y$-intercept of 40 cm, and an even gentler slope of 1.3 . It seems like an even better fit still. 
+
+Do you think you could find an even better fit? In order to do so, you need some criteria for judging which line fits better. In particular, you need a numerical measurement of how good the fit of each possible line is. 
+
+```{r 4, message=FALSE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() + 
+  geom_abline(intercept = 40, slope = 1.3) + 
+  xlim(0, 50) + 
+  ylim(0, 100)
+```
+
+### The "best" fit line
+
+The simple linear regression model for a numeric response as a function of a numeric explanatory variable can be visualized on the corresponding scatterplot by a straight line. 
+
+In regression, we use the least squares criterion to determine the best fit line. Statisticians have proven that (apart from pathological examples) if we seek the line that tries to minimize the sum of the squared distances between the line and a set of data points, a unique line exists. That line is called the "least squares regression line." 
+
+We might consider linear regression to be a specific example of a larger class of *smooth* models. The `geom_smooth()` function allows you to draw such models over a scatterplot of the data itself. This technique is known as visualizing the model *in the data space*. The `method` argument to `geom_smooth()` allows you to specify what class of smooth model you want to see. Since we are exploring linear models, we'll set this argument to the value `"lm"`.
+
+We can add the line to our plot using the `geom_smooth()` function and specifying the `method` argument to be `"lm"`, which stands for "linear model". 
+
+```{r 5, echo = TRUE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+### Ignore standard errors
+
+Note that by default, this will draw the regression line in blue, with gray shading for the standard error associated with the line. That should not concern us just yet, so we can turn it off by setting the `se` argument to `FALSE`. 
+
+```{r 6, echo = TRUE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+You'll explore the "best fit" line on your own in these next exercise.
+
+## Your turn! 
+
+Using the `bdims` dataset, create a scatterplot of body weight (`bwt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
+
+Then, add a linear regression line on top of the scatterplot. 
+
+
+```{r ex1, exercise = TRUE}
+ ggplot(data = ___, aes(x = ___, y = ___)) + 
+  ___ + 
+  ___(method = ___, se = FALSE)
+```
+
+```{r ex1-hint-1}
+ ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+  geom_point() + 
+  ___(method = ___, se = FALSE)
+```
+
+```{r ex1-hint-2}
+ ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+  geom_point() + 
+  geom_smooth(method = ___, se = FALSE)
+```
+
+
+```{r ex1-solution}
+ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### Uniqueness of least squares regression line
+
+The least squares criterion implies that the slope of the regression line is unique. In practice, the slope is computed by R. In this exercise, you will experiment with trying to find the optimal value for the regression slope for weight as a function of height in the `bdims` dataset via trial-and-error.
+
+We've built a custom function for you called `add_line()`, which takes a single argument: the proposed slope coefficient and plots it on the scatterplot of height and weight. 
+
+Use the code chunk below to experiment with different values (to the nearest integer) of the `my_slope` parameter until you find one that you think fits best.
+
+```{r ex2-setup}
+add_line <- function (my_slope) {
+
+  bdims_summary <- bdims %>%
+    summarize(N = n(), r = cor(hgt, wgt),
+              mean_hgt = mean(hgt), mean_wgt = mean(wgt),
+              sd_hgt = sd(hgt), sd_wgt = sd(wgt)) %>%
+    mutate(true_slope = r * sd_wgt / sd_hgt, 
+           true_intercept = mean_wgt - true_slope * mean_hgt)
+  p <- ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+    geom_point() + 
+    geom_point(data = bdims_summary, 
+               aes(x = mean_hgt, y = mean_wgt), 
+               color = "red", size = 3)
+  
+  my_data <- bdims_summary %>%
+    mutate(my_slope = my_slope, 
+           my_intercept = mean_wgt - my_slope * mean_hgt)
+  p + geom_abline(data = my_data, 
+                  aes(intercept = my_intercept, slope = my_slope), color = "dodgerblue")
+}
+
+ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
+  geom_point()
+```
+
+```{r ex2, exercise = TRUE}
+ add_line(my_slope = ___)
+```
+
+<div id="ex2-hint">
+**Hint:** Input your best guess for the slope of the regression line between height and weight. 
+</div>
+
+```{r ex2-solution}
+# Estimate optimal value of my_slope
+add_line(my_slope = 1)
+```
+
+## Understanding Linear Models
+
+Models are ubiquitous in statistics. In many cases, we assume that the value of our response variable is some function of our explanatory variable, plus some random noise. The latter term is important, and in a philosophical sense, is the focus of statistical thinking.
+
+What we are saying here is that there is some mathematical function $f$, which can translate values of one variable into values of another, except that there is some randomness in the process. What often distinguishes statisticians from other quantitative researchers is the way that we try to model that random noise. 
+
+$$
+  response = f(explanatory) + noise
+$$
+
+### Linear model
+
+For a linear regression model, we simply assume that $f$ takes the form of a linear function. Thus, our model describes the value of the response variable in terms of what creates a line (an intercept and a slope). 
+
+$$
+  response = intercept + slope \cdot explanatory + noise
+$$
+
+### Regression model
+
+In a regression model, we use Greek letters for the intercept and slope, indicating that they are population parameters which we hope to estimate with our sample. 
+
+The intercept is notated as $\beta_0$ and the slope is notated as $\beta_1$. The noise term in a regression is often denoted $\epsilon$. In a regression, we assume that the noise terms have a Normal distribution, centered at 0 with a known standard deviation of $\sigma_\epsilon$. The equation below is what we call our "population" regression equation, symbolizing that it is for the population we are interested in studying. 
+
+$$
+  Y = \beta_0 + \beta_1 \cdot X + \epsilon \,, \qquad \epsilon \sim N(0, \sigma_\epsilon)
+$$
+
+### Fitted values
+
+When we estimate our population regression equation with data, we need to indicate that our intercept and slope values are estimates for the *true* population intercept and slope. 
+
+We do this by changing our equation in four ways: 
+
+1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response 
+2. the error terms ($\epsilon$) are removed, as we are no longer modeling individual responses 
+3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept 
+4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope 
+
+The resulting model looks like: 
+
+$$
+  \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 \cdot X
+$$
+
+### Residuals
+
+The difference between what was observed in the data and what was predicted from the regression line is what we call a "residual." Obervations that lie above the regression line exceeded their predicted value and have a positive residual. Values below the regression line are less than their predicted value and have a negative residual. 
+
+The residuals are the realization of the noise term from the population regression equation. While $\epsilon$ and $e$ play analogous roles in the regression equation, $\epsilon$ is an unknown, true quantity, while $e$ is a known, estimate of that quantity. 
+
+$$
+  e = Y - \hat{Y}
+$$
+
+### Fitting procedure
+
+While we won't delve into the specifics of the least squares fitting procedure, we will outline what it does. It is intuitive that we would want a line that has small residuals. As discussed in the [Introduction to Modern Statistics textbook](https://openintro-ims.netlify.app/intro-linear-models.html#least-squares-regression), it is common practice to choose a line that minimizes the sum of squared residuals. 
+
+In this procedure, the residual for each observation is squared and all of the squared residuals are added up. You can think of the use of the squared error as saying that "a residual twice as large as another residual is more than twice as bad." In other words, overestimating by 4 is more than twice as bad as overestimating by 2. 
+
+### Least squares
+
+Actually computing the fitted coefficients is usually a messy business for which the computer is much better suited than we are, so we won't discuss that here. You should know that the least squares fitting procedure is a well-understood, relatively straightforward, deterministic process that can be computed efficiently. It will always return a unique solution, except in rare, unrealistic cases. 
+
+Your regression line will always have two attributes, (1) the residuals will always sum to 0, and (2) the point $(\bar{x}, \bar{y})$ is guaranteed to lie on the regression line.
+Given your understanding of correlation, it should not surprise you to learn that the regression slope and the correlation coefficient are closely-related. In fact, they are proportional to one another. 
+
+You should also be aware that there are other criteria---apart from least squares---for choosing a line of "best" fit, but we won't talk about them in this tutorial.
+
+### Key concepts
+
+It's worth reviewing some key concepts about regression models. 
+
+- $\hat{Y}$ is the mean value of the response, for a given value of $X$
+  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$
+- $\hat{\beta}$'s are estimates of true, unknown $\beta$'s
+  * the estimated intercept and slope our best guess of the true value of $\beta_0$ and $\beta_1$
+- Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s
+  * the residuals are estimates of the true, unknown noise
+  * "error" may be misleading term---better: *noise*
+
+
+You'll put your understanding of regression to use in these next exercises. 
+
+## Your turn! 
+
+Consider a linear regression model of the form:
+
+$$
+    Y = \beta_0 + \beta_1 \cdot X + \epsilon \,, \text{ where } \epsilon \sim N(0, \sigma_{\epsilon}) \,.
+$$
+
+The slope coefficient is:
+
+1. $Y$
+
+2. $\beta_0$
+
+3. $\beta_1$
+
+4. $\epsilon$
+
+
+```{r mc}
+question("",
+  answer("1", message = "Not quite! 1 represents the response variable."),
+  answer("2", message = "Try again! 2 represents the y-intercept."),
+  answer("3", correct = TRUE, message = "The $X$ represents the explanatory variables and the $\beta_0$ represents the y-intercept."),
+  answer("4", message = "Wrong! That represents the disturbance term."),
+  allow_retry = TRUE
+)
+```
+
+
+### Regression model output terminology
+
+The fitted model for the poverty rate of U.S. counties as a function of high school graduation rate is:
+
+$$
+\widehat{poverty} = 64.594 - 0.591 \cdot hs_{grad}
+$$
+
+
+```{r mc1}
+question("In Hampshire County in western Massachusetts, the high school graduation rate is 92.4%. These two facts imply that the mean poverty rate in Hampshire County is ___.
+",
+  answer("exactly 11.7%", message = "Incorrect, try again."),
+  answer("exactly 10.0%", message = "Not quite!"),
+  answer("expected to be about 10.0%", correct = TRUE, message = "Solve for poverty by plugging in 92.4 as hs_grad in the equation!"),
+  answer("expected to be about 11.7%", message = "Did you plug 92.4 into the equation?"),
+  allow_retry = TRUE
+)
+```
+
+
+## Fitting a linear model "by hand"
+
+Recall the simple linear regression model:
+
+$$
+    y = b_0 + b_1 \cdot x
+$$
+
+Two facts enable you to compute the slope $b_1$ and intercept $b_0$ of a simple linear regression model from some basic summary statistics.
+
+First, the slope can be defined as:
+
+$$
+    b_1 = r_{x,y} \cdot \frac{s_y}{s_x}
+$$
+
+where $r_{x,y}$ represents the correlation (`cor()`) of $x$ and $y$ and $s_x$ and $s_y$ represent the standard deviation (`sd()`) of $x$ and $y$, respectively.
+
+Second, the point $(\bar{x}, \bar{y})$ is *always* on the least squares regression line, where $\bar{x}$ and $\bar{y}$ denote the average of $x$ and $y$, respectively.
+
+In this exercise, you will find the slope and intercept of the least squares regression line for body weight ($y$) as a function of height ($x$). But, you might need to do some algebra to solve for $b_0$!
+
+The `bdims_summary` table has been added to your workspace. Use the `glimpse()` function to preview what the table looks like! 
+
+```{r preview-setup}
+bdims_summary <- bdims %>%
+  summarize(N = n(), r = cor(hgt, wgt),  
+            mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
+            mean_wgt = mean(wgt), sd_wgt = sd(wgt))
+```
+
+```{r preview, exercise = TRUE}
+# Print bdims_summary
+
+
+```
+
+Now, use `mutate()` and some algebra to add the `slope` and `intercept` to the `bdims_summary` table.
+
+```{r ex3-setup}
+bdims_summary <- bdims %>%
+  summarize(N = n(), r = cor(hgt, wgt),  
+            mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
+            mean_wgt = mean(wgt), sd_wgt = sd(wgt))
+```
+
+```{r ex3, exercise = TRUE}
+bdims_summary %>%
+  mutate(slope = ___, 
+         intercept = ___)
+```
+
+```{r ex3-hint-1}
+## Remember the slope can be calculated from 
+## 1. the correlation 
+## 2. the sd of height and weight
+bdims_summary %>%
+  mutate(slope = r  * (sd_wgt / sd_hgt), 
+         intercept = ___)
+```
+
+```{r ex3-hint-2}
+## Remember that x-bar and y-bar lie on the regression line! 
+
+bdims_summary %>%
+  mutate(slope = r  * (sd_wgt / sd_hgt), 
+         intercept = mean_wgt  - ___)
+```
+
+
+```{r ex3-solution}
+bdims_summary %>%
+  mutate(slope = r * sd_wgt / sd_hgt, 
+         intercept = mean_wgt - slope * mean_hgt)
+```
+
+<!--
+
+## Regression vs. regression to the mean
+
+### Heredity
+
+In the late 19th century, Sir Francis Galton developed much of the theory surrounding correlation and regression. One of the more enduring concepts is "regression to the mean." Here we note that "regression to the mean" is a distinct concept from "linear regression", which is the focus of this tutorial. But "regression to the mean" is an important statistical concept in its own right, so we will explore it here so that you can appreciate the difference. 
+
+As an example of Galton's "regression to the mean", consider analyzing  the heights of the children of NBA players.
+
+As always, it's best to start with a question: Do tall men tend to beget tall sons? Do tall women tend to have tall daughters? You might consider this question in the context of NBA and WNBA players. Do you suspect that children of NBA and WNBA players are likely to be tall? 
+
+### Galton's data
+
+The answer turns out to be "yes, but not as tall as their fathers." This effect is what Galton deemed "regression to the mean". Another way of thinking about this is that unusual phenomena are likely to become more common over time.
+
+In the plot, we see the relationship between the heights of a group of 465 men that Galton measured in the 1880s, and their fathers. The height of the son is on the $y$ axis, while the height of the corresponding father is on the $x$ axis. The diagonal indicates sons who are as tall as their fathers. The slope of the regression line---shown in blue---is more gentle. This reflects the observation that while tall fathers are still likely to have tall sons, the sons are not likely to be *as tall* as their fathers. Their height has been "regressed" towards the mean height. 
+
+```{r}
+Galton_men <- mosaicData::Galton %>%
+ filter(sex == "M")
+Galton_summary <- Galton_men %>%
+ summarize(N = n(),
+           mean_height = mean(height), sd_height = sd(height),
+           mean_father = mean(father), sd_father = sd(father))
+ggplot(data = Galton_men, aes(x = father, y = height)) +
+ geom_point() +
+# geom_rect(data = Galton_summary,
+#           aes(xmin = mean_height, xmax = 100, ymin = mean_father, ymax = 100))
+ geom_hline(data = Galton_summary, aes(yintercept = mean_height), lty = 3) +
+ geom_vline(data = Galton_summary, aes(xintercept = mean_father), lty = 3) +
+ geom_abline(slope = 1, intercept = 0, lty = 2) +
+ geom_smooth(method = "lm", se = FALSE)
+```
+
+It may be tempting to think that regression to the mean implies that men are getting shorter, but this is not true. Even in this sample, the mean height of the sons was the same---to the nearest tenth of an inch---to those of the fathers. 
+
+### Regression modeling
+
+This tutorial is about simple linear regression *modeling*. Typically, regression models combine some explanatory variables into an estimate for a single, numerical response variable. We are pursuing least squares regression models, but there are any number of alternative regression model specifications. Additionally, there are models like "regression trees" that also estimate a single, numerical response, but do not use a linear framework as we do in this tutorial. 
+
+"Regression": techniques for modeling a quantitative response can include a variety of models including:  
+- Least squares  
+- Weighted  
+- Generalized  
+- Nonparametric  
+- Ridge  
+- Bayesian  
+- ...  
+    
+The next exercises will allow you to explore Galton's data on your own. 
+
+### Regression to the mean
+
+*Regression to the mean* is a concept attributed to Sir Francis Galton. The basic idea is that extreme random observations will tend to be less extreme upon a second trial. This is simply due to chance alone. While "regression to the mean" and "linear regression" are not the same thing, we will examine them together in this exercise.
+
+One way to see the effects of regression to the mean is to compare the heights of parents to their children's heights. While it is true that tall mothers and fathers tend to have tall children, those children tend to be less tall than their parents, relative to average. That is, fathers who are 3 inches taller than the average father tend to have children who may be taller than average, but by less than 3 inches. 
+
+The `Galton_men` and `Galton_women` datasets contain data originally collected by Galton himself in the 1880s on the heights of men and women, respectively, along with their parents' heights.
+
+Compare the slope of the regression line to the slope of the diagonal line. What does this tell you?
+
+
+- Create a scatterplot of the height of men as a function of their father's height. Add the simple linear regression line and a diagonal line (with slope equal to 1 and intercept equal to 0) to the plot.
+- Create a scatterplot of the height of women as a function of their mother's height. Add the simple linear regression line and a diagonal line to the plot.
+
+```{r ex4-setup}
+Galton_men <- filter(Galton, sex == "M")
+Galton_women <- filter(Galton, sex == "F")
+```
+
+```{r ex4, exercise = TRUE}
+# Height of children vs. height of father
+ggplot(data = ___, aes(x = ___, y = ___)) +
+  geom_point() + 
+  geom_abline(slope = ___, intercept = ___) + 
+  geom_smooth(method = ___, se = FALSE)
+
+# Height of children vs. height of mother
+```
+
+```{r ex4-hint}
+"Use the scaffolding for the first scatterplot to generate your
+second scatterplot."
+```
+
+```{r ex4-solution}
+# Height of children vs. height of father
+ggplot(data = Galton_men, aes(x = father, y = height)) +
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = FALSE)
+
+# Height of children vs. height of mother
+ggplot(data = Galton_women, aes(x = mother, y = height)) +
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+
+### "Regression" in the parlance of our time
+
+In an opinion piece about nepotism [published in *The New York Times* in 2015](http://www.nytimes.com/2015/03/22/opinion/sunday/seth-stephens-davidowitz-just-how-nepotistic-are-we.html), economist Seth Stephens-Davidowitz wrote that:
+
+> "Regression to the mean is so powerful that once-in-a-generation talent basically never sires once-in-a-generation talent. It explains why Michael Jordan’s sons were middling college basketball players and Jakob Dylan wrote two good songs. It is why there are no American parent-child pairs among Hall of Fame players in any major professional sports league."
+
+
+
+```{r mc2}
+question("The author is arguing that...",
+  answer("Because of regression to the mean, an outstanding basketball player is likely to have sons that are as good at basketball as him.", message = "False, think about the previous example concerning the children of very tall parents."),
+  answer("Because of regression to the mean, an outstanding basketball player is likely to have sons that are not good at basketball.", message = "Not quite!  Think about the previous example concerning the children of very tall parents."),
+  answer("Because of regression to the mean, an outstanding basketball player is likely to have sons that are good at basketball, but not as good as him.", correct = TRUE, message ="That's right!  Basketball skill is likely similar to the previous example concerning the children of very tall parents."),
+  answer("Linear regression is incapable of evaluating musical or athletic talent.", message = "Incorrect!"),
+  allow_retry = TRUE
+)
+```
+
+-->
+
+## Congratulations!
+
+You have successfully completed Lesson 3 in Tutorial 3: Introduction to Linear Models.  
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 3: Introduction to Linear Models Data](https://openintrostat.github.io/ims-tutorials/03-introduction-to-linear-models/)
+
+`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-01/)
+
+`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-02/)
+
+`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-03/)
+
+`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-04/)
+
+`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-05/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
