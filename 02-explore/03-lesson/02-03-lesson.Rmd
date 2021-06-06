@@ -1,5 +1,5 @@
 ---
-title: "Summarizing and visualizing data: 3 - Numerical Summaries"
+title: "Exploratory data analysis: 3 - Numerical Summaries"
 output: 
   learnr::tutorial:
     progressive: true

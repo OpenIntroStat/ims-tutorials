@@ -1,5 +1,5 @@
 ---
-title: "Summarizing and visualizing data"
+title: "Exploratory data analysis"
 output: html_document
 ---
 

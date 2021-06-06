@@ -1,5 +1,5 @@
 ---
-title: "Summarizing and visualizing data: 4 - Case study"
+title: "Exploratory data analysis: 4 - Case study"
 output: 
   learnr::tutorial:
     progressive: true
