@@ -1,0 +1,692 @@
+---
+title: "Introduction to data: 1 - Language of data"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(openintro)
+library(emo)
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Setup for in some exercise chunks
+hsb2_public <- hsb2 %>%
+  filter(schtyp == "public")
+
+avg_read <- mean(hsb2$read)
+```
+
+## Welcome
+
+Hello, and welcome to **Getting Started with Data**!
+
+In this tutorial we will take you through concepts and R code that are essential for getting started with data analysis.
+
+Scientists seek to answer questions using rigorous methods and careful observations. These observations form the backbone of a statistical investigation and are called data. Statistics is the study of how best to collect, analyze, and draw conclusions from data. It is helpful to put statistics in the context of a general process of investigation:
+
+- **Step 1**: Identify a question or problem.
+
+- **Step 2**: Collect relevant data on the topic.
+
+- **Step 3**: Analyze the data.
+
+- **Step 4**: Form a conclusion.
+
+We will focus on **steps 1 and 2** of this process in this tutorial.
+
+Our learning goals for the tutorial are *to internalize the language of data, load and view a dataset in R and distinguish between various variable types, classify a study as observational or experimental, and determine the scope of inference, distinguish between various sampling strategies, and identify the principles of experimental design.*
+
+This tutorial does not assume any previous R experience, but if you would like an introduction to R first, we recommend the [RStudio Primers](https://rstudio.cloud/learn/primers) or the [R Bootcamp](https://r-bootcamp.netlify.com/).
+
+## Packages
+
+Packages are the fundamental units of reproducible R code. 
+They include reusable functions, the documentation that describes how to use them, and sample data.
+In this lesson we will make use of two packages:
+
+- **tidyverse**: Tidyverse is a collection of R packages for data science that adhere to a common philosophy of data and R programming syntax, and are designed to work together naturally. You can learn more about tidyverse [here](https://tidyverse.org/). But no need to go digging through the package documentation, we will walk you through what you need to know about these packages as they become relevant. 
+- **openintro**: The openintro package contains datasets used in openintro resources. You can find out more about the package [here](http://openintrostat.github.io/openintro).
+
+Once we have installed the packages, we use the `library()` function to load 
+packages into R. 
+
+Let's load these two packages to be used in the remainder of this lesson.
+
+```{r load-packages, exercise=TRUE}
+library(tidyverse)
+library(openintro)
+```
+
+## Data in R 
+
+In this lesson, we'll begin by introducing the terminology of datasets and data frames in R.
+
+One of the datasets that we will work with in this tutorial comes from the High School and Beyond Survey, which is a survey conducted on high school seniors by the National Center of Education Statistics.
+
+The data are organized in what we call a *data frame*, where each row represents an *observation* or a *case* and each column represents a *variable*. If you ever use spreadsheets, such as a Google sheet or Excel, this representation should be familiar to you.
+
+In this lesson we'll work with the High School and Beyond dataset, stored in the openintro package. The data are stored in a **data frame** called `hsb2`. You can read more about this dataset [here](http://openintrostat.github.io/openintro/reference/hsb2.html). Below is a 
+preview of the dataset. You can use the arrow on the right hand side to scroll 
+through the variables, and the numbers on the bottom to see different rows in 
+the dataset.
+
+```{r print-hsb2}
+hsb2
+```
+
+### Loading data into R
+
+There are many ways of loading data into R depending on where your data are stored. In this lesson we're using a dataset that is included in an R package so we can access this dataset by loading the package with the `library()` function. Other commonly used formats of data are plain text, comma separated values (CSV), Excel files (XLS or XLSX), or RData (the file format R uses to store data). 
+
+In many of the tutorials in these series we will use data from existing R packages, so you won't need to worry about the myriad ways of loading data into R. However, learning more about loading data into R is very important for when you're working on an analysis with your own data. A resource we recommend for learning more about importing data into R is the Data Import chapter in [R 4 Data Science](https://r4ds.had.co.nz/data-import.html) by Grolemund and Wickham. 
+
+### Take a peek
+
+When you want to work with data in R, a good first step is to take a peek at what
+the data look like. The `glimpse()` function is one good way of doing this. Click 
+on the blue "Run Code" button to run the code below, and take a look at the 
+output of the `glimpse()` function. 
+
+```{r glimpse-hsb2, exercise=TRUE}
+glimpse(hsb2)
+```
+
+The output of `glimpse()` tells us that the data frame includes 200 observations (rows) and 11 variables (columns). It also lists the variables and their types, along with values of the first few observations.
+
+Now let's put what you've learned so far to use!
+
+### 
+
+Next, we'll practice on another dataset, `email50`, which contains a subset of incoming emails for the first three months of 2012 for a single email account. We'll examine the structure of this dataset and determine the number of rows (observations) and columns (variables).
+
+Take a peek at the `email50` dataset using the `glimpse()` function. 
+
+*How many observations and variables are there?*
+
+```{r glimpse-email50, exercise=TRUE}
+
+```
+
+```{r glimpse-email50-solution}
+glimpse(email50)
+```
+
+## Types of variables
+
+When you first start working with a dataset, it's good practice to take a note of its dimensions; how many rows or observations and how many columns or variables the data frame has.
+
+You learned how to do this in the previous section using the `glimpse()` function. You also learned how to take a quick look at the list of variables in the dataset. In this section, we will delve deeper into the categorization of variables as **numerical and categorical**. This is an important step, as the type of variable helps us determine what summary statistics to calculate, what type of visualizations to make, and what statistical method will be appropriate to answer the research questions we're exploring.
+
+There are two types of variables: numerical and categorical.
+
+- **Numerical**, in other words, quantitative, variables take on numerical values. It is sensible to add, subtract, take averages, and so on, with these values.
+
+- **Categorical**, or qualitative, variables, take on a limited number of distinct categories. These categories can be identified with numbers, for example, it is customary to see likert variables (strongly agree to strongly disagree) coded as 1 through 5, but it wouldn't be sensible to do arithmetic operations with these values. They are merely placeholders for the levels of the categorical variable.
+
+### Numerical data
+
+Numerical variables can be further categorized as **continuous or discrete**.
+
+- **Continuous numerical** variables are usually measured, such as height. These variables can take on an infinite number of values within a given range.
+
+- **Discrete numerical** variables are those that take on one of a specific set of numeric values where we are able to count or enumerate all of the possibilities. One example of a discrete variable is number of pets in a household. In general, count data are an example of discrete variables.
+
+When determining whether a numerical variable is continuous or discrete, it is important to think about the nature of the variable and not just the observed value, as rounding of continuous variables can make them appear to be discrete. For example, height is a continuous variable, however we tend to report our height rounded to the nearest unit of measure, like inches or centimeters.
+
+### Categorical data
+
+Categorical variables that have ordered levels are called **ordinal**.
+
+Think about a survey question where you're asked how satisfied you are with the customer service you received and the options are very unsatisfied, unsatisfied, neutral, satisfied, and very satisfied. These levels have an inherent ordering, hence the variable would be called ordinal.
+
+If the levels of a categorical variable do not have an inherent ordering to them, then the variable is simply called categorical. For example, do you consume caffeine or not?
+
+### Variables in `hsb2`
+
+Let's take a moment to go through the variables in the High School and Beyond dataset:
+
+```{r glimpse-hsb2-again, echo=TRUE}
+glimpse(hsb2)
+```
+
+Using the `glimpse()` function, we can obtain a list of the variables in the dataset and also see what the values stored in these variables look like.
+
+The first variable is id, which is an identifier variable for the student. 
+
+```{r glimpse-hsb2-id}
+hsb2 %>% 
+  select(id) %>% 
+  glimpse()
+```
+
+Strictly speaking, this is a categorical variable, though the labeling of this variable is likely not that useful since we would not use this variable in an analysis of relationships between the variables in the dataset. You can think of this variable as being an anonymized version to 
+having the names of the students in the dataset.
+
+The next variable is gender, a categorical variable, with levels `"male"` and
+`"female"`. It should be noted that the language of government surveys, such as
+High School and Beyond, is slow to change. So with these types of data, you will
+continue to see variables mislabeled as "gender" when they in fact measure the
+biological sex (male, female) of the participant.  
+
+There is no inherent ordering to the levels of this variable, no matter what
+anyone tells you! So, this is just a categorical variable.The same is true for
+the race variable, which has levels of `"white"`, `"african american"`,
+`"hispanic"`, and `"asian"`.
+
+```{r glimpse-hsb2-race-gender}
+hsb2 %>% 
+  select(race, gender) %>% 
+  glimpse()
+```
+
+Socio-economic status, on the other hand, has three levels `"low"`, `"middle"`,
+and `"high"` that have an inherent ordering, hence this variable is an *ordinal*
+categorical variable.
+
+```{r glimpse-hsb2-ses}
+hsb2 %>% 
+  select(ses) %>% 
+  glimpse()
+```
+
+School type and program are also both categorical variables, with no inherent ordering to their levels.
+
+```{r glimpse-hsb2-schtyp-prog}
+hsb2 %>% 
+  select(schtyp, prog) %>% 
+  glimpse()
+```
+
+The remaining variables are scores that these students received in reading, writing, math, science, and social studies tests. Since these scores are all whole numbers, and assuming that it is not possible to obtain a non-whole number score on these tests, these variables are discrete numerical.
+
+Next we will practice identifying variables in a different dataset.
+
+###  
+
+Recall that the `glimpse()` function tells us the number of observations and variables in a dataset as well as the names and types of each column, along with a neatly printed preview of their first few values.
+
+Let's have another look at the `email50` data, so we can practice identifying variable types.
+
+Use the `glimpse()` function to view the variables in the `email50` dataset.
+
+Remember that variable descriptions are available in the help file for the dataset, which we can access by typing `?email50` (that is, type a question mark followed by the name of the
+dataset) in the code box and running it.
+
+*Review the output to identify each variable as either numerical or categorical, and further as discrete or continuous (if numerical) or ordinal or not ordinal (if categorical).*
+
+```{r glimpse-data, exercise=TRUE}
+
+```
+
+```{r glimpse-data-hint}
+glimpse(___)
+```
+
+```{r glimpse-data-solution}
+glimpse(email50)
+```
+
+## Categorical data in R: factors
+
+There are various data classes in R. In this tutorial, we'll focus on ones that are relevant to the concepts we will introduce. One of these classes is a factor, which is what R often stores categorical variables as. An important use of factors is in statistical modeling, since categorical variables enter into models differently than numerical variables. We'll learn more about what this difference is in a later tutorial, but for now just keep in mind that while factors might crop up in places where they're not actually helpful, there are also many places where they are essential to running a statistical analysis correctly.
+
+### Categorical Data
+
+- Often stored as factor in R
+  + Important use: statistical modeling
+  + Sometimes undesirable, sometimes essential
+- Common in subgroup analysis
+  + Only interested in a subset of the data
+  + Filter for specific levels (values) of categorical variable
+
+A common step in many analyses that involve categorical data is a subgroup analysis, where we work with only a subset of the data. For example, analyzing data only from students in public schools or only for students who identified as female. We can obtain these subsets by filtering for the specific levels we're interested in.
+
+Suppose we want to do an analysis of only the students in public schools in the High School and Beyond dataset. Let's first find out how many such students there are.
+
+One option for obtaining this information in R uses the `count()` function from the **dplyr** package, one of the packages included in the tidyverse. This package provides a variety of functions for wrangling and summarizing data. Once such function is `count()` which gives the frequencies of occurrence of the unique values in a given column. In this case we're interested in the number of students for each level of the `schtyp` (school type) column.
+
+```{r hsb2-count-schtyp, exercise=TRUE}
+hsb2 %>% 
+  count(schtyp)
+```
+
+There are 168 students in public schools and 32 in private schools.
+
+Let's pause for a moment and dissect what happened in these two lines of code.
+
+We can read the code as: "take the `hsb2` data frame and **pipe it** into the
+`count()` function, then `count()` the occurrences of unique values in the 
+`schtyp` variable."
+
+You might be wondering what we mean by _"pipe it into the `count()` function"_?
+
+### The pipe operator
+
+![](images/pipe-operator.png){width="30%"}
+
+The **pipe operator**, which **is percent greater than percent**, tells `R` to
+pass the object that comes before it into the first argument of the function
+that comes after it. Mathematically, **x pipe f(y)** becomes *f(x, y)*, since x
+is piped into the first argument of the function f().
+
+![](images/pipe-operator2.png){width="30%"}
+
+For example, one way of adding numbers in R is using the `sum()` function. The 
+`sum()` function has as many arguments as there are numbers you wish to add, 
+where each number is separated with a comma. For example, to add 3 and 4, we 
+would use the following code. Notice, 3 and 4 are separated by a comma, 
+indicating that these are the two numbers we wish for the `sum()` function to 
+add. 
+
+```{r sumdata1, echo=TRUE}
+# Sum of 3 and 4, without pipe
+sum(3, 4)
+```
+
+If we wanted to do the same operation with a pipe, we would instead use the
+code below. The pipe operator inserts 3 as the first argument into the `sum()`
+function, which looks like `sum(3, 4)`. 
+
+```{r sumdata2, echo=TRUE}
+# Sum of 3 and 4, with pipe
+3 %>% sum(4)
+```
+
+Piping 3 into the `sum()` function may seem a bit silly, especially since it's 
+not much easier than typing `sum(3,4)`. However, as we progress through these 
+tutorials you will see that the piping operator will allow us to sequentially
+link together data wrangling operations. This can save us a great deal of 
+headache later on, as the format of operations that use the pipe are far simpler 
+to read! We'll start with short pipes and throughout the tutorial build up to
+longer pipes that perform multiple operations.
+
+Next, let's use the `filter()` function to filter the data to only include
+public school students. 
+
+```{r hsb2-filter-schtyp-public, exercise=TRUE}
+hsb2_public <- hsb2 %>%
+  filter(schtyp == "public")
+```
+
+We can read the above code as: "take the `hsb2` data frame and **pipe it** into
+the `filter()` function. Next, `filter()` the data **for cases where school type
+is equal to public**. Then, **assign the resulting data frame** to a new data 
+frame called **hsb2 underscore public**."
+
+We should take note of two pieces of R syntax: *the double equal sign* (`==`) 
+and quotations (""). In R, `==` is a logical test for *"is equal to"*. `R` uses
+this logical test to search for observations (rows) in the data frame where
+school type is equal to public, and returns a data frame frame where this
+comparison is `TRUE` for every row. 
+
+In R, variables that are categorical use characters (rather than numbers) for
+values. To indicate to R that you want 
+your logical test to compare the values of a categorical variable to a specific
+level of that variable, you need to surround the name of the level in quotations
+(e.g. `schtyp == "public"`). The quotations tell R that the value of the variable 
+is a character, not a number. If you forget to use quotations, R will give you 
+an error message!
+
+Now, if we make another frequency table of school type in the filtered dataset,
+we should only see public school in the output.
+
+```{r hsb2-count-schtyp-again, exercise=TRUE}
+hsb2_public %>%
+  count(schtyp)
+```
+
+Now we will practice filtering and handling factors with a different categorical variable.
+
+### Filtering based on a factor
+
+Categorical data are often stored as factors in R. Next, we'll practice working with a factor variable, `number`, from the `email50` dataset. This variable tells us what type of number (none, small, or big) an email contains.
+
+Modify the code below to: 
+
+- Create a new dataset called `email50_big` that is a subset of the original `email50` dataset containing only emails with `"big"` numbers. This information is stored in the `number` variable.
+- Report the dimensions of `email50_big` using the `glimpse()` function again. *How many emails contain big numbers?*
+
+```{r email50-filter-number-big, exercise=TRUE}
+# Subset of emails with big numbers: email50_big
+email50_big <- ___ %>%
+  filter(___)
+
+# Glimpse the subset 
+
+```
+
+<div id="email50-filter-number-big-hint">
+**Hint:** We're looking for emails with big numbers, so filter for `number == "big"`.
+</div>
+
+```{r email50-filter-number-big-solution}
+# Subset of emails with big numbers: email50_big
+email50_big <- email50 %>%
+  filter(number == "big")
+
+# Glimpse the subset
+glimpse(email50_big)
+```
+
+## Discretize variables
+
+A common way of creating a new variable from an existing variable is discretizing, that is converting a numerical variable to a categorical variable based on certain criteria.
+
+For example, suppose we are not interested in the actual reading score of students, but instead whether their reading score is below average or at or above average. First, we need to calculate the average reading score with the `mean()` function. This will give us the mean value, 52.23. 
+
+```{r hsb2-mean-read, exercise=TRUE}
+# Calculate average reading score and show the value
+mean(hsb2$read)
+```
+However, in order to be able to refer back to this value later on, we might want to store it as an object that we can refer to by name. So instead of just printing the result, let's save it as a new object called **avg underscore read**.
+
+```{r hsb2-mean-read-assign, exercise=TRUE}
+# Calculate average reading score and store as avg_read
+avg_read <- mean(hsb2$read)
+```
+
+Before we move on, a quick tip: most often we want to do both; see the value and also store it for later use. The approach we used here, running the `mean()` function twice, is redundant. A less redundant 
+way to accomplish this task is to wrap your assignment code in parentheses so that R will both assign the average value of reading test scores to `avg_read`, and print out the value assigned to 
+`avg_read`. 
+
+```{r hsb2-mean-read-assign-show, exercise=TRUE}
+(avg_read <- mean(hsb2$read))
+```
+
+Next, in order to create the two groups of interest, we need to determine whether each student is either (1) below or (2) at or above average. For example, a reading score of 57 is above average, so is 68, but 44 is below. Obviously, going through each record like this would be tedious and error prone, so 
+let's explore another option! 
+
+### New variable: `read_cat`
+
+![](images/new-variable-read-cat.png){width="50%"}
+
+Instead we can create a new variable, named `read_cat`, with the `mutate()`
+function and the helpful `if_else()` function. 
+
+```{r hsb2-mutate-read-cat, exercise=TRUE}
+hsb2 <- hsb2 %>%
+  mutate(read_cat = if_else(read < avg_read,
+                            "below average",
+                            "at or above average")
+         )
+```
+
+First, we start with the data frame, `hsb2`, and pipe it into the `mutate()` 
+function. We use the `mutate()` function to create a new variable called
+`read_cat`. Note that we are using a new variable name here, so that we do not 
+overwrite the existing reading score variable, called `read`. 
+
+The values of this new variable are simple: if the reading score of the student is below the average reading score, the variable will have the label "below average", otherwise, the label will be "at or above average".
+
+This discretization can be accomplished using the `if_else()` function in R:
+
+- The first argument of the function is the logical test we wish to perform: `read < avg_read`.
+- The second argument is what we want the function to do if the result of the logical test is `TRUE`, in other words, if the student's score is below the average score: `"below average"`.
+- The third argument is what we want the function to do if the result of the logical test is `FALSE`, in other words, if the student's score is above the average score: `"at or above average"`.
+
+Next, it's your turn to discretize a different variable.
+
+###  
+
+Next, we'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
+
+The median marks the 50th percentile, or midpoint, of a distribution, so half of the emails should fall in one category and the other half in the other. We will learn more about the median and other measures of center in the next tutorial in this series.
+
+The `email50` dataset is available in your workspace. Modify the code below to:
+
+- Find the median number of characters in emails, save the result to a variable named `med_num_char`.
+- Using `mutate()`, create a new column called `num_char_cat`, which discretizes the `num_char` variable into `"below median"` or `"at or above median"`.
+- Assign the resulting data frame to a new data frame named `email50_updated`.
+- Then, using `count()`, determine the number of emails in each level of `num_char_cat`. Evaluate whether these counts match the expected numbers.
+
+```{r hsb2-mutate-num-char-cat, exercise=TRUE}
+# Calculate median number of characters: med_num_char
+med_num_char <- median(___)
+
+# Create num_char_cat variable in email50
+email50_updated <- email50 %>%
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "[VALUE IF TRUE]",
+                                "[VALUE IF FALSE]")
+         )
+  
+# Count emails in each category
+email50_updated %>%
+  count(___)
+```
+
+<div id="hsb2-mutate-num-char-cat-hint">
+**Hint:** In the `if_else()` function, the second argument is the value `num_char_cat` should take if the condition `num_char < med_num_char` is `TRUE`, and the third is if it's `FALSE`.
+</div>
+
+```{r hsb2-mutate-num-char-cat-solution}
+# Calculate median number of characters: med_num_char
+med_num_char <- median(email50$num_char)
+
+# Create num_char_cat variable in email50
+email50_updated <- email50 %>%
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "below median",
+                                "at or above median")
+         )
+  
+# Count emails in each category
+email50_updated %>%
+  count(num_char_cat)
+```
+
+
+### Combining levels of a different factor
+
+Another common way of creating a new variable based on an existing one is by *combining levels of a categorical variable*. For example, the `email50` dataset has a categorical variable called `number` with levels `"none"`, `"small"`, and `"big"`, but suppose we're only interested in whether an email contains a number. Next, we will create a variable containing this information and also visualize it.
+
+For now, do your best to understand the code we've provided to generate the plot. We will go through it in detail in the next section.
+
+In the `email50` dataset, the `number` variable has three levels, `"none"`, 
+`"some"`, and `"big"`. We want to create a new variable (`number_cat`) that
+combines the levels `"some"` and `"big"` into one level named `"yes"`, and 
+keeps the `"none"` level separate as a level named `"no"`. This should sound
+similar to how we used the `if_else()` function previously, where the logical
+condition we want to check is whether the level of `number` is equal to
+(`==`) `"none"`.  
+
+Use what you know about the `mutate` and `if_else()` functions to: 
+
+- Create a new column in `email50` called `number_cat` which discretizes the
+`number` variable into `"no"` and `"yes"`. 
+- Assign the resulting data frame to a new data frame named `email50_updated`.
+- Run the code provided to visualize the distribution of the `number_cat` variable.
+
+```{r email50-fortified, exercise=TRUE}
+# Create number_cat column in email50
+email50_updated <- email50 %>%
+  mutate(___ = if_else(___, 
+                          "[VALUE IF TRUE]", 
+                          "[VALUE IF FALSE]")
+            )
+
+
+ 
+# Visualize the distribution of number_cat
+ggplot(email50_updated, aes(x = number_cat)) +
+  geom_bar()
+```
+
+```{r email50-fortified-hint-1}
+number_cat = if_else(number == "none", 
+                     "[VALUE IF TRUE]", 
+                     "[VALUE IF FALSE]") 
+```
+
+```{r email50-fortified-hint-2}
+number_cat = if_else(number == "none", 
+                     "no", 
+                     "[VALUE IF FALSE]") 
+```
+
+```{r email50-fortified-hint-3}
+number_cat = if_else(number == "none", 
+                     "no", 
+                     "yes") 
+
+```
+
+```{r email50-fortified-solution}
+# Create number_cat column in email50
+email50_updated <- email50 %>%
+  mutate(number_cat = if_else(number == "none",
+                              "no", # if number is "none", make number_cat "no"
+                              "yes" # if number is not "none", make number_cat "yes"
+                              )
+         )
+   
+ 
+# Visualize the distribution of number_cat
+ggplot(email50_updated, aes(x = number_cat)) +
+  geom_bar()
+```
+
+## Visualizing numerical data
+
+The most logical and most useful first step of any data analysis is an exploratory analysis. And a very important and informative component of exploratory data analysis is visualization.
+
+We will learn a lot more about data visualization in the tutorial on Summarizing and Visualizing Data, so we won't go into too much detail on data visualization in this tutorial. Let's, however, make a simple scatterplot to visualize the relationship between two numerical variables so that you can get some exposure to constructing plots in R and how to interpret them.
+
+There are many methods for visualizing data in R, but in this tutorial we will focus on using the ggplot2 package, which is part of the tidyverse.
+
+We chose ggplot2 because this package makes *modern looking hassle-free plots* that take care of fiddly details like drawing legends.
+
+Additionally, once you learn how to make simple bivariate plots, with ggplot2 it is easy to extend your code to create a visualization that displays the relationship between many variables at once without having to learn too much more syntax.
+
+Another attractive feature of ggplot2 is that you can build your plots in layers, e.g. you can start with a layer showing the raw data and then add layers of annotations and statistical summaries. This is an attractive feature for learning the syntax, as we can go step-by-step, starting with a simple plot and slowly building up to more complex ones.
+
+We'll visualize the relationship between the math and science scores of the students in the High School and Beyond dataset.
+
+```{r hsb2-science-math, exercise=TRUE}
+ggplot(data = hsb2, aes(x = science, y = math)) + 
+  geom_point()
+```
+
+Let's pause for a moment and review what's going on in the code above.
+
+- We use the `ggplot()` function to create plots.
+- The first argument is the data frame containing the data we wish to plot: `data = hsb2`.
+- In the `aes`thetics argument, we map variables from the data frame to certain components of the plot. In this case we want to plot science test scores on the x and math test scores on the y axis: `aes(x = science, y = math)`.
+- Lastly, we specify what `geom`etric shapes should be used to represent each observation. In this case, we want to make a scatterplot, so we want each observation to be represented by a "point" on the plot, hence we add use the `geom_point()` function to add a points layer to the plot.
+
+In summary, the main function is `ggplot()`, the first argument is the data to use, then the aes maps the variables to certain features of the plot, and finally the geom informs the type of plot you want to make.
+
+Another important aspect to note here is that the `geom_XXX()` function is separated from the `ggplot()` function with a plus, `+`. As we mentioned earlier, ggplot2 plots are constructed in series of layers. The plus sign separates these layers. Generally, the `+` sign can be thought of as the end of 
+a line, so you should always hit enter/return after it. While it is not mandatory to move to the next line for each layer, doing so makes the code a lot easier to organize and read. So, we will follow this structure in this tutorial and we strongly recommend you do so whenever you're making plots with ggplot2.
+
+Now that you've learned how to make the plot, let's talk about what the plot says.
+
+### Interpreting a visualization
+
+We can see that there is a positive relationship between the science and math scores of students, meaning that students who score highly in science tend to also score highly in math. Probably not that surprising a result.
+
+```{r hsb2-science-math-lm}
+ggplot(data = hsb2, aes(x = science, y = math)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+We also mentioned earlier that extending from bivariate to multivariate plots is easy in ggplot2. Let's test that out!
+
+### Math, science, and program
+
+Let's plot the same math and science test scores, but this time let's also consider the program that the student is in: general, academic, or vocational. 
+
+```{r hsb2-science-math-prog, exercise=TRUE}
+ggplot(data = hsb2, aes(x = science, y = math, color = prog)) +
+  geom_point()
+```
+
+The code looks very similar to what we used before, except that we now have one other aesthetic mapping between the program variable and the `color` of the points that represent the observations. Note that we type the name of the variable as it appears in the data frame: `prog`.
+
+How does the plot below differ from the plot above? Look at the plot above and 
+think about where the lines would go if we fit a separate line for each level
+of the program variable (each color of points). The result would be a plot that
+looks like the one below. 
+
+```{r hsb2-science-mat-prog-lm}
+ggplot(data = hsb2, aes(x = science, y = math, color = prog)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+The same positive relationship between math and science scores is still apparent. But we can also see that students in academic programs, shown with green points, tend to score higher than those in vocational programs, in blue, and general programs, in red.
+
+We will wrap up this lesson with some practice creating a similar plot with different variables.
+
+### Visualizing numerical and categorical data
+
+Next we'll visualize the relationship between two numerical variables from the `email50` dataset, separated by whether or not the email was spam. This means that we will use an aspect of the plot (like color or shape) to identify the levels in the `spam` variable so that we can compare plotted values between them.
+
+Recall that in the `ggplot()` function, the first argument is the dataset, then we map the aesthetic features of the plot to variables in the dataset, and finally the `geom_XXX()` layer informs how data are represented on the plot.
+
+Next, we will make a scatterplot by adding a `geom_point()` layer to the `ggplot()` call.
+
+- Create a scatterplot of number of exclamation points (`exclaim_mess`) on the y-axis vs. number of characters (`num_char`) on the x-axis.
+- Color points by whether or not the email is `spam`.
+
+Note that when you first make the plot, you will see a color gradient in place 
+of where you expected to see a legend like before. This gradient appears because
+`spam` is stored as a numerical variable (0 = no, 1 = yes). But, we want to use
+it as a categorical variable in this plot. To do this we can force R to think of
+`spam` as a factor, by temporarily converting it to a factor inside the `ggplot`. 
+To do this we insert the name of the variable we want to convert to a factor 
+(`spam`) into the the `factor()` function (e.g. `factor(spam)`). 
+
+```{r email50-plot, exercise=TRUE}
+ggplot(email50, aes(x = ___, y = ___, color = ___)) +
+  [GEOM]
+```
+
+```{r email50-plot-hint-1}
+ggplot(email50, aes(x = num_char, y = ___, color = ___)) +
+  [GEOM]
+```
+
+```{r email50-plot-hint-2}
+ggplot(email50, aes(x = num_char, y = exclaim_mess, color = ___)) +
+  [GEOM]
+```
+
+```{r email50-plot-hint-3}
+ggplot(email50, aes(x = num_char, y = exclaim_mess, color = factor(spam))) +
+  {GEOM}
+```
+
+```{r email50-plot-solution}
+ggplot(email50, aes(x = num_char, y = exclaim_mess, color = factor(spam))) +
+  geom_point()
+```
+
+*Based on the plot, does there appear to be a relationship between these variables?* 
+
+## Congratulations!
+
+You have successfully completed Lesson 1 in Tutorial 1: Getting Started with Data.
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 1: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/01-getting-started-with-data/)
+
+`r emo::ji("one")` [Tutorial 1 - Lesson 1: Language of data](https://openintro.shinyapps.io/ims-01-getting-started-with-data-01/)
+
+`r emo::ji("two")` [Tutorial 1 - Lesson 2: Types of studies](https://openintro.shinyapps.io/ims-01-getting-started-with-data-02/)
+
+`r emo::ji("three")` [Tutorial 1 - Lesson 3: Sampling strategies and Experimental design](https://openintro.shinyapps.io/ims-01-getting-started-with-data-03/)
+
+`r emo::ji("four")` [Tutorial 1 - Lesson 4: Case study](https://openintro.shinyapps.io/ims-01-getting-started-with-data-04/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)

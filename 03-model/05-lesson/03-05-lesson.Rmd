@@ -1,0 +1,757 @@
+---
+title: "Regression modeling: 5 - Model fit"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+# load packages ----------------------------------------------------------------
+
+library(learnr)
+library(broom)
+library(tidyverse)
+library(openintro)
+library(Lahman)
+library(emo)
+
+# knitr options ----------------------------------------------------------------
+
+knitr::opts_chunk$set(fig.align = "center",
+                      fig.height = 3,
+                      fig.width = 5,
+                      echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+
+# data prep --------------------------------------------------------------------
+
+# Model: predict weight from height
+wgt_hgt_mod <- lm(wgt ~ hgt, data = bdims)
+
+# Model: predict SLG from OBP
+mod_slg_obp <- lm(slg ~ obp, data = filter(mlbbat10, at_bat >= 10))
+
+```
+
+## Assessing model fit
+
+### How well does our textbook model fit?
+
+Now that we understand what linear regression models *are* and how they *work*, a natural next question is to consider *how well* they work. In an intuitive sense, it seems clear that the regression line for the textbooks fits really well.
+
+```{r textbooks, echo = TRUE}
+ggplot(data = textbooks, aes(x = amaz_new, y = ucla_new)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### How well does our possum model fit?
+
+At the same time, the regression line for the possums fits less well, but it still seems useful.
+
+```{r possum, echo = TRUE}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Can we quantify our intuition about the quality of the model fit?
+
+### Sums of squared deviations
+
+In fact we can. Recall that we initially considered any number of lines. We settled on the unique regression line by applying the least squares criterion. That is, we found the line that minimizes the sum of the squared residuals. For each observation--which is represented on the scatterplot by a point--the residual is simply the vertical distance between that point and the line.
+
+```{r possum_augment_total_tail}
+total_tail_mod <- lm(total_l ~ tail_l, data = possum)
+
+total_tail_mod %>%
+  augment() %>%
+  ggplot(aes(x = tail_l, y = total_l)) +
+  geom_smooth(method = "lm", se = 0) +
+  geom_segment(aes(xend = tail_l, yend = .fitted),
+               arrow = arrow(length = unit(0.15, "cm")),
+               color = "darkgray") +
+  geom_point()
+```
+
+Here, we have highlighted the possum residuals with gray arrows. If we could find a line that made those gray arrows shorter --collectively, and after squaring them--that would be our regression line; but there is no such line: this one is the best.
+
+Note that we can't just minimize the sum of the residuals. That number is always zero, since the positive and negative residuals cancel each other out when added together.
+
+The sum of the squares works well mathematically, but it also has the effect of penalizing large residuals disproportionately. This is generally considered a useful property for statistical modeling, since you would usually prefer a model that misses often by a little bit, but never by a lot; to a model that works well most of the time but occasionally is way off. Once again, there are situations when other criteria are used for fitting models, but we won't talk about them in this tutorial.
+
+## Measures of model fit
+
+One way to assess strength of fit is to consider how far off the model is for a typical case. That is, for some observations, the fitted value will be very close to the actual value, while for others it will not. The magnitude of a typical residual can give us a sense of generally how close our estimates are.
+
+### SSE
+
+Recall that some of the residuals are positive, while others are negative. In fact, it is guaranteed by the least squares fitting procedure that the mean of the residuals is zero. Thus, it makes more sense to compute the square of the residuals.
+
+After using the `augment()` function to tidy up our model, the sum of the squared residuals is easily computed using `summarize()`. By convention, we often call this quantity **SSE**, for *s*um of *s*quared *e*rrors. It can also be computed as the variance of the residuals times one fewer than the number of observations.
+
+Keep in mind the column of the `augment()`-ed model we are interested in is named `.resid`. The period before it is part of its name and must be included!
+
+```{r total_tail_mod-summary-1, echo = TRUE}
+total_tail_mod %>%
+  augment() %>%
+  summarize(SSE = sum(.resid^2),
+            SSE_also = (n() - 1) * var(.resid))
+```
+
+### RMSE
+
+The SSE is a single number that captures how much our model missed by. Unfortunately, it is hard to interpret, since the units have been squared. Thus, another common way of thinking about the accuracy of a model is the **root mean squared error** or **RMSE**.
+
+The RMSE is essentially the standard deviation of the residuals. You might expect us to divide by $n$ here, but we instead divide by the number of *degrees of freedom*, which in this case is $n-2$. The concept of degrees of freedom comes up in many contexts in statistics, but a fuller discussion is beyond the scope of this tutorial.
+
+$$
+    RMSE = \sqrt{ \frac{\sum_i{e_i^2}}{d.f.} } = \sqrt{ \frac{SSE}{n-2} }
+$$
+
+The RMSE also generalizes to any kind model for a single numerical response, so it is not specific to regression models.
+
+### Residual standard error (possums)
+
+When R displays the `summary()` of a regression model, it displays the "residual standard error". This is the RMSE. Conveniently, the RMSE is in the units of the response, so this says that our model makes a predicted body length that is typically within about 3.57 centimeters of the truth. That seems useful, since the possums in our data set are between 75 and 96 centimeters.
+
+```{r total_tail_mod-summary-2, echo = TRUE}
+summary(total_tail_mod)
+```
+
+### Residual standard error (textbooks)
+
+For the textbooks, the residual standard error is $10.47. Somehow this doesn't seem as useful--and yet it seemed from the scatterplot that the fit of the textbook model was much better than the fit of the possum model. Reconciling these two notions will be up next.
+
+```{r textbooks-summary, echo = TRUE}
+books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
+
+summary(books_mod)
+```
+
+You'll work with residuals on your own in the next exercises.
+
+### RMSE
+
+The residual standard error reported for the regression model for poverty rate of U.S. counties in terms of high school graduation rate is 4.67.
+
+```{r mc1}
+question("What does this mean?",
+  answer("The typical difference between the observed poverty rate and the poverty rate predicted by the model is about 4.67 percentage points.", correct = TRUE, message = "Right! The RMSE is a measure of the differences between predicted values by a model or an estimator and the observed values."),
+  answer("The typical difference between the observed poverty rate and the poverty rate predicted by the model is about 4.67%. "),
+  answer("The model explains about 4.67% of the variability in poverty rate among counties."),
+  answer("The model correctly predicted the poverty rate of 4.67% of the counties."),
+  allow_retry = TRUE
+)
+```
+
+## Your turn!
+
+You can recover the residuals from `wgt_hgt_mod` with `residuals()`, and the degrees of freedom with `df.residual()`. Use these components to compute the RMSE of the `wgt_hgt_mod`.
+
+1. View a `summary()` of `wgt_hgt_mod`.
+2. Compute the mean of the `residuals()` and verify that it is approximately zero.
+3. Use `residuals()` and `df.residual()` to compute the root mean squared error (RMSE), a.k.a. *residual standard error*.
+
+```{r ex2, exercise = TRUE}
+# View summary of model
+
+
+# Compute the mean of the residuals
+___(residuals(wgt_hgt_mod))
+
+# Compute RMSE
+ sqrt(sum(___(___)^2) / df.residual(___))
+```
+
+<div id="ex2-hint">
+**Hint:** RMSE is calculated as the sum of squared residuals divided by the degrees of freedom of the model: `sqrt(sum(residuals(wgt_hgt_mod)^2) / df.residual(wgt_hgt_mod))`
+</div>
+
+```{r ex2-solution}
+# View summary of model
+summary(wgt_hgt_mod)
+
+# Compute the mean of the residuals
+mean(residuals(wgt_hgt_mod))
+
+# Compute RMSE
+sqrt(sum(residuals(wgt_hgt_mod)^2) / df.residual(wgt_hgt_mod))
+```
+
+## Comparing model fits
+
+### How well does our textbook model fit?
+
+Previously, you learned about how we could use the sum of the squared residuals to quantify how well our model fit the data. However, we noted that although the textbook model seemed to fit the data really well, the residual standard error was more than $10.
+
+```{r textbooks-plot}
+ggplot(data = textbooks, aes(x = amaz_new, y = ucla_new)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### How well does our possum model fit?
+
+On the other hand, the residual standard error for the possum model was about 3.5 cm, which seems like a high degree of accuracy, for a model that does not seem to be as tight of a fit.
+
+```{r possum-plot}
+ggplot(data = possum, aes(y = total_l, x = tail_l)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### Null (average) model
+
+It's hard to compare $10 to 3.5 centimeters. Which is "bigger"? What would be nice is if we had a way to compare the quality of a model's fit that was unitless. To do so, it is helpful to think about a benchmark.
+
+If you had to predict the body length of a possum, and you didn't have any information about that particular possum, what would your prediction be? Let's pause for a second and think.
+
+A sensible choice would be the average length of all possum. And in fact, if you have to make the same prediction for every possum, the average is the *best* number you can pick. We can think about this as a model where $\hat{y}$ (the predicted value of $y$) is equal to $\bar{y}$ (the average value of $y$).
+
+### Visualization of null model
+
+This model is often called the **null model**. This model makes sense to use as a benchmark, since it doesn't require any insight to make, and yet there is no reasonable model that could be any worse. It looks like this:
+
+```{r possum-null}
+null_mod <- lm(total_l ~ 1, data = possum)
+
+null_mod %>%
+  augment() %>%
+  mutate(tail_l = possum$tail_l) %>%
+  ggplot(aes(x = tail_l, y = total_l)) +
+  geom_smooth(method = "lm", se = 0, formula = y ~ 1) +
+  geom_segment(aes(xend = tail_l, yend = .fitted),
+               arrow = arrow(length = unit(0.15, "cm")),
+               color = "darkgray") +
+  geom_point()
+```
+
+### SSE of the null model
+
+We can fit the null model in R using `lm()`, but including only the constant 1 as our explanatory variable. This results in an SSE value of 1913.826.
+
+```{r possum-null-summary}
+possum_null <- lm(total_l ~ 1, data = possum)
+```
+
+```{r, echo = TRUE}
+null_mod %>%
+  augment(possum) %>%
+  summarize(SST = sum(.resid^2))
+```
+
+### SSE, our model
+
+Compare this number to the SSE for our possum model that uses tail length as an explanatory variable. The SSE in this case is 1301.488.
+
+```{r possum-total-summary, echo = TRUE}
+total_tail_mod %>%
+  augment() %>%
+  summarize(SSE = sum(.resid^2))
+```
+
+### Coefficient of determination
+
+The ratio of the SSE for our model to the SSE for the null model is a quantification of the variability explained by our model. More specifically, the SSE for the null model is often called SST, for the *total* sum of the squares. This is a measure of the variability in the response variable.
+
+By building a regression model, we hope to explain some of that variability. The portion of the SST that is *not* explained by our model is the SSE. These ideas are captured by this formula for the "coefficient of determination," usually referred to as $R^2$.
+
+$$
+    R^2 = 1 - \frac{SSE}{SST} = 1 - \frac{Var(e)}{Var(y)} \,,
+$$
+
+Due to this definition, we interpret $R^2$ as the proportion of the variability in the response variable that is explained by our model. It is the most commonly cited measure of the quality of the fit of a regression model.
+
+
+### Connection to correlation
+
+We have already seen a connection between the value of the correlation between $X$ and $Y$ and the slope of the regression line. In fact, the value of the correlation coefficient is also closely related to the value of $R^2$. For least squares regression models with a single explanatory variable, the value of $R^2$ is just the square of the correlation coefficient ($r_{x, y}^2$).
+
+Why then, do we need both concepts? Correlation is strictly a bivariate quantity, it can only be between a single response and a single explanatory variable. However, regression is a much more flexible modeling framework. Each regression model has its own value of $R^2$, but in future lessons you will learn how such models can incorporate many explanatory variables, unlike correlation.
+
+The $R^2$ gives us a numerical measurement of the strength of fit of our linear regression relative to a null model based on the average of the response variable ($\hat{y}_{null} = \bar{y}$).
+
+The null model has an $R^2$ of zero because $SSE = SST$. That is, since the fitted values ($\hat{y}_{null}$) are all equal to the average ($\bar{y}$), the residual for each observation is the distance between that observation and the mean of the response. Since we can always fit the null model, it serves as a baseline against which all other models will be compared.
+
+### Summary
+
+The easiest way to see the $R^2$ value is to apply the `summary()` function to your model object. In this case, we see that our model based on tail length explains about 32\% of the variability in body length for these possums.
+
+```{r possum-total-summary-2, echo = TRUE}
+summary(total_tail_mod)
+```
+
+### What about the textbooks?
+
+For the textbooks, the $R^2$ value is much higher -- here we can explain 97% of the variability in UCLA price using price on Amazon. Indeed, the $R^2$ comparison helps to confirm our graphical intuition that the textbook model is a better fit to the textbook data than the possum model is the possum data.
+
+```{r textbook-summary, echo = TRUE}
+books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
+
+summary(books_mod)
+```
+
+### Over-reliance on $R^2$
+
+While $R^2$ is certainly a useful and ubiquitous measure of model fit, it is not the be-all-and-end-all of statistical modeling. A high $R^2$ alone doesn't mean that you have a "good" model, and low $R^2$ doesn't mean that you have a lousy model. A model with a high $R^2$ may be overfit, or it may violate the conditions for inference that we will discuss in a later lesson. A model with a low $R^2$ can still provide substantial insight into a complex problem.
+
+We'll close by invoking the words of famed statistician George Box:
+
+> "Essentially, all models are wrong, but some are useful".
+
+
+Now it's time for you to assess model fit on your own.
+
+## Your turn!
+
+Recall that the coefficient of determination ($R^2$), can be computed as
+$$
+    R^2 = 1 - \frac{SSE}{SST} = 1 - \frac{Var(e)}{Var(y)} \,,
+$$
+where $e$ is the vector of residuals and $y$ is the response variable. This gives us the interpretation of $R^2$ as the percentage of the variability in the response that is explained by the model, since the residuals are the part of that variability that remains unexplained by the model.
+
+The `wgt_hgt_augment` dataframe is the result of `augment()`-ing the `wgt_hgt_mod` linear regression model. In this exercise you will use this augmented dataframe to calculate the $R^2$ of the model.
+
+1. Use the `summary()` function to assess what the $R^2$ value of `wgt_hgt_mod` is.
+2. Use the `bdims_augment_wgt_hgt` dataframe to compute the $R^2$ of `wgt_hgt_mod` manually using the formula above.
+*Hint*: `wgt` is the response variable in this linear regression!
+
+```{r ex3-setup}
+wgt_hgt_augment <- augment(wgt_hgt_mod)
+```
+
+```{r ex3, exercise = TRUE}
+# View model summary
+
+
+# Compute R-squared
+bdims_augment_wgt_hgt %>%
+  summarize(var_y = ___,
+            var_e = ___) %>%
+  mutate(R_squared = ___)
+```
+
+```{r ex3-hint}
+bdims_augment_wgt_hgt %>%
+  summarize(var_y = var(wgt),
+            var_e = var(.resid)) %>%
+  mutate(R_squared = ___)
+```
+
+```{r ex3-solution}
+# View model summary
+summary(wgt_hgt_mod)
+
+# Compute R-squared
+bdims_augment_wgt_hgt %>%
+  summarize(var_y = var(wgt),
+            var_e = var(.resid)) %>%
+  mutate(R_squared = 1 - var_e / var_y)
+```
+
+###
+
+### Interpretation of $R^2$
+
+The $R^2$ reported for the regression model for poverty rate of U.S. counties in terms of high school graduation rate is 0.464.
+
+```{r ir, echo = TRUE}
+lm(formula = poverty_2010 ~ hs_grad_2010, data = county_complete) %>%
+  summary()
+```
+
+```{r mc2}
+question("How should this value be interpreted?",
+  answer("46.4% of the variability in high school graduate rate among U.S. counties can be explained by poverty rate.", message = "Wrong!"),
+  answer("46.4% of the variability in poverty rate among U.S. counties can be explained by high school graduation rate.", correct = TRUE, message = "Right! The $R^2$ represents the percentage of the variability of the response variable that can be explained by the explanatory variable."),
+  answer("This model is 46.4% effective.", message = "Incorrect"),
+  answer("The correlation between poverty rate and high school graduation rate is 0.464.", message = "Try again!"),
+  allow_retry = TRUE
+)
+```
+
+## Unusual points
+
+In our previous discussion of outliers, we learned how to identify points that seem to be unusual. Now, we will refine that understanding by introducing two related but distinct concepts: leverage and influence.
+
+Recall the data we examined previously about Major League Baseball players during the 2010 season. We considered the relationship between the number of home runs hit by each player, and the corresponding number of bases that each player stole. The first statistic is a measurement of power, while the latter is a measurement of speed. As these skills are considered complementary, it should not be surprising that a simple linear regression model has a negative slope. In this case, we have fit the model to only those players with at least 400 at-bats, in a simple attempt to control for the confounding influence of playing time.
+
+```{r up2, echo = TRUE}
+regulars <- mlbbat10 %>%
+  filter(at_bat > 400)
+
+ggplot(data = regulars, aes(x = stolen_base, y = home_run)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = 0)
+```
+
+We noted previously that there were two potential outliers here: the point corresponding to the slugger Jose Bautista in the upper left, and the point belonging to speedster Juan Pierre in the lower right.
+
+Now that we have a regression model, we want to think about how individual observations might affect the slope of the line. Typically, the purpose of interpreting the slope coefficient is to learn about the overall relationship between the two variables, so it doesn't necessarily make sense if one or two individual observations have a disproportionate effect on that slope. Unfortunately, such points of high *leverage* are quite common.
+
+### Leverage
+
+Leverage has a precise mathematical definition that you can see here. The specifics of the formula are not so important, but you should recognize that the leverage score $h_i$ for an observation is entirely a function of the distance between each **individual** value of the explanatory variable and **mean** of the explanatory variable. This means that points that are close to the center of the scatterplot (along the x-axis) have low leverage, while points that are far from the (horizontal) center of the scatterplot have high leverage. For leverage, the $y$-coordinate doesn't matter at all.
+
+$$
+  h_i = \frac{1}{n} + \frac{(x_i - \bar{x})^2}{\sum_{i=1}^n (x_i - \bar{x})2}
+$$
+
+### Leverage computations
+
+It should not be surprising then, that the player with the largest leverage value is the aforementioned Juan Pierre (in the lower right-hand corner of the plot). The leverage scores can be retrieved using the `augment()` function, and then examining the `.hat` variable. [The name comes from the historical convention of computing leverage from the "hat" matrix.] Note that the leverage scores depend only on stolen bases. In this case, Pierre's leverage score is nearly twice as large as that of the next player.
+
+The `slice_max()` allows for you to **both** order a dataframe and select how many entries you wish to keep. The `order_by` argument allows for you to specify what variable to order by (similar to `arrange()`), and the `n` argument allows for you to specify how many rows you wish to keep. Pretty neat!
+
+```{r up3, echo = TRUE}
+mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars)
+
+mod_hr_sb %>%
+  augment() %>%
+  select(home_run, stolen_base, .hat) %>%
+  slice_max(order_by = .hat,
+            n = 5)
+```
+
+Observations of high leverage, by virtue of their extreme values of the explanatory variable, may or may not have a considerable effect on the slope of the regression line. An observation that does have such an effect is called "influential." In our case, the regression line is very close to the point corresponding to Juan Pierre. So, even though this is a high leverage observation, it is not considered influential.
+
+### Consider Rickey Henderson...
+
+However, suppose that there was a player with a similar number of stolen bases, but a decent number of home runs as well. In fact, Hall of Famer Rickey Henderson was such a player, and in his MVP-winning season of 1990, he stole 65 bases while hitting 28 home runs. Let's add this observation to our plot.
+
+```{r up4}
+outlier <- Batting %>%
+  filter(SB > 60 & SB < 70 & HR > 20) %>%
+  arrange(desc(HR)) %>%
+  select(playerID, yearID, teamID, SB, HR) %>%
+  head(1) %>%
+  rename(stolen_base = SB,
+         home_run = HR)
+
+regulars_plus <- regulars %>%
+  select(name, team, stolen_base, home_run) %>%
+  bind_rows(outlier)
+
+ggplot(data = regulars_plus, aes(x = stolen_base, y = home_run)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = 0) +
+  geom_abline(data = as.data.frame(t(coef(mod_hr_sb))),
+              aes(intercept = `(Intercept)`, slope = stolen_base),
+              lty = 2,
+              lwd = 1.5) +
+    xlim(0, 65)
+```
+
+The original regression line is plotted as the dashed black line, and the new regression line (with Rickey Henderson) is plotted as a solid blue line. Notice how the new regression line pulls upward ever so slightly from the previous dotted regression line. This is a direct result of Henderson's influence.
+
+Because this is a point of high leverage, it has the ability to pull the slope of the regression line up. However, unlike the point corresponding to Pierre, the point corresponding to Henderson also has a large residual. The combination of high leverage and large residual determine influence.
+
+### Influence via Cook's distance
+
+In fact, a measurement known as Cook's distance combines these two quantities (leverage and residual) to measure influence. These figures are also reported by the `augment()` function. We note here that the observation corresponding to Henderson has a large residual, high leverage, and by far the largest value of Cook's distance.
+
+```{r cook, echo = TRUE}
+mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars_plus)
+
+mod_hr_sb %>%
+  augment() %>%
+  select(home_run, stolen_base, .fitted, .resid, .hat, .cooksd) %>%
+  slice_max(order_by = .cooksd,
+            n = 5)
+```
+
+You'll explore some more outliers in these next exercises.
+
+## Your turn!
+
+The *leverage* of an observation in a regression model is defined entirely in terms of the distance of that observation from the mean of the explanatory variable. That is, observations close to the mean of the explanatory variable have low leverage, while observations far from the mean of the explanatory variable have high leverage. Points of high leverage may or may not be influential.
+
+The `augment()` function from the **broom** package automatically adds the leverage scores (`.hat`) to a model dataframe. Use `augment()` to list the top 6 observations by their leverage scores, in descending order.
+
+```{r ex5, exercise = TRUE}
+# Rank points of high leverage
+mod_slg_obp %>%
+  ___ %>%
+  slice_max(order_by = ___,
+            n = ___)
+```
+
+```{r ex5-hint-1}
+# Rank points of high leverage
+mod_slg_obp %>%
+  augment() %>%
+  slice_max(order_by = ___,
+            n = ___)
+```
+
+```{r ex5-hint-2}
+# Rank points of high leverage
+mod_slg_obp %>%
+  augment() %>%
+  slice_max(order_by = .hat,
+            n = ___)
+```
+
+```{r ex5-solution}
+# Rank points of high leverage
+mod_slg_obp %>%
+  augment() %>%
+  slice_max(order_by = .hat,
+            n = 6)
+```
+
+###
+
+### Influence
+
+As noted previously, observations of high leverage may or may not be *influential*. The influence of an observation depends not only on its leverage, but also on the magnitude of its residual. Recall that while leverage only takes into account the explanatory variable ($x$), the residual depends on the response variable ($y$) and the fitted value ($\hat{y}$).
+
+Influential points are likely to have high leverage and deviate from the general relationship between the two variables. We measure influence using Cook's distance, which incorporates both the leverage and residual of each observation.
+
+Use `augment()` and `slice_max()` to list the top 6 observations by their Cook's distance (`.cooksd`).
+
+```{r ex6, exercise = TRUE}
+# Rank influential points
+
+```
+
+<div id="ex6-hint">
+**Hint:** Take a peek at the previous exercise, and note that this time we want to arrange the output by `.cooksd` this time!
+</div>
+
+```{r ex6-solution}
+# Rank influential points
+mod_slg_obp %>%
+  augment() %>%
+  slice_max(order_by = .cooksd,
+            n = 6)
+```
+
+## Dealing with outliers
+
+Previously, we learned about how leverage and influence can help us understand how outliers affect our regression model. Suppose you have determined that an influential observation is affecting the slope of your regression line in a way that undermines the scientific merit of your model. What can you do about it?
+
+```{r o1}
+regulars <- mlbbat10 %>%
+  filter(at_bat > 400)
+
+outlier <- Batting %>%
+  filter(SB > 60 & SB < 70 & HR > 20) %>%
+  select(name = playerID, team = teamID, stolen_base = SB, home_run = HR) %>%
+  slice_max(order_by = home_run, n = 1)
+
+regulars_plus <- regulars %>%
+  select(name, team, stolen_base, home_run) %>%
+  bind_rows(outlier)
+```
+
+```{r o2}
+ggplot(data = regulars_plus, aes(x = stolen_base, y = home_run)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = 0)
+```
+
+
+The short answer is that there isn't much you can do about it other than removing the outliers. As the statistical modeller, this is a decision you can make, but it's crucial that you understand the ramifications of this decision and act in good scientific faith.
+
+### The full model
+
+In the full model of all the regular players from 2010 and Rickey Henderson from 1990, the slope of the regression line was -0.21 home runs per stolen base. In other words, players who steal five extra bases hit about one fewer home run, on average.
+
+```{r o3, echo = TRUE}
+lm(home_run ~ stolen_base, data = regulars_plus) %>%
+  coef()
+```
+
+### Removing outliers that don't fit
+
+Now, in this case, there is an easy argument that Rickey Henderson does not fit with the rest of these data. It is a bit of a contrived argument, since we added him previously for effect, but nonetheless there are good reasons to assert that Henderson doesn't belong. If we remove him, note how the slope of the regression line decreases. Now, it's only four extra stolen bases that are associated with hitting one fewer home run.
+
+```{r o4}
+lm(home_run ~ stolen_base, data = regulars) %>%
+  coef()
+```
+
+Remember that when removing outliers, the first questions you should ask yourself are:
+
+- What is the justification for removing the observation?
+- How does the scope of inference change?
+
+Anytime you are thinking about removing outliers, you should ask yourself what the justification is. "Because it improves my results" is not a good justification. Indeed, conscious ignorance of valid data is not intellectually honest, and has been the cause of more than a few retractions of previously published scientific papers. Be skeptical. The burden of proof is on you to make a strong argument as to why data should be omitted.
+
+Second, you must consider how this changes the scope of inference. If you are studying countries, are you omitting only the poorest countries? If so, then your results no longer apply to all countries, just non-poor countries. Misunderstanding how the scope of inference changes can be a fatal flaw in your analysis.
+
+### Removing outliers that do fit
+
+With Henderson out of the way, we could consider removing Juan Pierre as well. Here, there really aren't any good arguments as to why this should be done. First, the point is not influential, so whether we include it or not, it won't affect our results much. More importantly, because Juan Pierre was just a regular major league player in 2010, there is no reason to think that he somehow doesn't belong to the larger group of players. What is so special about Juan Pierre that would lead us to exclude him? If, hypothetically, he was a pitcher, or he was 60 years old, or he only had one arm, then you could try and make that case. But there is nothing like that going on here, and so we have no scientific reason to exclude him.
+
+Again, ask yourself:
+
+- What is the justification for removing the observation?
+- How does the scope of inference change?
+
+```{r o5, echo = TRUE}
+regulars_new <- regulars %>%
+  filter(stolen_base < 60)
+
+lm(home_run ~ stolen_base, data = regulars_new) %>%
+  coef()
+```
+
+Now it's time to deal with some outliers on your own.
+
+## Your turn!
+
+Observations can be outliers for a number of different reasons. Statisticians must always be careful—and more importantly, transparent—when dealing with outliers. Sometimes, a better model fit can be achieved by simply removing outliers and re-fitting the model. However, one must have strong justification for doing this. A desire to have a higher $R^2$ is not a good enough reason!
+
+In the `mlbbat10` data, the outlier with an OBP of 0.550 is [Bobby Scales](https://en.wikipedia.org/wiki/Bobby_Scales), an infielder who had four hits in 13 at-bats for the Chicago Cubs. Scales also walked seven times, resulting in his unusually high OBP. The justification for removing Scales here is weak. While his performance was unusual, there is nothing to suggest that it is not a valid data point, nor is there a good reason to think that somehow we will learn more about Major League Baseball players by excluding him.
+
+Nevertheless, we can demonstrate how removing him will affect our model.
+
+1. Use `filter()` to create a new dataset named `nontrivial_players` consisting of the players from `mlbbat10` with *at least* 10 at-bats **and** and OBP of below 0.500.
+2. Create a visualization of the relationship between at bats and obp for **both** the new and old datasets
+
+```{r ex7, exercise = TRUE}
+# Create nontrivial_players
+nontrivial_players <- mlbbat10 %>%
+  ___(___)
+
+# Visualize new model
+ggplot(data = nontrivial_players,
+       aes(x = ___, y = ___)) +
+  ___ +
+  ___
+
+# Visualize old model
+ggplot(data = mlbbat10,
+       aes(x = ___, y = ___)) +
+  ___ +
+  ___
+```
+
+```{r ex7-hint-1}
+nontrivial_players <- mlbbat10 %>%
+  filter(at_bat >= 10,
+         obp < 0.5)
+```
+
+```{r ex7-hint-2}
+ggplot(data = nontrivial_players, aes(x = obp, y = slg)) +
+  geom_point() +
+  geom_smooth(___)
+```
+
+```{r ex7-hint-3}
+ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```{r ex7-solution}
+nontrivial_players <- mlbbat10 %>%
+  filter(at_bat >= 10,
+         obp < 0.5)
+
+ggplot(data = nontrivial_players, aes(x = obp, y = slg)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+###
+
+Next, let's compare the models for these two datasets.
+
+1. Fit the linear model for `slg` as a function of `obp` for the `nontrivial_players`. Save this linear model as `mod_cleaner`.
+2. Fit the linear model for `slg` as a function of `obp` for the `mlbbat10`. Save this linear model as `mod_original`.
+3. View the `summary()` of the new model and compare the slope and $R^2$ to the original model fit to the data on all players.
+
+```{r ex8-setup}
+nontrivial_players <- mlbbat10 %>%
+  filter(at_bat >= 10,
+         obp < 0.5)
+```
+
+```{r ex8, exercise = TRUE}
+# Fit a model to new data
+mod_cleaner <- lm(___ ~ ___, data = ___)
+
+# Fit a model to the original data
+mod_original <- lm(___ ~ ___, data = ___)
+
+# View the new model's summary
+summary(___)
+
+# View the original model's summary
+summary(___)
+
+```
+
+```{r ex8-hint-1}
+mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
+```
+
+```{r ex8-hint-2}
+mod_original <- lm(slg ~ obp, data = mlbbat10)
+```
+
+```{r ex8-hint-3}
+summary(mod_cleaner)
+
+summary(mod_original)
+```
+
+```{r ex8-solution}
+mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
+
+mod_original <- lm(slg ~ obp, data = mlbbat10)
+
+summary(mod_cleaner)
+
+summary(mod_original)
+
+```
+
+
+## Congratulations!
+
+You have successfully completed all of the lessons in Tutorial 3: Introduction to Linear Models.
+
+This tutorial was about analyzing the relationship between two numeric variables. We learned a variety of techniques for doing this.
+
+First, we explored how powerful scatterplots can be in revealing bivariate relationships in an intuitive, graphical form. We built a framework for describing what we see in those scatterplots, and practiced implementing that framework on real data.
+
+Second, we learned about correlation---a simple way to quantify the strength of the linear relationship between two variables in a single number. We emphasized the value of such measurements, but illustrated how their careless application can lead to erroneous results.
+
+Third, we learned about linear regression---a relatively simple, yet powerful technique for modeling a response variable in terms of a single explanatory variable. We built our intuition about how these models work and identified some of their key properties.
+
+Fourth, we focused carefully on how to interpret the coefficients of regression models, and how those interpretations can bring real insight into complex problems. We also developed a foundational understanding of how to build these models in R, and how to work with them afterwards.
+
+Finally, we introduced the notion of model fit, and developed tools for helping us reason about the quality of our models, and how much we can learn from them.
+
+Together, we hope that these concepts will inform your thinking about the nature of the relationship between variables. These techniques should help to you unravel them on your own.
+
+What's next?
+
+`r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
+
+`r emo::ji("spiral_notepad")` [Tutorial 3: Introduction to Linear Models Data](https://openintrostat.github.io/ims-tutorials/03-introduction-to-linear-models/)
+
+`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-01/)
+
+`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-02/)
+
+`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-03/)
+
+`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-04/)
+
+`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-05/)
+
+`r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
