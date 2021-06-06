@@ -22,22 +22,22 @@ Statistical inference plays a role in many different data analyses (including th
 
 ## Lessons
 
-### 1 - [Sampling variability](https://openintro.shinyapps.io/ims-05-introduction-to-statistical-inference-01/)
+### 1 - [Sampling variability](https://openintro.shinyapps.io/ims-04-foundations-01/)
 
 The fundamental principle that there is variability across different samples will be investigated in this lesson. You will be able to characterize the variability across samples as compared to the underlying population. Remember, the goal of the research is to understand the population, while the information you have comes only from a single sample of data.
 
 
-### 2 - [Randomization test](https://openintro.shinyapps.io/ims-05-introduction-to-statistical-inference-02/)
+### 2 - [Randomization test](https://openintro.shinyapps.io/ims-04-foundations-02/)
 
 
 Using the **infer** package, you will be able to work through an entire randomization test. For a given dataset and research question, you will identify hypotheses and decide whether or not it is appropriate to reject the null hypothesis in favor of the research claim of interest.
 
 
-### 3 - [Errors in hypothesis testing](https://openintro.shinyapps.io/ims-05-introduction-to-statistical-inference-03/)
+### 3 - [Errors in hypothesis testing](https://openintro.shinyapps.io/ims-04-foundations-03/)
 
 Working through another complete hypothesis test (using the **infer** package), you will focus on how and when false conclusions are sometimes drawn. You will learn to distinguish between a Type I error where you are confident in a claim that isn't valid and a Type II error where you fail to conclude anything when your science is correct.  Additionally, you will learn the important role that number of observations play in reducing error rates.  
 
-### 4 - [Parameters and confidence intervals](https://openintro.shinyapps.io/ims-05-introduction-to-statistical-inference-04/)
+### 4 - [Parameters and confidence intervals](https://openintro.shinyapps.io/ims-04-foundations-04/)
 
 Additionally, using the **infer** package, you will learn to create confidence intervals for a single population proportion.  A confidence interval will provide a range of plausible values to estimate the unknown population value.  The parameter is the true unknown proportion of successes in the population, estimated using the sample proportion.  Bootstrapping allows for estimation of the variability of the sample proportion which leads to an interval estimate.
 

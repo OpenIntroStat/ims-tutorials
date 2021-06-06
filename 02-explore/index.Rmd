@@ -22,7 +22,7 @@ By the end of the tutorial, you'll be able to answer these questions and more, w
 
 ## Lessons
 
-### 1 - [Visualizing categorical data](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-01/)
+### 1 - [Visualizing categorical data](https://openintro.shinyapps.io/ims-02-explore-01/)
 
 Creating graphical and numerical summaries of two categorical variables, primarily using two R packages: ggplot2 and dplyr.
 
@@ -41,7 +41,7 @@ Creating graphical and numerical summaries of two categorical variables, primari
     * data integrity check for levels
   * Pie chart
 
-### 2 - [Visualizing numerical data](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-02/)
+### 2 - [Visualizing numerical data](https://openintro.shinyapps.io/ims-02-explore-02/)
 
 Learn useful statistics for describing distributions of data.
 
@@ -58,7 +58,7 @@ Learn useful statistics for describing distributions of data.
 * Boxplot
 * outlier detection
 
-### 3 - [Summarizing with statistics](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-03/)
+### 3 - [Summarizing with statistics](https://openintro.shinyapps.io/ims-02-explore-03/)
 
 Statistics for describing distributions of data.
 
@@ -68,7 +68,7 @@ Statistics for describing distributions of data.
 * Unusual observations
 * Transformations: Logarithm and sqrt to reduce skew in graphics and ease comparisons.
 
-### 4 - [Case study](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-04/)
+### 4 - [Case study](https://openintro.shinyapps.io/ims-02-explore-04/)
 
 Apply what you've learned to explore and summarize a real world dataset in this case study of email spam.
 

@@ -29,7 +29,7 @@ In this tutorial you'll also take your skills with simple linear regression to t
 
 ## Lessons
 
-### 1 - [Visualizing two variables](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-01/)
+### 1 - [Visualizing two variables](https://openintro.shinyapps.io/ims-03-model-01/)
 
 * Explore [bivariate relationships](https://en.wikipedia.org/wiki/Bivariate_analysis) graphically
 * Characterize bivariate relationships
@@ -37,20 +37,20 @@ In this tutorial you'll also take your skills with simple linear regression to t
 * Discuss transformations
 * Identify [outliers](https://en.wikipedia.org/wiki/Outlier)
 
-### 2 - [Correlation](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-02/)
+### 2 - [Correlation](https://openintro.shinyapps.io/ims-03-model-02/)
 
 * Quantify the strength of a linear relationship
 * Compute and interpret Pearson Product-Moment [correlation](https://en.wikipedia.org/wiki/Correlation_and_dependence)
 * Identify spurious correlations
 
-### 3 - [Simple linear regression](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-03/)
+### 3 - [Simple linear regression](https://openintro.shinyapps.io/ims-03-model-03/)
 
 * Visualize a simple linear model as "best fit" line
 * Conceptualize simple [linear regression](https://en.wikipedia.org/wiki/Linear_regression)
 * Fit and describe simple linear regression models
 * Internalize [regression to the mean](https://en.wikipedia.org/wiki/Regression_toward_the_mean)
 
-### 4 - [Interpreting regression models](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-04/)
+### 4 - [Interpreting regression models](https://openintro.shinyapps.io/ims-03-model-04/)
 
 * Interpret the meaning of coefficients in a regression model
 * Understand the impact of units and scales
@@ -58,39 +58,39 @@ In this tutorial you'll also take your skills with simple linear regression to t
 * Make predictions from regression models
 * Overlay a regression model on a scatterplot
 
-### 5 - [Model fit](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-05/)
+### 5 - [Model fit](https://openintro.shinyapps.io/ims-03-model-05/)
 
 * Assess the quality of fit of a regression model
 * Interpret [$R^2$](https://en.wikipedia.org/wiki/Coefficient_of_determination)
 * Measure [leverage](https://en.wikipedia.org/wiki/Leverage_(statistics)) and influence
 * Identify and attend to outliers
 
-### 6 - [Parallel slopes](https://openintro.shinyapps.io/ims-04-multivariable-and-logistic-models-01/)
+### 6 - [Parallel slopes](https://openintro.shinyapps.io/ims-03-model-06/)
 
 * Visualize, fit, and interpret a parallel slopes model, which has one numeric and one categorical explanatory variable
 * Describe a model in three different ways: mathematically, graphically, and through R syntax
 
-### 7 - [Evaluating and extending parallel slopes model](https://openintro.shinyapps.io/ims-04-multivariable-and-logistic-models-02/)
+### 7 - [Evaluating and extending parallel slopes model](https://openintro.shinyapps.io/ims-03-model-07/)
 
 * Assess and interpret model fit
 * Compute residuals and predictions
 * Fit and interpret interaction models
 * Recognize [Simpson's paradox](https://en.wikipedia.org/wiki/Simpson%27s_paradox)
 
-### 8 - [Multiple regression](https://openintro.shinyapps.io/ims-04-multivariable-and-logistic-models-03/)
+### 8 - [Multiple regression](https://openintro.shinyapps.io/ims-03-model-08/)
 
 * Visualize, fit, and interpret a multiple regression model with two numeric explanatory variables
 * Visualize, fit, and interpret a parallel planes model with two numeric explanatory variables and a categorical variable
 * Fit and interpret multiple regression models in higher dimensions
 * Understand and identify [multicollinearity](https://en.wikipedia.org/wiki/Multicollinearity)
 
-### 9 - [Logistic regression](https://openintro.shinyapps.io/ims-04-multivariable-and-logistic-models-04/)
+### 9 - [Logistic regression](https://openintro.shinyapps.io/ims-03-model-09/)
 
 * Visualize, fit, and interpret logistic regression models
 * Interpret coefficients on three different scales
 * Make predictions from a logistic regression model
 
-### 10 - [Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-04-multivariable-and-logistic-models-05/)
+### 10 - [Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 * Explore the relationship between price and the quality of food, service, and decor for Italian restaurants in [New York City](https://en.wikipedia.org/wiki/New_York_City)
 
