@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with Data: 2 - Types of Studies"
+title: "Introduction to data: 2 - Types of Studies"
 output: 
   learnr::tutorial:
     progressive: true

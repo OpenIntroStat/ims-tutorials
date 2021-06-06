@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with Data: 1 - Language of data"
+title: "Introduction to data: 1 - Language of data"
 output: 
   learnr::tutorial:
     progressive: true

@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with Data: 3 - Sampling strategies and Experimental design"
+title: "Introduction to data: 3 - Sampling strategies and Experimental design"
 output: 
   learnr::tutorial:
     progressive: true
