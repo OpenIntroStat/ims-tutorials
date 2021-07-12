@@ -432,9 +432,9 @@ This discretization can be accomplished using the `if_else()` function in R:
 
 Next, it's your turn to discretize a different variable.
 
-###  
+### New Variable `Num_char_cat` 
 
-Next, we'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
+We'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
 
 The median marks the 50th percentile, or midpoint, of a distribution, so half of the emails should fall in one category and the other half in the other. We will learn more about the median and other measures of center in the next tutorial in this series.
 
