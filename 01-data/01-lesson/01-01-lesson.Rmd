@@ -410,11 +410,12 @@ Instead we can create a new variable, named `read_cat`, with the `mutate()`
 function and the helpful `if_else()` function. 
 
 ```{r hsb2-mutate-read-cat, exercise=TRUE}
-hsb2 <- hsb2 %>%
+(hsb2 <- hsb2 %>%
   mutate(read_cat = if_else(read < avg_read,
                             "below average",
                             "at or above average")
          )
+)
 ```
 
 First, we start with the data frame, `hsb2`, and pipe it into the `mutate()` 
