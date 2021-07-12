@@ -322,7 +322,7 @@ frame called **hsb2 underscore public**."
 We should take note of two pieces of R syntax: *the double equal sign* (`==`) 
 and quotations (""). In R, `==` is a logical test for *"is equal to"*. `R` uses
 this logical test to search for observations (rows) in the data frame where
-school type is equal to public, and returns a data frame frame where this
+school type is equal to public, and returns a data frame where this
 comparison is `TRUE` for every row. 
 
 In R, variables that are categorical use characters (rather than numbers) for
