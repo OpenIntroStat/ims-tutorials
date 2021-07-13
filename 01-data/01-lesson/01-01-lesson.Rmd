@@ -422,6 +422,8 @@ hsb2 <- hsb2 %>%
                             "below average",
                             "at or above average")
          )
+
+hsb2
 ```
 
 First, we start with the data frame, `hsb2`, and pipe it into the `mutate()` 
