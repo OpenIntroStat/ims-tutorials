@@ -432,7 +432,7 @@ This discretization can be accomplished using the `if_else()` function in R:
 
 Next, it's your turn to discretize a different variable.
 
-### New Variable `Num_char_cat` 
+### New variable `num_char_cat` 
 
 We'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
 
