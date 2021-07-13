@@ -361,9 +361,16 @@ email50_big <- ___ %>%
 
 ```
 
-<div id="email50-filter-number-big-hint">
-**Hint:** We're looking for emails with big numbers, so filter for `number == "big"`.
-</div>
+
+```{r email50-filter-number-big-hint-1}
+# We're looking for emails with big numbers, so filter for `number == "big"`.
+```
+
+```{r email50-filter-number-big-hint-2}
+# Subset of emails with big numbers: email50_big
+email50_big <- email50 %>%
+  filter(number == "big")
+```
 
 ```{r email50-filter-number-big-solution}
 # Subset of emails with big numbers: email50_big
@@ -461,9 +468,34 @@ email50_updated %>%
   count(___)
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** In the `if_else()` function, the second argument is the value `num_char_cat` should take if the condition `num_char < med_num_char` is `TRUE`, and the third is if it's `FALSE`.
-</div>
+
+```{r hsb2-mutate-num-char-cat-hint-1}
+# Calculate median number of characters: med_num_char
+med_num_char <- median(email50$num_char)
+```
+
+
+```{r hsb2-mutate-num-char-cat-hint-2}
+# In the `if_else()` function, the second argument is the value `num_char_cat`.
+# If the condition `num_char < med_num_char` it should take `TRUE`,
+# else it should take `FALSE`.
+```
+
+```{r hsb2-mutate-num-char-cat-hint-3}
+# Create num_char_cat variable in email50
+email50_updated <- email50 %>%
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "below median",
+                                "at or above median")
+         )
+```
+
+```{r hsb2-mutate-num-char-cat-hint-4}
+# Count emails in each category
+email50_updated %>%
+  count(num_char_cat)
+```
+
 
 ```{r hsb2-mutate-num-char-cat-solution}
 # Calculate median number of characters: med_num_char
