@@ -47,11 +47,8 @@ At the end, we compare the attention spans of the two groups.
 
 Based on the observational study, even if we find a difference between the average attention span of these two groups of people, we can't attribute this difference solely to using screens because there may be other variables that we didn't control for in this study that contribute to the observed difference. For example, people who use screens at night might also be using screens for longer time periods during the day and their attention span might be affected by the daytime usage as well.
 
-![](images/design-observational-association.png){width="70%"}
 
 However, in the experiment, such variables that might also contribute to the outcome, called confounding variables, are most likely represented equally in the two groups due to random assignment. Therefore, if we find a difference between the two averages, we can indeed make a causal statement attributing this difference to bedtime screen usage.
-
-![](images/design-experiment-causation.png){width="70%"}
 
 Let's put these ideas into practice.
 
