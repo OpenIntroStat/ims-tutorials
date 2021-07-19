@@ -172,9 +172,7 @@ question("Which one of the barcharts shows no relationship between `age` and `fl
 )
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
 **Hint:** Which plot shows a similar *proportion* of people who like apple (or pumpkin) pies in each of the two age groups?
-</div>
 
 
 ### Contingency table review
