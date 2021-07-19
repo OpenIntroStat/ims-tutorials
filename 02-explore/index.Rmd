@@ -26,9 +26,9 @@ By the end of the tutorial, you'll be able to answer these questions and more, w
 
 Creating graphical and numerical summaries of two categorical variables, primarily using two R packages: ggplot2 and dplyr.
 
-* Graphical representation two categorical variables
+* Graphical representation of two categorical variables
   * Side-by-side bar charts
-  * Stacked bar chars
+  * Stacked bar charts
   * To normalize or not to normalize
 * Tabular representation of two categorical variables
   * Computation of margins
@@ -49,7 +49,7 @@ Learn useful statistics for describing distributions of data.
 * Side-by-side boxplots
 * Faceted histograms
 * Colored density curves
-* Graphical representation of one numerical var
+* Graphical representation of one numerical variable
 * Marginal vs conditioning
 * Histogram
 * binwidth
