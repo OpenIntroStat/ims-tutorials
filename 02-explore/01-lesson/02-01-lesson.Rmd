@@ -231,7 +231,7 @@ comics %>%
 
 ```{r ex1-solution}
 # Print the first rows of the data
-comics
+glimpse(comics)
 
 # Check levels of align
 comics %>% 
