@@ -319,7 +319,7 @@ Next, create a table with the proportions of male students admitted across depar
 
 1. Use `group_by()` to group the `ucb_admission_counts` first by department then by gender.
 2. Use `mutate()` to add a new column named `prop`, which is the ratio of those admitted or rejected by department and gender. Remember the calculation you used previously for row proportions! 
-3. Use `filter()` to filter the rows for those who are males **and** those who who were admitted. To "join" our filters we insert a comma between the filters we are interested (e.g. `filter(grade == "middle school", class == "Music"))`). 
+3. Use `filter()` to filter the rows for those who are males **and** those who were admitted. To "join" our filters we insert a comma between the filters we are interested (e.g. `filter(grade == "middle school", class == "Music"))`). 
 
 ```{r gender-male3, exercise=TRUE, exercise.setup="prepare-gender2"}
  ucb_admission_counts  %>%
