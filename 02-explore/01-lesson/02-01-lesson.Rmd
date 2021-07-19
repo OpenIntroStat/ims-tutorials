@@ -172,7 +172,7 @@ grid.arrange(p1, p2, p3, ncol = 3)
 
 ```{r mch1, echo = FALSE}
 question("Which one of the barcharts shows no relationship between `age` and `flavor`? In other words, which plot shows that pie preference is the same for both young and old?",
-  answer("Plot 1", correct = TRUE, message = "Nice one!"),
+  answer("Plot 1", correct = TRUE, message = "Nice one! The proportion of apple and pumpkin pie lover are the same."),
   answer("Plot 2", message = "Hmm, looks like the old prefer apple pies and the young prefer pumpkin pies in Plot 2."),
   answer("Plot 3", message = "Looks like the young really prefer pumpkin pies over apple pies in Plot 3!"),
   allow_retry = TRUE
