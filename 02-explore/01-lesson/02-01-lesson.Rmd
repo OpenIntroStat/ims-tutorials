@@ -262,6 +262,7 @@ The contingency table from the last exercise is available in your workspace as `
 2. use `filter()` to filter out all rows of `comics` with that level
 3. use `droplevels()` to drop the unused levels from the dataframe 
 4. save the simplified dataset as `comics_filtered`
+5. check if the unused level of `align` is dropped
 
 
 ```{r ex2-setup}
@@ -280,7 +281,8 @@ comics_filtered <- ___ %>%
   ___()
 
 # See the result
- comics_filtered
+ comics_filtered %>%
+   ___(align)
 
 ```
 
@@ -294,7 +296,8 @@ comics_filtered <- comics %>%
   droplevels()
 
 # See the result
-comics_filtered
+comics_filtered %>%
+  distinct(align)
 
 ```
 
