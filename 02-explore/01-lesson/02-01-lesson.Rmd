@@ -405,7 +405,7 @@ grid.arrange(p1, p2, ncol = 2)
 
 
 ```{r mc, echo=FALSE}
-question("Which of the following interpretations of the bar charts above is **not** valid?",
+question("Which of the following interpretations of the bar charts above is NOT valid?",
   answer("Among characters with `Neutral` alignment, males are the most common.", message = "Nope, not quite!"),
   answer("In general, there is an association between gender and alignment."),
   answer("Across all genders, `Bad` is the most common alignment.", correct = TRUE),
