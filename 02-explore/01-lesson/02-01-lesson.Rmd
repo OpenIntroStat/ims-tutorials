@@ -821,7 +821,7 @@ comics %>%
 To do this variable conversion we use the following steps:
 
 1. load in the `comics` data
-2. use the `mutate()` function to make changes to the `align` variable
+2. use the `mutate()` function to add the changed `align` variable
 3. use the `factor()` function to specify how the `align` variable will be changed
 4. save the updated dataset into a new dataframe, named `comics_updated`
 
@@ -901,10 +901,12 @@ ggplot(comics_updated, aes(x = ___)) +
 ```
 
 ```{r ex6-hint}
-Specify align as the x aesthetic, then facet by gender within facet_wrap().
+# Specify align as the x aesthetic, then facet by gender within facet_wrap().
 ```
 
 ```{r ex6-solution}
+# Specify align as the x aesthetic, then facet by gender within facet_wrap().
+
 ggplot(comics_updated, aes(x = align)) + 
   geom_bar() +
   facet_wrap(~ gender)
