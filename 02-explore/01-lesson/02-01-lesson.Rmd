@@ -376,7 +376,7 @@ ggplot(comics, aes(x = gender, fill = align)) +
 
 In many visualizations you make, you may be interested in changing the axis labels on the plot. Here, the axis labels of "gender" and "align" could use some spicing up, to be more descriptive. To change the labels of a `ggplot()`, you add (`+`) a `labs()` layer to the plot, where you can specify the `x`, `y`, and `fill` labels, as well as the plot's `title`. 
  
-```{r}
+```{r labels, exercise = TRUE}
 ggplot(comics, aes(x = gender, fill = align)) + 
   geom_bar(position = "dodge") + 
   labs(x = "Character's Sex", 
@@ -405,7 +405,7 @@ grid.arrange(p1, p2, ncol = 2)
 
 
 ```{r mc, echo=FALSE}
-question("Which of the following interpretations of the bar charts above is **not** valid?",
+question("Which of the following interpretations of the bar charts above is NOT valid?",
   answer("Among characters with `Neutral` alignment, males are the most common.", message = "Nope, not quite!"),
   answer("In general, there is an association between gender and alignment."),
   answer("Across all genders, `Bad` is the most common alignment.", correct = TRUE),
