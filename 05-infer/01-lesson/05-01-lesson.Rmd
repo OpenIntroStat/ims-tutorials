@@ -165,7 +165,13 @@ p_hat_happy <- gss2016 %>%
 p_hat_happy
 ``` 
 
-We learn that around 77% of our sample is "happy". This should be a good estimate of the percent of all Americans that are very happy, but it's not a sure thing since we only asked a small proportion of them.
+We learn that around 77% of our sample is "happy". If this were a simple random sample from the American population, this would be a good estimate of the percent of all Americans that are very happy, but it's not a sure thing since we only asked a small proportion of them.
+
+## How is does the GSS select respondents?
+
+Remember that not all randomly sampled data is the same -- a sample can be a simple random sample, a stratified sample, a cluster sample, or something more complex. The respondents to the GSS come from a complex survey design and appropriate inference for these data would account for this survey design. 
+
+The methods used in these tutorials and described in [Introduction to Modern Statistics](https://openintro.org/book/ims/online) are appropriate for simple random surveys or experimental data. Simple random samples are very rare in practice, particularly in large scale surveys. While we will make this simplifying assumption in the following exercises, more complex methods (those beyond the scope of the tutorials and [Introduction to Modern Statistics](https://openintro.org/book/ims/online)) should be used when doing inference on complex survey data. While not in scope, the [**srvyr**](https://cran.r-project.org/web/packages/srvyr/index.html) package provides a tidyverse-friendly interface for doing inference on complex survey data.
 
 ## 95% confidence interval
 
