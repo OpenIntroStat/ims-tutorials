@@ -31,6 +31,11 @@ comics <- read_csv("data/comics.csv") %>%
          !is.na(id), 
          !is.na(gender)) %>%
   droplevels()
+
+flavor <- rep(c("cherry", "key lime", "boston creme", "strawberry", 
+                 "blueberry", "apple", "pumpkin"),
+               c(13, 16, 15, 11, 14, 17, 12))
+pies <- data.frame(flavor = as.factor(flavor))
 ```
 
 ## Exploring categorical data
