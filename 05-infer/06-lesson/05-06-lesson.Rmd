@@ -1,5 +1,5 @@
 ---
-title: "Lesson 2 - Introducing the t-distribution"
+title: "Lesson 6 - Introducing the t-distribution"
 output: 
   learnr::tutorial:
     progressive: true

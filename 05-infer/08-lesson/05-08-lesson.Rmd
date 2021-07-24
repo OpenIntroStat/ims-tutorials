@@ -1,5 +1,5 @@
 ---
-title: "Lesson 4 - Comparing many means with ANOVA"
+title: "Lesson 8 - Comparing many means with ANOVA"
 output: 
   learnr::tutorial:
     progressive: true

@@ -1,5 +1,5 @@
 ---
-title: "Lesson 3 - Inference for difference in two means"
+title: "Lesson 7 - Inference for difference in two means"
 output: 
   learnr::tutorial:
     progressive: true
