@@ -40,9 +40,7 @@ mariokart <- mariokart %>%
 
 This lesson covers model evaluation. By looking at different properties of the model, including the adjusted $R^2$., you'll learn to compare models so that you can select the best one. You'll also learn about interaction terms in linear models.
 
-
 ## Model fit, residuals, and prediction
-
 
 ### Residuals
 
@@ -58,16 +56,13 @@ ggplot(data = mpg, aes(x = displ, y = hwy, color = factor(year))) +
   geom_point()
 ```
 
-
 One of the most natural questions we might have about our model is: "how well does it fit?" We measure this by computing---for each observation---the difference between the actual value of the response variable and the fitted value from our model. This distance is called a **residual**. Residuals for two observations are illustrated in this plot with vertical arrows. Just as in simple linear regression, the model fitting procedure will automatically minimize the length of those arrows across all of the points. 
 
 In a parallel slopes model, our model is represented by two lines, but only one of the lines is relevant for each observation. In the plot, the green points---each corresponding to a car made in 2008---are compared to the green line, and the orange points---each corresponding to a car made in 1999---are compared to the orange line. 
 
 Note that this necessarily makes our parallel slopes model more flexible than a simple linear regression model. The two lines are constrained to be parallel, but we still have two instead of one. If the best fit occurs when the two lines are very close together, then the coefficient of the categorical variable will be very small, and the parallel slopes model will be very similar to the simple linear regression model.
 
-
 ### Model Fit
-
 
 The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$. value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
 
@@ -80,9 +75,7 @@ To summarize:
 - As $p$ (number of explanatory variables) increases $R^2$ will always increase (or stay the same)
 - To adjust for an increasing $R^2$ use: $ R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} $ 
 
-
 ### Fitted values
-
 
 ```{r eval=FALSE, echo=TRUE}
 # returns a vector
@@ -158,6 +151,7 @@ We can see both measures in the output of the `summary()` function on our model 
 - Use `lm()` to fit a model that includes `wheels`, `cond`, and the random noise term.
 - Use `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object. Did the value of $R^2$ increase? What about adjusted $R^2$?
 
+###
 
 - The model `mod` is already in your workspace.
 - Add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` of your dataframe.
