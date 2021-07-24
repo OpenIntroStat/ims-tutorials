@@ -49,22 +49,26 @@ Let's get started.
 
 In this tutorial, you'll be exploring data from a wide range of contexts. The first dataset comes from comic books. Two publishers, Marvel and DC, have created a host of superheroes that have made their way into popular culture. You're probably familiar with Batman and Spiderman, but what about Mor the Mighty?
 
-The comics dataset has information on all comic characters that have been introduced by DC and Marvel. If we type the name of the dataset at the console, we get the first few rows and columns. Here we see that each row, or case, is a different character and each column, or variable, is a different observation made about that character. At the top the output tell us the dimensions of this dataset: over 23,000 cases and 11 variables. Right under the variable names, we see that the first three variables are characters, or the `chr` data type. These are variables that we could potentially consider categorical, as they all have a finite number of levels. The first case in the dataset is Peter Parker, alias: Spiderman, where his alias and character name are included in the first variable `name`. The second column, `id`, shows that Peter Parker's personal identity is kept secret, and the third column tell us that his `align`ment is good; that he's a superhero, not a super villain. If you scroll the table to the right side, you will see several additional variables, including eye color and hair color, almost all of which are also characters.
-
-```{r comics, echo=FALSE}
-comics 
+The comics dataset has information on all comic characters that have been introduced by DC and Marvel. Let's take take a look at the dataset and explore it. 
+```{r comics, exercise=TRUE}
+glimpse(comics)
 ```
 
-We can learn the different values of a particular character variable by using the `distinct()` function. It's clear that the alignment variable can be "good" or "neutral", but what other values are possible? Here, we pipe the `comics` data into the `distinct()` function, and then insert the `align` column into the `distinct()` function. Inspecting the resulting table, we learn that there are in fact four possible alignments, "Good", "Bad", "Neutral", and "Reformed criminals". 
 
-```{r levels, echo=TRUE}
+At the top the output tell us the dimensions of this dataset: over 15,000 cases and 11 variables. With one exception (appearances) we see that that all variables are characters, or of the `chr` data type. These are variables that we could potentially consider categorical, as they all have a finite number of levels. 
+
+The first case in the dataset is Peter Parker, alias: Spiderman, where his alias and character name are included in the first variable `name`. The second column, `id`, shows that Peter Parker's personal identity is kept secret, and the third column tell us that his `align`ment is good; that he's a superhero, not a super villain.
+
+We can learn the different values of a particular character variable by using the `distinct()` function. It's clear that the alignment variable can be "good" or "neutral", but what other values are possible? Here, we pipe the `comics` data into the `distinct()` function, and then insert the `align` column into the `distinct()` function. 
+
+```{r levels, exercise=TRUE}
 comics %>% 
   distinct(align)
 ```
 
-Good thing we checked that! If we do the same for identity, we learn that there are four possible identities.
+Inspecting the resulting table, we learn that there are in fact four possible alignments, "Good", "Bad", "Neutral", and "Reformed criminals". Good thing we checked that! If we do the same for identity, we learn that there are four possible identities.
 
-```{r levels2, echo=TRUE}
+```{r levels2, exercise=TRUE}
 comics %>% 
   distinct(id)
 ```
@@ -73,15 +77,17 @@ A common way to represent the number of cases that fall into each combination of
 
 1. use the `count()` function to count the number of observations
 2. specify the variables you are interested in **inside** the `count()` function
-3. pivot the table from its current "long" format to a "wide" format using the `pivot_wider()` function 
 
-This is what the process looks like:
 
-```{r levels3, echo=TRUE, eval = FALSE}
+```{r levels3, exercise=TRUE}
 # to get the long table
 comics %>% 
   count(align, id)
-  
+```
+
+3. pivot the table from its current "long" format to a "wide" format using the `pivot_wider()` function 
+
+```{r levels4, exercise=TRUE}
 # to get a wider table
 comics %>% 
   count(align, id) %>% 
@@ -92,15 +98,7 @@ The first two steps should look familiar to you, but the third step is a bit ove
 
 We want for the values of `align` to be in the rows and the values of `id` to be in the columns. We can use the `pivot_wider()` function to "pivot" our table so that it has this form, by moving the `id` variable to the columns, and filling the values of the table with the count variable (`n`). The `names_from` argument tells R where the names of the new columns are coming from (i.e. what variable), and the `values_from` argument tells R where the values in the table are coming from. Here, the values we want in our table are stored as a variable labeled `n` in our table. 
 
-```{r level3out, echo=FALSE}
-comics %>% 
-  count(align, id) %>% 
-  pivot_wider(names_from = id, values_from = n) %>% 
-  kable() %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")       
-```
-
-The output tells us that the most common category, at a count of 4493, was "Bad" characters with "Secret" identities.
+The output tells us that the most common category, at a count of 4352, was "Bad" characters with "Secret" identities.
 
 While tables of counts can be useful, you can get the bigger picture by translating these counts into a graphic. The graphics that you'll be making in this tutorial utilize the **ggplot2** package, which you got a glimpse of in the previous tutorial. Every ggplot requires that you specify three elements: 
 
@@ -119,24 +117,19 @@ ggplot(data = [DATASET], aes(x = [X VARIABLE],
 
 Here, we're interested in the relationship between two categorical variables, which is represented well by a stacked bar chart. In a bar chart, we plot the counts or frequencies of different levels of a categorical variable, by specifying the categorical variable we want to be on the x-axis, and adding a `geom_bar()` layer to the plot. 
 
-```{r formula2, eval=FALSE, include=TRUE}
+```{r formula2, exercise=TRUE}
 ggplot(comics, aes(x = id)) +
   geom_bar() 
 ```
 
 A stacked bar chart adds another layer to the plot, by dividing each bar into different levels of another variable. This coloring of the bars comes from adding a second categorical variable into the `fill` argument of the `aes()` function. This looks something like this: 
 
-```{r formula3, eval=FALSE, include=TRUE}
+```{r formula3, exercise=TRUE}
 ggplot(comics, aes(x = id, fill = align)) +
   geom_bar() 
 ```
 
 Let's look carefully at how this is constructed: each colored bar segment actually corresponds to a count in our table, with the x-axis and the fill color indicating the category being plotted. Several things pop out, like the fact that there are very few characters whose identities are unknown (since it's nearly flat). The single largest bar segment corresponds to the most common category: characters with secret identities that are also bad. We can look across the identity types and realize that bad is not always the largest category. This indicates that there is indeed an association between alignment and identity.
-
-```{r bar, echo=TRUE}
-ggplot(comics, aes(x = id, fill = align)) +
-    geom_bar()
-```
 
 That should be enough to get started. Now it's your turn to start exploring the data.
 
@@ -172,16 +165,14 @@ grid.arrange(p1, p2, p3, ncol = 3)
 
 ```{r mch1, echo = FALSE}
 question("Which one of the barcharts shows no relationship between `age` and `flavor`? In other words, which plot shows that pie preference is the same for both young and old?",
-  answer("Plot 1", correct = TRUE, message = "Nice one!"),
+  answer("Plot 1", correct = TRUE, message = "Nice one! The proportion of apple and pumpkin pie lover are the same."),
   answer("Plot 2", message = "Hmm, looks like the old prefer apple pies and the young prefer pumpkin pies in Plot 2."),
   answer("Plot 3", message = "Looks like the young really prefer pumpkin pies over apple pies in Plot 3!"),
   allow_retry = TRUE
 )
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
 **Hint:** Which plot shows a similar *proportion* of people who like apple (or pumpkin) pies in each of the two age groups?
-</div>
 
 
 ### Contingency table review
@@ -238,7 +229,7 @@ comics %>%
 
 ```{r ex1-solution}
 # Print the first rows of the data
-comics
+glimpse(comics)
 
 # Check levels of align
 comics %>% 
@@ -271,6 +262,7 @@ The contingency table from the last exercise is available in your workspace as `
 2. use `filter()` to filter out all rows of `comics` with that level
 3. use `droplevels()` to drop the unused levels from the dataframe 
 4. save the simplified dataset as `comics_filtered`
+5. check if the unused level of `align` is dropped
 
 
 ```{r ex2-setup}
@@ -289,7 +281,8 @@ comics_filtered <- ___ %>%
   ___()
 
 # See the result
- comics_filtered
+ comics_filtered %>%
+   ___(align)
 
 ```
 
@@ -303,7 +296,8 @@ comics_filtered <- comics %>%
   droplevels()
 
 # See the result
-comics_filtered
+comics_filtered %>%
+  distinct(align)
 
 ```
 
@@ -385,7 +379,7 @@ ggplot(comics, aes(x = gender, fill = align)) +
 
 In many visualizations you make, you may be interested in changing the axis labels on the plot. Here, the axis labels of "gender" and "align" could use some spicing up, to be more descriptive. To change the labels of a `ggplot()`, you add (`+`) a `labs()` layer to the plot, where you can specify the `x`, `y`, and `fill` labels, as well as the plot's `title`. 
  
-```{r}
+```{r labels, exercise = TRUE}
 ggplot(comics, aes(x = gender, fill = align)) + 
   geom_bar(position = "dodge") + 
   labs(x = "Character's Sex", 
@@ -414,7 +408,7 @@ grid.arrange(p1, p2, ncol = 2)
 
 
 ```{r mc, echo=FALSE}
-question("Which of the following interpretations of the bar charts above is **not** valid?",
+question("Which of the following interpretations of the bar charts above is NOT valid?",
   answer("Among characters with `Neutral` alignment, males are the most common.", message = "Nope, not quite!"),
   answer("In general, there is an association between gender and alignment."),
   answer("Across all genders, `Bad` is the most common alignment.", correct = TRUE),
@@ -830,7 +824,7 @@ comics %>%
 To do this variable conversion we use the following steps:
 
 1. load in the `comics` data
-2. use the `mutate()` function to make changes to the `align` variable
+2. use the `mutate()` function to add the changed `align` variable
 3. use the `factor()` function to specify how the `align` variable will be changed
 4. save the updated dataset into a new dataframe, named `comics_updated`
 
@@ -910,10 +904,12 @@ ggplot(comics_updated, aes(x = ___)) +
 ```
 
 ```{r ex6-hint}
-Specify align as the x aesthetic, then facet by gender within facet_wrap().
+# Specify align as the x aesthetic, then facet by gender within facet_wrap().
 ```
 
 ```{r ex6-solution}
+# Specify align as the x aesthetic, then facet by gender within facet_wrap().
+
 ggplot(comics_updated, aes(x = align)) + 
   geom_bar() +
   facet_wrap(~ gender)

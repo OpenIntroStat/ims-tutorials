@@ -322,7 +322,7 @@ frame called **hsb2 underscore public**."
 We should take note of two pieces of R syntax: *the double equal sign* (`==`) 
 and quotations (""). In R, `==` is a logical test for *"is equal to"*. `R` uses
 this logical test to search for observations (rows) in the data frame where
-school type is equal to public, and returns a data frame frame where this
+school type is equal to public, and returns a data frame where this
 comparison is `TRUE` for every row. 
 
 In R, variables that are categorical use characters (rather than numbers) for
@@ -361,9 +361,16 @@ email50_big <- ___ %>%
 
 ```
 
-<div id="email50-filter-number-big-hint">
-**Hint:** We're looking for emails with big numbers, so filter for `number == "big"`.
-</div>
+
+```{r email50-filter-number-big-hint-1}
+# We're looking for emails with big numbers, so filter for `number == "big"`.
+```
+
+```{r email50-filter-number-big-hint-2}
+# Subset of emails with big numbers: email50_big
+email50_big <- email50 %>%
+  filter(number == "big")
+```
 
 ```{r email50-filter-number-big-solution}
 # Subset of emails with big numbers: email50_big
@@ -415,6 +422,8 @@ hsb2 <- hsb2 %>%
                             "below average",
                             "at or above average")
          )
+
+hsb2
 ```
 
 First, we start with the data frame, `hsb2`, and pipe it into the `mutate()` 
@@ -432,9 +441,9 @@ This discretization can be accomplished using the `if_else()` function in R:
 
 Next, it's your turn to discretize a different variable.
 
-###  
+### New variable `num_char_cat` 
 
-Next, we'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
+We'll create a categorical version of the `num_char` variable in the `email50` dataset. `num_char` is the number of characters in an email, in thousands. This new variable will have two levels (`"below median"` and `"at or above median"`) depending on whether an email has less than the median number of characters or equal to or more than that value. 
 
 The median marks the 50th percentile, or midpoint, of a distribution, so half of the emails should fall in one category and the other half in the other. We will learn more about the median and other measures of center in the next tutorial in this series.
 
@@ -461,9 +470,34 @@ email50_updated %>%
   count(___)
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** In the `if_else()` function, the second argument is the value `num_char_cat` should take if the condition `num_char < med_num_char` is `TRUE`, and the third is if it's `FALSE`.
-</div>
+
+```{r hsb2-mutate-num-char-cat-hint-1}
+# Calculate median number of characters: med_num_char
+med_num_char <- median(email50$num_char)
+```
+
+
+```{r hsb2-mutate-num-char-cat-hint-2}
+# In the `if_else()` function, the second argument is the value `num_char_cat`.
+# If the condition `num_char < med_num_char` it should take `TRUE`,
+# else it should take `FALSE`.
+```
+
+```{r hsb2-mutate-num-char-cat-hint-3}
+# Create num_char_cat variable in email50
+email50_updated <- email50 %>%
+  mutate(num_char_cat = if_else(num_char < med_num_char,
+                                "below median",
+                                "at or above median")
+         )
+```
+
+```{r hsb2-mutate-num-char-cat-hint-4}
+# Count emails in each category
+email50_updated %>%
+  count(num_char_cat)
+```
+
 
 ```{r hsb2-mutate-num-char-cat-solution}
 # Calculate median number of characters: med_num_char
@@ -679,7 +713,7 @@ What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 1: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/01-getting-started-with-data/)
+`r emo::ji("spiral_notepad")` [Tutorial 1: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/01-data/)
 
 `r emo::ji("one")` [Tutorial 1 - Lesson 1: Language of data](https://openintro.shinyapps.io/ims-01-getting-started-with-data-01/)
 
