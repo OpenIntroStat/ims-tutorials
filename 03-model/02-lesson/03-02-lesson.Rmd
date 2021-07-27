@@ -377,7 +377,7 @@ anscombe %>%
 
 ## Perception of correlation
 
-Recall the scatterplot between the poverty rate of counties in the United States and the high school graduation rate in those counties from the previous lesson. 
+Recall the scatterplot between the poverty rate of counties in the United States and the high school graduation rate in those counties from the <a href="https://openintro.shinyapps.io/ims-03-model-01/#section-your-turn-1" target="_blank">previous lesson</a>. 
 
 ```{r mr3-pre}
 ggplot(data = county_complete, 
@@ -402,7 +402,7 @@ Estimating the value of the correlation coefficient between two quantities from 
 
 We are going to recreate scatterplots from the previous tutorial, jot down your best estimate of the value of the correlation coefficient between each pair of variables, and compare these values to the actual values you compute. 
 
-First, we will start with the relationship between `OBP` and `SLG` for all players in the `mlbbat10` dataset.
+First, we will start with the relationship between `obp` and `slg` for all players in the `mlbbat10` dataset.
 
 ```{r ex3, exercise = TRUE}
 # Run this and look at the plot
@@ -702,7 +702,7 @@ question("Which of the following conclusions **is not** a valid statistical inte
 
 Above all else, we must always remember that correlation does not imply causation. That is, just because two variables appear to move together does not mean that changes in one are causing changes in the other. There are many potential confounders that can cloud our ability to determine cause-and-effect. 
 
-Remarkable--but nonsensical--correlations are called "spurious." In fact, there is an entire blog devoted to them. Here is how the number of films Nicolas Cage has appeared in correlates with the number of people who drowned by falling into a pool.
+Remarkable--but nonsensical--correlations are called "spurious." In fact, there is an <a href="https://tylervigen.com/" target="_blank">entire blog</a> devoted to them. Here is how the number of films Nicolas Cage has appeared in correlates with the number of people who drowned by falling into a pool.
 
 
 ```{r img8, out.width=600}
