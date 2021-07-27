@@ -689,10 +689,10 @@ In the San Francisco Bay Area from 1960-1967, the correlation between the birthw
 
 ```{r mc5}
 question("Which of the following conclusions **is not** a valid statistical interpretation of these results?",
-  answer("We observed that babies with longer gestational periods tended to be heavier at birth."),
-  answer("It may be that a longer gestational period contributes to a heavier birthweight among babies, but a randomized, controlled experiment is needed to confirm this observation.", message = "Wrong!"),
-  answer("Staying in the womb longer causes babies to be heavier when they are born.", correct = TRUE, message =  "Correlation does not imply causation!"),
-  answer("These data suggest that babies with longer gestational periods tend to be heavier at birth, but there are many potential confounding factors that were not taken into account.", message = "Try again!"),
+  answer("We observed that babies with longer gestational periods tended to be heavier at birth.", message = "This statement **is** a valid interpretation of the results! It uses with 'tended' wording carefully to prevent a causal implication."),
+  answer("It may be that a longer gestational period contributes to a heavier birth weight among babies, but a randomized, controlled experiment is needed to confirm this observation.", message = "This statement **is** a valid interpretation of the results! It uses a cautionary language and refers explicitly to a randomized experiment to avoid that correlation also implies causation."),
+  answer("Staying in the womb longer causes babies to be heavier when they are born.", correct = TRUE, message =  "Correlation does not imply causation! This is the only **wrong interpretation**. All the other interpretations choose words carefully ('tend', 'experiment needed', 'beware of confounding factors', etc.) to prevent a causal implication."),
+  answer("These data suggest that babies with longer gestational periods tend to be heavier at birth, but there are many potential confounding factors that were not taken into account.", message = "This statement **is** a valid interpretation of the results! It uses with 'tend to be' wording carefully and refers explicitly to confounding factors."),
   allow_retry = TRUE
 )
 ```
