@@ -760,14 +760,15 @@ We will use these simulated data to explore if any pairs of variables might be m
 
 1. Create a scatterplot that shows the relationship between `x` and `y`, faceted by the set (`z`). 
 
-```{r ex7, exercise = TRUE}
+
+```{r ex7, exercise = TRUE, fig.height=5, fig.width=7}
 # Create faceted scatterplot
 ggplot(data = noise, aes(x = x, y = y)) + 
   geom_point() + 
   ___
 ```
 
-```{r ex7-solution}
+```{r ex7-solution, fig.height=5, fig.width=7}
 ggplot(data = noise, aes(x = x, y = y)) +
   geom_point() + 
   facet_wrap(vars(z))
