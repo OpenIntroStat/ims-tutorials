@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning = FALSE)
 
-anscombe <- anscombe %>%
+anscombe <- datasets::anscombe %>%
   mutate(id = 1:nrow(.)) %>%
   gather(key = "key", value = "val", -id) %>%
   separate(key, into = c("variable", "set"), sep = 1) %>%
