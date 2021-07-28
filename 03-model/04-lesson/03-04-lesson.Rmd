@@ -146,7 +146,7 @@ question("Which of the following mistakes in interpretation has the politician m
   answer("Switching the role of the response and explanatory variables."),
   answer("Confusing percentage change with percentage point change."),
   answer("All of the above.", correct = TRUE),
-  answer("None of the above.", message = "A little skepticism would be good here! The politician has made more than one mistake in interpreting the relationship."),
+  incorrect = "Only partly correct: The politician has made more mistakes in interpreting the relationship.",
   allow_retry = TRUE
 )
 ```

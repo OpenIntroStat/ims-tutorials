@@ -454,7 +454,7 @@ Math isn't everyone's cup of tea, and while this doesn't make it any less import
 A simple linear regression model can be visualized as a line through this data space.
 
 ```{r}
-knitr::include_graphics("04-01-lesson_files/figure-html/mpg-data-parallel-1.png")
+knitr::include_graphics("03-06-lesson_files/figure-html/mpg-data-parallel-1.png")
 ```
 
 
