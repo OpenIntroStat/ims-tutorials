@@ -215,10 +215,10 @@ When we estimate our population regression equation with data, we need to indica
 
 We do this by changing our equation in four ways: 
 
-1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response 
-2. the error terms ($\epsilon$) are removed, as we are no longer modeling individual responses 
-3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept 
-4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope 
+1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response. 
+2. The error terms ($\epsilon$) are removed, as we are no longer modeling individual responses. 
+3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept. 
+4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope.
 
 The resulting model looks like: 
 
@@ -255,13 +255,13 @@ You should also be aware that there are other criteria---apart from least square
 
 It's worth reviewing some key concepts about regression models. 
 
-- $\hat{Y}$ is the mean value of the response, for a given value of $X$
-  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$
-- $\hat{\beta}$'s are estimates of true, unknown $\beta$'s
-  * the estimated intercept and slope our best guess of the true value of $\beta_0$ and $\beta_1$
-- Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s
-  * the residuals are estimates of the true, unknown noise
-  * "error" may be misleading term---better: *noise*
+- $\hat{Y}$ is the mean value of the response, for a given value of $X$.
+  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$.
+- $\hat{\beta}$'s are estimates of true, unknown $\beta$'s.
+  * The estimated intercept and slope is our best guess of the true value of $\beta_0$ and $\beta_1$.
+- Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s.
+  * The residuals are estimates of the true, unknown noise.
+  * "error" may be a misleading term---better: *noise*.
 
 
 You'll put your understanding of regression to use in these next exercises. 
