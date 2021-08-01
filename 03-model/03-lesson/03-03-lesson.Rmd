@@ -104,7 +104,7 @@ You'll explore the "best fit" line on your own in these next exercise.
 
 ## Your turn! 
 
-Using the `bdims` dataset, create a scatterplot of body weight (`bwt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
+Using the `bdims` dataset, create a scatterplot of body weight (`wgt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
 
 Then, add a linear regression line on top of the scatterplot. 
 
