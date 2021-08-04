@@ -228,12 +228,13 @@ $$
 
 ```{r mc3}
 question("Which of the following statements is **incorrect**?",
-  answer("A person who is 170 cm tall is expected to weigh about 68 kg. "),
-  answer("Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight. ", correct = TRUE, message = "If you plug in the values, a person who is 170 cm tall *is* expected to weigh about 68 kg."),
-  answer("None of the above."),
+  answer("A person who is 170 cm tall is expected to weigh about 68 kg. ", message = "This answer is correct! If you plug in the values, a person who is 170 cm tall *is* expected to weigh about 68 kg: -105.011+ (1.018 * 170) = 60.049."),
+  answer("Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight. ", message = "This answer is correct! If you plug in the values, then you will see that the association between `obp` and `slg` is `cor(mlbbat10$obp, mlbbat10$slg) ≈ 0.82` whereas the association between height and weight is only `cor(bdims$hgt, bdims$wgt) ≈ 0.72`."),
+  answer("None of the above.", correct = TRUE, message = "Yes, both of the above options are correct, e.g. none of the above is incorrect! For the first option we have `-105.011+ (1.018 * 170) = 60.049` and the association between `obp` and `slg` is `cor(mlbbat10$obp, mlbbat10$slg) ≈ 0.82` whereas the association between height and weight is only `cor(bdims$hgt, bdims$wgt) ≈ 0.72`.  'None of the above' is the **only wrong statement** in this question."),
   allow_retry = TRUE
 )
 ```
+
 
 
 ## A linear model object
