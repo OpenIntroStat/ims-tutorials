@@ -166,22 +166,43 @@ The `lm()` function return a model object having class `"lm"`. This object conta
 For this exercise, fit the following regression models: 
 
 1. Using the `bdims` dataset, create a linear model for the weight of people (`wgt`) as a function of their height (`hgt`).
-2. Using the `mlbBat10` dataset, create a linear model for `slg` (y) as a function of `obp` (x).
+2. Using the `mlbbat10` dataset, create a linear model for `slg` (y) as a function of `obp` (x).
 3. Using the `mammals` dataset, create a linear model for the body weight of mammals (`body_wt`) as a function of their brain weight (`brain_wt`), after taking the natural log of both variables.
 
 
 ```{r ex1, exercise = TRUE}
 # Linear model for weight as a function of height
 lm(___ ~ ___, data = ___)
-# Linear model for SLG as a function of OBP
+# Linear model for 'slg' as a function of 'obp'
 # Log-linear model for body weight as a function of brain weight
 ```
 
-<div id="ex1-hint">
-**Hint:** The formula `y ~ x` means `y` is a function of `x`.
-</div>
 
-```{r ex1-solution}
+```{r ex1-hint-1}
+# The formula `y ~ x` means `y` is a function of `x`.
+```
+
+
+
+```{r ex1-hint-2}
+# The formula `y ~ x` means `y` is a function of `x`.
+
+# Linear model for weight as a function of height
+lm(wgt ~ hgt, data = bdims)
+```
+
+```{r ex1-hint-3}
+# The formula `y ~ x` means `y` is a function of `x`.
+
+# Linear model for weight as a function of height
+lm(wgt ~ hgt, data = bdims)
+# Linear model for SLG as a function of OBP
+lm(slg ~ obp, data = mlbbat10)
+```
+
+```{r ex1-hint-4}
+# The formula `y ~ x` means `y` is a function of `x`.
+
 # Linear model for weight as a function of height
 lm(wgt ~ hgt, data = bdims)
 # Linear model for SLG as a function of OBP
@@ -189,6 +210,7 @@ lm(slg ~ obp, data = mlbbat10)
 # Log-linear model for body weight as a function of brain weight
 lm(log(body_wt) ~ log(brain_wt), data = mammals)
 ```
+
 
 ### 
 
@@ -310,7 +332,7 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 # Show the full model output
 ```
 
-<div id="ex1-hint">
+<div id="ex2-hint">
 **Hint:** Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
 </div>
 
