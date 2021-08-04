@@ -104,7 +104,7 @@ You'll explore the "best fit" line on your own in these next exercise.
 
 ## Your turn! 
 
-Using the `bdims` dataset, create a scatterplot of body weight (`bwt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
+Using the `bdims` dataset, create a scatterplot of body weight (`wgt`) as a function of height (`hgt`) for all individuals in the `bdims` dataset. 
 
 Then, add a linear regression line on top of the scatterplot. 
 
@@ -215,10 +215,10 @@ When we estimate our population regression equation with data, we need to indica
 
 We do this by changing our equation in four ways: 
 
-1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response 
-2. the error terms ($\epsilon$) are removed, as we are no longer modeling individual responses 
-3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept 
-4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope 
+1. $Y$ is changed to $\hat{y}$, as we are now estimating the mean response rather than an individual response. 
+2. The error terms ($\epsilon$) are removed, as we are no longer modeling individual responses. 
+3. The $\beta_0$ is replaced with $\widehat{\beta_0}$, notating that this is an estimate of the true intercept. 
+4. The $\beta_1$ is replaced with $\widehat{\beta_1}$, notating that this is an estimate of the true slope.
 
 The resulting model looks like: 
 
@@ -255,13 +255,13 @@ You should also be aware that there are other criteria---apart from least square
 
 It's worth reviewing some key concepts about regression models. 
 
-- $\hat{Y}$ is the mean value of the response, for a given value of $X$
-  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$
-- $\hat{\beta}$'s are estimates of true, unknown $\beta$'s
-  * the estimated intercept and slope our best guess of the true value of $\beta_0$ and $\beta_1$
-- Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s
-  * the residuals are estimates of the true, unknown noise
-  * "error" may be misleading term---better: *noise*
+- $\hat{Y}$ is the mean value of the response, for a given value of $X$.
+  * $\hat{Y}$ is our best guess for the true value of $Y$ given what we know about $X$.
+- $\hat{\beta}$'s are estimates of true, unknown $\beta$'s.
+  * The estimated intercept and slope is our best guess of the true value of $\beta_0$ and $\beta_1$.
+- Residuals ($e$'s) are estimates of true, unknown $\epsilon$'s.
+  * The residuals are estimates of the true, unknown noise.
+  * "error" may be a misleading term---better: *noise*.
 
 
 You'll put your understanding of regression to use in these next exercises. 
@@ -533,5 +533,15 @@ What's next?
 `r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-04/)
 
 `r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-05/)
+
+`r emo::ji("six")` [Tutorial 3 - Lesson 6: Parallel slopes](https://openintro.shinyapps.io/ims-03-model-06/)
+
+`r emo::ji("seven")` [Tutorial 3 - Lesson 7: Evaluating and extending parallel slopes model](https://openintro.shinyapps.io/ims-03-model-07/)
+
+`r emo::ji("eight")` [Tutorial 3 - Lesson 8: Multiple regression](https://openintro.shinyapps.io/ims-03-model-08/)
+
+`r emo::ji("nine")` [Tutorial 3 - Lesson 9: Logistic regression](https://openintro.shinyapps.io/ims-03-model-09/)
+
+`r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
