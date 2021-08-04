@@ -33,6 +33,13 @@ We've spent some time building our graphical intuition about regression, as well
 Data were collected on 73 textbooks required for a few randomly selected courses at UCLA. For each textbook, we know the retail price at both the UCLA bookstore and on Amazon.com. We also know the department and course number for each corresponding course, and the ISBN of the book. 
 
 > What factors are associated with the price of each book at the UCLA bookstore?
+
+```{r}
+textbooks <- textbooks %>%
+  mutate(course_number = readr::parse_number(course))
+```
+
+
 ```{r 1, echo = TRUE}
 glimpse(textbooks)
 ```
@@ -40,11 +47,6 @@ glimpse(textbooks)
 ### Compared to the course number?
 
 One might suppose that more advanced books cost more. Our best guess for the level of the course is to extract the course number. The scatterplot shows the relationship between the course number and the price of the book at the UCLA bookstore. 
-
-```{r}
-textbooks <- textbooks %>%
-  mutate(course_number = readr::parse_number(course))
-```
 
 
 ```{r 2, echo = TRUE}
