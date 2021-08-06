@@ -404,13 +404,12 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 ```
 
 ```{r ex5, exercise = TRUE}
-# Load the broom package
 # Create hgt_wgt_tidy
 # Glimpse the resulting data frame
 ```
 
 ```{r ex5-hint-1}
-bdims_tidy <- augment(___)
+hgt_wgt_tidy <- augment(___)
 ```
 
 ```{r ex5-hint-2}
@@ -418,9 +417,7 @@ glimpse(___)
 ```
 
 ```{r ex5-solution}
-# Load the broom package
-library(broom)
-# Create bdims_tidy
+# Create hgt_wgt_tidy
 hgt_wgt_tidy <- augment(hgt_wgt_mod)
 # Glimpse the resulting data frame
 glimpse(hgt_wgt_tidy)
