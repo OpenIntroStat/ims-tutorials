@@ -612,7 +612,7 @@ In the `mlbbat10` data, the outlier with an OBP of 0.550 is [Bobby Scales](https
 
 Nevertheless, we can demonstrate how removing him will affect our model.
 
-1. Use `filter()` to create a new dataset named `nontrivial_players` consisting of the players from `mlbbat10` with *at least* 10 at-bats **and** and OBP of below 0.500.
+1. Use `filter()` to create a new dataset named `nontrivial_players` consisting of the players from `mlbbat10` with *at least* 10 at-bats **and** OBP of below 0.500.
 2. Create a visualization of the relationship between at bats and obp for **both** the new and old datasets
 
 ```{r ex7, exercise = TRUE}
