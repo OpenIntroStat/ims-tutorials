@@ -112,7 +112,7 @@ $$
     RMSE = \sqrt{ \frac{\sum_i{e_i^2}}{d.f.} } = \sqrt{ \frac{SSE}{n-2} }
 $$
 
-The RMSE also generalizes to any kind model for a single numerical response, so it is not specific to regression models.
+The RMSE also generalizes to any kind of model for a single numerical response, so it is not specific to regression models.
 
 ### Residual standard error (possums)
 
