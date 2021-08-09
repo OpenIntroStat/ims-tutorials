@@ -608,12 +608,12 @@ Now it's time to deal with some outliers on your own.
 
 Observations can be outliers for a number of different reasons. Statisticians must always be careful—and more importantly, transparent—when dealing with outliers. Sometimes, a better model fit can be achieved by simply removing outliers and re-fitting the model. However, one must have strong justification for doing this. A desire to have a higher $R^2$ is not a good enough reason!
 
-In the `mlbbat10` data, the outlier with an OBP of 0.550 is [Bobby Scales](https://en.wikipedia.org/wiki/Bobby_Scales), an infielder who had four hits in 13 at-bats for the Chicago Cubs. Scales also walked seven times, resulting in his unusually high OBP. The justification for removing Scales here is weak. While his performance was unusual, there is nothing to suggest that it is not a valid data point, nor is there a good reason to think that somehow we will learn more about Major League Baseball players by excluding him.
+In the `mlbbat10` data, the outlier with an `obp` of 0.550 is [Bobby Scales](https://en.wikipedia.org/wiki/Bobby_Scales), an infielder who had four hits in 13 `at_bat`s for the Chicago Cubs. Scales also walked seven times, resulting in his unusually high `obp`. The justification for removing Scales here is weak. While his performance was unusual, there is nothing to suggest that it is not a valid data point, nor is there a good reason to think that somehow we will learn more about Major League Baseball players by excluding him.
 
 Nevertheless, we can demonstrate how removing him will affect our model.
 
-1. Use `filter()` to create a new dataset named `nontrivial_players` consisting of the players from `mlbbat10` with *at least* 10 at-bats **and** and OBP of below 0.500.
-2. Create a visualization of the relationship between at bats and obp for **both** the new and old datasets
+1. Use `filter()` to create a new dataset named `nontrivial_players` consisting of the players from `mlbbat10` with *at least* 10 `at_bat`s **and** and `obp` of below 0.500.
+2. Create a visualization of the relationship between `at_bat`s and `obp` for **both** the new and old datasets
 
 ```{r ex7, exercise = TRUE}
 # Create nontrivial_players
@@ -640,13 +640,13 @@ nontrivial_players <- mlbbat10 %>%
 ```
 
 ```{r ex7-hint-2}
-ggplot(data = nontrivial_players, aes(x = obp, y = slg)) +
+ggplot(data = nontrivial_players, aes(x = at_bat, y = obp)) +
   geom_point() +
   geom_smooth(___)
 ```
 
 ```{r ex7-hint-3}
-ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
+ggplot(data = mlbbat10, aes(x = at_bat, y = obp)) +
   geom_point() +
   geom_smooth(method = "lm")
 ```
@@ -656,11 +656,11 @@ nontrivial_players <- mlbbat10 %>%
   filter(at_bat >= 10,
          obp < 0.5)
 
-ggplot(data = nontrivial_players, aes(x = obp, y = slg)) +
+ggplot(data = nontrivial_players, aes(x = at-bat, y = obp)) +
   geom_point() +
   geom_smooth(method = "lm")
 
-ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
+ggplot(data = mlbbat10, aes(x = at_bat, y = obp)) +
   geom_point() +
   geom_smooth(method = "lm")
 ```
@@ -669,8 +669,8 @@ ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
 
 Next, let's compare the models for these two datasets.
 
-1. Fit the linear model for `slg` as a function of `obp` for the `nontrivial_players`. Save this linear model as `mod_cleaner`.
-2. Fit the linear model for `slg` as a function of `obp` for the `mlbbat10`. Save this linear model as `mod_original`.
+1. Fit the linear model for `at_bat` as a function of `obp` for the `nontrivial_players`. Save this linear model as `mod_cleaner`.
+2. Fit the linear model for `at_bat` as a function of `obp` for the `mlbbat10`. Save this linear model as `mod_original`.
 3. View the `summary()` of the new model and compare the slope and $R^2$ to the original model fit to the data on all players.
 
 ```{r ex8-setup}
@@ -695,11 +695,11 @@ summary(___)
 ```
 
 ```{r ex8-hint-1}
-mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
+mod_cleaner <- lm(at_bat ~ obp, data = nontrivial_players)
 ```
 
 ```{r ex8-hint-2}
-mod_original <- lm(slg ~ obp, data = mlbbat10)
+mod_original <- lm(at_bat ~ obp, data = mlbbat10)
 ```
 
 ```{r ex8-hint-3}
@@ -709,9 +709,9 @@ summary(mod_original)
 ```
 
 ```{r ex8-solution}
-mod_cleaner <- lm(slg ~ obp, data = nontrivial_players)
+mod_cleaner <- lm(at_bat ~ obp, data = nontrivial_players)
 
-mod_original <- lm(slg ~ obp, data = mlbbat10)
+mod_original <- lm(at_bat ~ obp, data = mlbbat10)
 
 summary(mod_cleaner)
 
