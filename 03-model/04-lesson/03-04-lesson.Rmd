@@ -503,9 +503,9 @@ The `fitted.values()` function or the `augment()`-ed data frame provides us with
 
 The `ben` data frame contains a height and weight observation for one person. The `hgt_wgt_mod` object contains the fitted model for weight as a function of height for the observations in the `bdims` dataset. We can use the `predict()` function to generate expected values for the weight of new individuals. We must pass the data frame of new observations through the `newdata` argument.
 
-The same linear model, `mod`, is defined in your workspace.
+The same linear model, `hgt_wgt_mod`, is defined in your workspace.
 
-- Output `ben` to the console to take a look at it!
+- Output `ben` to take a look at it!
 - Use `predict()` with the `newdata` argument to compute the expected weight of the individual in the `ben` data frame.
 
 ```{r ex6-setup}
@@ -554,9 +554,11 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
               color = "dodgerblue")
 ```
 
-<div id="ex7-hint">
-**Hint:** The `hgt` variable in the `hgt_wgt_coefs` data frame indicates the slope.
-</div>
+
+```{r ex7-hint}
+# The `hgt` variable in the `hgt_wgt_coefs` data frame indicates the slope.
+```
+
 
 ```{r ex7-solution}
 # Add the line to the scatterplot
