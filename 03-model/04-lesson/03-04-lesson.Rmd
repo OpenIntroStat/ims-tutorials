@@ -281,7 +281,7 @@ summary(books_mod)
 
 Since the object `books_mod` contains everything R knows about our model, we can ask R for the fitted values, using the `fitted.values()` function. This returns a vector containing the $\hat{y}$ values for each observation in our dataset.
 
-In general, the length of the vector of fitted values is the same as the number of rows in the original data frame, since each observation corresponds to exactly one value of $\hat{y}$. However, if there were any observations with missing data, those will be automatically discarded by R when the model is fit, and thus, the length of the vector of fitted values may not be a large as the number of rows in the original data frame. 
+In general, the length of the vector of fitted values is the same as the number of rows in the original data frame, since each observation corresponds to exactly one value of $\hat{y}$. However, if there were any observations with missing data, those will be automatically discarded by R when the model is fit, and thus, the length of the vector of fitted values may not be as large as the number of rows in the original data frame. 
 
 ```{r 16, echo = TRUE}
 fitted.values(books_mod)
@@ -448,7 +448,7 @@ augment(books_mod) %>%
 
 ### Markup
 
-This turns out to be the management textbook "Financial Statement Analysis and Security Valuation". Does this qualifies as irony? 
+This turns out to be the management textbook "Financial Statement Analysis and Security Valuation". Does this qualify as irony? 
 
 ```{r lm3, echo = TRUE}
 textbooks %>%
