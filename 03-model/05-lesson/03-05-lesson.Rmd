@@ -317,7 +317,7 @@ where $e$ is the vector of residuals and $y$ is the response variable. This give
 The `wgt_hgt_augment` dataframe is the result of `augment()`-ing the `wgt_hgt_mod` linear regression model. In this exercise you will use this augmented dataframe to calculate the $R^2$ of the model.
 
 1. Use the `summary()` function to assess what the $R^2$ value of `wgt_hgt_mod` is.
-2. Use the `bdims_augment_wgt_hgt` dataframe to compute the $R^2$ of `wgt_hgt_mod` manually using the formula above.
+2. Use the `wgt_hgt_augment` dataframe to compute the $R^2$ of `wgt_hgt_mod` manually using the formula above.
 *Hint*: `wgt` is the response variable in this linear regression!
 
 ```{r ex3-setup}
@@ -329,14 +329,14 @@ wgt_hgt_augment <- augment(wgt_hgt_mod)
 
 
 # Compute R-squared
-bdims_augment_wgt_hgt %>%
+wgt_hgt_augment %>%
   summarize(var_y = ___,
             var_e = ___) %>%
   mutate(R_squared = ___)
 ```
 
 ```{r ex3-hint}
-bdims_augment_wgt_hgt %>%
+wgt_hgt_augment %>%
   summarize(var_y = var(wgt),
             var_e = var(.resid)) %>%
   mutate(R_squared = ___)
@@ -347,7 +347,7 @@ bdims_augment_wgt_hgt %>%
 summary(wgt_hgt_mod)
 
 # Compute R-squared
-bdims_augment_wgt_hgt %>%
+wgt_hgt_augment %>%
   summarize(var_y = var(wgt),
             var_e = var(.resid)) %>%
   mutate(R_squared = 1 - var_e / var_y)
