@@ -722,9 +722,9 @@ summary(mod_original)
 
 ## Congratulations!
 
-You have successfully completed all of the lessons in Tutorial 3: Introduction to Linear Models.
+You have successfully completed half of the lessons in Tutorial 3: Regression Modeling.
 
-This tutorial was about analyzing the relationship between two numeric variables. We learned a variety of techniques for doing this.
+This first half of the tutorial was about analyzing the relationship between two numeric variables. We learned a variety of techniques for doing this.
 
 First, we explored how powerful scatterplots can be in revealing bivariate relationships in an intuitive, graphical form. We built a framework for describing what we see in those scatterplots, and practiced implementing that framework on real data.
 
