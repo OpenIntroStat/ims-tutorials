@@ -278,9 +278,13 @@ Our plotting strategy is to compute the fitted values, plot these, and connect t
 
 Note that this approach has the added benefit of automatically colouring the lines appropriately to match the data. 
 
+### Your turn
+
 You already know how to use `ggplot()` and `geom_point()` to make the scatterplot. The only twist is that now you'll pass your `augment()`-ed model as the `data` argument in your `ggplot()` call. When you add your `geom_line()`, instead of letting the `y` aesthetic inherit its values from the `ggplot()` call, you can set it to the `.fitted` column of the `augment()`-ed model. This has the advantage of automatically colouring the lines for you.
 
-The parallel slopes model `mod` relating total price to the number of wheels and condition is already in your workspace.
+Coming back to the `mariokart` data, try to plot the parallel slope model:
+
+The parallel slopes model `mod` relating total price (`total_pr`) to the number of `wheels` and `cond`ition is already in your workspace.
 
 - `augment()` the model `mod` and explore the returned data frame using `glimpse()`. Notice the new variables that have been created.
 - Draw the scatterplot and save it as `data_space` by passing the `augment()`-ed model to `ggplot()` and using `geom_point()`.
