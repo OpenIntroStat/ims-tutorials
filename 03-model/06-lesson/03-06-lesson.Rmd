@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 1 - Parallel Slopes"
+title: "Regression modeling: 6 - Parallel Slopes"
 output: 
   learnr::tutorial:
     progressive: true
@@ -159,7 +159,7 @@ In this scatterplot, we use color to differentiate the cars from 2008 from those
 In this manner, we have depicted three variables---two numeric and one categorical---on the same scatterplot. Thus, this plot will enable us to visualize our parallel slopes model in the data space.
 
 
-```{r mpg-data-space}
+```{r mpg-data-space, echo=TRUE}
 data_space <- ggplot(data = mpg_manuals, aes(x = displ, y = hwy, color = factor(year))) + 
   geom_point()
 data_space
