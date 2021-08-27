@@ -103,7 +103,7 @@ We will fit a parallel slopes model using `lm()`. In addition to the `data` argu
 
 The output from `lm()` is a model object, which when printed, will show the fitted coefficients.
 
-- The dataset `mariokart` is already loaded for you. Take a peek at the data using `glimpse()`.
+- The dataset `mariokart` is already loaded for you. Take a peek at the data using `glimpse()`. (See also the details of the [`mariokart` data set](https://www.openintro.org/data/index.php?data=mariokart) on our data set page.)
 - Use `lm()` to fit a parallel slopes model for total price as a function of the number of wheels and the condition of the item. Use the argument `data` to specify the dataset you're using.
 
 ```{r ex1, exercise=TRUE}
@@ -476,7 +476,7 @@ Finally, R doesn't really understand math or geometry. But of course, R is reall
 - one line becomes multiple lines or a plane, or even multiple planes 
 
 
-As we extend simple linear regression into multiple regression, we will add additional explanatory variables. Instead of just having x, we will have x 1 and x 2, even possibly even more. The formula syntax will extend naturally, and additional coefficients will make their way into the mathematical equation. 
+As we extend simple linear regression into multiple regression, we will add additional explanatory variables. Instead of just having x, we will have x1 and x2, even possibly even more. The formula syntax will extend naturally, and additional coefficients will make their way into the mathematical equation. 
 
 As we add complexity, the data space will increase from two to three---and even more---dimensions, and the class of geometric objects that we can use to describe models will broaden to include multiple lines, planes, and even multiple planes. 
 
@@ -484,9 +484,9 @@ Unfortunately, while the mathematical and syntactic characterizations will scale
 
 ### Syntax from math
 
-The `babies` data set contains observations about the birthweight and other characteristics of children born in the San Francisco Bay area from 1960--1967. 
+The `babies` data set contains observations about the birthweight and other characteristics of children born in the San Francisco Bay area from 1960--1967 (You will find details of the [babies data](https://www.openintro.org/data/index.php?data=babies) on our [data set page](https://www.openintro.org/data/).). 
 
-We would like to build a model for birthweight as a function of the mother's age and whether this child was her first (`parity == 0`). Use the mathematical specification below to code the model in R. 
+We would like to build a model for birthweight as a function of the mother's `age` and whether this child was her first (`parity == 0`). Use the mathematical specification below to code the model in R. 
 
 $$
     birthweight = \beta_0 + \beta_1 \cdot age + \beta_2 \cdot parity + \epsilon
