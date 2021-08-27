@@ -344,7 +344,7 @@ lm(hwy ~ displ + factor(year), data = mpg)
 
 Let's start with the main intercept. The value is 35.276 and the units are the same as those of the response variable---miles per gallon. Recall that this is the expected fuel economy for a car from 1999 that had an engine size of 0 litres. Of course, in this case, this value has little meaning, since there is no such thing as a car with an engine size of 0 litres, but that is the literal interpretation of the role that 35.276 plays in our model. 
 
-As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the newer variable that we defined in the previous set of slides. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
+As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the newer variable that we defined in the previous sections. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
 
 ### Slope interpretation
 
@@ -376,7 +376,7 @@ Finally, the key difference in multiple regression is that coefficients must be 
 
 ### Intercept interpretation
 
-Recall that the `cond` variable is either `new` or `used`. Here are the fitted coefficients from your model:
+Recall that the `cond` variable of the `mariokart` data is either `new` or `used`. Here are the fitted coefficients from your model:
 
 ```{r, echo=TRUE}
 lm(total_pr ~ wheels + cond, data = mariokart)
