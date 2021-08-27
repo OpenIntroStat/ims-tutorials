@@ -200,7 +200,7 @@ mod <- lm(hwy ~ displ + factor(year), data = mpg)
 mod
 ```
 
-So what happens when the cars are newer? Plugging in and simplifying reveals the equation for a line. Note that since `displacement` is our numeric explanatory variable, the slope of the line is -3.611 mpg per litre, and the intercept is 36.678---the sum of the other two coefficients.
+So what happens when the cars are newer? Plugging in and simplifying reveals the equation for a line. Note that since `displ`acement is our numeric explanatory variable, the slope of the line is -3.611 mpg per litre, and the intercept is 36.678---the sum of the other two coefficients.
 
 What about the older cars from 1999? In that case, the value of `newer` is 0, and plugging that in to our equation also results in the equation for a line. This line also has a slope of -3.611 mpg per litre, but now the intercept is just 35.276 mpg.
 
