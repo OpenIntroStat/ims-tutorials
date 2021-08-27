@@ -286,12 +286,7 @@ Coming back to the `mariokart` data, try to plot the parallel slope model:
 
 The parallel slopes model `mod` relating total price (`total_pr`) to the number of `wheels` and `cond`ition is already in your workspace.
 
-- `augment()` the model `mod` and explore the returned data frame using `glimpse()`. Notice the new variables that have been created.
-- Draw the scatterplot and save it as `data_space` by passing the `augment()`-ed model to `ggplot()` and using `geom_point()`.
-- Use `geom_line()` *once* to add two parallel lines corresponding to our model.
-
-
-- Call the `augment()` function on the model object `mod`, the use `glimpse(augmented_mod)` to explore the resulting data frame.
+- Call the `augment()` function on the model object `mod`, then use `glimpse(augmented_mod)` to explore the resulting data frame.
 - To create `data_space` first map each of the three variables to an aesthetic in your `ggplot()`, then use the `geom_point()` function.
 - To plot the fitted values as a line, your `geom_line()` call will need to specify a new `y` aesthetic to plot the `.fitted` values.
 
