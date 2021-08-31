@@ -329,7 +329,8 @@ where $t$ is time, measured in weeks, and $temp$ is a binary variable indicating
 
 If you decide to keep the interaction term present in the second model, you are implicitly assuming that:
 
-*Hint:* An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
+<details>An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
+</details>
 
 ```{r letter-w}
 question("If you decide to keep the interaction term present in the second model, you are implicitly assuming that",
