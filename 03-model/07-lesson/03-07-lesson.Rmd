@@ -136,7 +136,7 @@ $$
     R^2 = 1 - \frac{SSE}{SST} \,,
 $$
 
-where $SSE$ and $SST$ are the sum of the squared residuals, and the total sum of the squares, respectively. One issue with this measure is that the $SSE$ can only decrease as new variable are added to the model, while the $SST$ depends only on the response variable and therefore is not affected by changes to the model. This means that you can increase $R^2$ by adding *any* additional variable to your model - even random noise. 
+where $SSE$ and $SST$ are the sum of the squared residuals, and the total sum of the squares, respectively. One issue with this measure is that the $SSE$ can only decrease as new variables are added to the model, while the $SST$ depends only on the response variable and therefore is not affected by changes to the model. This means that you can increase $R^2$ by adding *any* additional variable to your model - even random noise. 
 
 The adjusted $R^2$ includes a term that penalizes a model for each additional explanatory variable (where $p$ is the number of explanatory variables). 
 
