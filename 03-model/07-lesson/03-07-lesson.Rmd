@@ -29,8 +29,7 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 
 SAT <- mosaicData::SAT %>%
-  rename(total = sat) %>%
-  mutate(sat_bin = cut(frac, 3))
+  rename(total = sat)
 
 mariokart <- mariokart %>%
   filter(total_pr < 100)
@@ -418,30 +417,32 @@ ggplot(data = SAT, aes(x = salary, y = total)) +
 
 ### Percentage taking the SAT
 
-Let's try turning the SAT score into an ordinal variable with 3 levels.
+How about the percentage  (`frac`tion) of students eligible for taking the SAT? Let's try turning the SAT score into an ordinal variable with 3 levels.
+
+First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. 
 
 ```{r echo=TRUE}
-SAT <- SAT %>%
+SAT_bin <- SAT %>%
   mutate(sat_bin = cut(frac, 3))
 ``` 
 
 ```{r echo=TRUE}  
-mod <- lm(formula = total ~ salary + sat_bin, data = SAT)
-
-tidy(mod)
+mod <- lm(formula = total ~ salary + sat_bin, data = SAT_bin)
+mod
 ``` 
+
+Note that in this case the categorical variable `sat_bin` is not binary---it has three levels. This results in another coefficient. 
 
 It turns out that the rate at which students take the SAT has a moderating effect on this relationship. Consider how things change when we add a categorical variable to make this a parallel slopes model. In this case, we want to separate states into three groups based on how many of their students take the SAT. 
 
-First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. Note that in this case the categorical variable `sat_bin` is not binary---it has three levels. This results in another coefficient. How many lines to you think we will see in the plot?
-
+How many lines do you think we will see in the plot?
 
 ### Simpson's paradox
 
 If you guess three, you were correct. 
 
 ```{r sat-binned, echo=TRUE}
-ggplot(data = SAT, aes(x = salary, y = total, color = sat_bin)) + 
+ggplot(data = SAT_bin, aes(x = salary, y = total, color = sat_bin)) + 
   geom_point() + 
   geom_line(data = broom::augment(mod), aes(y = .fitted))
 ```
@@ -452,20 +453,34 @@ This phenomenon is known as **Simpson's paradox**, and it occurs widely in the s
 
 ### Consequences of Simpson's paradox
 
-In the simple linear regression model for average SAT score, (`total`) as a function of average teacher salary (`salary`), the fitted coefficient was -5.02 points per thousand dollars. This suggests that for every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 5 points lower. 
+```{r sat-simple, echo=TRUE}
+lm(formula = total ~ salary, data = SAT)
+```
 
-In the model that includes the percentage of students taking the SAT, the coefficient on `salary` becomes 1.84 points per thousand dollars. 
 
-*Hint:* The coefficient on the new term is positive.
+In the simple linear regression model for average SAT score, (`total`) as a function of average teacher salary (`salary`), the fitted coefficient was -5.54 points per thousand dollars. This suggests that for every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 5.5 points lower. 
+
+```{r sat-with-bins, echo=TRUE}
+lm(formula = total ~ salary + salary:sat_bin, data = SAT_bin)
+```
+
+
+But in the model that includes the percentage of students taking the SAT, the coefficient on `salary` becomes 3.09 points  per thousand dollars. 
+
+
 
 ```{r letter-z}
 question("Choose the correct interpretation of this slope coefficient.",
-  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 2 points lower.", message="Was there another variable?"),
-  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 2 points higher, after controlling for the percentage of students taking the SAT.", correct = TRUE, message="Right!"),
-  answer("The average SAT score in richer states is about 2 points higher.", message="It's not that simple..."),
+  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 3 points lower.", message="Was there another variable?"),
+  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 3 points higher, after controlling for the percentage of students taking the SAT.", correct = TRUE, message="Right!"),
+  answer("The average SAT score in richer states is about 3 points higher.", message="It's not that simple..."),
   allow_retry=TRUE
 )
 ```
+
+<details>
+The coefficient on the new term is positive.
+</details>
 
 
 ### Simpson's paradox in action
