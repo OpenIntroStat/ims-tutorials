@@ -38,7 +38,7 @@ mariokart <- mariokart %>%
 
 ## Evaluating and extending parallel slopes model
 
-This lesson covers model evaluation. By looking at different properties of the model, including the adjusted $R^2$., you'll learn to compare models so that you can select the best one. You'll also learn about interaction terms in linear models.
+This lesson covers model evaluation. By looking at different properties of the model, including the adjusted $R^2$, you'll learn to compare models so that you can select the best one. You'll also learn about interaction terms in linear models.
 
 ## Model fit, residuals, and prediction
 
@@ -64,9 +64,9 @@ Note that this necessarily makes our parallel slopes model more flexible than a 
 
 ### Model Fit
 
-The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$. value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
+The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$ value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
 
-In general, a higher $R^2$. may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$.. Thus, model fits in multiple regression are often compared using the adjusted $R^2$. value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$., adjusted $R^2$. will not necessarily increase as new explanatory variables are added---it could go up or down.
+In general, a higher $R^2$ may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$. Thus, model fits in multiple regression are often compared using the adjusted $R^2$ value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$, adjusted $R^2$ will not necessarily increase as new explanatory variables are added---it could go up or down.
 
 To summarize:
 
@@ -128,7 +128,7 @@ augment(mod, newdata = new_obs)
 
 To figure this out, we can simply input the values of the explanatory variables. In this case, my car has a 1.8 liter engine. We can create a new data.frame with the information, and then feed it to `predict()` or `augment()` using the newdata argument. Either function will return a predicted mileage of 30.18 mpg. This is slightly less than the manufacturer's reported 33 mpg, giving us a residual of 2.82 mpg.
 
-### $R^2$. vs. adjusted $R^2$.
+### $R^2$ vs. adjusted $R^2$
 
 Two common measures of how well a model fits to data are $R^2$ (the coefficient of determination) and the adjusted $R^2$. The former measures the percentage of the variability in the response variable that is explained by the model. To compute this, we define
 
