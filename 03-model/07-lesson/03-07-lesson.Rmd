@@ -66,14 +66,14 @@ Note that this necessarily makes our parallel slopes model more flexible than a 
 
 The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$. value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
 
-In general, a higher $R^2$. may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$.. Thus, model fits in multiple regression are often compared using the adjusted $R^2$. value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables p increases. Unlike $R^2$., adjusted $R^2$. will not necessarily increase as new explanatory variables are added---it could go up or down.
+In general, a higher $R^2$. may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$.. Thus, model fits in multiple regression are often compared using the adjusted $R^2$. value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$., adjusted $R^2$. will not necessarily increase as new explanatory variables are added---it could go up or down.
 
 To summarize:
 
 - $R^2 = 1 - \frac{SSE}{SST}$ 
 - $SSE$ gets smaller as $\Rightarrow R^2$ increases 
 - As $p$ (number of explanatory variables) increases $R^2$ will always increase (or stay the same)
-- To adjust for an increasing $R^2$ use: $ R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} $ 
+- To adjust for an increasing $R^2$ use: $R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1}$ 
 
 ### Fitted values
 
