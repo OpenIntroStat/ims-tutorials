@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 2 - Evaluating and extending parallel slopes model"
+title: "Regression modeling: 7 - Evaluating and extending parallel slopes model"
 output: 
   learnr::tutorial:
     progressive: true
