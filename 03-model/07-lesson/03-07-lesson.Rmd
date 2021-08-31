@@ -144,19 +144,17 @@ $$
     R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} \,,
 $$
 
-We can see both measures in the output of the `summary()` function on our model object.
 
-- Use `summary()` to compute $R^2$ and adjusted $R^2$ on the model object called `mod`.
-- Use `mutate()` and `rnorm()` to add a new variable called `noise` to the `mariokart` data set that consists of random noise. Save the new dataframe as `mariokart_noisy`.
-- Use `lm()` to fit a model that includes `wheels`, `cond`, and the random noise term.
-- Use `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object. Did the value of $R^2$ increase? What about adjusted $R^2$?
 
-###
+## Your turn
 
-- The model `mod` is already in your workspace.
-- Add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` of your dataframe.
+### Model Fit
+
+Now try it for yourself. The model `mod` from the `mariokart` data set is already in your workspace.
+
+- Use `mutate()` to add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` to the `mariokart` data set. Save the new dataframe as `mariokart_noisy`.
 - The first argument of `lm()` is a formula involving the variables `total_pr`, `wheels`, `cond`, and `noise`.
-- Call the function `summary()` with the argument `mod2`.
+- Call the function `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object `mod2`. Did the value of $R^2$ increase? What about adjusted $R^2$?
 
 ```{r ex1-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
@@ -184,7 +182,7 @@ summary(mod)
 ```{r ex1-hint-2}
 # add random noise
 mariokart_noisy <- mariokart %>%
-  mutate(noise = rnorm(nrow(mariokart)))
+  mutate(noise = rnorm(n = nrow(mariokart)))
 ```
 
 ```{r ex1-hint-3}
@@ -198,7 +196,7 @@ summary(mod)
 
 # add random noise
 mariokart_noisy <- mariokart %>%
-  mutate(noise = rnorm(nrow(mariokart)))
+  mutate(noise = rnorm(n = nrow(mariokart)))
   
 # compute new model
 mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
