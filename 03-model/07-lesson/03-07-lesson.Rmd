@@ -329,9 +329,6 @@ where $t$ is time, measured in weeks, and $temp$ is a binary variable indicating
 
 If you decide to keep the interaction term present in the second model, you are implicitly assuming that:
 
-<details>An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
-</details>
-
 ```{r letter-w}
 question("If you decide to keep the interaction term present in the second model, you are implicitly assuming that",
   answer("The amount of rot will vary based on the temperature.", message="What about the time of exposure?"),
@@ -342,6 +339,8 @@ question("If you decide to keep the interaction term present in the second model
 )
 ```
 
+<details>An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
+</details>
 
 ### Fitting a model with interaction
 
@@ -366,9 +365,9 @@ Include the term `cond:duration` in your formula to model the interaction of con
 
 ```
 
-<div id="ex3-hint">
-**Hint:** To include an interaction effect of variable A and B, use `A:B`.
-</div>
+<details>
+To include an interaction effect of variable A and B, use `A:B`.
+</details>
 
 ```{r ex3-solution}
 # include interaction
