@@ -261,7 +261,7 @@ Thus far we have considered models where the regression lines were constrained t
 ### Adding interaction terms
 
 $$
-    \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot is_newer + \hat{\beta}_3 \cdot displ \cdot is_newer
+    \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot is\_newer + \hat{\beta}_3 \cdot displ \cdot is\_newer
 $$
 
 - For older cars 
