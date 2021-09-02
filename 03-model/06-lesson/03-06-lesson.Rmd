@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 1 - Parallel Slopes"
+title: "Regression modeling: 6 - Parallel Slopes"
 output: 
   learnr::tutorial:
     progressive: true
@@ -103,7 +103,7 @@ We will fit a parallel slopes model using `lm()`. In addition to the `data` argu
 
 The output from `lm()` is a model object, which when printed, will show the fitted coefficients.
 
-- The dataset `mariokart` is already loaded for you. Take a peek at the data using `glimpse()`.
+- The dataset `mariokart` is already loaded for you. Take a peek at the data using `glimpse()`. (See also the details of the [`mariokart` data set](https://www.openintro.org/data/index.php?data=mariokart) on our data set page.)
 - Use `lm()` to fit a parallel slopes model for total price as a function of the number of wheels and the condition of the item. Use the argument `data` to specify the dataset you're using.
 
 ```{r ex1, exercise=TRUE}
@@ -159,7 +159,7 @@ In this scatterplot, we use color to differentiate the cars from 2008 from those
 In this manner, we have depicted three variables---two numeric and one categorical---on the same scatterplot. Thus, this plot will enable us to visualize our parallel slopes model in the data space.
 
 
-```{r mpg-data-space}
+```{r mpg-data-space, echo=TRUE}
 data_space <- ggplot(data = mpg_manuals, aes(x = displ, y = hwy, color = factor(year))) + 
   geom_point()
 data_space
@@ -200,7 +200,7 @@ mod <- lm(hwy ~ displ + factor(year), data = mpg)
 mod
 ```
 
-So what happens when the cars are newer? Plugging in and simplifying reveals the equation for a line. Note that since `displacement` is our numeric explanatory variable, the slope of the line is -3.611 mpg per litre, and the intercept is 36.678---the sum of the other two coefficients.
+So what happens when the cars are newer? Plugging in and simplifying reveals the equation for a line. Note that since `displ`acement is our numeric explanatory variable, the slope of the line is -3.611 mpg per litre, and the intercept is 36.678---the sum of the other two coefficients.
 
 What about the older cars from 1999? In that case, the value of `newer` is 0, and plugging that in to our equation also results in the equation for a line. This line also has a slope of -3.611 mpg per litre, but now the intercept is just 35.276 mpg.
 
@@ -278,16 +278,15 @@ Our plotting strategy is to compute the fitted values, plot these, and connect t
 
 Note that this approach has the added benefit of automatically colouring the lines appropriately to match the data. 
 
+### Your turn
+
 You already know how to use `ggplot()` and `geom_point()` to make the scatterplot. The only twist is that now you'll pass your `augment()`-ed model as the `data` argument in your `ggplot()` call. When you add your `geom_line()`, instead of letting the `y` aesthetic inherit its values from the `ggplot()` call, you can set it to the `.fitted` column of the `augment()`-ed model. This has the advantage of automatically colouring the lines for you.
 
-The parallel slopes model `mod` relating total price to the number of wheels and condition is already in your workspace.
+Coming back to the `mariokart` data, try to plot the parallel slope model:
 
-- `augment()` the model `mod` and explore the returned data frame using `glimpse()`. Notice the new variables that have been created.
-- Draw the scatterplot and save it as `data_space` by passing the `augment()`-ed model to `ggplot()` and using `geom_point()`.
-- Use `geom_line()` *once* to add two parallel lines corresponding to our model.
+The parallel slopes model `mod` relating total price (`total_pr`) to the number of `wheels` and `cond`ition is already in your workspace.
 
-
-- Call the `augment()` function on the model object `mod`, the use `glimpse(augmented_mod)` to explore the resulting data frame.
+- Call the `augment()` function on the model object `mod`, then use `glimpse(augmented_mod)` to explore the resulting data frame.
 - To create `data_space` first map each of the three variables to an aesthetic in your `ggplot()`, then use the `geom_point()` function.
 - To plot the fitted values as a line, your `geom_line()` call will need to specify a new `y` aesthetic to plot the `.fitted` values.
 
@@ -345,7 +344,7 @@ lm(hwy ~ displ + factor(year), data = mpg)
 
 Let's start with the main intercept. The value is 35.276 and the units are the same as those of the response variable---miles per gallon. Recall that this is the expected fuel economy for a car from 1999 that had an engine size of 0 litres. Of course, in this case, this value has little meaning, since there is no such thing as a car with an engine size of 0 litres, but that is the literal interpretation of the role that 35.276 plays in our model. 
 
-As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the newer variable that we defined in the previous set of slides. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
+As we saw above, the coefficient on year can also be thought of as an intercept. Note here that R has chosen to report the name of the coefficient as `factor(year)2008`. This reflects the fact that `year` was the name of the variable we gave R, `factor(year)` was the formatting used in the `lm()` command, and 2008 is the value of that variable about which R is reporting. This variable is identical to the newer variable that we defined in the previous sections. Here, R is telling us that cars manufactured in 2008 get about 1.4 miles per gallon better gas mileage than those manufactured in 1999, after controlling for engine size. This is our key finding, and we'll return to this in just a minute.
 
 ### Slope interpretation
 
@@ -377,7 +376,7 @@ Finally, the key difference in multiple regression is that coefficients must be 
 
 ### Intercept interpretation
 
-Recall that the `cond` variable is either `new` or `used`. Here are the fitted coefficients from your model:
+Recall that the `cond` variable of the `mariokart` data is either `new` or `used`. Here are the fitted coefficients from your model:
 
 ```{r, echo=TRUE}
 lm(total_pr ~ wheels + cond, data = mariokart)
@@ -477,7 +476,7 @@ Finally, R doesn't really understand math or geometry. But of course, R is reall
 - one line becomes multiple lines or a plane, or even multiple planes 
 
 
-As we extend simple linear regression into multiple regression, we will add additional explanatory variables. Instead of just having x, we will have x 1 and x 2, even possibly even more. The formula syntax will extend naturally, and additional coefficients will make their way into the mathematical equation. 
+As we extend simple linear regression into multiple regression, we will add additional explanatory variables. Instead of just having x, we will have x1 and x2, even possibly even more. The formula syntax will extend naturally, and additional coefficients will make their way into the mathematical equation. 
 
 As we add complexity, the data space will increase from two to three---and even more---dimensions, and the class of geometric objects that we can use to describe models will broaden to include multiple lines, planes, and even multiple planes. 
 
@@ -485,9 +484,9 @@ Unfortunately, while the mathematical and syntactic characterizations will scale
 
 ### Syntax from math
 
-The `babies` data set contains observations about the birthweight and other characteristics of children born in the San Francisco Bay area from 1960--1967. 
+The `babies` data set contains observations about the birthweight and other characteristics of children born in the San Francisco Bay area from 1960--1967 (You will find details of the [babies data](https://www.openintro.org/data/index.php?data=babies) on our [data set page](https://www.openintro.org/data/).). 
 
-We would like to build a model for birthweight as a function of the mother's age and whether this child was her first (`parity == 0`). Use the mathematical specification below to code the model in R. 
+We would like to build a model for birthweight as a function of the mother's `age` and whether this child was her first (`parity == 0`). Use the mathematical specification below to code the model in R. 
 
 $$
     birthweight = \beta_0 + \beta_1 \cdot age + \beta_2 \cdot parity + \epsilon
