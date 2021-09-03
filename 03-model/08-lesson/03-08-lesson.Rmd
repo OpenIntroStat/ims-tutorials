@@ -43,23 +43,25 @@ Thus far, we've only considered multiple regression models with one numeric expl
 
 ### Adding a second numeric explanatory variable
 
+The following example uses the [`babies` data](https://www.openintro.org/data/index.php?data=babies) set from the `openintro` package together with our ‘tidy’-toolkit collected in the tidyverse package. We are going to model the birthweight (`bwt`) of babies born in San Francisco between 1960 and 1967 as a function of their pregnancy’s length of `gestation` (in weeks) and the mother’s `age` (in years).
+
 
 - Mathematical: 
+
+Mathematically, adding a second numeric explanatory variable is trivial---we just add another term to our model.
 
 $$ \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cdot age $$
 
 - Syntactical: 
 
-```{r echo=TRUE, eval=FALSE}
-lm(bwt ~ gestation + age, data = babies)
+The syntax for fitting this model in R is similarly trivial---we simply extend the formula to incorporate both the `gestation` and `age` variables, just as we did before.
+
+```{r ex01, echo=TRUE, exercise=TRUE}
+mod <- lm(bwt ~ gestation + age, data = babies)
+mod
 ``` 
 
-
-Mathematically, adding a second numeric explanatory variable is trivial---we just add another term to our model. In this example, we are modeling the birthweight of babies born in San Francisco as a function of their pregnancy's length of gestation (in weeks) and the mother's age (in years). Note that both gestation and age are numeric variables here, so this is not a parallel slopes model. 
-
-The syntax for fitting this model in R is similarly trivial---we simply extend the formula to incorporate both the gestation and age variables, just as we did before. 
-
-Note also that since `age` is not categorical, we don't have to worry about using the `factor()` function, or converting a categorical variable into binary variables, like we had to with `year` and `is_newer`.
+Note that both `gestation` and `age` are numeric variables here, so this is not a parallel slopes model. Note also that since `age` is not categorical, we don't have to worry about using the `factor()` function, or converting a categorical variable into binary variables, like we had to with `year` and `is_newer` in previous lessons.
 
 
 ### No longer a 2D problem
