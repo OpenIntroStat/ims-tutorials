@@ -64,32 +64,31 @@ mod
 Note that both `gestation` and `age` are numeric variables here, so this is not a parallel slopes model. Note also that since `age` is not categorical, we don't have to worry about using the `factor()` function, or converting a categorical variable into binary variables, like we had to with `year` and `is_newer` in previous lessons.
 
 
-### No longer a 2D problem
+### Data space is 3D
 
 Unfortunately, while the mathematical and syntactical formulations of multiple regression models are easy extensions of things we already know, a visual formulation of these models becomes much trickier. 
 
 You might be tempted to visualize our model using a ggplot expression like this. But unfortunately, this will not work, because ggplot only handles 2D graphics, and thus there is no z aesthetic.
 
-```{r echo=TRUE, eval=FALSE}
+```{r 3d-not-working, echo=TRUE, eval=FALSE}
 # doesn't work
 ggplot(data = babies, aes(x = gestation, y = age, z = bwt)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-### Data space is 3D
-
 Our data space is now three dimensional, because `bwt`, `gestation`, and `age` are all numeric variables that our model encapsulates. So we will need to get a little bit creative in order to create a meaningful visualization of our model.
 
+One way to visualize a 3D model in a 2D space is to color the outcome variable.
 
-```{r babies-gestation-age, echo=TRUE}
+
+```{r dataspace-setup, echo=TRUE, exercise=TRUE}
 data_space <- ggplot(babies, aes(x = gestation, y = age)) + 
   geom_point(aes(color = bwt))  
 data_space
 ```
 
-
-
+You may note in the resulting graph that the blue points tend to get lighter with increasing gestation, reflecting an increase in birthweight.
 
 
 ### Tiling the plane
@@ -123,7 +122,7 @@ We then use the `geom_tile()` function to superimpose these values on our data s
 
 Note how the color of the tiles lighten as you get closer to the upper right corner. This reflects that the model predicts heavier babies for older mothers with longer gestational periods.
 
-```{r babies-tiled-plane, echo=TRUE}
+```{r babies-tiled-plane, echo=TRUE, exercise=TRUE}
 model_space <- data_space + 
   geom_tile(data = bwt_hats, aes(fill = .fitted, alpha = 0.5)) + 
   scale_fill_continuous("bwt", limits = range(babies$bwt))
@@ -338,7 +337,7 @@ Note that in this case both slopes are positive, but have different magnitudes.
 
 When we depicted our model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birthweights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
 
-```{r babies-model-space, echo=TRUE}
+```{r babies-model-space, echo=TRUE, exercise=TRUE}
 model_space
 ```
 
@@ -350,7 +349,7 @@ However, this rate of change is constant across mothers of all ages. It doesn't 
 
 Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birthweight, while holding age constant.
 
-```{r babies-model-hline, echo=TRUE}
+```{r babies-model-hline, echo=TRUE, exercise=TRUE}
 model_space + 
   geom_hline(yintercept = 30, color = "red")
 ```
@@ -363,7 +362,7 @@ So the coefficient of 0.17 ounces per year is the slope of the plane for a fixed
 
 It's also apparent from the plot that the colours change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation is bigger than the coefficient on age.
 
-```{r babies-model-vline, echo=TRUE}
+```{r babies-model-vline, echo=TRUE, exercise=TRUE}
 model_space + 
   geom_vline(xintercept = 280, color = "red")
 ```
