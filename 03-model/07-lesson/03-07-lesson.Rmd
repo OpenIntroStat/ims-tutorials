@@ -4,6 +4,7 @@ output:
   learnr::tutorial:
     progressive: true
     allow_skip: true
+    css: "css/style.css"
 runtime: shiny_prerendered
 ---
 
@@ -222,7 +223,6 @@ The fitted model `mod` is already in your environment.
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
-
 ```{r ex2, exercise=TRUE}
 # return a vector
 
@@ -231,9 +231,11 @@ mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 
 ```
 
-<div id="ex2-hint">
-**Hint:** You can get predictions with `predict(mod)`, and `augment()` works similarly as well.
-</div>
+<details>
+<summary>**Hint:**</summary>
+You can get predictions with `predict(mod)`, and `augment()` works similarly as well.
+</details>
+
 
 ```{r ex2-solution}
 # return a vector
@@ -338,7 +340,9 @@ question("If you decide to keep the interaction term present in the second model
 )
 ```
 
-<details>An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
+<details>
+<summary>**Hint:**</summary>
+An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
 </details>
 
 ### Fitting a model with interaction
@@ -365,6 +369,7 @@ Include the term `cond:duration` in your formula to model the interaction of con
 ```
 
 <details>
+<summary>**Hint:**</summary>
 To include an interaction effect of variable A and B, use `A:B`.
 </details>
 
@@ -392,6 +397,7 @@ ggplot(___, aes(___)) +
 ```
 
 <details>
+<summary>**Hint:**</summary>
 Define groups using the color `aes`thetic in the ggplot call.
 </details>
 
@@ -479,6 +485,7 @@ question("Choose the correct interpretation of this slope coefficient.",
 ```
 
 <details>
+<summary>**Hint:**</summary>
 The coefficient on the new term is positive.
 </details>
 
@@ -514,6 +521,7 @@ slr + aes(___)
 
 
 <details>
+<summary>**Hint:**</summary>
 You can add layers to an existing plot with `+`.
 </details>
 
