@@ -56,7 +56,7 @@ $$ \hat{bwt} = \hat{\beta}_0 + \hat{\beta}_1 \cdot gestation + \hat{\beta}_2 \cd
 
 The syntax for fitting this model in R is similarly trivial---we simply extend the formula to incorporate both the `gestation` and `age` variables, just as we did before.
 
-```{r ex01, echo=TRUE, exercise=TRUE}
+```{r ex1-babies-fit-model, echo=TRUE, exercise=TRUE}
 mod <- lm(bwt ~ gestation + age, data = babies)
 mod
 ``` 
@@ -82,55 +82,68 @@ Our data space is now three dimensional, because `bwt`, `gestation`, and `age` a
 One way to visualize a 3D model in a 2D space is to color the outcome variable.
 
 
-```{r dataspace-setup, echo=TRUE, exercise=TRUE}
+```{r ex2-babies-data-space, echo=TRUE, exercise=TRUE, exercise.setup="ex1-babies-fit-model"}
 data_space <- ggplot(babies, aes(x = gestation, y = age)) + 
   geom_point(aes(color = bwt))  
 data_space
 ```
 
-You may note in the resulting graph that the blue points tend to get lighter with increasing gestation, reflecting an increase in birthweight.
+It is difficult to see but you may note in the resulting graph that the blue points tend to get lighter with increasing gestation, reflecting an increase in birthweight.
 
 
 ### Tiling the plane
 
-One way to visualize a 3D model is to tile the plane. That is, we will create a 2D plot that covers all combinations of our two explanatory variables, and we will use color to reflect the corresponding fitted values. 
+Another (better) way to visualize a 3D model is to tile the plane. We will create a 2D plot that covers all combinations of our two explanatory variables and then use color for tiles in the _background_ to reflect the corresponding fitted values. 
 
-Here, we have created that grid of values using the `data_grid()` function, and then fed those into our model using the `augment()` function with the newdata argument. These two steps create a data frame of all possible combinations of gestation and age values, along with the model prediction for each.
+We will need two steps to create a data frame of all possible combinations of `gestation` and `age` values, along with the model prediction for each.
+
+1. Firstly, we create a grid of values using the `data_grid()` function. With the `seq_range` function, we specify the spaces in the sequence of our variables. Using the parameter `by = 1` means that we want to produce all possible combinations. Both functions are part of the `modelr` package, which is not part of the `tidyverse` and must be loaded separately.
+
+2. Secondly, we feed those generated grid values into our model using the `broom` package. In this case, we can't use the `data` argument as we had done previously. Our data are not the same as those used to fit the model object but come from the `data_grid()` function. So we must use the `newdata` argument.
 
 
+```{r ex3-babies-tiling-plane, echo=TRUE, exercise.setup="ex2-babies-data-space", exercise=TRUE}
+library(modelr)
+library(broom)
 
-```{r echo=TRUE}
+# Step 1: Generate an evenly spaced grid of points from the data
 grid <- babies %>%
   data_grid(
     gestation = seq_range(gestation, by = 1), 
     age = seq_range(age, by = 1)
   )
-``` 
+glimpse(grid)
 
-```{r echo=TRUE}
-mod <- lm(bwt ~ gestation + age, data = babies)
-
-bwt_hats <- augment(mod, newdata = grid)
+# Step 2: Augment with the grid data
+bwt_hats <- broom::augment(mod, newdata = grid)
+glimpse(bwt_hats)
 ```
 
+`glimpse` shows that the grid consists of 6,386 rows. This number is the result of the combination of all unique values of the `gestation` and `age` variable. Check it with a multiplication of both vector lengths  in the following code sandbox:
+
+```{r sandbox, exercise.cap="Sandbox", exercise=TRUE, exercise.setup="ex3-babies-tiling-plane" }
+
+```
+
+```{r sandbox-solution}
+x <- length(unique(grid$gestation)) 
+y <- length(unique(grid$age))
+x * y
+```
+
+3. Thirdly, we use the `geom_tile()` function from the `ggplot2` package to superimpose these values on our data space. Setting the `alpha` argument to 0.5 allows us to see both the actual observations (as points) and the model predictions (as a smooth surface). 
 
 
 
-### Tiles in the data space
 
-We then use the `geom_tile()` function to superimpose these values on our data space. Setting the `alpha` argument to 0.5 allows us to see both the actual observations (as points) and the model predictions (as a smooth surface). 
-
-Note how the color of the tiles lighten as you get closer to the upper right corner. This reflects that the model predicts heavier babies for older mothers with longer gestational periods.
-
-```{r babies-tiled-plane, echo=TRUE, exercise=TRUE}
+```{r ex4-babies-model-space, echo=TRUE, exercise=TRUE, exercise.setup="ex3-babies-tiling-plane"}
 model_space <- data_space + 
   geom_tile(data = bwt_hats, aes(fill = .fitted, alpha = 0.5)) + 
   scale_fill_continuous("bwt", limits = range(babies$bwt))
 model_space
 ```
 
-
-
+Note how the color of the tiles lightens as you get closer to the upper right corner. This change reflects that the model predicts heavier babies for older mothers with longer gestational periods.
 
 ### 3D visualization
 
@@ -140,7 +153,7 @@ A perhaps more natural way to visualize a multiple regression model is as a plan
 The `plot_ly` syntax is similar to that of ggplot. In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. The x, y, and plane objects were created in code that we aren't showing here due to its complexity. Using the plot below, trying moving the model around with your mouse. Visualizing the structure from different angles helps a lot to see what is going on.
 
 
-```{r babies-plotly, echo=TRUE, message=FALSE}
+```{r ex5-babies-plotly, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE, message=FALSE, exercise.lines=27}
 library(plotly)
 
 grid <- babies %>%
@@ -447,7 +460,7 @@ If you guess parallel planes, you're right!
 
 ### Drawing parallel planes in 3D
 
-```{r babies-plotly-two, echo=TRUE}
+```{r babies-plotly-two, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE}
 grid <- babies %>%
   modelr::data_grid(
     gestation = seq_range(gestation, n = 50),
