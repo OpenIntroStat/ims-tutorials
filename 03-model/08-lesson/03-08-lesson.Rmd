@@ -217,32 +217,46 @@ Try to move the model around with your mouse! Visualizing the structure from dif
 
 Note how the plane cuts through the data points. The residual associated with each observation is the vertical distance between that point and the plane. Believe it or not, this plane is the one that uniquely minimizes the sum of the squared residuals between itself and these data points.
 
+## Your turn
+
+Now you will fit a multiple linear regression model (MLR model) yourself. The dataset `mariokart` you are going to use is already loaded in your workspace. Have a first look at the data:
+
+```{r ex0-mariokart-glimpse, exercise=TRUE}
+
+```
+
+```{r ex0-mariokart-glimpse-solution}
+glimpse(mariokart)
+```
 
 
 ### Fitting a MLR model
 
-In terms of the R code, fitting a multiple linear regression model is easy: simply add variables to the model formula you specify in the `lm()` command. 
+In terms of the R code, fitting a MLR model is easy: Simply add variables to the model formula you specify in the `lm()` command. 
 
 In a parallel slopes model, we had two explanatory variables: one was numeric and one was categorical. Here, we will allow both explanatory variables to be numeric.
 
 
-The dataset `mariokart` is already loaded in your workspace.
-
 - Fit a multiple linear regression model for total price as a function of the duration of the auction and the starting price.
 
+If you don't remember the variable names look at the previous exercise or at the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
+
+
 ```{r ex1, exercise=TRUE}
-# Fit the model using duration and start_pr
+# Fit the model using duration and starting price
 
 ```
 
 ```{r ex1-hint}
+# Fit the model using duration and starting price
 lm(total_pr ~ ___ + ___, data = mariokart)
 ```
 
 ```{r ex1-solution}
-# Fit the model using duration and start_pr
+# Fit the model using duration and starting price
 lm(total_pr ~ duration + start_pr, data = mariokart)
 ```
+
 
 ### Tiling the plane
 
