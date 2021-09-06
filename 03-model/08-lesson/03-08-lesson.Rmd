@@ -115,7 +115,7 @@ grid <- babies %>%
 glimpse(grid)
 
 # Step 2: Augment with the grid data
-bwt_hats <- broom::augment(mod, newdata = grid)
+bwt_hats <- augment(mod, newdata = grid)
 glimpse(bwt_hats)
 ```
 
@@ -148,23 +148,36 @@ Note how the color of the tiles lightens as you get closer to the upper right co
 ### 3D visualization
 
 
-A perhaps more natural way to visualize a multiple regression model is as a plane through a cloud of points in three dimensions. Here, we use the plotly package to illustrate our model for the birthweight of babies. Note how the plane cuts through the data points. The residual associated with each observation is the vertical distance between that point and the plane. Believe it or not, this plane is the one that uniquely minimizes the sum of of the squared residuals between itself and these data points.
+A perhaps more natural way to visualize a multiple regression model is as a plane through a cloud of points in three dimensions. Here, we use the [plotly package](https://plotly.com/r/) to illustrate our model for the birthweight of babies. 
 
-The `plot_ly` syntax is similar to that of ggplot. In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. The x, y, and plane objects were created in code that we aren't showing here due to its complexity. Using the plot below, trying moving the model around with your mouse. Visualizing the structure from different angles helps a lot to see what is going on.
+Our approach is similar to the previous one.
+
+1. Again we start with the generation of an evenly spaced grid of points from the data. But instead to use every possible combination of both variables (`by = 1`) we build a symmetrical plane of 50 points (`n = 50`).
+
+2. The second step is the same: We feed those generated grid values into our model.
+
+3. We build the regression plane as a matrix of the unique values of both variables as we had done previously in the sandbox and extract (`pull`) the vector of the `.fitted` value from our model.
+
+4. Instead of `ggplot2` we use the `plotly` package for the visualization. The syntax of the `plot_ly` function is very similar to that of `ggplot.` In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. 
 
 
 ```{r ex5-babies-plotly, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE, message=FALSE, exercise.lines=27}
+library(modelr)
+library(broom)
 library(plotly)
 
+# 1. Generate an evenly spaced grid of points from the data
 grid <- babies %>%
-  modelr::data_grid(
+  data_grid(
     gestation = seq_range(gestation, n = 50),
     age = seq_range(age, n = 50)
   )
 
+# 2. Feed generated grid values into model
 tidy_planes <- mod %>%
   augment(newdata = grid)
 
+# 3. Build the plane
 x <- unique(grid$gestation)
 y <- unique(grid$age)
 
@@ -172,6 +185,7 @@ plane <- tidy_planes %>%
   pull(.fitted) %>%
   matrix(nrow = length(x), byrow = TRUE)
 
+# 4. Visualize regression plane together with the data points
 plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6) %>%
   add_markers(text = ~case, marker = list(size = 2)) %>%
   add_surface(
@@ -182,6 +196,11 @@ plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6) %>%
     cmax = 1
   )
 ```
+
+Move the model around with your mouse. Visualizing the structure from different angles helps a lot to see what is going on.
+
+Note how the plane cuts through the data points. The residual associated with each observation is the vertical distance between that point and the plane. Believe it or not, this plane is the one that uniquely minimizes the sum of the squared residuals between itself and these data points.
+
 
 ### Fitting a MLR model
 
