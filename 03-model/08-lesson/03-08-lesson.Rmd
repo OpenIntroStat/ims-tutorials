@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 3 - Multiple Regression"
+title: "Regression modeling: 8 - Multiple Regression"
 output: 
   learnr::tutorial:
     progressive: true
@@ -35,6 +35,14 @@ mariokart <- filter(mariokart, total_pr < 100)
 
 This lesson will show you how to add two, three, and even more numeric explanatory variables to a linear model.
 
+We are going to use two data sets. 
+
+1. For our explication and demonstration, we will use `babies`, a data set originated from the Child Health and Development Studies. It is a data frame with 1236 observations and eight variables. For details see the [OpenIntro data page](https://www.openintro.org/data/index.php?data=babies).
+
+2. In your exercises you will work with `mariokart`. The data were collected in early October 2009 from an eBay auction for the Nintendo Wii game Mario Kart. `mariokart` has 143 observations with 12 variables. For details see the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
+
+As in the other lessons, the `openintro` and `tidyverse` packages are already pre-loaded. Tidyverse is itself a collection of R packages designed for data science. The most essential eight packages are loaded together with `library(tidyverse)` automatically. When we use other packages, we will load them explicitly in the appropriate chunks.
+
 ## Adding a numerical explanatory variable
 
 
@@ -43,7 +51,15 @@ Thus far, we've only considered multiple regression models with one numeric expl
 
 ### Adding a second numeric explanatory variable
 
-The following example uses the [`babies` data](https://www.openintro.org/data/index.php?data=babies) set from the `openintro` package together with our ‘tidy’-toolkit collected in the tidyverse package. We are going to model the birthweight (`bwt`) of babies born in San Francisco between 1960 and 1967 as a function of their pregnancy’s length of `gestation` (in weeks) and the mother’s `age` (in years).
+We are going to model the birthweight (`bwt`) of babies born in San Francisco between 1960 and 1967 as a function of their pregnancy’s length of `gestation` (in weeks) and the mother’s `age` (in years). 
+
+As a refresher, let us have a look at the data.
+
+```{r ex0-babies-glimpse, exercise=TRUE}
+glimpse(babies)
+```
+
+At the beginning of the upcoming chapters of this lesson, we will provide introductory information in two different modes: mathematical as formula and syntactical as R code snippets.
 
 
 - Mathematical: 
@@ -152,13 +168,13 @@ A perhaps more natural way to visualize a multiple regression model is as a plan
 
 Our approach is similar to the previous one.
 
-1. Again we start with the generation of an evenly spaced grid of points from the data. But instead to use every possible combination of both variables (`by = 1`) we build a symmetrical plane of 50 points (`n = 50`).
+1. Again, we start with generating an evenly spaced grid of points from the data. But instead, to use every possible combination of both variables (`by = 1`), we build a symmetrical plane of 50 points (`n = 50`).
 
 2. The second step is the same: We feed those generated grid values into our model.
 
-3. We build the regression plane as a matrix of the unique values of both variables as we had done previously in the sandbox and extract (`pull`) the vector of the `.fitted` value from our model.
+3. This is an additional step: We build the regression plane as a matrix of the unique values of both variables as we had done previously in the sandbox and extract (`pull`) the vector of the `.fitted` value from our model. We need these data for the next step of the visualization.
 
-4. Instead of `ggplot2` we use the `plotly` package for the visualization. The syntax of the `plot_ly` function is very similar to that of `ggplot.` In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. 
+4. Instead of `ggplot2`, we use the `plotly` package for the visualization. The syntax of the `plot_ly` function is  similar to `ggplot.` In this case, the `add_markers()` function draws the points, while the `add_surface()` function draws the plane. 
 
 
 ```{r ex5-babies-plotly, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE, message=FALSE, exercise.lines=27}
@@ -197,9 +213,10 @@ plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6) %>%
   )
 ```
 
-Move the model around with your mouse. Visualizing the structure from different angles helps a lot to see what is going on.
+Try to move the model around with your mouse! Visualizing the structure from different angles helps a lot to see what is going on.
 
 Note how the plane cuts through the data points. The residual associated with each observation is the vertical distance between that point and the plane. Believe it or not, this plane is the one that uniquely minimizes the sum of the squared residuals between itself and these data points.
+
 
 
 ### Fitting a MLR model
