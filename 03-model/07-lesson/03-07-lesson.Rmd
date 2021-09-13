@@ -1,9 +1,10 @@
 ---
-title: "Regression modeling: 2 - Evaluating and extending parallel slopes model"
+title: "Regression modeling: 7 - Evaluating and extending parallel slopes model"
 output: 
   learnr::tutorial:
     progressive: true
     allow_skip: true
+    css: "css/style.css"
 runtime: shiny_prerendered
 ---
 
@@ -29,8 +30,7 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 
 SAT <- mosaicData::SAT %>%
-  rename(total = sat) %>%
-  mutate(sat_bin = cut(frac, 3))
+  rename(total = sat)
 
 mariokart <- mariokart %>%
   filter(total_pr < 100)
@@ -38,7 +38,7 @@ mariokart <- mariokart %>%
 
 ## Evaluating and extending parallel slopes model
 
-This lesson covers model evaluation. By looking at different properties of the model, including the adjusted $R^2$., you'll learn to compare models so that you can select the best one. You'll also learn about interaction terms in linear models.
+This lesson covers model evaluation. By looking at different properties of the model, including the adjusted $R^2$, you'll learn to compare models so that you can select the best one. You'll also learn about interaction terms in linear models.
 
 ## Model fit, residuals, and prediction
 
@@ -64,16 +64,16 @@ Note that this necessarily makes our parallel slopes model more flexible than a 
 
 ### Model Fit
 
-The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$. value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
+The coefficient of determination---usually called R-squared or $R^2$---carries over from simple linear regression. Recall that the sum of the squared residuals (or errors) is denoted SSE. If the model fits the data better, then the residuals are smaller, the SSE is smaller, and the $R^2$ value is higher. The total sum of the squares---denoted SST---is a function of the response variable alone and does not depend on the model. 
 
-In general, a higher $R^2$. may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$.. Thus, model fits in multiple regression are often compared using the adjusted $R^2$. value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables p increases. Unlike $R^2$., adjusted $R^2$. will not necessarily increase as new explanatory variables are added---it could go up or down.
+In general, a higher $R^2$ may be a sign of a better model fit, but the situation becomes more complicated in multiple regression because additional explanatory variables will always increase $R^2$. Thus, model fits in multiple regression are often compared using the adjusted $R^2$ value defined here. Note that the only difference is that a penalty is applied as the number of explanatory variables $p$ increases. Unlike $R^2$, adjusted $R^2$ will not necessarily increase as new explanatory variables are added---it could go up or down.
 
 To summarize:
 
 - $R^2 = 1 - \frac{SSE}{SST}$ 
 - $SSE$ gets smaller as $\Rightarrow R^2$ increases 
 - As $p$ (number of explanatory variables) increases $R^2$ will always increase (or stay the same)
-- To adjust for an increasing $R^2$ use: $ R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} $ 
+- To adjust for an increasing $R^2$ use: $R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1}$ 
 
 ### Fitted values
 
@@ -128,7 +128,7 @@ augment(mod, newdata = new_obs)
 
 To figure this out, we can simply input the values of the explanatory variables. In this case, my car has a 1.8 liter engine. We can create a new data.frame with the information, and then feed it to `predict()` or `augment()` using the newdata argument. Either function will return a predicted mileage of 30.18 mpg. This is slightly less than the manufacturer's reported 33 mpg, giving us a residual of 2.82 mpg.
 
-### $R^2$. vs. adjusted $R^2$.
+### $R^2$ vs. adjusted $R^2$
 
 Two common measures of how well a model fits to data are $R^2$ (the coefficient of determination) and the adjusted $R^2$. The former measures the percentage of the variability in the response variable that is explained by the model. To compute this, we define
 
@@ -136,7 +136,7 @@ $$
     R^2 = 1 - \frac{SSE}{SST} \,,
 $$
 
-where $SSE$ and $SST$ are the sum of the squared residuals, and the total sum of the squares, respectively. One issue with this measure is that the $SSE$ can only decrease as new variable are added to the model, while the $SST$ depends only on the response variable and therefore is not affected by changes to the model. This means that you can increase $R^2$ by adding *any* additional variable to your model - even random noise. 
+where $SSE$ and $SST$ are the sum of the squared residuals, and the total sum of the squares, respectively. One issue with this measure is that the $SSE$ can only decrease as new variables are added to the model, while the $SST$ depends only on the response variable and therefore is not affected by changes to the model. This means that you can increase $R^2$ by adding *any* additional variable to your model - even random noise. 
 
 The adjusted $R^2$ includes a term that penalizes a model for each additional explanatory variable (where $p$ is the number of explanatory variables). 
 
@@ -144,19 +144,17 @@ $$
     R^2_{adj} = 1 - \frac{SSE}{SST} \cdot \frac{n-1}{n-p-1} \,,
 $$
 
-We can see both measures in the output of the `summary()` function on our model object.
 
-- Use `summary()` to compute $R^2$ and adjusted $R^2$ on the model object called `mod`.
-- Use `mutate()` and `rnorm()` to add a new variable called `noise` to the `mariokart` data set that consists of random noise. Save the new dataframe as `mariokart_noisy`.
-- Use `lm()` to fit a model that includes `wheels`, `cond`, and the random noise term.
-- Use `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object. Did the value of $R^2$ increase? What about adjusted $R^2$?
 
-###
+## Your turn
 
-- The model `mod` is already in your workspace.
-- Add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` of your dataframe.
+### Model Fit
+
+Now try it for yourself. The model `mod` from the `mariokart` data set is already in your workspace.
+
+- Use `mutate()` to add a variable called `noise` by calling `rnorm()` with the argument `n` equal to the `nrow()` to the `mariokart` data set. Save the new dataframe as `mariokart_noisy`.
 - The first argument of `lm()` is a formula involving the variables `total_pr`, `wheels`, `cond`, and `noise`.
-- Call the function `summary()` with the argument `mod2`.
+- Call the function `summary()` to compute $R^2$ and adjusted $R^2$ on the new model object `mod2`. Did the value of $R^2$ increase? What about adjusted $R^2$?
 
 ```{r ex1-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
@@ -184,7 +182,7 @@ summary(mod)
 ```{r ex1-hint-2}
 # add random noise
 mariokart_noisy <- mariokart %>%
-  mutate(noise = rnorm(nrow(mariokart)))
+  mutate(noise = rnorm(n = nrow(mariokart)))
 ```
 
 ```{r ex1-hint-3}
@@ -198,7 +196,7 @@ summary(mod)
 
 # add random noise
 mariokart_noisy <- mariokart %>%
-  mutate(noise = rnorm(nrow(mariokart)))
+  mutate(noise = rnorm(n = nrow(mariokart)))
   
 # compute new model
 mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
@@ -225,7 +223,6 @@ The fitted model `mod` is already in your environment.
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
-
 ```{r ex2, exercise=TRUE}
 # return a vector
 
@@ -234,9 +231,11 @@ mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 
 ```
 
-<div id="ex2-hint">
-**Hint:** You can get predictions with `predict(mod)`, and `augment()` works similarly as well.
-</div>
+<details>
+<summary>**Hint:**</summary>
+You can get predictions with `predict(mod)`, and `augment()` works similarly as well.
+</details>
+
 
 ```{r ex2-solution}
 # return a vector
@@ -263,7 +262,7 @@ Thus far we have considered models where the regression lines were constrained t
 ### Adding interaction terms
 
 $$
-    \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot is_newer + \hat{\beta}_3 \cdot displ \cdot is_newer
+    \hat{mpg} = \hat{\beta}_0 + \hat{\beta}_1 \cdot displ + \hat{\beta}_2 \cdot is\_newer + \hat{\beta}_3 \cdot displ \cdot is\_newer
 $$
 
 - For older cars 
@@ -307,7 +306,7 @@ And here is the interaction model.
 lm(hwy ~ displ + factor(year) + displ:factor(year), data = mpg)
 ``` 
 
-Interpreting the coefficients in an interaction model becomes more complicated. Note the difference between the fitted coefficients of the parallel slopes model with the interaction model. The original slope of -3.61 mpg per liter for all cars is now separated into two slopes: -3.77 mpg per liter for older cars, and -3.46 mpg per liter for newer cars. Thus, fuel economy for the older cars is not only lower overall, but it also declines more rapidly as a function of engine size. This importantly changes the interpretation of the model. It suggests that the greater fuel economy of the 2008 cars is not just related to the fact that they had smaller engines, on average -- a function mainly of consumer choice. It suggests that the 2008 cars were also engineered better, in that they were able to maintain fuel economy slightly better even with larger engine sizes. 
+Interpreting the coefficients in an interaction model becomes more complicated. Note the difference between the fitted coefficients of the parallel slopes model with the interaction model. The original slope of -3.61 mpg per liter for all cars is now separated into two slopes: -3.77 mpg per liter for older cars, and -3.46 (-3.77 + 0.31 = -3.46) mpg per liter for newer cars. Thus, fuel economy for the older cars is not only lower overall, but it also declines more rapidly as a function of engine size. This importantly changes the interpretation of the model. It suggests that the greater fuel economy of the 2008 cars is not just related to the fact that they had smaller engines, on average -- a function mainly of consumer choice. It suggests that the 2008 cars were also engineered better, in that they were able to maintain fuel economy slightly better even with larger engine sizes. 
 
 Now, the size of that difference is small, and as the plot suggests, it doesn't appear to make a practical difference. In this case, the difference is not statistically significant, and thus the parallel slopes model is probably a better representation of the data, but you will tackle that subtlety in another tutorial.
 
@@ -331,8 +330,6 @@ where $t$ is time, measured in weeks, and $temp$ is a binary variable indicating
 
 If you decide to keep the interaction term present in the second model, you are implicitly assuming that:
 
-*Hint:* An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
-
 ```{r letter-w}
 question("If you decide to keep the interaction term present in the second model, you are implicitly assuming that",
   answer("The amount of rot will vary based on the temperature.", message="What about the time of exposure?"),
@@ -343,6 +340,10 @@ question("If you decide to keep the interaction term present in the second model
 )
 ```
 
+<details>
+<summary>**Hint:**</summary>
+An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
+</details>
 
 ### Fitting a model with interaction
 
@@ -367,9 +368,10 @@ Include the term `cond:duration` in your formula to model the interaction of con
 
 ```
 
-<div id="ex3-hint">
-**Hint:** To include an interaction effect of variable A and B, use `A:B`.
-</div>
+<details>
+<summary>**Hint:**</summary>
+To include an interaction effect of variable A and B, use `A:B`.
+</details>
 
 ```{r ex3-solution}
 # include interaction
@@ -384,7 +386,8 @@ Interaction models are easy to visualize in the data space with **ggplot2** beca
 
 The dataset `mariokart` is already loaded in your workspace.
 
-- Use the `color` aesthetic and the `geom_smooth()` function to plot the interaction model between duration and condition in the data space. Make sure you set the `method` and `se` arguments of `geom_smooth()`.
+- Use the `color` aesthetic and the `geom_smooth()` function to plot the interaction model between duration and condition in the data space. 
+- Make sure you set the `method` and `se` arguments of `geom_smooth()`.
 
 ```{r ex4, exercise=TRUE}
 # interaction plot
@@ -393,9 +396,10 @@ ggplot(___, aes(___)) +
   geom_smooth(___)
 ```
 
-<div id="ex4-hint">
-**Hint:** Define groups using the color `aes`thetic in the ggplot call.
-</div>
+<details>
+<summary>**Hint:**</summary>
+Define groups using the color `aes`thetic in the ggplot call.
+</details>
 
 ```{r ex4-solution}
 # interaction plot
@@ -419,30 +423,32 @@ ggplot(data = SAT, aes(x = salary, y = total)) +
 
 ### Percentage taking the SAT
 
-Let's try turning the SAT score into an ordinal variable with 3 levels.
+How about the percentage  (`frac`tion) of students eligible for taking the SAT? Let's try turning the SAT score into an ordinal variable with 3 levels.
+
+First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. 
 
 ```{r echo=TRUE}
-SAT <- SAT %>%
+SAT_bin <- SAT %>%
   mutate(sat_bin = cut(frac, 3))
 ``` 
 
 ```{r echo=TRUE}  
-mod <- lm(formula = total ~ salary + sat_bin, data = SAT)
-
-tidy(mod)
+mod <- lm(formula = total ~ salary + sat_bin, data = SAT_bin)
+mod
 ``` 
+
+Note that in this case the categorical variable `sat_bin` is not binary---it has three levels. This results in another coefficient. 
 
 It turns out that the rate at which students take the SAT has a moderating effect on this relationship. Consider how things change when we add a categorical variable to make this a parallel slopes model. In this case, we want to separate states into three groups based on how many of their students take the SAT. 
 
-First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. Note that in this case the categorical variable `sat_bin` is not binary---it has three levels. This results in another coefficient. How many lines to you think we will see in the plot?
-
+How many lines do you think we will see in the plot?
 
 ### Simpson's paradox
 
 If you guess three, you were correct. 
 
 ```{r sat-binned, echo=TRUE}
-ggplot(data = SAT, aes(x = salary, y = total, color = sat_bin)) + 
+ggplot(data = SAT_bin, aes(x = salary, y = total, color = sat_bin)) + 
   geom_point() + 
   geom_line(data = broom::augment(mod), aes(y = .fitted))
 ```
@@ -453,20 +459,35 @@ This phenomenon is known as **Simpson's paradox**, and it occurs widely in the s
 
 ### Consequences of Simpson's paradox
 
-In the simple linear regression model for average SAT score, (`total`) as a function of average teacher salary (`salary`), the fitted coefficient was -5.02 points per thousand dollars. This suggests that for every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 5 points lower. 
+```{r sat-simple, echo=TRUE}
+lm(formula = total ~ salary, data = SAT)
+```
 
-In the model that includes the percentage of students taking the SAT, the coefficient on `salary` becomes 1.84 points per thousand dollars. 
 
-*Hint:* The coefficient on the new term is positive.
+In the simple linear regression model for average SAT score, (`total`) as a function of average teacher salary (`salary`), the fitted coefficient was -5.54 points per thousand dollars. This suggests that for every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 5.5 points lower. 
+
+```{r sat-with-bins, echo=TRUE}
+lm(formula = total ~ salary + salary:sat_bin, data = SAT_bin)
+```
+
+
+But in the model that includes the percentage of students taking the SAT, the coefficient on `salary` becomes 3.09 points  per thousand dollars. 
+
+
 
 ```{r letter-z}
 question("Choose the correct interpretation of this slope coefficient.",
-  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 2 points lower.", message="Was there another variable?"),
-  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 2 points higher, after controlling for the percentage of students taking the SAT.", correct = TRUE, message="Right!"),
-  answer("The average SAT score in richer states is about 2 points higher.", message="It's not that simple..."),
+  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 3 points lower.", message="Was there another variable?"),
+  answer("For every additional thousand dollars of salary for teachers in a particular state, the expected SAT score for a student from that state is about 3 points higher, after controlling for the percentage of students taking the SAT.", correct = TRUE, message="Right!"),
+  answer("The average SAT score in richer states is about 3 points higher.", message="It's not that simple..."),
   allow_retry=TRUE
 )
 ```
+
+<details>
+<summary>**Hint:**</summary>
+The coefficient on the new term is positive.
+</details>
 
 
 ### Simpson's paradox in action
@@ -475,6 +496,14 @@ A mild version of Simpson's paradox can be observed in the MarioKart auction dat
 
 However, a simple linear regression model reveals the opposite: longer auctions are associated with lower final prices. The problem is that all other things are *not* equal. In this case, the new MarioKarts - which people pay a premium for - were mostly sold in one-day auctions, while a plurality of the used MarioKarts were sold in the standard seven-day auctions. 
 
+```{r mariokart-plot, echo=TRUE}
+slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+slr
+```
+
+
 Our simple linear regression model is misleading, in that it suggests a negative relationship between final auction price and duration. However, *for the used* MarioKarts, the relationship is positive.
 
 The object `slr` is already defined for you.
@@ -482,34 +511,23 @@ The object `slr` is already defined for you.
 - Fit a simple linear regression model for final auction price (`total_pr`) as a function of duration (`duration`).
 - Use `aes()` to add a color aesthetic that's mapped to the condition variable to the `slr` object, which is the plot shown below.
 
-```{r}
-slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = 0)
-slr
-```
-
-
 ```{r ex5, exercise=TRUE}
-slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
-
 # model with one slope
-
+___
 
 # plot with two slopes
 slr + aes(___)
 ```
 
 
-<div id="ex5-hint">
-**Hint:** You can add layers to an existing plot with `+`.
-</div>
+<details>
+<summary>**Hint:**</summary>
+You can add layers to an existing plot with `+`.
+</details>
 
 ```{r ex5-solution}
 # model with one slope
-lm(total_pr ~ duration, data = mariokart)
+lm(formula = total_pr ~ duration, data = mariokart)
 
 # plot with two slopes
 slr + aes(color = cond)
@@ -517,23 +535,23 @@ slr + aes(color = cond)
 
 ## Congratulations!
 
-You have successfully completed Lesson 2 in Tutorial 4: Multiple and Logistic Regression. 
+You have successfully completed Lesson 7 in Tutorial 3: Regression modeling. 
 
 What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 3: Introduction to Linear Models Data](https://openintrostat.github.io/ims-tutorials/03-introduction-to-linear-models/)
+`r emo::ji("spiral_notepad")` [Tutorial 3: Introduction to Linear Models Data](https://openintrostat.github.io/ims-tutorials/03-model/)
 
-`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-01/)
+`r emo::ji("one")` [Tutorial 3 - Lesson 1: Visualizing two variables](https://openintro.shinyapps.io/ims-03-model-01/)
 
-`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-02/)
+`r emo::ji("two")` [Tutorial 3 - Lesson 2: Correlation](https://openintro.shinyapps.io/ims-03-model-02/)
 
-`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-03/)
+`r emo::ji("three")` [Tutorial 3 - Lesson 3: Simple linear regression](https://openintro.shinyapps.io/ims-03-model-03/)
 
-`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-04/)
+`r emo::ji("four")` [Tutorial 3 - Lesson 4: Interpreting regression models](https://openintro.shinyapps.io/ims-03-model-04/)
 
-`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-introduction-to-linear-models-05/)
+`r emo::ji("five")` [Tutorial 3 - Lesson 5: Model fit](https://openintro.shinyapps.io/ims-03-model-05/)
 
 `r emo::ji("six")` [Tutorial 3 - Lesson 6: Parallel slopes](https://openintro.shinyapps.io/ims-03-model-06/)
 
