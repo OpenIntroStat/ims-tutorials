@@ -20,12 +20,15 @@ library(mosaicData)
 
 # knitr options ----------------------------------------------------------------
 
-knitr::opts_chunk$set(fig.align = "center", 
-                      fig.height = 3, 
-                      fig.width = 5,
-                      echo = FALSE, 
-                      message = FALSE, 
-                      warning = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.width = 6,
+  fig.asp = 0.618,
+  fig.retina = 3,
+  dpi = 300,
+  out.width = "80%",
+  fig.align = "center"
+  )
 
 # data prep --------------------------------------------------------------------
 
