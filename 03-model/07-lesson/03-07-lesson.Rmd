@@ -232,7 +232,7 @@ mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 You can get predictions with `predict(mod)`, and `augment()` works similarly as well.
 </details>
 
@@ -341,7 +341,7 @@ question("If you decide to keep the interaction term present in the second model
 ```
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 An interaction term allows the two lines representing the amount of rot in each location to have different slopes.
 </details>
 
@@ -369,7 +369,7 @@ Include the term `cond:duration` in your formula to model the interaction of con
 ```
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 To include an interaction effect of variable A and B, use `A:B`.
 </details>
 
@@ -397,7 +397,7 @@ ggplot(___, aes(___)) +
 ```
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 Define groups using the color `aes`thetic in the ggplot call.
 </details>
 
@@ -485,7 +485,7 @@ question("Choose the correct interpretation of this slope coefficient.",
 ```
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 The coefficient on the new term is positive.
 </details>
 
@@ -521,7 +521,7 @@ slr + aes(___)
 
 
 <details>
-<summary>**Hint:**</summary>
+<summary>**Hint**</summary>
 You can add layers to an existing plot with `+`.
 </details>
 
