@@ -325,13 +325,11 @@ We have created three objects that you will need:
 - `y`: a vector of unique values of `start_pr`
 - `plane`: a matrix of the fitted values across all combinations of `x` and `y`
 
-Much like `ggplot()`, the `plot_ly()` function will allow you to create a plot object with variables mapped to `x`, `y`, and `z` aesthetics. The `add_markers()` function is similar to `geom_point()` in that it allows you to add points to your 3D plot. 
-
-Note that `plot_ly` uses the pipe (`%>%`) operator to chain commands together.
+What follows is the code we've created as the preparation for your task:
 
 
 ```{r ex3-setup}
-mariokart <- filter(marioKart, total_pr < 100)
+mariokart <- filter(mariokart, total_pr < 100)
 mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 
 grid <- mariokart %>%
@@ -351,10 +349,39 @@ plane <- tidy_planes %>%
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
+```{r display-exercise-3, echo=TRUE}
+mariokart <- filter(mariokart, total_pr < 100)
+mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
+
+grid <- mariokart %>%
+  modelr::data_grid(
+    duration = seq_range(duration, n = 70),
+    start_pr = seq_range(start_pr, n = 70)
+  )
+
+tidy_planes <- mod %>%
+  augment(newdata = grid)
+
+x <- unique(grid$duration)
+y <- unique(grid$start_pr)
+
+plane <- tidy_planes %>%
+  pull(.fitted) %>%
+  matrix(nrow = length(x), byrow = TRUE)
+```
+
+
+Much like `ggplot()`, the `plot_ly()` function will allow you to create a plot object with variables mapped to `x`, `y`, and `z` aesthetics. The `add_markers()` function is similar to `geom_point()` in that it allows you to add points to your 3D plot. 
+
+Note that `plot_ly` uses the pipe (`%>%`) operator to chain commands together.
+
 - Run the `plot_ly` command to draw 3D scatterplot for `total_pr` as a function of `duration` and `start_pr` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis.
 - Use `add_surface()` to draw a plane through the cloud of points by setting `z = ~plane`.
 
 ```{r ex3, exercise=TRUE}
+# load plotly package
+library(plotly) 
+
 # draw the 3D scatterplot
 p <- plot_ly(data = mariokart, z = ~ ____,x = ~____, y = ~____, opacity = 0.6) %>%
   add_markers() 
@@ -364,11 +391,12 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~_____, showscale = FALSE)
 ```
 
-<div id="ex3-hint">
-**Hint:** Use `add_surface()` to draw the plane.
-</div>
 
-```{r ex3-solution, eval=FALSE}
+
+```{r ex3-solution}
+# load plotly package
+library(plotly) 
+
 # draw the 3D scatterplot
 p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
   add_markers() 
