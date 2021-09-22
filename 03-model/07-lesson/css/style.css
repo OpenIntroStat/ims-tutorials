@@ -1,0 +1,7 @@
+/* reverse summary tag to standard (= list-item) */
+
+details summary {
+  display: list-item;
+}
+
+

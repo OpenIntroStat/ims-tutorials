@@ -16,14 +16,17 @@ library(gapminder)
 library(emo)
 library(patchwork)
 
-knitr::opts_chunk$set(warning = FALSE,
-                      message = FALSE,
-                      echo = FALSE, 
-                      fig.height = 3,
-                      fig.width = 5,
-                      fig.align = "center")
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.width = 6,
+  fig.asp = 0.618,
+  fig.retina = 3,
+  dpi = 300,
+  out.width = "80%",
+  fig.align = "center"
+  )
 
-options(max.print=4000)
+options(max.print = 4000)
 
 email <- email %>%
   mutate(spam = if_else(spam == 0, "not spam", "spam"))
@@ -33,6 +36,8 @@ comics <- read_csv("data/comics.csv") %>%
 ```
 
 ## Emails
+
+### 
 
 In this lesson, you'll get a chance to put to use what you know about exploratory data analysis in exploring a new dataset. 
 
@@ -219,7 +224,7 @@ email %>%
 email %>%
   mutate(log_exclaim_mess = log(exclaim_mess + .01)) %>%
   ggplot(aes(x = log_exclaim_mess)) +
-  geom_histogram() +
+  geom_histogram(binwidth = 0.5) +
   facet_wrap(~spam)
 ```
 
@@ -255,7 +260,7 @@ p1 <- email %>%
 p2 <- email %>% 
   mutate(log_exclaim_mess = log(exclaim_mess+0.01)) %>% 
   ggplot(aes(x = log_exclaim_mess)) +
-  geom_histogram()+
+  geom_histogram(binwidth = 0.5)+
   facet_wrap(~spam)
 
 p1 / p2
@@ -265,13 +270,13 @@ p1 / p2
 
 One approach says that there are two mechanisms going on: one generating the zeros and the other generating the non-zeros, so we will analyze these two groups separately. A simpler approach is to think of the variable as two level categorical variable (zero or not zero) and to treat it like a categorical variable.
 
-```{r 9}
+```{r 9, fig.asp = 0.5}
 email2 <- email %>%
   mutate(zero = exclaim_mess == 1, log_exclaim_mess = log(exclaim_mess))
 
 email2 %>% 
   ggplot(aes(x = log_exclaim_mess, fill = zero)) +
-  geom_histogram()+
+  geom_histogram(binwidth = 0.5)+
   facet_wrap(~spam)+
   theme(legend.position = "none") 
 ```
@@ -280,7 +285,7 @@ email2 %>%
 
 To do so we create a new variable, we'll call it `zero` and use it to color in our bar chart.
 
-```{r facet}
+```{r facet, fig.asp = 0.5}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
   ggplot(aes(x = zero, fill = zero)) +
@@ -576,7 +581,7 @@ That led to this bar chart, which was informative, but you might caused you to d
 
 Let's go through how we would flip the ordering of those bars so that they agree with the plot on the left.
 
-```{r switch-bars}
+```{r switch-bars, out.width = "100%"}
 knitr::include_graphics("images/switch-bars.png")
 ```
 
@@ -601,7 +606,7 @@ email <- email %>%
 
 Now, when we go to make the plot with the same code, the order of the bars are as we wan them.
 
-```{r echo=TRUE}
+```{r echo=TRUE, fig.asp = 0.5}
 email %>%
   ggplot(aes(x = zero)) +
   geom_bar() +
@@ -627,6 +632,7 @@ To explore the association between this variable and `spam`, select and construc
 Let's practice constructing a faceted bar plot.
 
 - Construct a faceted bar plot of the association between `number` and `spam`.
+- You should facet by `number`
 
 ```{r ex6, exercise = TRUE}
 # Construct plot of
@@ -637,25 +643,32 @@ ___(email, ___
 
 ```{r ex6-solution}
 # Construct plot of number_reordered
-ggplot(email, aes(x = number)) +
+ggplot(email, aes(x = spam)) +
   geom_bar() +
-  facet_wrap(~ spam)
+  facet_wrap(~ number)
 ```
 
 ### What's in a number interpretation
 
-```{r mc4-pre}
+Below are two plots showing the relationship between `number` and `spam`.
+
+```{r mc4-pre1, fig.asp = 0.5}
+ggplot(email, aes(x = spam)) +
+  geom_bar() +
+  facet_wrap(~number)
+```
+
+```{r mc4-pre2, fig.asp = 0.5}
 ggplot(email, aes(x = number)) +
   geom_bar() +
   facet_wrap(~spam)
 ```
 
 ```{r mc4}
-question("Which of the following interpretations of the plot **is not** valid?",
-  answer("Given that an email contains a small number, it is more likely to be 
-not spam"),
+question("Which of the following interpretations of the above plots is *not* valid?",
+  answer("Given that an email contains a small number, it is more likely to be not spam"),
   answer("Given that an email contains no number, it is more likely to be spam.", correct = TRUE),
-  answer("Given that an email contains a big number, it is more likely to be not spam.", correct = TRUE),
+  answer("Given that an email contains a big number, it is more likely to be not spam."),
   answer("Within both spam and not spam, the most common number is a small one.", message = "Wrong!"),
   incorrect = "Given the kind of number an email contains, we can't say whether it'll be more or less likely to be spam.",
   allow_retry = TRUE
@@ -679,21 +692,20 @@ comics %>%
 
 On the bar plot, it's quite difficult to tell how the `NA` group compares to the `Public` group, but this comparison is much easier in the bar plot. Also `Unknown` is barely visible in the bar plot and almost not there in the pie chart.
 
-```{r}
+```{r out.width = "100%"}
 p1 <- comics %>%
   count(id) %>%
   ggplot(aes(x = "", y = n, fill = id))+
-  geom_bar(stat="identity", width=1)+
-  coord_polar("y", start=0) +
+  geom_bar(stat="identity", width = 1)+
+  coord_polar("y", start = 0) +
   theme(axis.text = element_blank(),
         axis.ticks = element_blank(),
         panel.grid  = element_blank())
 
-p2 <- ggplot(comics, aes(x = id, fill = id)) +
-  geom_bar() +
-  guides(fill = FALSE)
+p2 <- ggplot(comics, aes(y = id, fill = id)) +
+  geom_bar(show.legend = FALSE)
 
-p1 / p2
+p1 + p2
 ```
 
 
@@ -701,10 +713,12 @@ p1 / p2
 
 We saw how the story can change, depending on if we're visualizing counts or proportions.
 
-```{r fig.width=10}
+```{r out.width = "100%"}
 p1 <- ggplot(comics, aes(y = id))+
   geom_bar() +
-  facet_wrap(~align, nrow = 1)
+  facet_wrap(~align, nrow = 1, 
+             labeller = labeller(align = label_wrap_gen(10))) +
+  scale_x_continuous(guide = guide_axis(check.overlap = TRUE))
 
 p2 <- ggplot(comics, aes(y = align, fill = id)) +
   geom_bar() 

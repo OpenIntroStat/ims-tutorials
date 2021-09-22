@@ -655,7 +655,7 @@ ggplot(data = hsb2, aes(x = science, y = math, color = prog)) +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-The same positive relationship between math and science scores is still apparent. But we can also see that students in academic programs, shown with green points, tend to score higher than those in vocational programs, in blue, and general programs, in red.
+The same positive relationship between math and science scores is still apparent. But we can also see that students in academic programs, shown with green points, tend to have higher math scores relative to their science scores than those in vocational programs, in blue, and general programs, in red.
 
 We will wrap up this lesson with some practice creating a similar plot with different variables.
 
