@@ -710,15 +710,20 @@ By including the duration, starting price, and condition variables in our model,
 The first plane corresponds to the model output when the condition of the item is `new`, while the second plane corresponds to the model output when the condition of the item is `used`. The planes have the same slopes along both the duration and starting price axes - it is the $z$-intercept that is different. 
 
 
-
 ### Parallel plane interpretation
 
-The coefficients from our parallel planes model is shown below.
+Calculate the coefficients from the `mariokart` parallel planes: You already used all the needed information in the previous exercise when you drew the scatterplot.
 
-```{r}
+
+```{r ex6, exercise=TRUE}
+lm(formula = ___ ~ ___ + ___ + ___, data = ___)
+```
+
+```{r ex6-solution}
 lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart)
 ```
 
+The coefficients from our parallel planes model is shown below.
 Choose the right interpretation of $\beta_3$ (the coefficient on `condUsed`):
 
 
@@ -745,22 +750,27 @@ $$
 
 - Syntactical:
 
-```{r}
+By now, you may have caught on to the fact that there are no mathematical or syntactical hurdles to adding more variables to a multiple regression model. You can add as many terms as you want and R will happily fit the model for you. 
+
+```{r ex11-babies, exercise=TRUE}
 lm(bwt ~ gestation + age + smoke + height + weight + parity, 
                data = babies)
 ```
 
-- Syntactical (same model, but note order of coefficients)
+In this case we added explanatory variables for the mother's height and weight, and a variable called parity that denotes whether this child was her first pregnancy. It seems reasonable to think that any of these variables might play a role in determining a child's birthweight, and so there may be valid scientific reasons for including any or all of these variables in our model. 
 
-```{r}
+In R, you can use the dot operator in a formula to mean *all other variables in the data.frame*. 
+
+
+```{r ex12-babies, exercise=TRUE}
 lm(bwt ~ . - case, data = babies)
 ```
 
-By now, you may have caught on to the fact that there are no mathematical or syntactical hurdles to adding more variables to a multiple regression model. You can add as many terms as you want and R will happily fit the model for you. 
+In the last expression above, we have built the "kitchen sink" model by throwing everything in with the dot operator---with one exception. There are often variables that are recorded that will not make sense to include in a model. The case variable in the babies data set simply identifies each case---it is not an observed property of each birth. Therefore, we exclude it explicitly. You can read the `. - case` formula as *all variables except for the one named case*.
 
-In this case we added explanatory variables for the mother's height and weight, and a variable called parity that denotes whether this child was her first pregnancy. It seems reasonable to think that any of these variables might play a role in determining a child's birthweight, and so there may be valid scientific reasons for including any or all of these variables in our model. 
 
-In R, you can use the dot operator in a formula to mean *all other variables in the data.frame*. In the last expression above, we have built the "kitchen sink" model by throwing everything in with the dot operator---with one exception. There are often variables that are recorded that will not make sense to include in a model. The case variable in the babies data set simply identifies each case---it is not an observed property of each birth. Therefore, we exclude it explicitly. You can read the `. - case` formula as *all variables except for the one named case*.
+
+
 
 ### Higher dimensional geometry
 
