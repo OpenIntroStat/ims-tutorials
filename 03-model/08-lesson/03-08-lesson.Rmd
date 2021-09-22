@@ -473,7 +473,7 @@ lm(___ ~ ___ + ___, data = ___)
 ```
 
 
-```{r ex6-babies2-solution, exercise=TRUE, exercise.eval=TRUE}
+```{r ex6-babies2-solution}
 lm(bwt ~ gestation + age, data = babies)
 ```
 
