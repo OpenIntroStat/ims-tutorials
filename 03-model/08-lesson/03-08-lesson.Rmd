@@ -28,6 +28,8 @@ knitr::opts_chunk$set(fig.align = "center",
 
 # data prep --------------------------------------------------------------------
 
+tutorial_options(exercise.blanks = TRUE)
+
 mariokart <- filter(mariokart, total_pr < 100)
 ```
 
@@ -219,10 +221,10 @@ Note how the plane cuts through the data points. The residual associated with ea
 
 ## Your turn
 
-Now you will fit a multiple linear regression model (MLR model) yourself. The dataset `mariokart` you are going to use is already loaded in your workspace. Have a first look at the data:
+Now you will fit a multiple linear regression model (MLR model) yourself. The dataset `mariokart` you are going to use is already loaded in your workspace. Have a first look with `glimpse()` at the data:
 
 ```{r ex0-mariokart-glimpse, exercise=TRUE}
-
+___(___)
 ```
 
 ```{r ex0-mariokart-glimpse-solution}
@@ -242,17 +244,17 @@ In a parallel slopes model, we had two explanatory variables: one was numeric an
 If you don't remember the variable names look at the previous exercise or at the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
 
 
-```{r ex1, exercise=TRUE}
+```{r ex1-mariokart, exercise=TRUE}
 # Fit the model using duration and starting price
-
+lm(___ ~ ___ + ___, data = ___)
 ```
 
-```{r ex1-hint}
+```{r ex1-mariokart-hint}
 # Fit the model using duration and starting price
 lm(total_pr ~ ___ + ___, data = mariokart)
 ```
 
-```{r ex1-solution}
+```{r ex1-mariokart-solution}
 # Fit the model using duration and starting price
 lm(total_pr ~ duration + start_pr, data = mariokart)
 ```
@@ -269,7 +271,7 @@ This is a multistep process:
 - Use `augment()` with the `newdata` argument to find the $\hat{y}$'s corresponding to the values in `grid`.
 - Add these to the `data_space` plot by using the `fill` aesthetic and `geom_tile()`.
 
-```{r ex2-setup}
+```{r ex2-mariokart-setup}
 mariokart <- filter(mariokart, total_pr < 100)
 mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 
@@ -288,7 +290,7 @@ The model object `mod` is already in your workspace.
 - Use `augment()` to create a `data.frame` that contains the values the model outputs for each row of `grid`.
 - Use `geom_tile` to illustrate these predicted values over the `data_space` plot. Use the `fill` aesthetic and set `alpha = 0.5`.
 
-```{r ex2, exercise=TRUE}
+```{r ex2-mariokart, exercise=TRUE}
 # add predictions to grid
 price_hats <- _____
 
@@ -297,16 +299,21 @@ data_space +
   geom_tile(data = ____, aes(___),____)
 ```
 
-```{r ex2-hint-1}
+```{r ex2-mariokart-hint-1}
+# add predictions to grid
 price_hats <- augment(mod, newdata = grid)
 ```
 
-```{r ex2-hint-2}
+```{r ex2-mariokart-hint-2}
+# add predictions to grid
+price_hats <- augment(mod, newdata = grid)
+
+# tile the plane
 data_space + 
   geom_tile(data = price_hats, aes(___), alpha = ___)
 ```
 
-```{r ex2-solution}
+```{r ex2-mariokart-solution}
 # add predictions to grid
 price_hats <- augment(mod, newdata = grid)
 
@@ -328,7 +335,7 @@ We have created three objects that you will need:
 What follows is the code we've created as the preparation for your task:
 
 
-```{r ex3-setup}
+```{r ex3-mariokart-setup}
 mariokart <- filter(mariokart, total_pr < 100)
 mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 
@@ -378,7 +385,7 @@ Note that `plot_ly` uses the pipe (`%>%`) operator to chain commands together.
 - Run the `plot_ly` command to draw 3D scatterplot for `total_pr` as a function of `duration` and `start_pr` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis.
 - Use `add_surface()` to draw a plane through the cloud of points by setting `z = ~plane`.
 
-```{r ex3, exercise=TRUE}
+```{r ex3-mariokart, exercise=TRUE}
 # load plotly package
 library(plotly) 
 
@@ -391,9 +398,23 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~_____, showscale = FALSE)
 ```
 
+```{r ex3-mariokart-hint-1}
+# load plotly package
+library(plotly) 
+
+```
+
+```{r ex3-mariokart-hint-2}
+# load plotly package
+library(plotly) 
+
+# draw the 3D scatterplot
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+  add_markers() 
+```
 
 
-```{r ex3-solution}
+```{r ex3-mariokart-solution}
 # load plotly package
 library(plotly) 
 
@@ -625,7 +646,7 @@ Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounc
 
 ### Visualizing parallel planes
 
-```{r ex5-setup}
+```{r ex5-mariokart-setup}
 mod <- lm(total_pr ~ duration + start_pr + cond, data = mariokart)
 
 grid <- mariokart %>%
@@ -659,7 +680,7 @@ Draw a 3D plot for the `mariokart` model. Once again we have stored the `x` and 
 - Apply `plot_ly` to draw 3D scatterplot for the mariokart model, Use `total_pr` as a function of `duration`, `start_pr`, and `cond` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis. Use color to represent `cond`.
 - Use `add_surface()` (twice) to draw two planes through the cloud of points, one for new MarioKarts and another for used ones. Use the objects `plane0` and `plane1`.
 
-```{r ex5, exercise=TRUE}
+```{r ex5-mariokart, exercise=TRUE}
 # load plotly
 ___(plotly)
 
@@ -674,13 +695,13 @@ p %>%
 ```
 
 
-```{r ex5-hint-1}
+```{r ex5-mariokart-hint-1}
 # load plotly
 library(plotly)
 ```
 
 
-```{r ex5-hint-2}
+```{r ex5-mariokart-hint-2}
 # load plotly
 library(plotly)
 
@@ -690,7 +711,7 @@ p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opac
 ```
 
 
-```{r ex5-solution}
+```{r ex5-mariokart-solution}
 # load plotly
 library(plotly)
 
@@ -715,11 +736,11 @@ The first plane corresponds to the model output when the condition of the item i
 Calculate the coefficients from the `mariokart` parallel planes: You already used all the needed information in the previous exercise when you drew the scatterplot.
 
 
-```{r ex6, exercise=TRUE}
+```{r ex6-mariokart, exercise=TRUE}
 lm(formula = ___ ~ ___ + ___ + ___, data = ___)
 ```
 
-```{r ex6-solution}
+```{r ex6-mariokart-solution}
 lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart)
 ```
 
@@ -784,12 +805,12 @@ The interpretation of the coefficients in larger models remains the same. We can
 
 This time you will throw even more variables into your `mariokart` model, including the number of bids in each auction (`nBids`) and the number of `wheels`. 
 
-```{r ex7, exercise=TRUE}
+```{r ex7-mariokart, exercise=TRUE}
 lm(formula = ___ ~ ___ + ___ + ___ + ___ + ___, data = ___)
 ```
 
 
-```{r ex7-solution}
+```{r ex7-mariokart-solution}
 lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart)
 ```
 
