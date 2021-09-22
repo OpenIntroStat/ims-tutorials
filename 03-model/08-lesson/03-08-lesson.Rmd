@@ -501,11 +501,10 @@ lm(formula = total_pr ~ duration + start_pr, data = mariokart)
 The coefficients from our model for the total auction price of `mariokart` as a function of auction duration and starting price are shown above. A colleague claims that these results imply that the duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
 
 
-*Hint:* Whether a coefficient is positive or negative doesn't effect how important it is.
-
 ```{r mc1}
 question("This interpretation is false because.",
-  answer("The coefficient on duration is negative."),
+  answer("The coefficient on duration is negative.", 
+         message="Whether a coefficient is positive or negative doesn't effect how important it is."),
   answer("Smaller coefficients are more important."),
   answer("The coefficients have different units (dollars per day and dollars per dollar, respectively) and so they are not directly comparable.", correct = TRUE),
   answer("The intercept coefficient is much bigger, so it is the most important one."),
