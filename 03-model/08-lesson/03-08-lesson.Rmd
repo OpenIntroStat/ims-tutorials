@@ -704,12 +704,11 @@ lm(formula = total_pr ~ duration + start_pr + cond, data = mariokart)
 
 Choose the right interpretation of $\beta_3$ (the coefficient on `condUsed`):
 
-*Hint:*  The reference level specified needs to be kept in mind when interpreting factor coefficients.
 
 ```{r mc2}
 question("Choose the right interpretation of beta the coefficient on `condUsed`",
-  answer("The expected premium for new (relative to used) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", correct = TRUE, message="Correct!"),
-  answer("The expected premium for used (relative to new) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", message="Note the reference level"),
+  answer("The expected premium for new (relative to used) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", correct = TRUE),
+  answer("The expected premium for used (relative to new) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", message="Wrong reference level. The reference level specified needs to be kept in mind when interpreting factor coefficients."),
   answer("For each additional day the auction lasts, the expected final price declines by $8.95, after controlling for starting price and condition.", message="Wrong coefficient"), 
   allow_retry=TRUE
 )
