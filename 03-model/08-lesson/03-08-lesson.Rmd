@@ -618,15 +618,8 @@ The interpretations that we developed previously still hold---we just need to th
 
 The coefficient of gestation is 0.45 ounces per day, which is only slightly less than it was in our previous model that did not consider smoking. Our interpretation is that each additional day of gestation was associated with an increase in expected birthweight of 0.45 ounces, after controlling for the mother's age and smoking status. Each additional year of the mother's age was associated with an increase in expected birthweight of just 0.11 ounces per year, after controlling for gestational length and the mother's smoking status. Note that the effect of the mother's age on birthweight appears lower than in the previous model. 
 
-```{r echo=TRUE}
-lm(bwt ~ gestation + age, data = babies)
-```
 
 Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounces. Thus, our model predicts that mothers who smoke will deliver babies that weight 8 ounces less, on average, than mothers of the same age and gestational length who don't smoke. That is, the negative effect of smoking on expected birthweight is 8 ounces (or half a pound), after controlling for gestational length and the mother's age. This is a *huge* effect compared to the influence of the other two variables we have considered.
-
-```{r echo=TRUE}
-lm(bwt ~ gestation + age + smoke, data = babies)
-```
 
 ### Visualizing parallel planes
 
