@@ -542,11 +542,11 @@ $$
 
 No study of birthweight is complete without some discussion of the effect of smoking, which is known to have all kinds of undesirable health consequences. Mothers in the babies data set have their smoking status recorded as a binary variable: either she was or was not a smoker. 
 
-```{r}
+```{r ex10-babies-smoking, exercise=TRUE}
 lm(bwt ~ gestation + age + smoke, data = babies)
 ```
 
-Adding this third explanatory variable to our model is again easy. Since this variable is encoded as 0 or 1, no transformation is necessary and we can simply add another term to the mathematical model and the formula syntax to specify our new model.
+Adding this third explanatory variable to our model was again easy. Since this variable is encoded as 0 or 1, no transformation is necessary and we can simply add another term to the mathematical model and the formula syntax to specify our new model.
 
 ### Geometry
 
@@ -554,13 +554,19 @@ Adding this third explanatory variable to our model is again easy. Since this va
 - 2 numeric: a plane
 - 2 numeric + 1 categorical: parallel planes! 
 
-But here again the geometric changes are not as easy to see. However, our emphasis on the geometry of these models should give you some intuition. Recall that the addition of a categorical explanatory variable to a numeric explanatory variable changed a line into parallel lines. Moreover, a model with two numeric explanatory variables was a plane. Can you guess how the addition of a categorical explanatory variable will change the geometry of a model with two numeric explanatory variables?
+But here again the geometric changes are not as easy to see. However, our emphasis on the geometry of these models should give you some intuition. Recall that the addition of a categorical explanatory variable to a numeric explanatory variable changed a line into parallel lines. Moreover, a model with two numeric explanatory variables was a plane. 
 
-If you guess parallel planes, you're right!
+Can you guess how the addition of a categorical explanatory variable will change the geometry of a model with two numeric explanatory variables?
 
 ### Drawing parallel planes in 3D
 
-```{r babies-plotly-two, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, echo=TRUE}
+If you guessed parallel planes, you're right!
+
+```{r babies-plotly-two, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, exercise.lines=43}
+library(broom)
+library(modelr)
+library(plotly)
+
 grid <- babies %>%
   modelr::data_grid(
     gestation = seq_range(gestation, n = 50),
@@ -602,7 +608,9 @@ plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6, colors
   )
 ```
 
-Once again, we can use plotly to create a 3D image of our model in the data space. Here we have used the `add_surface()` function twice: once to add a plane for non-smokers, and again to add another plane for smokers. The plane on "top" is the one for non-smokers---can you think of why this might be case? We'll return to this question in a minute.
+Besides the tidyverse meta-package, which we have already loaded all the time, we also need to load the [broom](https://broom.tidymodels.org/) and [modelr](https://modelr.tidyverse.org/) and [plotly](https://plotly.com/r/) package.
+
+Once again, we can then use `plotly` to create a 3D image of our model in the data space. Here we have used the `add_surface()` function twice: once to add a plane for non-smokers and again to add another plane for smokers. The plane on “top” is the one for non-smokers --- can you think of why this might be the case? We'll return to this question in a minute.
 
 ### Coefficient interpretation
 
