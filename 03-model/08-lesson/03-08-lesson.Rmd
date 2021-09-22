@@ -426,11 +426,11 @@ Note that in this case both slopes are positive, but have different magnitudes.
 
 ### Tiled plane
 
-When we depicted our model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birthweights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
-
 ```{r ex7-babies-model-space, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
 model_space
 ```
+
+Remember: When we depicted our above model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birthweights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
 
 ### Tiled plane plus first slope
 
@@ -438,12 +438,13 @@ For a 30-year-old mother, the increase in expected birthweight is 0.47 ounces pe
 
 However, this rate of change is constant across mothers of all ages. It doesn't matter whether you are 20, 30, or 40. While the expected birthweight does depend on the mother's age, the rate of change in birthweight with respect to gestational length does not depend on the the mother's age. 
 
-Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birthweight, while holding age constant.
 
 ```{r ex8-babies-model-hline, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
 model_space + 
   geom_hline(yintercept = 30, color = "red")
 ```
+
+Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birthweight, while holding age constant.
 
 ### Tiled plane plus second slope
 
@@ -451,27 +452,36 @@ Similarly, at the typical gestational length of 40 weeks (or 280 days), the expe
 
 So the coefficient of 0.17 ounces per year is the slope of the plane for a fixed length of gestation. Again, since this slope is the same for all gestational lengths, we can interpret this coefficient as the effect of the mother's age on birthweight, while holding gestational length constant.
 
-It's also apparent from the plot that the colours change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation is bigger than the coefficient on age.
+Recapitulating we can say: Whenever you interpret coefficients from a multiple regression model, be sure to always include a phrase to the effect of "holding x constant." Another good alternative is "after controlling for x." This information is crucial to having a valid understanding of a regression model.
 
-```{r ex9-babies-model-vline, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
+
+```{r ex9-babies-model-vline, exercise=TRUE, exercise.setup="ex8-babies-model-hline"}
 model_space + 
   geom_vline(xintercept = 280, color = "red")
 ```
 
+It's also apparent from the plot that the colours change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation is bigger than the coefficient on age.
+
 ### Coefficient interpretation
 
-Now, you might be tempted to think that bigger coefficients are always more important, but this is not true. The value of the coefficients depend on the units of the explanatory variables. In this case, one variable is in the units of days (of gestational length), while the other is in the units of years (of mother's age). They are not directly comparable. 
+Now, you might be tempted to think that bigger coefficients are always more important, but this is not true. The value of the coefficients depend on the units of the explanatory variables. 
+
+Let's fit again our `babies` model, incorporating both the `gestation` and `age` variables, just as we did before.
 
 ```{r ex6-babies2, exercise=TRUE}
 lm(___ ~ ___ + ___, data = ___)
 ```
 
 
-```{r ex6-babies2-solution}
+```{r ex6-babies2-solution, exercise=TRUE, exercise.eval=TRUE}
 lm(bwt ~ gestation + age, data = babies)
 ```
 
-When you interpret coefficients from a multiple regression model, be sure to always include a phrase to the effect of "holding x constant." Another good alternative is "after controlling for x." This information is crucial to having a valid understanding of a regression model.
+In this case, one variable is in the units of days (of gestational length), while the other is in the units of years (of mother's age). They are not directly comparable.
+
+Now it is your turn to look at the `mariokart` data set.
+
+## Your turn
 
 ### Coefficient magnitude
 
