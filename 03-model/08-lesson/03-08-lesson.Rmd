@@ -768,10 +768,6 @@ lm(bwt ~ . - case, data = babies)
 
 In the last expression above, we have built the "kitchen sink" model by throwing everything in with the dot operator---with one exception. There are often variables that are recorded that will not make sense to include in a model. The case variable in the babies data set simply identifies each case---it is not an observed property of each birth. Therefore, we exclude it explicitly. You can read the `. - case` formula as *all variables except for the one named case*.
 
-
-
-
-
 ### Higher dimensional geometry
 
 You may also have caught on to the fact that a geometric interpretation of these higher order models is extremely difficult. There are things called hyperplanes which generalize the notion of a plane to higher dimensions, but since we humans can't visualize more than three spatial dimensions anyway, there isn't much hope of visualizing our higher dimensional models in their full glory. 
@@ -780,12 +776,9 @@ We can of course employ tricks like mapping variables to color, creating small m
 
 ### Interpretation in large models
 
-```{r}
-lm(bwt ~ gestation + age + smoke + height + weight + parity, 
-   data = babies)
-```
-
 The interpretation of the coefficients in larger models remains the same. We can still think of the coefficients on numeric explanatory variables as being slopes, and we can still think of the coefficients on categorical explanatory variables as being intercepts. The main thing we have to be careful about is remembering to include language specifying the other variables in the model. Here, our main finding would likely be that the expected birthweight of babies born to mothers who smoke is 8.4 ounces lower than mothers who don't, after controlling for gestational length, and her age, height, weight, and whether she had previous pregnancies.
+
+## Your turn
 
 ### Interpretation of coefficient in a big model
 
