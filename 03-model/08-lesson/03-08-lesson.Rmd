@@ -562,7 +562,7 @@ Can you guess how the addition of a categorical explanatory variable will change
 
 If you guessed parallel planes, you're right!
 
-```{r babies-plotly-two, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, exercise.lines=43}
+```{r ex10-babies-plotly-two, exercise.setup="ex3-babies-tiling-plane", exercise=TRUE, exercise.lines=43}
 library(broom)
 library(modelr)
 library(plotly)
@@ -608,9 +608,9 @@ plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6, colors
   )
 ```
 
-Besides the tidyverse meta-package, which we have already loaded all the time, we also need to load the [broom](https://broom.tidymodels.org/) and [modelr](https://modelr.tidyverse.org/) and [plotly](https://plotly.com/r/) package.
+Besides the tidyverse meta-package, which we have already loaded all the time, we also needed to load the [broom](https://broom.tidymodels.org/) and [modelr](https://modelr.tidyverse.org/) and [plotly](https://plotly.com/r/) package.
 
-Once again, we can then use `plotly` to create a 3D image of our model in the data space. Here we have used the `add_surface()` function twice: once to add a plane for non-smokers and again to add another plane for smokers. The plane on “top” is the one for non-smokers --- can you think of why this might be the case? We'll return to this question in a minute.
+Once again, we can then used `plotly` to create a 3D image of our model in the data space. Here we have used the `add_surface()` function twice: once to add a plane for non-smokers and again to add another plane for smokers. The plane on “top” is the one for non-smokers --- can you think of why this might be the case? We'll return to this question in a minute.
 
 ### Coefficient interpretation
 
