@@ -782,20 +782,25 @@ The interpretation of the coefficients in larger models remains the same. We can
 
 ### Interpretation of coefficient in a big model
 
-This time we have thrown even more variables into our model, including the number of bids in each auction (`nBids`) and the number of `wheels`. Unfortunately this makes a full visualization of our model impossible, but we can still interpret the coefficients. 
+This time you will throw even more variables into your `mariokart` model, including the number of bids in each auction (`nBids`) and the number of `wheels`. 
 
-```{r}
+```{r ex7, exercise=TRUE}
+lm(formula = ___ ~ ___ + ___ + ___ + ___ + ___, data = ___)
+```
+
+
+```{r ex7-solution}
 lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mariokart)
 ```
 
-*Hint:* The coefficient on `wheels` represents how the number of wheel affects the price when you take into account all the other variables in the model.
+Unfortunately this makes a full visualization of our model impossible, but we can still interpret the coefficients. 
 
 ```{r mc3}
 question("Choose the correct interpretation of the coefficient on the number of wheels",
-  answer("The average number of wheels is 6.72.", message="We can't infer that from this"),
+  answer("The average number of wheels is 6.72.", message="We can't infer that from our data."),
   answer("Each additional wheel costs exactly $6.72.", message="Exactly' is rarely used in statistics!"),
-  answer("Each additional wheel is associated with an increase in the expected auction price of $6.72.", message="Right idea, but..."),
-  answer("Each additional wheel is associated with an increase in the expected auction price of $6.72, after controlling for auction duration, starting price, number of bids, and the condition of the item.", correct = TRUE, message="Correct!"), 
+  answer("Each additional wheel is associated with an increase in the expected auction price of $6.72.", message="Right idea, but...The coefficient on `wheels` represents how the number of wheel affects the price when you take into account all the other variables in the model."),
+  answer("Each additional wheel is associated with an increase in the expected auction price of $6.72, after controlling for auction duration, starting price, number of bids, and the condition of the item.", correct = TRUE), 
   allow_retry=TRUE
 )
 ```
