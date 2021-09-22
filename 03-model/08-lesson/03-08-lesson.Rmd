@@ -485,13 +485,21 @@ Now it is your turn to look at the `mariokart` data set.
 
 ### Coefficient magnitude
 
-The coefficients from our model for the total auction price of MarioKarts as a function of auction duration and starting price are shown below. 
+As a repetition fit again a multiple linear regression model with the `mariokart` data set for total price (`total_pr`) as a function of the `duration` of the auction and the starting price (`start_pr`).
 
-```{r}
+
+```{r ex4-mariokart, exercise=TRUE}
+# Fit the model using duration and starting price
+lm(formula = ___ ~ ___ + ___, data = ___)
+```
+
+```{r ex4-mariokart-solution}
+# Fit the model using duration and starting price
 lm(formula = total_pr ~ duration + start_pr, data = mariokart)
 ```
 
-A colleague claims that these results imply that the duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
+The coefficients from our model for the total auction price of `mariokart` as a function of auction duration and starting price are shown above. A colleague claims that these results imply that the duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
+
 
 *Hint:* Whether a coefficient is positive or negative doesn't effect how important it is.
 
