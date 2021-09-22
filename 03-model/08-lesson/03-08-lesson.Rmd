@@ -536,18 +536,20 @@ question("This interpretation is false because.",
 
 ### Practicing interpretation
 
-Fit a multiple regression model for the total auction price of an item in the `mariokart` data set as a function of the starting price and the duration of the auction. Compute the coefficients and choose the correct interpretation of the `duration` variable.
+You fit a multiple regression model for the total auction price of an item in the `mariokart` data set as a function of the starting price and the duration of the auction. You computed the coefficients. Now choose the correct interpretation of the `duration` variable.
 
-- For each additional day the auction lasts, the expected final price declines by $1.51, after controlling for starting price. 
-- For each additional dollar of starting price, the expected final price increases by $0.23, after controlling for the duration of the auction.
-- The duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger. 
-- The average auction lasts 51 days.
 
-*Hint:* Remember, the inclusion of another variable in your model is sometimes referred to as "controlling for" that variable.
-
-```{r ex4, exercise=TRUE}
-
+```{r mc2}
+question("This interpretation is correct …",
+  answer("For each additional day the auction lasts, the expected final price declines by $1.51, after controlling for starting price."),
+  answer("For each additional dollar of starting price, the expected final price increases by $0.23, after controlling for the duration of the auction.", correct = TRUE, message="Remember, the inclusion of another variable in your model is sometimes referred to as 'controlling for' that variable."),
+  answer("The duration of the auction is a more important determinant of final price than starting price, because the coefficient is larger."),
+  answer("The average auction lasts 51 days."),
+  allow_retry=TRUE
+)
 ```
+
+
 
 
 ## Adding a third (categorical) variable
@@ -749,7 +751,7 @@ The coefficients from our parallel planes model is shown below.
 Choose the right interpretation of $\beta_3$ (the coefficient on `condUsed`):
 
 
-```{r mc2}
+```{r mc3}
 question("Choose the right interpretation of beta the coefficient on `condUsed`",
   answer("The expected premium for new (relative to used) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", correct = TRUE),
   answer("The expected premium for used (relative to new) MarioKarts is $8.95, after controlling for the duration and starting price of the auction.", message="Wrong reference level. The reference level specified needs to be kept in mind when interpreting factor coefficients."),
@@ -817,7 +819,7 @@ lm(formula = total_pr ~ duration + start_pr + cond + wheels + n_bids, data = mar
 
 Unfortunately this makes a full visualization of our model impossible, but we can still interpret the coefficients. 
 
-```{r mc3}
+```{r mc4}
 question("Choose the correct interpretation of the coefficient on the number of wheels",
   answer("The average number of wheels is 6.72.", message="We can't infer that from our data."),
   answer("Each additional wheel costs exactly $6.72.", message="Exactly' is rarely used in statistics!"),
