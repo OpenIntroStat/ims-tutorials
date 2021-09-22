@@ -621,13 +621,9 @@ The coefficient of gestation is 0.45 ounces per day, which is only slightly less
 
 Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounces. Thus, our model predicts that mothers who smoke will deliver babies that weight 8 ounces less, on average, than mothers of the same age and gestational length who don't smoke. That is, the negative effect of smoking on expected birthweight is 8 ounces (or half a pound), after controlling for gestational length and the mother's age. This is a *huge* effect compared to the influence of the other two variables we have considered.
 
+## Your turn
+
 ### Visualizing parallel planes
-
-By including the duration, starting price, and condition variables in our model, we now have two explanatory variables and one categorical variable. Our model now takes the geometric form of two parallel planes!
-
-The first plane corresponds to the model output when the condition of the item is `new`, while the second plane corresponds to the model output when the condition of the item is `used`. The planes have the same slopes along both the duration and starting price axes - it is the $z$-intercept that is different. 
-
-Once again we have stored the `x` and `y` vectors for you. Since we now have two planes, there are matrix objects `plane0` and `plane1` stored for you as well.
 
 ```{r ex5-setup}
 mod <- lm(total_pr ~ duration + start_pr + cond, data = mariokart)
@@ -656,12 +652,17 @@ plane1 <- tidy_planes %>%
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
-###  
+Draw a 3D plot for the `mariokart` model. Once again we have stored the `x` and `y` vectors for you. Since we now have two planes, there are matrix objects `plane0` and `plane1` stored for you as well.
 
-- Use `plot_ly` to draw 3D scatterplot for `total_pr` as a function of `duration`, `start_pr`, and `cond` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis. Use color to represent `cond`.
+**Instructions**
+
+- Apply `plot_ly` to draw 3D scatterplot for the mariokart model, Use `total_pr` as a function of `duration`, `start_pr`, and `cond` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis. Use color to represent `cond`.
 - Use `add_surface()` (twice) to draw two planes through the cloud of points, one for new MarioKarts and another for used ones. Use the objects `plane0` and `plane1`.
 
 ```{r ex5, exercise=TRUE}
+# load plotly
+___(plotly)
+
 # draw the 3D scatterplot
 p <- plot_ly(data = mariokart, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
   add_markers(color = ~___) 
@@ -672,11 +673,27 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
-<div id="ex5-hint">
-**Hint:** In `add_surface()`, define `z = ~ plane0` and `z = ~ plane1`.
-</div>
+
+```{r ex5-hint-1}
+# load plotly
+library(plotly)
+```
+
+
+```{r ex5-hint-2}
+# load plotly
+library(plotly)
+
+# draw the 3D scatterplot
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+  add_markers(color = ~cond) 
+```
+
 
 ```{r ex5-solution}
+# load plotly
+library(plotly)
+
 # draw the 3D scatterplot
 p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
   add_markers(color = ~cond) 
@@ -686,6 +703,13 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
 ```
+
+
+By including the duration, starting price, and condition variables in our model, we now have two explanatory variables and one categorical variable. Our model now takes the geometric form of two parallel planes!
+
+The first plane corresponds to the model output when the condition of the item is `new`, while the second plane corresponds to the model output when the condition of the item is `used`. The planes have the same slopes along both the duration and starting price axes - it is the $z$-intercept that is different. 
+
+
 
 ### Parallel plane interpretation
 
