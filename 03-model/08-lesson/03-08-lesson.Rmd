@@ -24,7 +24,8 @@ knitr::opts_chunk$set(fig.align = "center",
                       fig.width = 5,
                       echo = FALSE, 
                       message = FALSE, 
-                      warning = FALSE)
+                      warning = FALSE,
+                      verbose = FALSE)
 
 # data prep --------------------------------------------------------------------
 
