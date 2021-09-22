@@ -416,7 +416,7 @@ What do the coefficients in a multiple regression model mean?
 
 Consider the fitted coefficients for our model for the birthweight of babies shown below. 
 
-```{r echo=TRUE}
+```{r ex6-babies-coef, exercise=TRUE}
 lm(bwt ~ gestation + age, data = babies)
 ```
 
@@ -428,7 +428,7 @@ Note that in this case both slopes are positive, but have different magnitudes.
 
 When we depicted our model as a tiled surface in the plane, we noticed that the color of the tiles got lighter and bluer as we moved towards the upper right hand corner of the plot. This reflects the fact that our model predicts higher birthweights for babies with longer gestational periods born to older mothers. But at what rate does this color change?
 
-```{r babies-model-space, echo=TRUE, exercise=TRUE}
+```{r ex7-babies-model-space, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
 model_space
 ```
 
@@ -440,7 +440,7 @@ However, this rate of change is constant across mothers of all ages. It doesn't 
 
 Thus, the coefficient of 0.47 ounces per day on gestation reflects the slope of the plane for a fixed value of age. And since this slope doesn't change with respect to age, we often say that it reflects the effect of gestational length upon birthweight, while holding age constant.
 
-```{r babies-model-hline, echo=TRUE, exercise=TRUE}
+```{r ex8-babies-model-hline, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
 model_space + 
   geom_hline(yintercept = 30, color = "red")
 ```
@@ -453,7 +453,7 @@ So the coefficient of 0.17 ounces per year is the slope of the plane for a fixed
 
 It's also apparent from the plot that the colours change more rapidly as you move horizontally as opposed to vertically. This reflects the fact that the coefficient on gestation is bigger than the coefficient on age.
 
-```{r babies-model-vline, echo=TRUE, exercise=TRUE}
+```{r ex9-babies-model-vline, exercise=TRUE, exercise.setup="ex4-babies-model-space"}
 model_space + 
   geom_vline(xintercept = 280, color = "red")
 ```
@@ -462,7 +462,12 @@ model_space +
 
 Now, you might be tempted to think that bigger coefficients are always more important, but this is not true. The value of the coefficients depend on the units of the explanatory variables. In this case, one variable is in the units of days (of gestational length), while the other is in the units of years (of mother's age). They are not directly comparable. 
 
-```{r echo=TRUE}
+```{r ex6-babies2, exercise=TRUE}
+lm(___ ~ ___ + ___, data = ___)
+```
+
+
+```{r ex6-babies2-solution}
 lm(bwt ~ gestation + age, data = babies)
 ```
 
