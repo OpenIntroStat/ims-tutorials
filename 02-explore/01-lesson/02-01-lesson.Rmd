@@ -436,7 +436,7 @@ After counting the number of observations at each level of `id` and `align`, we 
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop)
 
 ```
@@ -445,7 +445,7 @@ comics %>%
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -476,7 +476,7 @@ comics %>%
   count(id, align) %>% 
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop)
 ```
 
@@ -486,7 +486,7 @@ comics %>%
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>%
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -511,7 +511,7 @@ comics %>%
   count(id, align) %>% 
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop)
 ```
 
@@ -521,7 +521,7 @@ comics %>%
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = c(id), 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
