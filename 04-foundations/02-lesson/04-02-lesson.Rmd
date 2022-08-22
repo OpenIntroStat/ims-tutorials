@@ -9,6 +9,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, grid, gridExtra, emo, ggplot2, infer, janitor)
 
 library(learnr)
 library(kableExtra)
