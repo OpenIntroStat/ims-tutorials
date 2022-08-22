@@ -72,7 +72,7 @@ knitr::include_graphics("images/2-1-3.png")
 
 ### 
 
-We assert this hypothesis, this model of the true state of the word, using hypothesize.
+We assert this hypothesis, this model of the true state of the world, using hypothesize.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-4.png")
