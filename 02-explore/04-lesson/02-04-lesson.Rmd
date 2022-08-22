@@ -374,7 +374,7 @@ email %>%
 question(
   "Which of the following interpretations of the plot **is** valid?",
   answer("There are more emails with images than without images."),
-  answer("Emails with images have a higher proportion that are spam than do emails without images.", correct = TRUE),
+  answer("Emails without images have a higher proportion that are spam than do emails with images.", correct = TRUE),
   answer("An email without an image is more likely to be not spam than spam.", correct = TRUE),
   allow_retry = TRUE,
   message = "Pay close attention to the legend and the axes of the plot."
