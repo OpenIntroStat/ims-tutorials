@@ -516,7 +516,7 @@ question("The author is arguing that...",
 
 ## Congratulations!
 
-You have successfully completed Lesson 3 in Tutorial 3: Introduction to Linear Models.  
+You have successfully completed Lesson 3 in Tutorial 3: Regression modeling.  
 
 What's next?
 

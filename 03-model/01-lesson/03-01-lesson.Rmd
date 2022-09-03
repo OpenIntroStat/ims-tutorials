@@ -565,7 +565,7 @@ ab_gt_200 %>%
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 3: Introduction to Linear Models.
+You have successfully completed Lesson 1 in Tutorial 3: Regression modeling.
 
 What's next?
 
