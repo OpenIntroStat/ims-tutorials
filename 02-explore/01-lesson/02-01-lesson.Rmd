@@ -430,13 +430,13 @@ You may have noticed in the last exercises that sometimes raw counts of cases ca
 
 Let's return to our table of counts of cases by identity and alignment. If we wanted to instead get a sense of the proportion of all cases that fell into each category, we can modify our previous table. We will need to add a column that calculates the proportion of total observations that were observed in each combination of `id` and `align`. 
 
-After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument.  
+After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument, excluding any variables used in `names_from` and `values_from`.  
 
 ```{r fctp, echo = TRUE, eval = FALSE}
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 
 ```
@@ -445,7 +445,7 @@ comics %>%
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -476,7 +476,7 @@ comics %>%
   count(id, align) %>% 
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
@@ -486,7 +486,7 @@ comics %>%
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>%
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -511,7 +511,7 @@ comics %>%
   count(id, align) %>% 
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
@@ -521,7 +521,7 @@ comics %>%
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -608,7 +608,7 @@ comics <- comics %>%
 comics %>% 
   count(align, gender) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(align, gender, prop), 
+  pivot_wider(id_cols = align, 
               names_from = gender, values_from = prop)
 
 # Conditional on columns
@@ -616,7 +616,7 @@ comics %>%
   count(align, gender) %>% 
   group_by(gender) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(align, gender, prop), 
+  pivot_wider(id_cols = gender, 
               names_from = align, values_from = prop) 
 ```
 
