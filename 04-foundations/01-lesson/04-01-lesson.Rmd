@@ -1205,10 +1205,10 @@ What's next?
 
 `r emo::ji("one")` [Tutorial 4 - Lesson 1: Sampling variability](https://openintro.shinyapps.io/ims-04-foundations-01/)
 
-`r emo::ji("one")` [Tutorial 4 - Lesson 2: Randomization test](https://openintro.shinyapps.io/ims-04-foundations-02/)
+`r emo::ji("two")` [Tutorial 4 - Lesson 2: Randomization test](https://openintro.shinyapps.io/ims-04-foundations-02/)
 
-`r emo::ji("one")` [Tutorial 4 - Lesson 3: Errors in hypothesis testing](https://openintro.shinyapps.io/ims-04-foundations-03/)
+`r emo::ji("three")` [Tutorial 4 - Lesson 3: Errors in hypothesis testing](https://openintro.shinyapps.io/ims-04-foundations-03/)
 
-`r emo::ji("one")` [Tutorial 4 - Lesson 4: Parameters and confidence intervals](https://openintro.shinyapps.io/ims-04-foundations-04/)
+`r emo::ji("four")` [Tutorial 4 - Lesson 4: Parameters and confidence intervals](https://openintro.shinyapps.io/ims-04-foundations-04/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
