@@ -1061,7 +1061,7 @@ test_results
 
 ## Congratulations!
 
-You have successfully completed Lesson 3 in Tutorial 5: Statistical inference.  
+You have successfully completed Lesson 7 in Tutorial 5: Statistical inference.  
 
 What's next?
 

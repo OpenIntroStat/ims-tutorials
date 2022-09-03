@@ -713,7 +713,7 @@ For which of the pairwise comparisons would you conclude that there is a "signif
 
 ## Congratulations!
 
-You have successfully completed Lesson 4 in Tutorial 5: Comparing many means.  
+You have successfully completed Lesson 8 in Tutorial 5: Statistical inference.  
 
 You should now have a very good understanding of statistical inference for numerical data. In this tutorial you have learned about parametric procedures for conducing an analysis of variance (ANOVA). Specifically, you should now be familiar with the concepts of variability within and between groups, the $F$-distribution, and multiple comparison procedures. 
 

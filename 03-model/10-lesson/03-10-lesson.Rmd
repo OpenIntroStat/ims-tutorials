@@ -554,7 +554,7 @@ question("Which of the following interpretations is invalid?
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 3: Regression modeling.  
+You have successfully completed Lesson 10 in Tutorial 3: Regression modeling.  
 
 We hope that you've found this tutorial to be illuminating and useful. 
 

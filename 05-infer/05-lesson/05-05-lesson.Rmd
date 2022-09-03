@@ -1109,7 +1109,7 @@ weight_mean_ht %>%
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 5: Statistical inference.  
+You have successfully completed Lesson 5 in Tutorial 5: Statistical inference.  
 
 What's next?
 

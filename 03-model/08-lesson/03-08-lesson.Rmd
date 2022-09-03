@@ -661,7 +661,7 @@ question("Choose the correct interpretation of the coefficient on the number of 
 
 ## Congratulations!
 
-You have successfully completed Lesson 3 in Tutorial 3: Regression modeling.  
+You have successfully completed Lesson 8 in Tutorial 3: Regression modeling.  
 
 What's next?
 

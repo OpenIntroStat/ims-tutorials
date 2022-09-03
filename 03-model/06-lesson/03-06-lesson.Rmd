@@ -543,7 +543,7 @@ lm(bwt ~ gestation + smoke, data = babies)
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 3: Regression modeling.  
+You have successfully completed Lesson 6 in Tutorial 3: Regression modeling.  
 
 What's next?
 
