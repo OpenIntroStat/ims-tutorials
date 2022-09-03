@@ -1,5 +1,5 @@
 ---
-title: "Regression modeling: 3 - Multiple Regression"
+title: "Regression modeling: 8 - Multiple Regression"
 output: 
   learnr::tutorial:
     progressive: true
