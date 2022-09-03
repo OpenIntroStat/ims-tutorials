@@ -46,7 +46,7 @@ EDA is all about learning the structure of a dataset through a series of numeric
 
 The emphasis of the first two lessons is on visualization: how to create and interpret graphical displays of your data. The third lesson focuses on numerical summaries of distributions and utilizes a simple, but powerful coding paradigm in R. We end with a case study that will allow you to synthesize these concepts and apply them to a more complex dataset that contains information on the characteristics of email that are associated with it being spam.
 
-Before beginning the tutorial, we recommend you have some exposure to the R language and that you've taken the Getting Started with Data tutorial in this series.
+Before beginning the tutorial, we recommend you have some exposure to the R language and that you've taken the Introduction to data tutorial in this series.
 
 Let's get started.
 
@@ -984,7 +984,7 @@ What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 2: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/02-explore/)
+`r emo::ji("spiral_notepad")` [Tutorial 2: Exploratory data analysis](https://openintrostat.github.io/ims-tutorials/02-explore/)
 
 `r emo::ji("one")` [Tutorial 2 - Lesson 1: Visualizing categorical data](https://openintro.shinyapps.io/ims-02-explore-01/)
 

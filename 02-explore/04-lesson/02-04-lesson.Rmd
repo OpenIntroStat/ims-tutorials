@@ -778,7 +778,7 @@ What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 2: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/02-explore/)
+`r emo::ji("spiral_notepad")` [Tutorial 2: Exploratory data analysis](https://openintrostat.github.io/ims-tutorials/02-explore/)
 
 `r emo::ji("one")` [Tutorial 2 - Lesson 1: Visualizing categorical data](https://openintro.shinyapps.io/ims-02-explore-01/)
 
