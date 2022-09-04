@@ -9,6 +9,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, emo, ggplot2, infer)
 
 library(learnr)
 library(tidyverse)
@@ -178,12 +180,12 @@ rent_med_ci <- manhattan %>%
 glimpse(rent_med_ci)
 ```
 
-<div id="bootstrap_distribution-hint">
+```{r bootstrap_distribution-hint, echo = FALSE}
 **Hint:** 
 - In `specify()`, set `response` to `rent` without quotes.
 - In `generate()`, set `reps` to `15000` and `type` to `"bootstrap"`.
 - In `calculate()`, set `stat` to `"median"`.
-</div>
+```
 
 ```{r bootstrap_distribution-solution}
 # Generate bootstrap distribution of medians
@@ -206,34 +208,32 @@ Then, plot a histogram of the bootstrap medians.
 - Using `rent_med_ci`, plot `stat` on the `x` axis.
 - Add a histogram layer with a binwidth of `50`.
 
+```{r bootstrap_medians-setup, include = FALSE}
+# Set seed so that same bootstrap object can be reused later
+set.seed(20170801)
 
-```{r bootstrap_medians, exercise=TRUE}
-# From previous step
+# Create bootstrap distribution of medians
 rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%  
+  specify(response = rent) %>%
   generate(reps = 15000, type = "bootstrap") %>%
   calculate(stat = "median")
-  
+```
+
+```{r bootstrap_medians, exercise = TRUE}
 # Plot the rent_med_ci statistic
 ggplot(___, aes(___)) +
   # Make it a histogram with a binwidth of 50
   ___
 ```
 
-<div id="bootstrap_medians-hint">
+```{r bootstrap_medians-hint, echo = FALSE}
 **Hint:** 
 - Use `ggplot()` with `rent_med_ci` as the dataset.
 - Inside `aes()`, map `x` to `stat`.
 - Add `geom_histogram()`, setting `binwidth` to `50`.
-</div>
+```
 
 ```{r bootstrap_medians-solution}
-# From previous step
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%  
-  generate(reps = 15000, type = "bootstrap") %>%
-  calculate(stat = "median")
-  
 # Plot the rent_med_ci statistic
 ggplot(rent_med_ci, aes(x = stat)) +
   # Make it a histogram with a binwidth of 50
@@ -247,8 +247,6 @@ In the previous tutorials you have already discussed percentile and standard err
 ### Bootstrap distribution
 
 ![](images/chp1-vid2-boot-dist-withaxes.png)
-
-
 
 Here is our bootstrap distribution, comprised of 15000 bootstrap medians. Each observation in this plot is a median from a bootstrap sample. And remember that each bootstrap sample is a sample taken with replacement from the original sample, and of the same size as the original sample. 
 
@@ -320,11 +318,11 @@ rent_med_ci %>%
   ) 
 ```
 
-<div id="bootstrap_interval-hint">
+```{r bootstrap_interval-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()`, with `quantile(stat, 0.025)` for the 2.5th percentile.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
-</div>
+```
 
 ```{r bootstrap_interval-solution}
 # Calculate bootstrap CI as lower and upper quantiles
@@ -354,11 +352,11 @@ rent_med_obs <- manhattan %>%
 rent_med_obs
 ```
 
-<div id="bootstrap_interval_2-hint">
+```{r bootstrap_interval_2-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()` and `median_rent` to the median of `rent`.
 - Use `pull()` to extract the vector from the data frame.
-</div>
+```
 
 ```{r bootstrap_interval_2-solution}
 rent_med_obs <- manhattan %>%
@@ -378,13 +376,13 @@ Then, determine the critical value.
 - Calculate the degrees of freedom in the dataset.
 - Use the t-distribution to determine the critical value for a 95% confidence interval. *`qt()` takes the percentile of the t-distribution you want to find and the degrees of freedom as arguments.*
 
-
-```{r bootstrap_interval_3, exercise=TRUE}
-# From previous step
+```{r bootstrap_interval_3-setup, include=FALSE}
 rent_med_obs <- manhattan %>%
   summarize(median_rent = median(rent)) %>%
   pull()
-  
+```
+
+```{r bootstrap_interval_3, exercise=TRUE}
 # Calculate the degrees of freedom
 degrees_of_freedom <- ___  
   
@@ -392,18 +390,13 @@ degrees_of_freedom <- ___
 t_star <- ___
 ```
 
-<div id="bootstrap_interval_3-hint">
+```{r bootstrap_interval_3-hint, echo = FALSE}
 **Hint:** 
 - The degrees of freedom is n - 1.
 - Use `qt()`, setting `p` to `0.975` and `df` to the degrees of freedom.
-</div>
+```
 
 ```{r bootstrap_interval_3-solution}
-# From previous step
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
-  pull()
-  
 # Calculate the degrees of freedom
 degrees_of_freedom <- nrow(manhattan) - 1  
   
@@ -419,15 +412,25 @@ And finally, complete the calculation of the 95% bootstrap confidence interval u
 - Summarize again to calculate the lower and upper limits of the CI.
 - *Compare the interval to the one you calculated in step 1.*
 
+```{r bootstrap_interval_4-setup, include=FALSE}
+# Set seed so that same bootstrap object can be reused later
+set.seed(20170801)
 
-```{r bootstrap_interval_4, exercise=TRUE}
-# From previous steps
+# Create bootstrap distribution of medians
+rent_med_ci <- manhattan %>%
+  specify(response = rent) %>%
+  generate(reps = 15000, type = "bootstrap") %>%
+  calculate(stat = "median")
+
 rent_med_obs <- manhattan %>%
   summarize(median_rent = median(rent)) %>%
   pull()
+
 degrees_of_freedom <- nrow(manhattan) - 1 
 t_star <- qt(0.975, df = degrees_of_freedom)
+```
 
+```{r bootstrap_interval_4, exercise=TRUE}
 # Calculate the CI using the std error method
 rent_med_ci %>%
   # Calculate the std error of the statistic
@@ -437,39 +440,38 @@ rent_med_ci %>%
     l = ___ - ___ * ___,
     u = ___ + ___ * ___
   )
-  
-# Recall the CI using the percentile method from step 1
-rent_med_ci %>%
-  summarize(
-    l = quantile(stat, 0.025),
-    u = quantile(stat, 0.975)
-  )
 ```
 
-<div id="bootstrap_interval_4-hint">
+```{r bootstrap_interval_4-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
-- Use `summarize()` again, setting `l` to the observed median minus the critical value times the bootstrap standard error.
-</div>
+- Use `summarize()` again, setting `l_se` to the observed median minus the critical value times the bootstrap standard error.
+```
 
 ```{r bootstrap_interval_4-solution}
-# From previous steps
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
-  pull()
-degrees_of_freedom <- nrow(manhattan) - 1 
-t_star <- qt(0.975, df = degrees_of_freedom)
-
 # Calculate the CI using the std error method
 rent_med_ci %>%
   # Calculate the std error of the statistic
   summarize(boot_se = sd(stat)) %>%
   # Calculate the lower and upper limits of the CI
   summarize(
-    l = rent_med_obs - t_star * boot_se,
-    u = rent_med_obs + t_star * boot_se
+    l_se = rent_med_obs - t_star * boot_se,
+    u_se = rent_med_obs + t_star * boot_se
   )
-  
+```
+
+```{r bootstrap_interval_5-setup, include=FALSE}
+# Set seed so that same bootstrap object can be reused later
+set.seed(20170801)
+
+# Create bootstrap distribution of medians
+rent_med_ci <- manhattan %>%
+  specify(response = rent) %>%
+  generate(reps = 15000, type = "bootstrap") %>%
+  calculate(stat = "median")
+```
+
+```{r bootstrap_interval_5, exercise = TRUE}
 # Recall the CI using the percentile method from step 1
 rent_med_ci %>%
   summarize(
@@ -477,6 +479,7 @@ rent_med_ci %>%
     u = quantile(stat, 0.975)
   )
 ```
+
 
 ### 
 
@@ -544,13 +547,12 @@ glimpse(ncbirths_complete_visits)
 
 ```
 
-
-<div id="doctor-hint">
+```{r doctor-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
 - Use `summarize()` again, setting `l` to the observed median minus the critical value times the bootstrap standard error.
 - For `u`, change the minus to a plus.
-</div>
+```
 
 ```{r doctor-solution}
 # Filter for rows with non-missing visits
@@ -586,12 +588,12 @@ visit_mean_ci <- ncbirths_complete_visits %>%
   ___(stat = ___)
 ```
 
-<div id="doctor_2-hint">
+```{r doctor_2-hint, echo = FALSE}
 **Hint:** 
 - Use `specify()`, setting `response` to `visits`.
 - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"mean"`.
-</div>
+```
 
 ```{r doctor_2-solution}
 # From previous step
@@ -631,11 +633,11 @@ visit_mean_ci %>%
   )
 ```
 
-<div id="doctor_3-hint">
+```{r doctor_3-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
-</div>
+```
 
 ```{r doctor_3-solution}
 # From previous steps
@@ -682,12 +684,12 @@ visit_sd_ci <- ncbirths_complete_visits %>%
 visit_sd_ci
 ```
 
-<div id="doctor_4-hint">
+```{r doctor_4-hint, echo = FALSE}
 **Hint:** 
 - Use `specify()`, setting `response` to `visits`.
 - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"sd"`.
-</div>
+```
 
 ```{r doctor_4-solution}
 # Calculate 15000 bootstrap standard deviations of visits
@@ -719,11 +721,11 @@ visit_sd_ci %>%
   )
 ```
 
-<div id="doctor_5-hint">
+```{r doctor_5-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
-</div>
+```
 
 ```{r doctor_5-solution}
 # From previous step
@@ -794,9 +796,9 @@ rent_med_ht <- manhattan %>%
 rent_med_ht
 ```
 
-<div id="apartments-hint">
+```{r apartments-hint, echo = FALSE}
 **Hint:** Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`.
-</div>
+```
 
 ```{r apartments-solution}
 n_replicates <- 15000
@@ -840,11 +842,11 @@ rent_med_obs <- manhattan %>%
 rent_med_obs
 ```
 
-<div id="apartments_2-hint">
+```{r apartments_2-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()`, setting `median_rent` to the median of `rent`.
 - Use `pull()` to extract the vector from the data frame.
-</div>
+```
 
 ```{r apartments_2-solution}
 # From previous step
@@ -893,11 +895,11 @@ rent_med_ht %>%
   summarize(p_val = ___ / ___)
 ```
 
-<div id="apartments_3-hint">
+```{r apartments_3-hint, echo = FALSE}
 **Hint:** 
 - Use `filter()`, using the condition `stat` greater than or equal to the observed median rent, `rent_med_obs`.
 - Use `summarize()`, setting `p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
-</div>
+```
 
 ```{r apartments_3-solution}
 # From previous step
@@ -979,13 +981,13 @@ weight_mean_ht <- ncbirths %>%
   ___
 ```
 
-<div id="babies-hint">
+```{r babies-hint, echo = FALSE}
 **Hint:** 
 - Use `specify()`, setting `response` to `weight`.
 - Use `hypothesize()`, setting `null` to `"point"` and `mu` to `7`.
 - Use `generate()`, setting `reps` to `n_replicates` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"sd"`.
-</div>
+```
 
 ```{r babies-solution}
 n_replicates <- 1500
@@ -1022,11 +1024,11 @@ weight_mean_obs <- ncbirths %>%
   ___
 ```
 
-<div id="babies-hint">
+```{r babies_2-hint, echo = FALSE}
 **Hint:** 
 - Use `summarize()`, setting `mean_weight` to the mean of `weight`.
 - Use `pull()` to extract the vector from the data frame.
-</div>
+```
 
 ```{r babies_2-solution}
 # From previous step
@@ -1077,12 +1079,12 @@ weight_mean_ht %>%
   )
 ```
 
-<div id="babies-hint">
+```{r babies_3-hint, echo = FALSE}
 **Hint:** 
 - Use `filter()`, using the condition `stat` greater than or equal to the observed median rent.
 - Use `summarize()`, setting `one_sided_p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
 - Inside `summarize()`, set `two_sided_p_val` to double `one_sided_p_val`.
-</div>
+```
 
 ```{r babies_3-solution}
 # From previous steps
@@ -1109,20 +1111,27 @@ weight_mean_ht %>%
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 7: Inference for Numerical Responses.  
+You have successfully completed Lesson 5 in Tutorial 5: Statistical inference.  
 
 What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 7: Inference for Numerical Responses](https://openintrostat.github.io/ims-tutorials/07-inference-for-numerical-responses/)
+`r emo::ji("spiral_notepad")` [Tutorial 5: Statistical inference](https://openintrostat.github.io/ims-tutorials/05-infer/)
 
-`r emo::ji("one")` [Tutorial 7 - Lesson 1: Bootstrapping for estimating a parameter](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-01/)
+`r emo::ji("one")` [Tutorial 5 - Lesson 1: Inference for a single proportion](https://openintro.shinyapps.io/ims-05-infer-01/)
 
-`r emo::ji("one")` [Tutorial 7 - Lesson 2: Introducing the t-distribution](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-02/)
+`r emo::ji("two")` [Tutorial 5 - Lesson 2: Hypothesis Tests to Compare Proportions](https://openintro.shinyapps.io/ims-05-infer-02/)
 
-`r emo::ji("one")` [Tutorial 7 - Lesson 3: Inference for difference in two parameters](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-03/)
+`r emo::ji("three")` [Tutorial 5 - Lesson 3: Chi-squared Test of Independence](https://openintro.shinyapps.io/ims-05-infer-03/)
 
-`r emo::ji("one")` [Tutorial 7 - Lesson 4: Comparing many means](https://openintro.shinyapps.io/ims-07-inference-for-numerical-responses-04/)
+`r emo::ji("four")` [Tutorial 5 - Lesson 4: Chi-squared Goodness of Fit Test](https://openintro.shinyapps.io/ims-05-infer-04/)
 
+`r emo::ji("five")` [Tutorial 5 - Lesson 5: Bootstrapping for estimating a parameter](https://openintro.shinyapps.io/ims-05-infer-05/)
+
+`r emo::ji("six")` [Tutorial 5 - Lesson 6: Introducing the t-distribution](https://openintro.shinyapps.io/ims-05-infer-06/)
+
+`r emo::ji("seven")` [Tutorial 5 - Lesson 7: Inference for difference in two parameters](https://openintro.shinyapps.io/ims-05-infer-07/)
+
+`r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
