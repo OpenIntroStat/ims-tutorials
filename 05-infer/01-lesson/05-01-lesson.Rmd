@@ -9,6 +9,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, emo, ggplot2, infer, broom)
 
 library(learnr)
 library(openintro)
@@ -308,7 +310,7 @@ SE_happy
 
 ### 
 
-We can use this value, along with our point estimate, to roughly calculate a 05% confidence interval:
+We can use this value, along with our point estimate, to roughly calculate a 95% confidence interval:
 
 $$(\hat{p} - 2 \times SE, \hat{p} + 2 \times SE)$$ 
 
@@ -788,7 +790,7 @@ We learned that for a 95% confidence interval (a confidence level of .95), if we
 The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from it's p-hat. Intervals that capture the true value are in green; those that miss it are in red.
 
 ```{r echo=FALSE, out.width = "60%"}
-knitr::include_graphics("images/gssMany-happy-nocapture.png")
+knitr::include_graphics("images/gssMany-happy-nocapture_65.png")
 ```
 
 You can guess the confidence level using the proportion of intervals that contain the true parameter value.

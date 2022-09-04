@@ -8,6 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message = FALSE, warning = FALSE,	include = FALSE}
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, emo, gt, ggplot2, patchwork, openintro)
+
 library(learnr)
 library(tidyverse)
 library(openintro)
@@ -649,7 +652,7 @@ Consider the density plots shown here. What are the most appropriate measures to
 
 Using the shapes of the density plots you created above, calculate the most appropriate measures of center and spread for the distribution of life expectancy in the countries of the Americas. Note you'll need to apply a filter here!
 
-```{r ex3, exercise = TRUE}
+```{r ex3, exercise = TRUE, exercise.setup="ex2-setup"}
 # Compute stats for lifeExp in Americas
 gap2007 %>%
   filter(___) %>%

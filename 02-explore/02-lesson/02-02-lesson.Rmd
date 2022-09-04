@@ -8,6 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message = FALSE,warning = FALSE,	include = FALSE}
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, gridExtra, png, gtable, stringr, grid, learnr, kableExtra, tidyverse, emo, gt, ggplot2, cowplot, patchwork, openintro, ggridges)
+
 knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE,
                       message = FALSE,
@@ -789,7 +792,7 @@ Thus, the `%in%` operator always comes with the `c()` function, which makes the 
 
 Putting this all together, our code looks like: 
 
-```{r, ex2-setup, echo = TRUE}
+```{r, ex2-setup, exercise = TRUE}
 common_cyl <- cars %>%
   filter(ncyl %in% c(4, 6, 8))
 ```

@@ -8,6 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, grid, png, emo, ggplot2, datasets)
+
 library(learnr)
 library(tidyverse)
 library(openintro)
@@ -745,14 +748,14 @@ Statisticians must always be skeptical of potentially spurious correlations. Hum
 
 The `noise` dataset contains 20 sets of `x` and `y` variables drawn at random from a standard normal distribution. Each set, denoted as `z`, has 50 `x`, `y` pairs. A preview of the `noise` dataset is shown below. 
 
-```{r}
+```{r prepare-noise}
 set.seed(1234)
 n <- 1000
 k <- 20
 noise <- data.frame(y = rnorm(n), x = rnorm(n), z = rep(1:k))
 ```
 
-```{r, echo = TRUE}
+```{r glimpse-noise, exercise=TRUE, exercise.eval=TRUE, echo = TRUE, exercise.setup="prepare-noise"}
 glimpse(noise)
 ```
 
@@ -761,7 +764,7 @@ We will use these simulated data to explore if any pairs of variables might be m
 1. Create a scatterplot that shows the relationship between `x` and `y`, faceted by the set (`z`). 
 
 
-```{r ex7, exercise = TRUE, fig.height=5, fig.width=7}
+```{r ex7, exercise = TRUE, fig.height=5, fig.width=7, exercise.setup="prepare-noise"}
 # Create faceted scatterplot
 ggplot(data = noise, aes(x = x, y = y)) + 
   geom_point() + 
@@ -776,7 +779,7 @@ ggplot(data = noise, aes(x = x, y = y)) +
 
 2. Compute the correlation between each set of `x` and `y`.  
 
-```{r ex8, exercise = TRUE}
+```{r ex8, exercise = TRUE, exercise.setup="prepare-noise"}
 # Compute correlations for each dataset
 noise_summary <- noise %>%
   group_by(___) %>%
@@ -802,14 +805,14 @@ noise_summary <- noise %>%
 
 3. Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
 
-```{r ex9-setup}
+```{r prepare-noise-summary, exercise.setup="prepare-noise"}
 noise_summary <- noise %>%
   group_by(z) %>%
   summarize(N = n(), 
             spurious_cor = cor(x, y))
 ```
 
-```{r ex9, exercise = TRUE}
+```{r ex9, exercise = TRUE, exercise.setup="prepare-noise-summary"}
 # Isolate sets with correlations above 0.2 in absolute strength
 noise_summary %>%
   filter(abs(___) > ___)

@@ -9,6 +9,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, emo, ggplot2, infer, broom)
 
 library(learnr)
 library(broom)
@@ -23,7 +25,7 @@ library(emo)
 knitr::opts_chunk$set(fig.align = "center", 
                       fig.height = 3, 
                       fig.width = 5,
-                      echo = FALSE, 
+                      echo = TRUE, 
                       message = FALSE, 
                       warning = FALSE)
 
@@ -72,7 +74,7 @@ knitr::include_graphics("images/2-1-3.png")
 
 ### 
 
-We assert this hypothesis, this model of the true state of the word, using hypothesize.
+We assert this hypothesis, this model of the true state of the world, using hypothesize.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-4.png")
@@ -125,7 +127,7 @@ set.seed(12345)
 null <- gss2016 %>%
   specify(response = cappun, success = "FAVOR") %>%
   hypothesize(null = "point", p = 0.5) %>% 
-  generate(reps = 500, type = "simulate") %>% 
+  generate(reps = 500, type = "draw") %>% 
   calculate(stat = "prop")
 
 null
@@ -133,9 +135,9 @@ null
 
 ### 
 
-The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed p-hat, 0.57. The curve represents the sort of p-hats you would see if p was 0.57 and the red line is the p-hat that you actually observed. If your p-hat is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
+The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed p-hat, 0.57. The curve represents the sort of p-hats you would see if p was 0.50 and the red line is the p-hat that you actually observed. If your p-hat is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 ggplot(null, aes(x = stat)) +
   geom_density() +
   geom_vline(
@@ -146,7 +148,7 @@ ggplot(null, aes(x = stat)) +
 
 This is formalized by computing the p-value, the proportion of generated p-hats that were more extreme than the observed p-hat. In other words, we want to summarize the column of statistics by finding the proportion that are greater than 0.57. We multiply that number by two to account for the left tail of the null distribution, which also contained p-hats that were farther from the center of the distribution than 0.57.
 
-```{r eval=FALSE}
+```{r eval=TRUE, echo=TRUE}
 null %>%
   summarize(mean(stat > p_hat)) %>%
   pull() * 2
@@ -195,13 +197,21 @@ ggplot(gss2016, aes(x = postlife)) +
   geom_bar()
 ```
 
+We can exclude the missing data by calling `na.omit`:
+
+```{r ex1-naomit, exercise=TRUE}
+gss2016_completecases <- gss2016 %>%
+                          na.omit
+# Using `gss2016`, plot postlife
+ggplot(gss2016_completecases, aes(x = postlife)) +
+  # Add bar layer
+  geom_bar()
+```
+
+
 Compute the proportion of respondents that do believe in life after death and save it has `p_hat`.
 
 ```{r ex2, exercise=TRUE}
-# From previous step
-ggplot(gss2016, aes(x = postlife)) +
-  geom_bar()
-
 # Calculate and save proportion that believe
 p_hat <- ___ %>%
   summarize(prop_yes = ___) %>%
@@ -213,17 +223,15 @@ p_hat
 
 ```{r ex2-hint}
 p_hat <- ___ %>%
+  na.omit %>% 
   summarize(prop_yes = mean(postlife == "YES")) %>%
   pull()
 ```
 
 ```{r ex2-solution}
-# From previous step
-ggplot(gss2016, aes(x = postlife)) +
-  geom_bar()
-
 # Compute and save proportion that believe
 p_hat <- gss2016 %>%
+  na.omit %>%
   summarize(prop_yes = mean(postlife == "YES")) %>%
   pull()
 
@@ -258,22 +266,24 @@ sim1 <- gss2016 %>%
 sim1
 ```
 
-<div id="ex3-hint">
+```{r ex3-hint}
 **Hint:** 
 - In `specify()`, set `response` to `postlife` and `success` to `"YES"`.
 - In `hypothesize()`, set `null` to `"point"` and `p` to `0.75`.
 - In `generate()`, set `reps` to `1` and `type` to `"simulate"`.
-</div>
+```
 
 ```{r ex3-solution}
 # Generate one data set under H0
 sim1 <- gss2016 %>%
+  # Explicitly exclude missing data
+  na.omit %>% 
   # Specify the response and success
   specify(response = postlife, success = "YES") %>%
   # Hypothesize the null value of p
   hypothesize(null = "point", p = 0.75) %>%
   # Generate a single simulated dataset
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 
 # See the result
 sim1
@@ -288,9 +298,10 @@ Using `sim1`, construct a bar plot to visualize the distribution of `postlife`.
 ```{r ex4, exercise=TRUE}
 # From previous step
 sim1 <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 
 # Using sim1, plot postlife
 ___ +
@@ -298,18 +309,18 @@ ___ +
   ___
 ```
 
-<div id="ex4-hint">
-**Hint:** 
+```{r ex4-hint}
 - In `ggplot()`, use `sim1` as the dataset and map the `x` aesthetic to `postlife`.
 - Use `geom_bar()`.
-</div>
+```
 
 ```{r ex4-solution}
 # From previous step
 sim1 <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 
 # Using sim1, plot postlife
 ggplot(sim1, aes(x = postlife)) +
@@ -322,9 +333,10 @@ Compute the proportion of simulated respondents in `sim1` that believe in life a
 ```{r ex5, exercise=TRUE}
 # From previous steps
 sim1 <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 
 # Compute proportion that believe
 sim1 %>%
@@ -332,21 +344,23 @@ sim1 %>%
   pull()
 ```
 
-<div id="ex5-hint">
-**Hint:** In `summarize()`, set `prop_yes` to the mean of cases where `postlife` equals `"YES"`.
-</div>
+```{r ex5-hint}
+In `summarize()`, set `prop_yes` to the mean of cases where `postlife` equals `"YES"`.
+```
 
 ```{r ex5-solution}
 # From previous steps
 sim1 <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 
 # Compute proportion that believe
 sim1 %>%
-  summarize(prop_yes = mean(postlife == "YES")) %>%
-  pull()
+    na.omit %>%    
+    summarize(prop_yes = mean(postlife == "YES")) %>%
+    pull()
 ```
 
 ### Testing a claim
@@ -355,15 +369,17 @@ In the last exercise, you got a sense of what a single simulated p-hat might be 
 
 In this exercise, you'll settle this question.
 
-```{r}
+```{r testing_a_claim_setup, echo=FALSE}
 sim1 <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 # Find the observed proportion
 p_hat <- gss2016 %>%
-  summarize(prop_yes = mean(postlife == "YES")) %>%
-  pull()
+    na.omit %>%    
+    summarize(prop_yes = mean(postlife == "YES")) %>%
+    pull()
 ```
 
 Extend your code for the last exercise to `calculate()` sample proportions of believers in 500 generated data sets. Save this collection of p-hats to `null`.
@@ -371,37 +387,41 @@ Extend your code for the last exercise to `calculate()` sample proportions of be
 ```{r ex6, exercise=TRUE}
 # Generate null distribution
 ___ <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = ___, type = "simulate") %>%
+  generate(reps = ___, type = "draw") %>%
   # Calculate proportions
   ___(stat = ___)
 ```
 
-<div id="ex6-hint">
+```{r ex6-hint}
 **Hint:** `stat = "prop"`
-</div>
+```
 
 ```{r ex6-solution}
 # Generate null distribution
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
   # Calculate proportions
   calculate(stat = "prop")
 ```
 
-Visualize the null distribution by creating a density plot of the statistics. Using `geom_vline()`, add a vertical line at the value of `p_hat` (from the last exercise), colored `"red"`.
+Visualize the null distribution by creating a density plot of the statistics. Using `geom_vline()`, add a vertical line at the value of `p_hat` (from the last exercise), colored `"red"`. 
 
-```{r ex7, exercise=TRUE}
-# From previous step
+```{r ex7, exercise=TRUE, exercise.setup="testing_a_claim_setup"}
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
+  # Calculate proportions
   calculate(stat = "prop")
-  
+
+
 # Visualize null distribution
 ___ +
   # Add density layer
@@ -410,20 +430,21 @@ ___ +
   geom_vline(xintercept = ___, color = "___")
 ```
 
-<div id="ex7-hint">
+```{r ex7-hint}
 **Hint:** 
 - Use `geom_density()` without arguments to create a density plot. 
 - In the `geom_vline()` call, `xintercept` to `p_hat` and `color` to `"red"`.
-</div>
+```
 
 ```{r ex7-solution}
-# From previous step
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
+  # Calculate proportions
   calculate(stat = "prop")
-  
+
 # Visualize null distribution
 ggplot(null, aes(x = stat)) +
   # Add density layer
@@ -435,14 +456,16 @@ ggplot(null, aes(x = stat)) +
 - Compute the one-tailed p-value by finding the proportion of null values that are greater than or equal to your observed `p_hat`. 
 - Compute the two-tailed p-value (where the proportion of null values is equal to or more extreme than the observed `p_hat`) from this by multiplying by 2.
 
-```{r ex8, exercise=TRUE}
-# From previous step
+```{r ex8, exercise=TRUE, exercise.setup="testing_a_claim_setup"}
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
+  # Calculate proportions
   calculate(stat = "prop")
-  
+
+
 ___ %>%
   summarize(
     # Compute the one-tailed p-value
@@ -453,18 +476,20 @@ ___ %>%
   pull(two_tailed_pval)
 ```
 
-<div id="ex8-hint">
+```{r ex8-hint}
 **Hint:** Find the p-value by figuring out the proportion of `stat`s that are greater than or equal `p_hat`.
-</div>
+```
 
 ```{r ex8-solution}
-# From previous step
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = 0.75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
+  # Calculate proportions
   calculate(stat = "prop")
-  
+
+
 null %>%
   summarize(
     # Compute the one-tailed p-value
@@ -500,18 +525,19 @@ question("Using an alpha level of .05, what is your decision regarding the null 
 ```
 
 
-```{r}
+```{r, include=FALSE}
 sim1 <- gss2016 %>%
 specify(response = postlife, success = "YES") %>%
 hypothesize(null = "point", p = .75) %>%
-generate(reps = 1, type = "simulate")
+generate(reps = 1, type = "draw")
 p_hat <- gss2016 %>%
 summarize(mean(postlife == "YES", na.rm = TRUE)) %>%
 pull()
 null <- gss2016 %>%
+  na.omit %>% 
   specify(response = postlife, success = "YES") %>%
   hypothesize(null = "point", p = .75) %>%
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "draw") %>%
   # Calculate proportions
   calculate(stat = "prop")
 
@@ -601,7 +627,7 @@ d_hat
 ```
 
 
-We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a group_by line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the diff function and save it as d-hats, which we learn is 0-point-1-4-7.
+We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a group_by line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the diff function and save it as d-hats, which we learn is 0.147.
 
 
 
@@ -740,7 +766,7 @@ Removed 13 rows containing missing values.
 
 The inference chain should look familiar but now we're going to generate 500 data sets and calculate a difference in proportions for each one. We need to specify the order of that difference, so we'll look at proportion of female minus proportion of male so that it's in the same order as the d-hat that we calculated from our data. 
 
-You'll see a warning message pop up here. That's just to let us know that we have some missing data that have been excluded from our analysis.
+You'll see a warning message pop up here. That's just to let us know that we have some missing data that have been excluded from our analysis. Earlier, we explicitly excluded such missing data by specifying `na.omit`.
 
 
 
@@ -761,7 +787,7 @@ knitr::include_graphics("images/ch2v2-density-plot.png")
 ```
 
 
-When we plot our observed statistic against the null distribution,  we learn that that observed difference of around point-1-5 is quite a bit greater than the sort of differences that we'd see if there was no association.  This corresponds to a p-value of point-0-2.  These data constitute evidence that there is a more general association between sex and belief in the afterlife in the population of all Americans.
+When we plot our observed statistic against the null distribution,  we learn that that observed difference of around 0.15 is quite a bit greater than the sort of differences that we'd see if there was no association.  This corresponds to a p-value of 0.02.  These data constitute evidence that there is a more general association between sex and belief in the afterlife in the population of all Americans.
 
 ### Death penalty and sex
 
@@ -781,9 +807,9 @@ ___(___, aes(x = ___, fill = ___)) +
   ___(position = "___")
 ```
 
-<div id="ex9-hint">
+```{r ex9-hint}
 **Hint:** To plot proportions instead of counts, set `position` to `"fill"` within your bar layer.
-</div>
+```
 
 ```{r ex9-solution}
 # Plot distribution of sex filled by cappun
@@ -810,9 +836,9 @@ ___ <- gss2016 %>%
 p_hats
 ```
 
-<div id="ex10-hint">
+```{r ex10-hint}
 **Hint:** Group the data by the `sex` variable to find the proportion of respondents that favor capital punishment in each group.
-</div>
+```
 
 ```{r ex10-solution}
 # Compute two proportions
@@ -848,9 +874,9 @@ d_hat <- ___
 d_hat
 ```
 
-<div id="ex11-hint">
+```{r ex11-hint}
 **Hint:** Use the `diff()` function to find the difference between the two elements of `p_hats`.
-</div>
+```
 
 ```{r ex11-solution}
 # From previous step
@@ -877,7 +903,7 @@ In the last exercise you learned that about 52% of women favor the death penalty
 The `stat`istic that you'll be using in this exercise is a `"diff in props"`, which requires that you specify the order of the difference by adding an argument, `order = c("FIRST", "SECOND")`, where first and second refer to the group names. This results in the calculation: FIRST - SECOND.
 
 
-```{r}
+```{r d_hat_difference}
 p_hats <- gss2016 %>%
   group_by(sex) %>%
   summarize(mean(cappun == "FAVOR", na.rm = TRUE)) %>%
@@ -907,9 +933,9 @@ ___ <- gss2016 %>%
   ___(stat = ___, order = c("___", "___"))
 ```
 
-<div id="ex12-hint">
+```{r ex12-hint}
 **Hint:** In `calculate()` you need to specify the `stat` and `order` arguments this time.
-</div>
+```
 
 ```{r ex12-solution}
 # Create null distribution
@@ -930,7 +956,7 @@ null <- gss2016 %>%
 Construct a density plot to visualize the statistics stored in the `null` distribution and add a vertical red line to indicate the observed test statistic `d_hat` that you calculated in the last exercise.
 
 
-```{r ex13, exercise=TRUE}
+```{r ex13, exercise=TRUE, exercise.setup="d_hat_difference"}
 # From previous step
 null <- gss2016 %>%
   specify(cappun ~ sex, success = "FAVOR") %>%
@@ -946,9 +972,9 @@ ___ +
   geom_vline(xintercept = ___, color = "___")
 ```
 
-<div id="ex13-hint">
+```{r ex13-hint}
 **Hint:** Use `geom_density()` to create a density plot.
-</div>
+```
 
 ```{r ex13-solution}
 # From previous step
@@ -972,7 +998,7 @@ Compute the two-tailed p-value.
 - Double it to get the two-tailed p-value.
 
 
-```{r ex14, exercise=TRUE}
+```{r ex14, exercise=TRUE, exercise.setup="d_hat_difference"}
 # From previous step
 null <- gss2016 %>%
   specify(cappun ~ sex, success = "FAVOR") %>%
@@ -989,9 +1015,9 @@ null %>%
   pull(two_tailed_pval)
 ```
 
-<div id="ex14-hint">
+```{r ex14-hint}
 **Hint:** Use the `mean()` function to find the proportion of statistics that are less than `d_hat`.
-</div>
+```
 
 ```{r ex14-solution}
 # From previous step
@@ -1014,7 +1040,7 @@ null %>%
 ### Interpreting the test
 
 What is your conclusion regarding the association between sex and support for the death penalty? Recall that this code calculates the p-value:
-```{r}
+```{r eval=FALSE}
 # Compute two-tailed p-value
 null %>%
   summarize(pval = 2 * mean(stat <= d_hat))
@@ -1032,7 +1058,7 @@ question("",
 ```
 
 
-```{r}
+```{r, include=FALSE}
 set.seed(31)
 null <- gss2016 %>%
   specify(cappun ~ sex, success = "FAVOR") %>%
@@ -1098,9 +1124,9 @@ ___ <- gss2016 %>%
   ___
 ```
 
-<div id="ex15-hint">
+```{r ex15-hint}
 **Hint:** When using the bootstrap to create a confidence interval, you no longer have to `hypothesize()`.
-</div>
+```
 
 ```{r ex15-solution}
 # Create the bootstrap distribution
@@ -1116,14 +1142,10 @@ boot <- gss2016 %>%
 
 
 
-
-
-
-
 - Compute the standard deviation, `sd()`,  of the bootstrap distribution to estimate the standard error and save it as `SE`.
 - Formulate the 95% confidence interval for `d_hat` by subtracting and adding 2 SEs.
 
-```{r ex16, exercise=TRUE}
+```{r ex16, exercise=TRUE, exercise.setup="d_hat_difference"}
 # From previous step
 boot <- gss2016 %>%
   specify(cappun ~ sex, success = "FAVOR") %>%
@@ -1139,11 +1161,11 @@ ___ <- ___ %>%
 c(___, ___)
 ```
 
-<div id="ex16-hint">
+```{r ex16-hint}
 **Hint:**
 - The `sd()` function computes the standard deviation.
 - The bounds of the confidence interval are the observed statistic plus or minus twice the standard error.
-</div>
+```
 
 ```{r ex16-solution}
 # From previous step
@@ -1324,7 +1346,7 @@ $$
 This claims that there is no difference in the proportions that favor the death penalty between the people that flipped `"heads"` and those that flipped `"tails"`. Since `coinflip` was formed independently of `cappun`, we *know* that this null hypothesis is true. The question is: will your test reject or retain this null hypothesis?
 
 
-```{r}
+```{r gssmod_init}
 # Set seed
 set.seed(384)
 
@@ -1339,7 +1361,7 @@ gssmod <- gss2016 %>%
 - *Inspect the new `coinflip` variable.*
 - Compute the proportions that `FAVOR` among both `heads` and `tails` values of `coinflip` using the dataset `gssmod`. Save this statistic to `p_hats`.
 
-```{r ex17, exercise=TRUE}
+```{r ex17, exercise=TRUE, exercise.setup="gssmod_init"}
 # Inspect coinflip
 gssmod %>%
   select(coinflip)
@@ -1354,9 +1376,9 @@ ___ <- gssmod %>%
 p_hats
 ```
 
-<div id="ex17-hint">
+```{r ex17-hint}
 **Hint:** Use the `mean()` function to compute the proportions you're after.
-</div>
+```
 
 ```{r ex17-solution}
 # Inspect coinflip
@@ -1375,7 +1397,7 @@ p_hats
 
 Compute your final test statistic, `d_hat`, as the difference in `p_hats`.
 
-```{r ex18, exercise=TRUE}
+```{r ex18, exercise=TRUE, exercise.setup="gssmod_init"}
 # From previous step
 p_hats <- gssmod %>%
   group_by(coinflip) %>%
@@ -1386,9 +1408,9 @@ p_hats <- gssmod %>%
 d_hat <- ___
 ```
 
-<div id="ex18-hint">
+```{r ex18-hint}
 **Hint:** The `diff()` function will calculate the difference between the two elements of `p_hats`.
-</div>
+```
 
 ```{r ex18-solution}
 # From previous step
@@ -1398,12 +1420,12 @@ p_hats <- gssmod %>%
   pull()
   
 # Compute difference in proportions
-d_hat <- diff(p_hats)
+(d_hat <- diff(p_hats))
 ```
 
 Construct the null distribution of the difference in proportions under the null hypothesis that `cappun` and `coinflip` are independent and save it to `null`. Note that the order of the difference should be `"heads"` then `"tails"`.
 
-```{r ex19, exercise=TRUE}
+```{r ex19, exercise=TRUE, exercise.setup="gssmod_init"}
 # From previous steps
 p_hats <- gssmod %>%
   group_by(coinflip) %>%
@@ -1423,9 +1445,9 @@ null <- gssmod %>%
   ___
 ```
 
-<div id="ex19-hint">
+```{r ex19-hint}
 **Hint:** Use the formula `cappun ~ coinflip` in `specify()`.
-</div>
+```
 
 ```{r ex19-solution}
 # From previous steps
@@ -1449,7 +1471,7 @@ null <- gssmod %>%
 
 Visualize the distribution of the null statistics using a density plot and add a vertical red line at the value of your observed `d_hat`.
 
-```{r ex20, exercise=TRUE}
+```{r ex20, exercise=TRUE, exercise.setup="gssmod_init"}
 # From previous steps
 p_hats <- gssmod %>%
   group_by(coinflip) %>%
@@ -1470,9 +1492,9 @@ ___ +
   ___
 ```
 
-<div id="ex20-hint">
+```{r ex20-hint}
 **Hint:** You can create a density plot with `geom_density()`.
-</div>
+```
 
 ```{r ex20-solution}
 # From previous steps
@@ -1512,7 +1534,7 @@ quantile(x, probs = .8)
 Once you have the rejection region defined by the upper and lower cutoffs, you can make your decision regarding the null by checking if your observed statistic falls between those cutoffs (in which case you will fail to reject) or outside of them (in which case you will reject).
 
 
-```{r}
+```{r decision_init, echo=FALSE}
 set.seed(384)
 gssmod <- gss2016 %>%
   mutate(coinflip  = sample(c("heads", "tails"), 
@@ -1535,7 +1557,7 @@ null <- gssmod %>%
 - Find the upper cutoff by starting with the `null` data frame, which has been carried over from the last exercise, and summarizing the `stat` column by finding the alpha / 2 `quantile()`. Save this value as `lower`. Next, find the 1 - alpha / 2 `quantile()` and save it to `upper`.
 - Check if your observed value of `d_hat` is `between()` the `lower` and `upper` cutoffs to find whether you should fail to reject the null hypothesis.
 
-```{r ex21, exercise=TRUE}
+```{r ex21, exercise=TRUE, exercise.setup="decision_init"}
 # Set alpha
 ___
 
@@ -1552,11 +1574,11 @@ d_hat %>%
   between(___, ___)
 ```
 
-<div id="ex21-hint">
+```{r ex21-hint}
 **Hint:** 
 - To find the upper bound, place `quantile(stat, probs = 1 - alpha/2)` in your call to `summarize()`.
 - The `between()` function takes the arguments `x`, `left`, and `right` and returns `TRUE` or `FALSE`.
-</div>
+```
 
 ```{r ex21-solution}
 # Set alpha
@@ -1577,7 +1599,7 @@ d_hat %>%
 
 Visualize the reject and fail to reject regions by starting with your null distribution from last time and adding one vertical blue line for each cutoff.
 
-```{r ex22, exercise=TRUE}
+```{r ex22, exercise=TRUE, exercise.setup="decision_init"}
 # From previous step
 alpha <- 0.05
 upper <- null %>%
@@ -1597,9 +1619,9 @@ ggplot(null, aes(x = stat)) +
   geom_vline(xintercept = ___, color = "___")
 ```
 
-<div id="ex22-hint">
+```{r ex22-hint}
 **Hint:** Add two more calls to `geom_vline()`, with `lower` and `upper` as the respective x-intercepts, both colored `"blue"`.
-</div>
+```
 
 ```{r ex22-solution}
 # From previous step

@@ -8,6 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, gridExtra, png, gtable, stringr, grid, learnr, kableExtra, tidyverse, emo, gt, ggplot2, openintro)
+
 library(knitr)
 library(gridExtra)
 library(png)
@@ -496,8 +499,6 @@ comics %>%
       columns = vars(Bad),
       rows = Bad == .57)
   )
-
-## WHY IS THIS TABLE SQASHED?
 ```
 
 To condition on the columns rather than the rows, we change the variable we are grouping. To condition on the columns, we `group_by()` the `align` variable. After conditioning on the columns, we now see that the columns sum to one. Also, we learn, for example, that the proportion of bad characters that are secret is around 63%.
@@ -789,7 +790,7 @@ The pie chart is a common way to display categorical data where the size of the 
 If we represent this data using a barchart the answer is obvious: the proportion of public is greater. For that reason, it's generally a good idea to stick to barcharts.
 
 ```{r pie, echo=FALSE, fig.height=3, fig.width=6, cache = TRUE}
-plot1 <- ggplot(comics, aes(x = "", y = id, fill = id))+
+plot1 <- ggplot(comics %>% group_by(id)%>%count, aes(x = "", y = n, fill = id))+
  geom_bar(stat="identity", width=1)+
  coord_polar("y", start=0) +
    theme(axis.text = element_blank(),
