@@ -42,6 +42,10 @@ soda <- data.frame(
 )
 
 homeown_perm <- read_rds("data/homeown_perm.rds")
+
+homes <- NHANES %>%
+  select(Gender, HomeOwn) %>%
+  filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
 
@@ -571,7 +575,7 @@ homes <- NHANES %>%
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
- (2)
+(2)
 
 - Find the observed difference in proportions of men who own and women who own, by carrying out the following steps: 
 1. Using the `homes` dataset, group by `Gender`.
