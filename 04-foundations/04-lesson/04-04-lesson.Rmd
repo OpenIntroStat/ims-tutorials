@@ -164,14 +164,13 @@ ex1_props %>%
 
 ### Variability of $\hat{p}$ from the sample (bootstrapping)
 
-
-To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. As a way of trying to measure the variability of $\hat{p}$ we have set up a scenario, again, totally unrealistic, where we are taking many samples from the same population. For each of the samples, $\hat{p}$ is calculated. The standard error is exactly the number we need to know and is calculated to be 0.085. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population.
+To start, consider a totally unrealistic situation on voter preference, where we actually know the true population parameter is that 60% of people prefer candidate X. As a way of trying to measure the variability of $\hat{p}$ we have set up a scenario, again, totally unrealistic, where we are taking many samples from the same population. For each of the samples, $\hat{p}$ is calculated. The standard error is exactly the number we need to know and is calculated to be 0.087. But it is unrealistic to think we could take many samples from the population. Typically, the researcher has exactly one sample from the population.
 
 It turns out that the variability of the statistic $\hat{p}$ can be measured without taking repeated samples from the population. Instead, we take repeated samples from the original observed data.
 
 Here, we generate 1000 resamples from one pool of data. An important characteristic of resampling is that it must be done with replacement, otherwise every resample would be identical.
 
-Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.085 from the previous, unrealistic slide.
+Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.084, which is very close to the number 0.087 from the previous, unrealistic slide.
 
 ```{r eval = TRUE}
 # Generate 1000 resamples of one poll
