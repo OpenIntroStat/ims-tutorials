@@ -293,7 +293,7 @@ question("",
   answer("1", message = "Not quite! 1 represents the response variable."),
   answer("2", message = "Try again! 2 represents the y-intercept."),
   answer("3", correct = TRUE, message = "The $X$ represents the explanatory variables and the $\beta_0$ represents the y-intercept."),
-  answer("4", message = "Wrong! That represents the disturbance term."),
+  answer("4", message = "Wrong! That represents the disturbance term, or the noise."),
   allow_retry = TRUE
 )
 ```
