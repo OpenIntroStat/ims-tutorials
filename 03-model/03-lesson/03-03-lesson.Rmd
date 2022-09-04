@@ -226,7 +226,7 @@ We do this by changing our equation in four ways:
 The resulting model looks like: 
 
 $$
-  \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 \cdot X
+\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 \cdot X
 $$
 
 ### Residuals
