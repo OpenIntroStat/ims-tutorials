@@ -1143,7 +1143,7 @@ Consider a situation where there are 24 men, 24 women, and 35 people are still p
 
 You'll analyze these new data, contained in `gender_discrimination_new`, using the same permutation algorithm from before.
 
-The `gender_discrimination_perm` and `gender_discrimination_perm` datasets are also available in your workspace.
+The `gender_discrimination_new_perm` and `diff_orig_new` datasets are also available in your workspace.
 
   (1)
 - Run the code to recall the counts of `gender` and `decision` in the original dataset.
