@@ -455,6 +455,8 @@ diff_orig <- gender_discrimination %>%
 diff_orig
 ```
 
+Note that the difference is negative here due to the order of subtraction in the `diff()` function. It gives us `female - male`, though we have been working with `male - female` so far. Since the hypothesis test we're doing is two-sided, we won't worry about the negative sign -- we're interested in differences in both directions anyway.
+
 ### 
 
 (1) Create a data frame of permuted differences in promotion rates.
