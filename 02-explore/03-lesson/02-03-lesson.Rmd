@@ -167,15 +167,15 @@ Now that we have some sensible measures of center, we can answer questions like:
 
 To answer this question we start by using `mutate()` to create a new variable that will be TRUE if the state value is either "California", "Oregon", or "Washington", and FALSE otherwise. This process uses some of the tools we've seen before, namely the `if_else()` function and the `%in%` operator, and puts them together. 
 
-In the code below, we make a new variable named `coast` and specify how that variable is calculated. The condition we use inside of the `if_else()` function states that if the state associated with an observation is included in "California, Oregon, or Washington, the `coast` variable should have a value of `"west"`. If the state of an observation is not included in this list, then the `coast` variable should have a value of `"east"`. 
+In the code below, we make a new variable named `west_coast` and specify how that variable is calculated. The condition we use inside of the `if_else()` function states that if the state associated with an observation is included in "California, Oregon, or Washington, the `west_coast` variable should have a value of `"yes"`. If the state of an observation is not included in this list, then the `west_coast` variable should have a value of `"no"`. 
 
-Notice the `life <- life %>%` line in the code below. This line is telling R that we are updating the original `life` dataset with a new dataset that contains the `coast` variable. 
+Notice the `life <- life %>%` line in the code below. This line is telling R that we are updating the original `life` dataset with a new dataset that contains the `west_coast` variable. 
 
 ```{r life-mutate, echo = TRUE}
 life <- life %>%
-  mutate(coast = if_else(state %in% c("California", "Oregon", "Washington"), 
-    "west",
-    "east"
+  mutate(west_coast = if_else(state %in% c("California", "Oregon", "Washington"), 
+    "yes",
+    "no"
   ))
 ```
 
@@ -183,7 +183,7 @@ To compute means for the two groups (west coast and the rest of the country), we
 
 ```{r life-groupby, echo = TRUE}
 life %>%
-  group_by(coast) %>%
+  group_by(west_coast) %>%
   summarize(mean(expectancy),
             median(expectancy))
 ```
@@ -225,7 +225,7 @@ life %>%
 
 ### With `group_by()`
 
-If we add a line to `group_by()` `coast`, it's effectively breaking the dataset into two groups and calculating the `mean()` of the expectancy variable for each one separately.
+If we add a line to `group_by()` `west_coast`, it's effectively breaking the dataset into two groups and calculating the `mean()` of the expectancy variable for each one separately.
 
 ```{r life-gr-sum-gt}
 life %>%
@@ -238,7 +238,7 @@ life %>%
       ),
     locations = cells_body(
       columns = vars(expectancy),
-      rows = coast == TRUE)
+      rows = west_coast == TRUE)
   ) %>%
     tab_style(
     style = list(
@@ -247,14 +247,14 @@ life %>%
       ),
     locations = cells_body(
       columns = vars(expectancy),
-      rows = coast == FALSE)
+      rows = west_coast == FALSE)
   )
 ```
 
 ```{r life-gr-sum}
 life %>%
   slice(240:247) %>%
-  group_by(coast) %>%
+  group_by(west_coast) %>%
   summarize(mean(expectancy))
 ```
 
@@ -724,7 +724,7 @@ It's difficult to compare these distributions because they are both heavily righ
 
 
 ```{r inc, echo = TRUE}
-ggplot(life, aes(x = income, fill = coast)) +
+ggplot(life, aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.3)
 ```
 
@@ -733,7 +733,7 @@ ggplot(life, aes(x = income, fill = coast)) +
 Since income has a heavy right skew, either the square-root or log-transform will do a good job of drawing in the right tail and spreading out the lower values so that we can see what's going on. We can perform the transformation by wrapping income in the `log()` function, which will take the natural log (ln). 
 
 ```{r inc2, echo = TRUE}
-ggplot(life, aes(x = log(income), fill = coast)) +
+ggplot(life, aes(x = log(income), fill = west_coast)) +
   geom_density(alpha = 0.3)
 ```
 
@@ -867,23 +867,23 @@ We've discussed three different aspects of a distribution that are important to 
 
 When conducting an exploratory data analysis: center, variability, and shape. A fourth and final thing to look for are outliers. These are observations that have extreme values far from the bulk of the distribution. They're often very interesting cases, but they're also good to know about before proceeding with more formal analysis.
 
-We saw some extreme values when we plotted the distribution of income for counties on the West Coast. What are we to make of this blip of counties? One thing we can do is display the data using a boxplot. To make the boxplot a bit easier to compare with a density plot, you can specify the categorical variable (`coast`) as the y-variable. This option creates vertically stacked boxplots rather than horizontally stacked boxplots. 
+We saw some extreme values when we plotted the distribution of income for counties on the West Coast. What are we to make of this blip of counties? One thing we can do is display the data using a boxplot. To make the boxplot a bit easier to compare with a density plot, you can specify the categorical variable (`west_coast`) as the y-variable. This option creates vertically stacked boxplots rather than horizontally stacked boxplots. 
 
 ```{r, echo = TRUE, eval = FALSE}
-ggplot(life, aes(x = income, fill = coast)) +
+ggplot(life, aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.5)
 
-ggplot(life, aes(x = income, y = coast, color = coast)) +
+ggplot(life, aes(x = income, y = west_coast, color = west_coast)) +
   geom_boxplot(alpha = 0.5) + 
   theme(legend.position = "hide")
 ```
 
 
 ```{r coast-income, fig.width = 7}
-p1 <- ggplot(life, aes(x = income, fill = coast)) +
+p1 <- ggplot(life, aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.5)
 
-p2 <- ggplot(life, aes(x = income, y = coast, color = coast)) +
+p2 <- ggplot(life, aes(x = income, y = west_coast, color = west_coast)) +
   geom_boxplot(alpha = 0.5) + 
   theme(legend.position = "hide")
 
@@ -920,20 +920,20 @@ To do this, we form a pipeline where the first step is to filter on those counti
 ```{r, echo = TRUE, eval = FALSE}
 life %>%
   filter(!is_outlier) %>%  
-  ggplot(aes(x = income, fill = coast)) +
+  ggplot(aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.3)
 
-ggplot(life, aes(x = income, fill = coast)) +
+ggplot(life, aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.3)
 ```
 
 ```{r, fig.width = 8}
 p1 <- life %>%
   filter(!is_outlier) %>%  
-  ggplot(aes(x = income, fill = coast)) +
+  ggplot(aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.3)
 
-p2 <- ggplot(life, aes(x = income, fill = coast)) +
+p2 <- ggplot(life, aes(x = income, fill = west_coast)) +
   geom_density(alpha = 0.3)
 
 p1 + p2
