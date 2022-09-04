@@ -869,7 +869,7 @@ In this exercise, you'll use these two new distributions to get a sense for how 
 
  (1)
 
-- Tabulate the small dataset, `gender_discrimination_small`. That is, call `count()`, passing the `gender` and `promote` columns, to get a contingency table.
+- Tabulate the small dataset, `gender_discrimination_small`. That is, call `count()`, passing the `gender` and `decision` columns, to get a contingency table.
 - Do the same with the big dataset, `gender_discrimination_big`.
 
 ```{r sample_size, exercise=TRUE}
