@@ -1079,7 +1079,7 @@ one_poll_boot <- one_poll %>%
 
 set.seed(470)  
 # Collect 30 observations from a population with true proportion of 0.8
-one_poll_0.8 <- data_frame(vote = ifelse(rbinom(30, 1, .8) == 1L, "yes", "no"))
+one_poll_0.8 <- tibble(vote = ifelse(rbinom(30, 1, .8) == 1L, "yes", "no"))
 
 # Bootstrap to find the SE of p-hat: one_poll_boot
 one_poll_boot_0.8 <- one_poll_0.8 %>%
@@ -1206,7 +1206,7 @@ one_poll_boot <- one_poll %>%
   
 p <- c(0.005, 0.025, 0.05, 0.95, 0.975, 0.995) 
 intervals <- paste0(c(99, 95, 90), "%")
-conf_int_data <- data_frame(
+conf_int_data <- tibble(
   p = p,
   ci_endpoints = quantile(one_poll_boot$stat, p),
   ci_percent = c(intervals, rev(intervals))

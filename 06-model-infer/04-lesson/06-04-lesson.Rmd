@@ -1020,7 +1020,7 @@ In this first example, it appears as though the variables are not linearly relat
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 n <- 100
 set.seed(4747)
-hypdata_nonlinear <- data_frame(
+hypdata_nonlinear <- tibble(
   explanatory = runif(n),
   response = 10 + 3 * explanatory + 15 * explanatory ^ 2 + rnorm(n)
 )
@@ -1298,7 +1298,7 @@ In this last example, it appears as though the points are not normally distribut
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 n <- 100
 set.seed(4747)
-hypdata_nonnorm = data_frame(
+hypdata_nonnorm <- tibble(
   explanatory = runif(n),
   response = (10 + 10 * explanatory + rnorm(n, 0, 4)) ^ 2
 )
