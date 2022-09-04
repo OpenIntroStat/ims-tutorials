@@ -670,10 +670,6 @@ The votes from a single poll, `one_poll`, and the data from 1000 bootstrap resam
 
 As in the previous exercise, when discussing the variability of a statistic, the number is referred to as the *standard error*.
 
-
-
-
-
 - Calculate $\hat{p}$ and assign the result to `p_hat`. In the call to `summarize()`, calculate `stat` as the `mean()` of `vote`s that equal `"yes"`.
 - Find an interval of values that are plausible for the true parameter by calculating $\hat{p} \pm 2SE$.
     - The `lower` bound of the confidence interval is `p_hat` minus twice the standard error of `stat`. Use `sd()` to calculate the standard error.
@@ -692,7 +688,9 @@ one_poll_boot <- one_poll %>%
   
 p_hat <- one_poll %>%
   # Calculate proportion of yes votes
-  summarize(stat = ___)
+  summarize(stat = ___) %>%
+  # Pull out as numeric vector
+  pull()
 
 # Create an interval of plausible values
 one_poll_boot %>%
@@ -720,7 +718,9 @@ one_poll_boot <- one_poll %>%
   
 p_hat <- one_poll %>%
   # Calculate proportion of yes votes
-  summarize(stat = mean(vote == "yes"))
+  summarize(stat = mean(vote == "yes")) %>%
+  # Pull out as numeric vector
+  pull()
 
 # Create an interval of plausible values
 one_poll_boot %>%
@@ -732,16 +732,9 @@ one_poll_boot %>%
   )
 ```
 
-
- 
-
-
 Remember that a confidence level describes how likely you are to have gotten a sample that was close enough to the true parameter.  Indeed, with the sample at hand, the confidence interval of plausible values *does* contain the true population parameter of 0.6. Luckily!
 
-
-
 ### Bootstrap percentile interval
-
 
 The main idea in the previous exercise was that the distance between the original sample $\hat{p}$ and the resampled (or bootstrapped) $\hat{p}^*$ values gives a measure for how far the original $\hat{p}$ is from the true population proportion.  
 
