@@ -199,7 +199,6 @@ ggplot(randdiff) +
 
 The second shuffle, on the other hand, gives 27 people on the East Coast who prefer cola as compared with 20 on the West Coast who prefer cola. The difference in sample proportions for the second shuffle of the data is -0.02, which is less extreme than the original data. Note that both the original data, the red line, and the first two shuffled differences in proportions, black dots, can be plotted together. 
 
-
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(27,20), Orange = c(7,6), ) 
 
@@ -226,7 +225,7 @@ ggplot(randdiff) +
 The next few shuffles give differences in proportions centered around zero. 
 
 ```{r}
-dt <- tibble(Location = c('East','West'), Cola = c(28,21), Orange = c(8,5), ) 
+dt <- tibble(Location = c('East','West'), Cola = c(28,21), Orange = c(6,5)) 
 
 kable(dt, format = "html", escape = F) %>%
   kable_styling("striped", full_width = F, position = "float_left")
