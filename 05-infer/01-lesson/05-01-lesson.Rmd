@@ -9,6 +9,8 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, learnr, tidyverse, openintro, emo, ggplot2, infer, broom)
 
 library(learnr)
 library(openintro)
@@ -308,7 +310,7 @@ SE_happy
 
 ### 
 
-We can use this value, along with our point estimate, to roughly calculate a 05% confidence interval:
+We can use this value, along with our point estimate, to roughly calculate a 95% confidence interval:
 
 $$(\hat{p} - 2 \times SE, \hat{p} + 2 \times SE)$$ 
 
@@ -788,7 +790,7 @@ We learned that for a 95% confidence interval (a confidence level of .95), if we
 The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from it's p-hat. Intervals that capture the true value are in green; those that miss it are in red.
 
 ```{r echo=FALSE, out.width = "60%"}
-knitr::include_graphics("images/gssMany-happy-nocapture.png")
+knitr::include_graphics("images/gssMany-happy-nocapture_65.png")
 ```
 
 You can guess the confidence level using the proportion of intervals that contain the true parameter value.
@@ -1336,20 +1338,29 @@ question(
 
 ## Congratulations!
 
-You have successfully completed Lesson 1 in Tutorial 6: Inference for Categorical Responses.  
+You have successfully completed Lesson 1 in Tutorial 5: Statistical inference.  
 
 What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 6: Inference for Categorical Responses](https://openintrostat.github.io/ims-tutorials/06-inference-for-categorical-responses/)
+`r emo::ji("spiral_notepad")` [Tutorial 5: Statistical inference](https://openintrostat.github.io/ims-tutorials/05-infer/)
 
-`r emo::ji("one")` [Tutorial 6 - Lesson 1: Inference for a single proportion](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-01/)
+`r emo::ji("one")` [Tutorial 5 - Lesson 1: Inference for a single proportion](https://openintro.shinyapps.io/ims-05-infer-01/)
 
-`r emo::ji("one")` [Tutorial 6 - Lesson 2: Hypothesis Tests to Compare Proportions](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-02/)
+`r emo::ji("two")` [Tutorial 5 - Lesson 2: Hypothesis Tests to Compare Proportions](https://openintro.shinyapps.io/ims-05-infer-02/)
 
-`r emo::ji("one")` [Tutorial 6 - Lesson 3: Chi-squared Test of Independence](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-03/)
+`r emo::ji("three")` [Tutorial 5 - Lesson 3: Chi-squared Test of Independence](https://openintro.shinyapps.io/ims-05-infer-03/)
 
-`r emo::ji("one")` [Tutorial 6 - Lesson 4: Chi-squared Goodness of Fit Test](https://openintro.shinyapps.io/ims-06-inference-for-categorical-responses-04/)
+`r emo::ji("four")` [Tutorial 5 - Lesson 4: Chi-squared Goodness of Fit Test](https://openintro.shinyapps.io/ims-05-infer-04/)
+
+`r emo::ji("five")` [Tutorial 5 - Lesson 5: Bootstrapping for estimating a parameter](https://openintro.shinyapps.io/ims-05-infer-05/)
+
+`r emo::ji("six")` [Tutorial 5 - Lesson 6: Introducing the t-distribution](https://openintro.shinyapps.io/ims-05-infer-06/)
+
+`r emo::ji("seven")` [Tutorial 5 - Lesson 7: Inference for difference in two parameters](https://openintro.shinyapps.io/ims-05-infer-07/)
+
+`r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
+
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)

@@ -8,6 +8,9 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
+pacman::p_load(knitr, gridExtra, png, gtable, stringr, grid, learnr, kableExtra, tidyverse, emo, gt, ggplot2, openintro)
+
 library(knitr)
 library(gridExtra)
 library(png)
@@ -46,7 +49,7 @@ EDA is all about learning the structure of a dataset through a series of numeric
 
 The emphasis of the first two lessons is on visualization: how to create and interpret graphical displays of your data. The third lesson focuses on numerical summaries of distributions and utilizes a simple, but powerful coding paradigm in R. We end with a case study that will allow you to synthesize these concepts and apply them to a more complex dataset that contains information on the characteristics of email that are associated with it being spam.
 
-Before beginning the tutorial, we recommend you have some exposure to the R language and that you've taken the Getting Started with Data tutorial in this series.
+Before beginning the tutorial, we recommend you have some exposure to the R language and that you've taken the Introduction to data tutorial in this series.
 
 Let's get started.
 
@@ -430,13 +433,13 @@ You may have noticed in the last exercises that sometimes raw counts of cases ca
 
 Let's return to our table of counts of cases by identity and alignment. If we wanted to instead get a sense of the proportion of all cases that fell into each category, we can modify our previous table. We will need to add a column that calculates the proportion of total observations that were observed in each combination of `id` and `align`. 
 
-After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument.  
+After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument, excluding any variables used in `names_from` and `values_from`.  
 
 ```{r fctp, echo = TRUE, eval = FALSE}
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 
 ```
@@ -445,7 +448,7 @@ comics %>%
 comics %>% 
   count(id, align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -476,7 +479,7 @@ comics %>%
   count(id, align) %>% 
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
@@ -486,7 +489,7 @@ comics %>%
   group_by(id) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>%
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -496,8 +499,6 @@ comics %>%
       columns = vars(Bad),
       rows = Bad == .57)
   )
-
-## WHY IS THIS TABLE SQASHED?
 ```
 
 To condition on the columns rather than the rows, we change the variable we are grouping. To condition on the columns, we `group_by()` the `align` variable. After conditioning on the columns, we now see that the columns sum to one. Also, we learn, for example, that the proportion of bad characters that are secret is around 63%.
@@ -511,7 +512,7 @@ comics %>%
   count(id, align) %>% 
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
@@ -521,7 +522,7 @@ comics %>%
   group_by(align) %>% 
   mutate(prop = n / sum(n)) %>% 
   ungroup() %>% 
-  pivot_wider(id_cols = c(id, align, prop), 
+  pivot_wider(id_cols = id, 
               names_from = align, values_from = prop) %>% 
   mutate_if(is.numeric, format, digits = 2) %>% 
   gt() %>%
@@ -608,7 +609,7 @@ comics <- comics %>%
 comics %>% 
   count(align, gender) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(align, gender, prop), 
+  pivot_wider(id_cols = align, 
               names_from = gender, values_from = prop)
 
 # Conditional on columns
@@ -616,7 +617,7 @@ comics %>%
   count(align, gender) %>% 
   group_by(gender) %>% 
   mutate(prop = n / sum(n)) %>% 
-  pivot_wider(id_cols = c(align, gender, prop), 
+  pivot_wider(id_cols = gender, 
               names_from = align, values_from = prop) 
 ```
 
@@ -789,7 +790,7 @@ The pie chart is a common way to display categorical data where the size of the 
 If we represent this data using a barchart the answer is obvious: the proportion of public is greater. For that reason, it's generally a good idea to stick to barcharts.
 
 ```{r pie, echo=FALSE, fig.height=3, fig.width=6, cache = TRUE}
-plot1 <- ggplot(comics, aes(x = "", y = id, fill = id))+
+plot1 <- ggplot(comics %>% group_by(id)%>%count, aes(x = "", y = n, fill = id))+
  geom_bar(stat="identity", width=1)+
  coord_polar("y", start=0) +
    theme(axis.text = element_blank(),
@@ -984,14 +985,14 @@ What's next?
 
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
-`r emo::ji("spiral_notepad")` [Tutorial 2: Getting Started with Data](https://openintrostat.github.io/ims-tutorials/02-summarizing-and-visualizing-data/)
+`r emo::ji("spiral_notepad")` [Tutorial 2: Exploratory data analysis](https://openintrostat.github.io/ims-tutorials/02-explore/)
 
-`r emo::ji("one")` [Tutorial 2 - Lesson 1: Visualizing categorical data](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-01/)
+`r emo::ji("one")` [Tutorial 2 - Lesson 1: Visualizing categorical data](https://openintro.shinyapps.io/ims-02-explore-01/)
 
-`r emo::ji("one")` [Tutorial 2 - Lesson 2: Visualizing numerical data](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-02/)
+`r emo::ji("two")` [Tutorial 2 - Lesson 2: Visualizing numerical data](https://openintro.shinyapps.io/ims-02-explore-02/)
 
-`r emo::ji("one")` [Tutorial 2 - Lesson 3: Summarizing with statistics](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-03/)
+`r emo::ji("three")` [Tutorial 2 - Lesson 3: Summarizing with statistics](https://openintro.shinyapps.io/ims-02-explore-03/)
 
-`r emo::ji("one")` [Tutorial 2 - Lesson 4: Case study](https://openintro.shinyapps.io/ims-02-summarizing-and-visualizing-data-04/)
+`r emo::ji("four")` [Tutorial 2 - Lesson 4: Case study](https://openintro.shinyapps.io/ims-02-explore-04/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
