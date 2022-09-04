@@ -400,7 +400,7 @@ Now that we have a regression model, we want to think about how individual obser
 Leverage has a precise mathematical definition that you can see here. The specifics of the formula are not so important, but you should recognize that the leverage score $h_i$ for an observation is entirely a function of the distance between each **individual** value of the explanatory variable and **mean** of the explanatory variable. This means that points that are close to the center of the scatterplot (along the x-axis) have low leverage, while points that are far from the (horizontal) center of the scatterplot have high leverage. For leverage, the $y$-coordinate doesn't matter at all.
 
 $$
-  h_i = \frac{1}{n} + \frac{(x_i - \bar{x})^2}{\sum_{i=1}^n (x_i - \bar{x})2}
+  h_i = \frac{1}{n} + \frac{(x_i - \bar{x})^2}{\sum_{i=1}^n (x_i - \bar{x})^2}
 $$
 
 ### Leverage computations
