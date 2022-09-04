@@ -40,7 +40,7 @@ This lesson will show you how to add two, three, and even more numeric explanato
 
 We are going to use two data sets. 
 
-1. For our explication and demonstration, we will use `babies`, a data set originated from the Child Health and Development Studies. It is a data frame with 1236 observations and eight variables. For details see the [OpenIntro data page](https://www.openintro.org/data/index.php?data=babies).
+1. For our explication and demonstration, we will use `babies`, a data set originated from the Child Health and Development Studies. It is a data frame with 1236 observations and eight variables. For details see [package documentation](http://openintrostat.github.io/openintro/reference/babies.html).
 
 2. In your exercises you will work with `mariokart`. The data were collected in early October 2009 from an eBay auction for the Nintendo Wii game Mario Kart. `mariokart` has 143 observations with 12 variables. For details see the [OpenIntro data page](https://www.openintro.org/data/index.php?data=mariokart).
 
