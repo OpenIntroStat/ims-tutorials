@@ -9,16 +9,12 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
-if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
-pacman::p_load(knitr, learnr, tidyverse, openintro, emo, ggplot2, infer, broom, magrittr, ggridges)
-
 library(learnr)
 library(tidyverse)
 library(infer)
 library(broom)
 library(emo)
 library(openintro)
-library(magrittr)
 library(ggridges)
 
 # knitr options ----------------------------------------------------------------

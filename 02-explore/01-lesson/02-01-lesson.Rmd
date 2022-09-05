@@ -8,8 +8,6 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
-pacman::p_load(knitr, gridExtra, png, gtable, stringr, grid, learnr, kableExtra, tidyverse, emo, gt, ggplot2, openintro)
 
 library(knitr)
 library(gridExtra)

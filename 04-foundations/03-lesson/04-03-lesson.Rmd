@@ -9,8 +9,6 @@ runtime: shiny_prerendered
 
 ```{r setup, include=FALSE}
 # load packages ----------------------------------------------------------------
-if (!require("pacman")) install.packages("pacman",repos = "http://cran.us.r-project.org")
-pacman::p_load(knitr, learnr, tidyverse, openintro, grid, gridExtra, emo, ggplot2, infer)
 
 library(learnr)
 library(kableExtra)
@@ -423,7 +421,7 @@ opp_perm %>%
 ```
 
 ```{r mc1}
-question("Based on this result of 0.017, what can you conclude from the study about the effect of reminding students to save money?",
+question("Based on this result of 0.007, what can you conclude from the study about the effect of reminding students to save money?",
   correct = "Good job! We can confidently say the different messaging *caused* the students to change their buying habits, since they were randomly assigned to treatment and control groups. Let\'s continue.", allow_retry = TRUE,
   answer("Reminding them causes them to be less likely to buy the DVD.", correct = TRUE),
   answer("Reminding them causes them to be more likely to buy the DVD.", message = "Not quite. Look back at the research question."),
