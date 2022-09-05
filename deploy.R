@@ -17,7 +17,7 @@ walk(indexes, render)
 rmds      <- dir_info(recurse = 2, glob = "*.Rmd")
 indexes   <- dir_info(recurse = 2, glob = "*x.Rmd")
 tutorials <- anti_join(rmds, indexes, by = "path") %>% pull(path)
-# walk(tutorials, run) -- doesn't work, need a way to shut down each tutorial
+# walk(tutorials, run_tutorial) -- doesn't work, need a way to shut down each tutorial
 
 # get a list of directories ----------------------------------------------------
 
@@ -45,8 +45,8 @@ tutorials <- tibble(dir_to_deploy = dirs_to_deploy, lesson = dirs_to_deploy) %>%
 
 # deploy all -------------------------------------------------------------------
 
-#for(i in 1:length(dirs_to_deploy)){
-for(i in 3:3){
+for(i in 3:length(dirs_to_deploy)){
+#for(i in 3:3){
   deployApp(
     appDir = tutorials$dir_to_deploy[i],
     appTitle = tutorials$title[i],
