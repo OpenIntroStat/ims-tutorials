@@ -416,7 +416,7 @@ This new measure is better, but it has an undesirable property: it will just kee
 ```{r ma-deviation-sq-mean-pop}
 life_ma %>%
   mutate(
-    deviation = expectancy - life_ma_summary$mean,
+    deviation = expectancy - mean(life_ma$expectancy),
     deviation_sq = deviation^2
     ) %>%
   summarise(mean_sq_deviation = sum(deviation_sq) / nrow(life_ma))
@@ -427,7 +427,7 @@ If you change the $n$ to an $n - 1$, you get what's called the *sample variance*
 ```{r ma-deviation-sq-mean-samp, echo = TRUE}
 life_ma %>%
   mutate(
-    deviation = expectancy - life_ma_summary$mean,
+    deviation = expectancy - mean(life_ma$expectancy),
     deviation_sq = deviation^2
     ) %>%
   summarise(mean_sq_deviation = sum(deviation_sq) / (nrow(life_ma) - 1))
