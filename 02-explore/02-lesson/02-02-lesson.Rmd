@@ -795,10 +795,15 @@ Thus, the `%in%` operator always comes with the `c()` function, which makes the 
 
 Putting this all together, our code looks like: 
 
-```{r, ex2-setup, exercise = TRUE}
+```{r, ex2-setup, echo=FALSE}
 common_cyl <- cars %>%
   filter(ncyl %in% c(4, 6, 8))
 ```
+
+```{r, ref.label="ex2-setup", echo=TRUE}
+```
+
+
 
 Now, with the `common_cyl` dataset, create overlaid density plots of `city_mpg` colored by `ncyl`.
 Keep in mind that `ncyl` is a numerical variable, so you will need to convert it to a categorical variable to use it as the `fill`. 
