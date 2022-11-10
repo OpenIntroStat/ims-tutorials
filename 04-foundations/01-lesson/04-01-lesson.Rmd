@@ -683,9 +683,9 @@ homeown_perm <- homes %>%
 homeown_perm
 ```
 
-<div id="null_model-hint">
-**Hint:** `specify()` takes a formula, `HomeOwn ~ Gender`, and `success` is `"Own"`.
-</div>
+```{r null_model-hint}
+`specify()` takes a formula, `HomeOwn ~ Gender`, and `success` is `"Own"`.
+```
 
 ```{r null_model-solution}
 # Specify variables
@@ -713,9 +713,9 @@ homeown_perm <- homes %>%
 homeown_perm
 ```
 
-<div id="null_model2-hint">
-**Hint:** `hypothesize(null = "independence")`
-</div>
+```{r null_model2-hint}
+`hypothesize(null = "independence")`
+```
 
 ```{r null_model2-solution}
 # Hypothesize independence
@@ -747,9 +747,9 @@ homeown_perm <- homes %>%
 homeown_perm
 ```
 
-<div id="null_model3-hint">
-**Hint:** `generate(reps = 10, type = "permute")`
-</div>
+```{r null_model3-hint}
+`generate(reps = 10, type = "permute")`
+```
 
 ```{r null_model3-solution}
 # Perform 10 permutations
@@ -809,9 +809,9 @@ homeown_perm <- homes %>%
 homeown_perm
 ```
 
-<div id="randomized_statistics-hint">
-**Hint:** `calculate(stat = "diff in props", order = c("male", "female"))`
-</div>
+```{r randomized_statistics-hint}
+`calculate(stat = "diff in props", order = c("male", "female"))`
+```
 
 ```{r randomized_statistics-solution}
 # Perform 100 permutations
