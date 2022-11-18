@@ -290,6 +290,7 @@ diff_mean_ht <- stem_cell %>%
 ```
 
 ```{r stem_cell_3-hint}
+**Hint:**
 - Call `specify()`, setting `formula` to a formula with `change` as the response variable and `trmt` as the explanatory variable.
 - Call `hypothesize()`, setting `null` to `"independence"`.
 - Call `generate()`, setting `reps` to `n_replicates` and `type` to `"permute"`.

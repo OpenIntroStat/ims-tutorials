@@ -999,6 +999,7 @@ pchisq(chi_obs, df = ___, lower.tail = ___)
 ```
 
 ```{r ex14-hint}
+**Hint:**
 - For the permutation p-value, find the proportion (`mean()`) of `stat`s that are greater than or equal to the observed statistic.
 - Use the argument `df = 3` again.
 ```
