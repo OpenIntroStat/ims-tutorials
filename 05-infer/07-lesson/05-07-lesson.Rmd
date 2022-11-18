@@ -36,6 +36,9 @@ stem_cell <- stem_cell %>%
 acs12 <- acs12 %>%
   mutate(hrly_pay = income / (hrs_work * 52))
 
+acs12 <- acs12 %>%
+  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"))
+
 acs12_complete_hrlypay_citizen <- acs12 %>%
   filter(!is.na(hrly_pay), !is.na(citizen))
 ```
@@ -816,7 +819,6 @@ If $\mu$ is defined as average hourly pay in the population, the null hypothesis
 ```{r}
 acs12 %>%
   filter(!is.na(hrly_pay)) %>%
-  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"), ) %>% 
   group_by(citizen) %>%
   summarise(x_bar = round(mean(hrly_pay), 2),
             s = round(sd(hrly_pay), 2),
@@ -852,10 +854,6 @@ Here, our null hypothesis alternative hypothesis says that there is a difference
 
 ### 
 
-```{r, echo = FALSE}
-acs12 <- acs12 %>%
-  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"))
-```
 
 ```{r, echo=TRUE}
 acs12 %>%
