@@ -33,6 +33,11 @@ set.seed(421398)
 stem_cell <- stem_cell %>%
   mutate(change = after - before)
 
+acs12 <- acs12 %>%
+  mutate(hrly_pay = income / (hrs_work * 52))
+
+acs12_complete_hrlypay_citizen <- acs12 %>%
+  filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
 ## Hypothesis testing for a differnece in two means via simulation
