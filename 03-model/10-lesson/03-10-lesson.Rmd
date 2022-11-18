@@ -97,9 +97,9 @@ One quick technique for jump-starting EDA is to examine all of the pairwise scat
 
 ```
 
-<div id="ex1-hint">
-**Hint:** The `paris()` function is helpful for looking for pairs of variables that have high correlation.
-</div>
+```{r ex1-hint}
+The `paris()` function is helpful for looking for pairs of variables that have high correlation.
+```
 
 ```{r ex1-solution}
 pairs(nyc)
@@ -233,9 +233,9 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 
 ```
 
-<div id="ex3-hint">
-*Hint:* What is the difference between the coefficients that are in both models?
-</div>
+```{r ex3-hint}
+What is the difference between the coefficients that are in both models?
+```
 
 ```{r ex3-solution}
 lm(Price ~ Food + East, data = nyc)
@@ -307,9 +307,9 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) 
 ```
 
-<div id="ex4-hint">
-**Hint:** Remember `add_surface()`?
-</div>
+```{r ex4-hint}
+Remember `add_surface()`?
+```
 
 ```{r ex4-solution}
 # fit model
@@ -500,9 +500,9 @@ p %>%
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
-<div id="ex6-hint">
-**Hint:** In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
-</div>
+```{r ex6-hint}
+In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
+```
 
 ```{r ex6-solution}
 # draw 3D scatterplot
