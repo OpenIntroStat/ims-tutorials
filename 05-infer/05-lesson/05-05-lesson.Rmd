@@ -179,7 +179,7 @@ glimpse(rent_med_ci)
 ```
 
 ```{r bootstrap_distribution-hint, echo = FALSE}
-**Hint:** 
+
 - In `specify()`, set `response` to `rent` without quotes.
 - In `generate()`, set `reps` to `15000` and `type` to `"bootstrap"`.
 - In `calculate()`, set `stat` to `"median"`.
@@ -225,7 +225,7 @@ ggplot(___, aes(___)) +
 ```
 
 ```{r bootstrap_medians-hint, echo = FALSE}
-**Hint:** 
+
 - Use `ggplot()` with `rent_med_ci` as the dataset.
 - Inside `aes()`, map `x` to `stat`.
 - Add `geom_histogram()`, setting `binwidth` to `50`.
@@ -317,7 +317,7 @@ rent_med_ci %>%
 ```
 
 ```{r bootstrap_interval-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()`, with `quantile(stat, 0.025)` for the 2.5th percentile.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
 ```
@@ -351,7 +351,7 @@ rent_med_obs
 ```
 
 ```{r bootstrap_interval_2-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()` and `median_rent` to the median of `rent`.
 - Use `pull()` to extract the vector from the data frame.
 ```
@@ -389,7 +389,7 @@ t_star <- ___
 ```
 
 ```{r bootstrap_interval_3-hint, echo = FALSE}
-**Hint:** 
+
 - The degrees of freedom is n - 1.
 - Use `qt()`, setting `p` to `0.975` and `df` to the degrees of freedom.
 ```
@@ -441,7 +441,7 @@ rent_med_ci %>%
 ```
 
 ```{r bootstrap_interval_4-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
 - Use `summarize()` again, setting `l_se` to the observed median minus the critical value times the bootstrap standard error.
 ```
@@ -546,7 +546,7 @@ glimpse(ncbirths_complete_visits)
 ```
 
 ```{r doctor-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()` to calculate `boot_se` as the standard deviation of `stat`.
 - Use `summarize()` again, setting `l` to the observed median minus the critical value times the bootstrap standard error.
 - For `u`, change the minus to a plus.
@@ -587,7 +587,7 @@ visit_mean_ci <- ncbirths_complete_visits %>%
 ```
 
 ```{r doctor_2-hint, echo = FALSE}
-**Hint:** 
+
 - Use `specify()`, setting `response` to `visits`.
 - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"mean"`.
@@ -632,7 +632,7 @@ visit_mean_ci %>%
 ```
 
 ```{r doctor_3-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
 ```
@@ -683,7 +683,7 @@ visit_sd_ci
 ```
 
 ```{r doctor_4-hint, echo = FALSE}
-**Hint:** 
+
 - Use `specify()`, setting `response` to `visits`.
 - Use `generate()`, setting `reps` to `15000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"sd"`.
@@ -720,7 +720,7 @@ visit_sd_ci %>%
 ```
 
 ```{r doctor_5-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()`, setting `l` to the `0.05` quantile of `stat`.
 - The `probs` arguments for the `l` and `u` quantiles should add up to one.
 ```
@@ -795,7 +795,7 @@ rent_med_ht
 ```
 
 ```{r apartments-hint, echo = FALSE}
-**Hint:** Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`.
+Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`.
 ```
 
 ```{r apartments-solution}
@@ -841,7 +841,7 @@ rent_med_obs
 ```
 
 ```{r apartments_2-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()`, setting `median_rent` to the median of `rent`.
 - Use `pull()` to extract the vector from the data frame.
 ```
@@ -894,7 +894,7 @@ rent_med_ht %>%
 ```
 
 ```{r apartments_3-hint, echo = FALSE}
-**Hint:** 
+
 - Use `filter()`, using the condition `stat` greater than or equal to the observed median rent, `rent_med_obs`.
 - Use `summarize()`, setting `p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
 ```
@@ -980,7 +980,7 @@ weight_mean_ht <- ncbirths %>%
 ```
 
 ```{r babies-hint, echo = FALSE}
-**Hint:** 
+
 - Use `specify()`, setting `response` to `weight`.
 - Use `hypothesize()`, setting `null` to `"point"` and `mu` to `7`.
 - Use `generate()`, setting `reps` to `n_replicates` and `type` to `"bootstrap"`.
@@ -1023,7 +1023,7 @@ weight_mean_obs <- ncbirths %>%
 ```
 
 ```{r babies_2-hint, echo = FALSE}
-**Hint:** 
+
 - Use `summarize()`, setting `mean_weight` to the mean of `weight`.
 - Use `pull()` to extract the vector from the data frame.
 ```
@@ -1078,7 +1078,7 @@ weight_mean_ht %>%
 ```
 
 ```{r babies_3-hint, echo = FALSE}
-**Hint:** 
+
 - Use `filter()`, using the condition `stat` greater than or equal to the observed median rent.
 - Use `summarize()`, setting `one_sided_p_val` to the number of rows, `n()`, divided by the total number of replicates, `n_replicates`.
 - Inside `summarize()`, set `two_sided_p_val` to double `one_sided_p_val`.

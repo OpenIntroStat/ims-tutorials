@@ -576,9 +576,9 @@ ggplot(data = cars, ___) +
   ___
 ```
 
-<div id="ex6-hint">
-**Hint:** Does a distribution appear to have outliers? If so, a boxplot is more appropriate. Does a distribution have multiple modes? If so, a density plot is more appropriate.  
-</div>
+```{r ex6-hint}
+Does a distribution appear to have outliers? If so, a boxplot is more appropriate. Does a distribution have multiple modes? If so, a density plot is more appropriate.  
+```
 
 ```{r ex6-solution}
 # Create plot of city_mpg

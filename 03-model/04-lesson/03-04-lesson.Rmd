@@ -338,9 +338,9 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 # Show the full model output
 ```
 
-<div id="ex2-hint">
-**Hint:** Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
-</div>
+```{r ex2-hint}
+Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
+```
 
 ```{r ex2-solution}
 # Show the coefficients

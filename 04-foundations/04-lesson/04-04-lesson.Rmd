@@ -875,7 +875,7 @@ one_poll_boot %>%
 ```
 
 ```{r bootstrap_percentile_3-hint}
-**Hint:** After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
+After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
 ```
 
 ```{r bootstrap_percentile_3-solution}

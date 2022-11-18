@@ -264,7 +264,7 @@ sim1
 ```
 
 ```{r ex3-hint}
-**Hint:** 
+
 - In `specify()`, set `response` to `postlife` and `success` to `"YES"`.
 - In `hypothesize()`, set `null` to `"point"` and `p` to `0.75`.
 - In `generate()`, set `reps` to `1` and `type` to `"simulate"`.
@@ -393,7 +393,7 @@ ___ <- gss2016 %>%
 ```
 
 ```{r ex6-hint}
-**Hint:** `stat = "prop"`
+`stat = "prop"`
 ```
 
 ```{r ex6-solution}
@@ -428,7 +428,7 @@ ___ +
 ```
 
 ```{r ex7-hint}
-**Hint:** 
+
 - Use `geom_density()` without arguments to create a density plot. 
 - In the `geom_vline()` call, `xintercept` to `p_hat` and `color` to `"red"`.
 ```
@@ -474,7 +474,7 @@ ___ %>%
 ```
 
 ```{r ex8-hint}
-**Hint:** Find the p-value by figuring out the proportion of `stat`s that are greater than or equal `p_hat`.
+Find the p-value by figuring out the proportion of `stat`s that are greater than or equal `p_hat`.
 ```
 
 ```{r ex8-solution}
@@ -805,7 +805,7 @@ ___(___, aes(x = ___, fill = ___)) +
 ```
 
 ```{r ex9-hint}
-**Hint:** To plot proportions instead of counts, set `position` to `"fill"` within your bar layer.
+To plot proportions instead of counts, set `position` to `"fill"` within your bar layer.
 ```
 
 ```{r ex9-solution}
@@ -834,7 +834,7 @@ p_hats
 ```
 
 ```{r ex10-hint}
-**Hint:** Group the data by the `sex` variable to find the proportion of respondents that favor capital punishment in each group.
+Group the data by the `sex` variable to find the proportion of respondents that favor capital punishment in each group.
 ```
 
 ```{r ex10-solution}
@@ -872,7 +872,7 @@ d_hat
 ```
 
 ```{r ex11-hint}
-**Hint:** Use the `diff()` function to find the difference between the two elements of `p_hats`.
+Use the `diff()` function to find the difference between the two elements of `p_hats`.
 ```
 
 ```{r ex11-solution}
@@ -931,7 +931,7 @@ ___ <- gss2016 %>%
 ```
 
 ```{r ex12-hint}
-**Hint:** In `calculate()` you need to specify the `stat` and `order` arguments this time.
+In `calculate()` you need to specify the `stat` and `order` arguments this time.
 ```
 
 ```{r ex12-solution}
@@ -970,7 +970,7 @@ ___ +
 ```
 
 ```{r ex13-hint}
-**Hint:** Use `geom_density()` to create a density plot.
+Use `geom_density()` to create a density plot.
 ```
 
 ```{r ex13-solution}
@@ -1013,7 +1013,7 @@ null %>%
 ```
 
 ```{r ex14-hint}
-**Hint:** Use the `mean()` function to find the proportion of statistics that are less than `d_hat`.
+Use the `mean()` function to find the proportion of statistics that are less than `d_hat`.
 ```
 
 ```{r ex14-solution}
@@ -1122,7 +1122,7 @@ ___ <- gss2016 %>%
 ```
 
 ```{r ex15-hint}
-**Hint:** When using the bootstrap to create a confidence interval, you no longer have to `hypothesize()`.
+When using the bootstrap to create a confidence interval, you no longer have to `hypothesize()`.
 ```
 
 ```{r ex15-solution}
@@ -1374,7 +1374,7 @@ p_hats
 ```
 
 ```{r ex17-hint}
-**Hint:** Use the `mean()` function to compute the proportions you're after.
+Use the `mean()` function to compute the proportions you're after.
 ```
 
 ```{r ex17-solution}
@@ -1406,7 +1406,7 @@ d_hat <- ___
 ```
 
 ```{r ex18-hint}
-**Hint:** The `diff()` function will calculate the difference between the two elements of `p_hats`.
+The `diff()` function will calculate the difference between the two elements of `p_hats`.
 ```
 
 ```{r ex18-solution}
@@ -1443,7 +1443,7 @@ null <- gssmod %>%
 ```
 
 ```{r ex19-hint}
-**Hint:** Use the formula `cappun ~ coinflip` in `specify()`.
+Use the formula `cappun ~ coinflip` in `specify()`.
 ```
 
 ```{r ex19-solution}
@@ -1490,7 +1490,7 @@ ___ +
 ```
 
 ```{r ex20-hint}
-**Hint:** You can create a density plot with `geom_density()`.
+You can create a density plot with `geom_density()`.
 ```
 
 ```{r ex20-solution}
@@ -1572,7 +1572,7 @@ d_hat %>%
 ```
 
 ```{r ex21-hint}
-**Hint:** 
+
 - To find the upper bound, place `quantile(stat, probs = 1 - alpha/2)` in your call to `summarize()`.
 - The `between()` function takes the arguments `x`, `left`, and `right` and returns `TRUE` or `FALSE`.
 ```
@@ -1617,7 +1617,7 @@ ggplot(null, aes(x = stat)) +
 ```
 
 ```{r ex22-hint}
-**Hint:** Add two more calls to `geom_vline()`, with `lower` and `upper` as the respective x-intercepts, both colored `"blue"`.
+Add two more calls to `geom_vline()`, with `lower` and `upper` as the respective x-intercepts, both colored `"blue"`.
 ```
 
 ```{r ex22-solution}

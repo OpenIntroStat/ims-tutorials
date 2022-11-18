@@ -152,9 +152,9 @@ Using the `ncbirths` dataset, use `ggplot()` to make a scatterplot visualizing t
 
 ```
 
-<div id="ex1-hint">
-**Hint:** In the `ggplot()` map `weeks` to the `x` aesthetic and `weight` to the `y` aesthetic. Remember to use the `ncbirths` dataset!
-</div>
+```{r ex1-hint}
+In the `ggplot()` map `weeks` to the `x` aesthetic and `weight` to the `y` aesthetic. Remember to use the `ncbirths` dataset!
+```
 
 ```{r ex1-solution}
 # Scatterplot of weight vs. weeks
@@ -175,9 +175,9 @@ ncbirths <- ncbirths %>%
   mutate(weeks_cut = cut(___, breaks = ___))
 ```
 
-<div id="cut-ex-hint">
-**Hint:** The `cut()` function should cut the `weeks` variable into 4 different categories.
-</div>
+```{r cut-ex-hint}
+The `cut()` function should cut the `weeks` variable into 4 different categories.
+```
 
 Next, using the new `weeks_cut` variable, make side-by-side boxplots illustrating how the birth weight of these babies varies according to the number of weeks of gestation.
 
@@ -192,9 +192,9 @@ ggplot(data = ___,
   ___
 ```
 
-<div id="ex2-hint">
-**Hint:** In the plot `x` is `weeks_cut` and `y` is `weight` from the `ncbirths` dataset.
-</div>
+```{r ex2-hint}
+In the plot `x` is `weeks_cut` and `y` is `weight` from the `ncbirths` dataset.
+```
 
 ```{r ex2-solution}
 ggplot(data = ncbirths,
@@ -421,9 +421,9 @@ Fist, let's use the `coord_trans()` function to modify our original scatterplot,
   ___(x = "log10", y = "log10")
 ```
 
-<div id="ex7-hint">
-**Hint:** The function you want to use is `coord_trans()`!
-</div>
+```{r ex7-hint}
+The function you want to use is `coord_trans()`!
+```
 
 ```{r ex7-solution}
 ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
@@ -442,9 +442,9 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   ___
 ```
 
-<div id="ex8-hint">
-**Hint:** Add in the `scale_x_log10()` and `scale_y_log10()` to transform the x- and y-axis!
-</div>
+```{r ex8-hint}
+Add in the `scale_x_log10()` and `scale_y_log10()` to transform the x- and y-axis!
+```
 
 ```{r ex8-solution}
 ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +

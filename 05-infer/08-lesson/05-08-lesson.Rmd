@@ -122,12 +122,12 @@ ggplot(data = ___, mapping = aes(___)) +
   facet_wrap(vars(___))
 ```
 
-<div id="vocabulary-hint">
-**Hint:** 
+```{r vocabulary-hint}
+
 - Use `gss` as the plot's `data` argument, then map `x` to `wordsum` in c`aes()`. 
 - Add a histogram layer with `geom_histogram()`. Vocabulary scores can only be whole numbers, so it doesn't make sense to have a `binwidth` narrower than one (1) point.
 - The faceting formula can be specified using `vars(class)`.
-</div>
+```
 
 ```{r vocabulary-solution}
 # Using gss, plot wordsum
@@ -352,11 +352,11 @@ aov_evals_rank <- aov(___, data = ___)
 tidy(aov_evals_rank)
 ```
 
-<div id="vocabulary_2-hint">
-**Hint:** 
+```{r vocabulary_2-hint}
+
 - Call `aov()`, passing a formula of `score ~ rank`, using the `evals` dataset.
 - Call `tidy()`, passing the `aov_evals_rank` AOV model.
-</div>
+```
 
 
 ```{r vocabulary_2-solution}
@@ -452,11 +452,11 @@ gss %>%
   summarize(___ = ___)
 ```
 
-<div id="vocabulary_3-hint">
-**Hint:** 
+```{r vocabulary_3-hint}
+
 - Call `group_by()`, passing `class` as the argument.
 - Call `summarize()`, setting `std_dev_wordsum` to `sd(wordsum)`.
-</div>
+```
 
 ```{r vocabulary_3-solution}
 gss %>%
@@ -482,10 +482,10 @@ gss %>%
   geom_density_ridges()
 ```
 
-<div id="vocabulary_4-hint">
-**Hint:** 
+```{r vocabulary_4-hint}
+
 - Call `ggplot()`, passing `wordsum` to the `x` variable and `class` to the `y` variable. 
-</div>
+```
 
 ```{r vocabulary_4-solution}
 gss %>%
@@ -678,11 +678,11 @@ gss %$%
   pairwise.t.test(wordsum, class, p.adjust.method = "none")
 ```
 
-<div id="vocabulary_4-hint">
-**Hint:** 
+```{r vocabulary_4-hint}
+
 - Use `wordsum` as `x`, `class` as `g`, and set `p.adjust.method` to `"bonferroni"`.
 - Call `tidy()`, passing `t_test_results`.
-</div>
+```
 
 ```{r vocabulary_5-solution}
 # Run a pairwise t-test on wordsum and class, without adjustment

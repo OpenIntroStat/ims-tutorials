@@ -115,11 +115,11 @@ y > z
 y < z
 ```
 
-<div id="t-distribution-hint">
-**Hint:** 
+```{r t-distribution-hint}
+
 - Call `pt()` setting the quantile, `q`, to `3` and `df` to the number of degrees of freedom.
 - The total area under a probability distribution is 1.
-</div>
+```
 
 ```{r t-distribution-solution}
 # P(T < 3) for df = 10
@@ -169,11 +169,11 @@ y > z
 y < z
 ```
 
-<div id="t-distribution-hint">
-**Hint:** 
+```{r t-distribution-hint}
+
 - The first argument to the `qt()` function is the percentile you want find the cutoff for. For example, `qt(0.5, df = 5)` returns the 50th percentile of the t-distribution with 5 degrees of freedom.
 - The upper bound of the middle 95% is `0.975`.
-</div>
+```
 
 ```{r t-distribution-cutoffs-solution}
 # 95th percentile for df = 10
@@ -298,11 +298,11 @@ acs12_emp %>%
          conf_level = ___)
 ```
 
-<div id="Average_commute_time_of_Americans-hint">
-**Hint:** 
+```{r Average_commute_time_of_Americans-hint}
+
 - Call `filter()` with the condition that `employment` is equal to (`==`) `"employed"`.
 - Call `t_test()`, using `time_to_work` as the `response` and using a confidence level of `0.95`.
-</div>
+```
 
 ```{r Average_commute_time_of_Americans-solution}
 # Filter for employed respondents
@@ -347,13 +347,13 @@ acs12_emp %>%
          conf_level = ___)
 ```
 
-<div id="Average_number_of_hours_worked-hint">
-**Hint:**   
+```{r Average_number_of_hours_worked-hint}
+  
 
 - Use `hrs_work` as the `response`.
 - Say you want a confidence interval by specifying `TRUE` for `conf_int`. 
 - Find a 95% confidence interval by setting `conf_level` to 0.95.
-</div>
+```
 
 ```{r Average_number_of_hours_worked-solution}
 # Run a t-test on hrs_work and look at the CI
@@ -485,13 +485,13 @@ textbooks %>%
          conf_level = ___)
 ```
 
-<div id="t-interval_at_various_levels-hint">
-**Hint:**  
+```{r t-interval_at_various_levels-hint}
+ 
 
 - Use the `diff` column as the `response`. 
 - Turn the confidence interval on by setting `conf_int` to `TRUE`.  
 - Change the `conf_level` to the specified with (either 0.90, 0.95, or 0.99).
-</div>
+```
 
 ```{r t-interval_at_various_levels-solution}
 # Run a t-test on diff with a 90% CI
@@ -592,13 +592,13 @@ textdiff_med_ci <- textbooks %>%
   calculate(stat = ___)
 ```
 
-<div id="estimate_the_median_difference_in_textbook_prices-hint">
-**Hint:**  
+```{r estimate_the_median_difference_in_textbook_prices-hint}
+ 
 
 - Use `specify()`, setting `response` to `diff`.
 - Use `generate()`, setting `reps` to `1000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"median"`.
-</div>
+```
 
 ```{r estimate_the_median_difference_in_textbook_prices-solution}
 # Calculate 10000 bootstrap medians of diff
@@ -629,9 +629,9 @@ textdiff_med_ci %>%
                           type = ___)
 ```
 
-<div id="estimate_the_median_difference_in_textbook_prices_2-hint">
-**Hint:** Set `level` equal to 0.95 and `type` equal to `"percentile"`. 
-</div>
+```{r estimate_the_median_difference_in_textbook_prices_2-hint}
+Set `level` equal to 0.95 and `type` equal to `"percentile"`. 
+```
 
 ```{r estimate_the_median_difference_in_textbook_prices_2-solution}
 # Calculate the 95% CI via percentile method
@@ -660,9 +660,9 @@ hsb2 <- hsb2 %>%
   mutate(diff = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores-hint">
-**Hint:** Calculate `diff` as `math` minus `science`.
-</div>
+```{r test-for-a-difference-in-median-test-scores-hint}
+Calculate `diff` as `math` minus `science`.
+```
 
 ```{r test-for-a-difference-in-median-test-scores-solution}
 # Add a column, diff, of math minus science
@@ -696,13 +696,13 @@ scorediff_med_ht <- hsb2 %>%
   calculate(stat = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores_2-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_2-hint}
+
 - Use `specify()`, setting `response` to `diff`.
 - Use `hypothesize()`, setting `null` to `"point"` and `mu` to `0`.
 - Use `generate()`, setting `reps` to 1000 and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"median"`.
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_2-solution}
 scorediff_med_ht <- hsb2 %>%
@@ -739,11 +739,11 @@ scorediff_med_obs
 ```
 
 
-<div id="test-for-a-difference-in-median-test-scores_3-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_3-hint}
+
 
 - Set `median_diff` to the median of the observed `diff` column.
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_3-solution}
 # Calculate observed median of differences
@@ -780,12 +780,12 @@ scorediff_med_ht %>%
               direction = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores_4-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_4-hint}
+
 
 - Use `scorediff_med_obs` as the observed statistic. 
 - Use `"two-sided"` as the direction in the alternative. 
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_4-solution}
 # Calculate two-sided p-value
