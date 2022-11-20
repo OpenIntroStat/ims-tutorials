@@ -81,6 +81,12 @@ starbucks3 <- starbucks %>%
   sample_n(size=20)
 starbucks_many <- starbucks %>%
   rep_sample_n(size=20, replace=FALSE, reps=50)
+
+alpha <- 0.05
+degrees_of_freedom <- nrow(twins) - 2
+confidence_level <- 1 - alpha
+p_upper <- 1 - alpha / 2
+critical_value <- qt(p_upper, df = degrees_of_freedom)
 ```
 
 ## t-Based Inference For the Slope Parameter 
@@ -250,7 +256,7 @@ question("Why does it matter if the sampling distribution is accurate?",
 Using the permuted datasets (recall, the randomization forces the null hypothesis to be true), investigate the distribution of the standardized slope statistics (the slope, which has been divided by the standard error). Note that the distribution of the standardized slope is well described by a t-distribution.
 
 
-```{r echo=TRUE, message=FALSE, eval=FALSE}
+```{r ex31_setup, echo=FALSE, message=FALSE}
 set.seed(4747)
 twins_perm <- twins %>% rep_sample_n(size=nrow(twins), reps=500) %>%
   group_by(replicate) %>%
@@ -265,7 +271,7 @@ twins_perm <- twins %>% rep_sample_n(size=nrow(twins), reps=500) %>%
 - Calculated the degrees of freedom of `twins`, as the number of its rows minus two.
 
 
-```{r ex31, exercise=TRUE}
+```{r ex31, exercise=TRUE, exercise.setup="ex31_setup"}
 # Look at the data
 twins_perm
 
@@ -310,7 +316,7 @@ degrees_of_freedom <- nrow(twins) - 2
     - Set `color` to `"red"`.
 
 
-```{r ex33, exercise=TRUE}
+```{r ex33, exercise=TRUE, exercise.setup="ex31_setup"}
 # From previous step
 biological_perm <- twins_perm %>%
   filter(term == "Biological_perm")
@@ -428,7 +434,7 @@ The biological term from the model is available as `biological_term`.
 
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r ex35_setup, echo=FALSE}
 model <- lm(Foster ~ Biological, data = twins)
 biological_term <- model %>% 
   tidy() %>% 
@@ -439,7 +445,7 @@ options(tibble.width = Inf)
 ```
 
 
-```{r ex35, exercise=TRUE}
+```{r ex35, exercise=TRUE, exercise.setup="ex35_setup"}
 # Calculate the degrees of freedom of twins
 degrees_of_freedom <- nrow(twins) - 2
 
@@ -491,7 +497,7 @@ When technical conditions hold (see next lesson) , the inference from the random
 - In the call to `summarize()`, calculate the p-value as the proportion of absolute estimates of slope that are at least as extreme as the absolute observed estimate of slope.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r ex36_setup, echo=FALSE}
 set.seed(4747)
 perm_slope <- twins %>%
   specify(Foster ~ Biological) %>%
@@ -502,12 +508,12 @@ perm_slope <- twins %>%
 obs_slope <- lm(Foster ~ Biological, data = twins) %>%
   tidy() %>%   
   filter(term == "Biological") %>%
-  select(estimate) %>%   
+  dplyr::select(estimate) %>%   
   pull() 
 ```
 
 
-```{r ex36, exercise=TRUE}
+```{r ex36, exercise=TRUE, exercise.setup="ex36_setup"}
 # The slope in the observed data and each permutation replicate
 obs_slope
 perm_slope
@@ -604,7 +610,6 @@ lm(Calories ~ Fat, data=starbucks) %>%
 lm(Calories ~ Fat, data=starbucks) %>% tidy() %>%
    mutate(lower = estimate - crit_val*std.error,
           upper = estimate + crit_val*std.error)
-
 ```
 
 As you've seen in previous lessons, a confidence interval for a given parameter can be created using the estimate of the parameter as well as the standard error of the estimate around the parameter. The estimate and the SE are both given in the tidy evaluation of the linear model.
@@ -625,7 +630,7 @@ tidy_mod
 ```{r echo=TRUE, eval=TRUE}
 tidy_mod %>% 
   filter(term == "(Intercept)") %>% 
-  select(conf.low, conf.high)
+  dplyr::select(conf.low, conf.high)
 ```
 
 
@@ -650,8 +655,7 @@ tidy_mod
 ```{r echo=TRUE, eval=TRUE}
 tidy_mod %>% 
   filter(term == "Fat") %>% 
-  select(conf.low, conf.high)
-  
+  dplyr::select(conf.low, conf.high)
 ```
 
 
@@ -800,7 +804,7 @@ As with hypothesis testing, if technical conditions hold (technical conditions a
 Note that the bootstrap and t-intervals will not be exactly the same because they use different computational steps to arrive at the interval estimate.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r ex11_setup, echo=TRUE}
 set.seed(4747)
 boot_slope <- twins %>%
   specify(Foster ~ Biological) %>%
@@ -816,7 +820,7 @@ Calculate the confidence level and the lower and upper percentile cutoffs from a
 
 
 
-```{r ex11, exercise=TRUE}
+```{r ex11, exercise=TRUE, exercise.setup="ex11_setup"}
 alpha <- 0.05
 
 # Calculate the confidence level
@@ -859,7 +863,7 @@ p_upper <- 1 - alpha / 2
 - Summarize the bootstrap replicates to calculate a confidence interval using quantiles of `stat`. Use `p_lower` and `p_upper` for the quantiles.
 
 
-```{r ex12a, exercise=TRUE}
+```{r ex12a, exercise=TRUE, exercise.setup="ex11_setup"}
 # From previous step
 alpha <- 0.05
 confidence_level <- 1 - alpha
@@ -873,7 +877,7 @@ tidied_model <- lm(Foster ~ Biological, data = twins) %>%
 # Recall the t-confidence interval
 tidied_model %>%
   filter(term == "Biological") %>%
-  select(conf.low, conf.high)
+  dplyr::select(conf.low, conf.high)
 
 # Create the bootstrap confidence interval
 boot_slope %>% 
@@ -907,7 +911,7 @@ tidied_model <- lm(Foster ~ Biological, data = twins) %>%
 # Recall the t-confidence interval
 tidied_model %>%
   filter(term == "Biological") %>%
-  select(conf.low, conf.high)
+  dplyr::select(conf.low, conf.high)
 
 # Create the bootstrap confidence interval
 boot_slope %>% 
@@ -988,7 +992,7 @@ Additionally, you can see the intervals which capture the average calorie conten
 ```{r echo=TRUE, eval=TRUE}
 predMeans <- augment(lm(Calories ~ Fat, data = starbucks),
                      se_fit = TRUE) %>%
-   select(Calories, Fat, .fitted, .se.fit) %>%
+   dplyr::select(Calories, Fat, .fitted, .se.fit) %>%
    mutate(lowMean = .fitted - crit_val*.se.fit,
           upMean =  .fitted + crit_val*.se.fit) 
 
@@ -1212,7 +1216,7 @@ Manually create what `geom_smooth()` does, using `predictions`. Provide the aest
 - Add a ribbon layer with `x` mapped to `Biological`, `ymin` mapped to `lower_mean_prediction` and `ymax` mapped to `upper_mean_prediction`. Use the `data = predictions` dataset and set the transparency, `alpha` to `0.2`.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r ex315_setup, echo=FALSE}
 alpha <- 0.05
 degrees_of_freedom <- nrow(twins) - 2
 confidence_level <- 1 - alpha
@@ -1235,7 +1239,7 @@ ggplot(twins, aes(x = Biological, y = Foster)) +
 ```
 
 
-```{r ex315, exercise=TRUE}
+```{r ex315, exercise=TRUE, exercise.setup="ex315_setup"}
 # This plot is shown
 ggplot(twins, aes(x = Biological, y = Foster)) + 
   geom_point() +
@@ -1298,7 +1302,7 @@ You have already seen `tidy()`, to pull out coefficient-level information from a
 The linear regression is provided as `model` and the predictions from the previous exercise are given as `predictions`.
 
 
-```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r ex316_setup, echo=FALSE, eval=TRUE}
 alpha <- 0.05
 degrees_of_freedom <- nrow(twins) - 2
 confidence_level <- 1 - alpha
@@ -1327,7 +1331,7 @@ model <- lm(Foster ~ Biological, data = twins)
 
 
 
-```{r ex316, exercise=TRUE}
+```{r ex316, exercise=TRUE, exercise.setup="ex316_setup"}
 twins_sigma <- model %>%
   # Get model-level information
   ___ %>%
@@ -1367,7 +1371,7 @@ predictions %>%
 - Calculate the prediction interval for the foster twins' IQ as the model prediction, `.fitted` plus or minus the critical value times the standard error of the predictions.
 
 
-```{r ex317, exercise=TRUE}
+```{r ex317, exercise=TRUE, exercise.setup="ex316_setup"}
 # From previous step
 twins_sigma <- model %>% glance() %>% pull(sigma)
 predictions2 <- predictions %>%
@@ -1421,7 +1425,7 @@ Update the plot to add a ribbon layer of prediction intervals.
 
 
 
-```{r ex318, exercise=TRUE}
+```{r ex318, exercise=TRUE, exercise.setup="ex316_setup"}
 # From previous step3
 twins_sigma <- model %>% glance() %>% pull(sigma)
 predictions3 <- predictions %>%
@@ -1482,7 +1486,6 @@ ggplot() +
     fill = "red"
   )
 ```
-
 
 ## Congratulations!
 

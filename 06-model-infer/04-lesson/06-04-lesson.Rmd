@@ -17,11 +17,12 @@ library(infer)
 library(tidyverse)
 library(emo)
 
+
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # From http://www.rossmanchance.com/iscam2/data/movies03.txt
 hypdata_nonequalvar <- read_delim("data/movies03.txt", "\t") %>%
-  select(response = box.office, explanatory = score)
+  dplyr::select(response = box.office, explanatory = score)
 
 set.seed(47474)
 explanatory <- rnorm(500)
@@ -387,7 +388,7 @@ question("Which of the linear regression technical conditions are violated in th
 In the next few exercises, you will calculate residuals from a data set that complies with the linear regression technical conditions.  For the linear model conditions to hold, the points should be scattered throughout the residual plot with no discernible pattern.  Here, the residual plot looks like a scattering of points.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r ex41_setup, echo=FALSE, message=FALSE, warning=FALSE}
 set.seed(4747)
 hypdata_nice <- tibble(explanatory = rnorm(200, 3, 1), 
                        response = explanatory * 3 + 12 + rnorm(200, 0, 2))
@@ -400,7 +401,7 @@ Using `hypdata_nice`, draw a scatter plot of `response` versus `explanatory`.
 
 
 
-```{r ex41, exercise=TRUE}
+```{r ex41, exercise=TRUE, exercise.setup="ex41_setup"}
 # Using hypdata_nice, draw a scatter plot of response vs. explanatory
 ___
 ```
@@ -428,7 +429,7 @@ ggplot(hypdata_nice, aes(x = explanatory, y = response)) +
 - Using `modeled_observations`, plot `.resid` vs. `.fitted` and add a point layer.
 
 
-```{r ex42, exercise=TRUE}
+```{r ex42, exercise=TRUE, exercise.setup="ex41_setup"}
 # Run a linear regression of response vs. explanatory
 model <- ___
 
@@ -443,7 +444,7 @@ ___
 ```
 
 
-```{r ex42-solution}
+```{r ex42-hint}
 - Call `lm()`, modeling `response` versus `explanatory` and setting the data to `hypdata_nice`.
 - Call `augment()` to get the observation-level information from the model.
 - Use `modeled_observations` as `ggplot()`'s data argument. Inside `aes()`, map `x` to `.fitted` and `y` to `.resid`.
@@ -453,7 +454,7 @@ ___
 
 
 
-```{r ex42-hint}
+```{r ex42-solution}
 # Run a linear regression of response vs. explanatory
 model <- lm(response ~ explanatory, data = hypdata_nice)
 
@@ -478,7 +479,7 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
 Now, you will calculate residuals from a data set that violates the technical conditions.  For the linear model conditions to hold, the points should be scattered throughout the residual plot with no discernible pattern.  Here the residuals reveal a violation of the technical conditions.
 
 
-```{r echo=FALSE}
+```{r hypdata_poor_setup, echo=FALSE}
 set.seed(4747)
 hypdata_poor <- tibble(explanatory = rnorm(200, 3, 1), response = explanatory * 3 + 12 + explanatory * rnorm(200, 0, 1))
 ```
@@ -491,7 +492,7 @@ Using `hypdata_poor`, draw a scatter plot of `response` versus `explanatory`.
 
 
 
-```{r ex43, exercise=TRUE}
+```{r ex43, exercise=TRUE, exercise.setup="hypdata_poor_setup"}
 # Using hypdata_poor, draw a scatter plot of response vs. explanatory
 ___
 ```
@@ -522,7 +523,7 @@ ggplot(hypdata_poor, aes(x = explanatory, y = response)) +
 
 
 
-```{r ex45, exercise=TRUE}
+```{r ex45, exercise=TRUE, exercise.setup="hypdata_poor_setup"}
 # Run a linear regression of response vs. explanatory
 model <- ___
 
@@ -726,7 +727,7 @@ The data provided in this exercise (`hypdata_outlier`) has an extreme outlier.  
 
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r hypdata_outlier_setup, echo=FALSE, message=FALSE, warning=FALSE}
 set.seed(4747)
 hypdata_outlier <- tibble(explanatory = rnorm(200, 3, 1), response = explanatory * 3 + 12 + rnorm(200, 0, 2))
 hypdata_outlier$response[47] <- 500
@@ -734,11 +735,14 @@ hypdata_outlier$response[47] <- 500
 ggplot(hypdata_outlier, aes(x = explanatory, y = response)) + 
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) 
+
+hypdata_no_outlier <- hypdata_outlier %>% 
+  filter(response < 200)
 ```
 
 
 
-```{r ex44, exercise=TRUE}
+```{r ex44, exercise=TRUE, exercise.setup="hypdata_outlier_setup"}
 # This plot is shown
 p <- ggplot(hypdata_outlier, aes(x = explanatory, y = response)) + 
   geom_point() +
@@ -795,16 +799,7 @@ The datasets with and without the outlier are provided as `hypdata_outlier` and 
 
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-set.seed(4747)
-hypdata_outlier <- tibble(explanatory = rnorm(200, 3, 1), response = explanatory * 3 + 12 + rnorm(200, 0, 2))
-hypdata_outlier$response[47] <- 500
-hypdata_no_outlier <- hypdata_outlier %>% 
-  filter(response < 200)
-```
-
-
-```{r exer45, exercise=TRUE}
+```{r exer45, exercise=TRUE, exercise.setup="hypdata_outlier_setup"}
 # Model response vs. explanatory on hypdata_outlier and tidy it
 ___
 
@@ -840,7 +835,7 @@ Using the data frames `hypdata_out` (containing an outlier) and `hypdata_noout` 
 -  Find the p-values by finding the proportion of ( `abs`olute value) permuted slopes which are larger than or equal to the ( `abs`olute value of the) observed slopes.  As before, use `mean` on the binary inequality to find the proportion.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r ex46_setup, echo=FALSE, message=FALSE, warning=FALSE}
 set.seed(4747)
 explanatory <- rnorm(50,3,1)
 response <- explanatory*3 + 12 + rnorm(50, 0, 10)
@@ -850,7 +845,7 @@ hypdata_out <-  data.frame(explanatory, response)
 obs_slope_out <- lm(response ~ explanatory, hypdata_out) %>%
   tidy() %>%
   filter(term == "explanatory") %>%
-  select(estimate) %>%
+  dplyr::select(estimate) %>%
   pull() 
 
 hypdata_noout <- hypdata_out %>% filter(explanatory < 4.6) 
@@ -858,7 +853,7 @@ hypdata_noout <- hypdata_out %>% filter(explanatory < 4.6)
 obs_slope_noout <- lm(response ~ explanatory, hypdata_noout) %>%
   tidy() %>%
   filter(term == "explanatory") %>%
-  select(estimate) %>%
+  dplyr::select(estimate) %>%
   pull() 
 
 set.seed(4747)
@@ -877,7 +872,7 @@ perm_slope_noout <- hypdata_noout %>%
 ```
 
 
-```{r ex46, exercise=TRUE}
+```{r ex46, exercise=TRUE, exercise.setup="ex46_setup"}
 # Calculate the p-value with the outlier
 perm_slope_out %>% 
   mutate(abs_perm_slope = ___) %>%
@@ -944,7 +939,7 @@ But importantly, changing the values of X do not change the values of the residu
 
 ### Squaring the explanatory variable
 
-```{r echo=FALSE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE}
 ggplot(data=data_nonlin, 
   aes(x=explanatory, y=response)) + 
   geom_point() +
@@ -952,7 +947,7 @@ ggplot(data=data_nonlin,
 ```
 
 
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=TRUE}
 ggplot(data=data_nonlin, 
   aes(x=explanatory^2, y=response))+ 
      geom_point() +
@@ -981,7 +976,7 @@ Unlike transformations on the explanatory variable, when a response variable is 
 ### A natural log transformation
 
 
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=TRUE}
 ggplot(data=data_nonnorm, 
   aes(x=explanatory, y=response)) + 
      geom_point() +
@@ -990,7 +985,7 @@ ggplot(data=data_nonnorm,
 
 
 
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=TRUE}
 ggplot(data=data_nonnorm, 
   aes(x = explanatory,
       y = log(response))) + 
@@ -1017,7 +1012,7 @@ The next three examples work with datasets where the underlying data structure v
 In this first example, it appears as though the variables are not linearly related.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r ex47_setup, echo=FALSE, message=FALSE, warning=FALSE}
 n <- 100
 set.seed(4747)
 hypdata_nonlinear <- tibble(
@@ -1038,7 +1033,7 @@ hypdata_nonlinear <- tibble(
 
 
 
-```{r ex47, exercise=TRUE}
+```{r ex47, exercise=TRUE, exercise.setup="ex47_setup"}
 # Run this to see how the model looks
 ggplot(hypdata_nonlinear, aes(x = explanatory, y = response)) + 
   geom_point() + 
@@ -1101,7 +1096,7 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
 
 
 
-```{r ex48, exercise=TRUE}
+```{r ex48, exercise=TRUE, exercise.setup="ex47_setup"}
 # Run this to see how the model looks
 ggplot(hypdata_nonlinear, aes(x = explanatory + explanatory ^ 2, y = response)) + 
   geom_point() + 
@@ -1161,12 +1156,6 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
 
 
 In this next example, it appears as though the variance of the `response` variable increases as the `explanatory` variable increases.  Note that the fix in this exercise has the effect of changing both the variability as well as modifying the linearity of the relationship.
-
-
-```{r echo=TRUE, eval=FALSE}
-
-```
-
 
 
 
@@ -1252,7 +1241,7 @@ modeled_observations <- augment(model)
 modeled_observations
 
 # Using modeled_observations, plot residuals vs. fitted values
-ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
+ggplot(modeled_observations, aes(x = .fitted, y = .std.resid)) +
   # Add a point layer
   geom_point() + 
   # Add horizontal line at y = 0
@@ -1280,7 +1269,7 @@ modeled_observations <- augment(model)
 modeled_observations
 
 # Using modeled_observations, plot residuals vs. fitted values
-ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
+ggplot(modeled_observations, aes(x = .fitted, y = .std.resid)) +
   # Add a point layer
   geom_point() + 
   # Add horizontal line at y = 0
@@ -1295,7 +1284,7 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
 In this last example, it appears as though the points are not normally distributed around the regression line.  Again, note that the fix in this exercise has the effect of changing both the variability as well as modifying the linearity of the relationship.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r hypdata_nonnorm_setup, echo=FALSE, message=FALSE, warning=FALSE}
 n <- 100
 set.seed(4747)
 hypdata_nonnorm <- tibble(
@@ -1315,7 +1304,7 @@ hypdata_nonnorm <- tibble(
     - Add a horizontal line at `y = 0` using `geom_hline()` and setting `yintercept` to `0`.
 
 
-```{r ex411, exercise=TRUE}
+```{r ex411, exercise=TRUE, exercise.setup="hypdata_nonnorm_setup"}
 # Run this to see how the model looks
 ggplot(hypdata_nonnorm, aes(x = explanatory, y = response)) + 
   geom_point() + 
@@ -1374,7 +1363,7 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
 - Rerun the code and look at how the plots change.
 
 
-```{r ex412, exercise=TRUE}
+```{r ex412, exercise=TRUE, exercise.setup="hypdata_nonnorm_setup"}
 # Run this to see how the model looks
 ggplot(hypdata_nonnorm, aes(x = explanatory, y = sqrt(response))) + 
   geom_point() + 
@@ -1390,7 +1379,7 @@ modeled_observations <- augment(model)
 modeled_observations
 
 # Using modeled_observations, plot residuals vs. fitted values
-ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
+ggplot(modeled_observations, aes(x = .fitted, y = .std.resid)) +
   # Add a point layer
   geom_point() + 
   # Add horizontal line at y = 0
@@ -1421,12 +1410,13 @@ modeled_observations <- augment(model)
 modeled_observations
 
 # Using modeled_observations, plot residuals vs. fitted values
-ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
+ggplot(modeled_observations, aes(x = .fitted, y = .std.resid)) +
   # Add a point layer
   geom_point() + 
   # Add horizontal line at y = 0
   geom_hline(yintercept = 0)
 ```
+
 
 ## Congratulations!
 

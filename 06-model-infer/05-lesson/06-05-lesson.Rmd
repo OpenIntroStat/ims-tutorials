@@ -17,12 +17,16 @@ library(tidyverse)
 library(GGally)
 library(emo)
 
+
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # http://andrewpbray.github.io/data/LA.csv
 LAhomes <- read_csv("data/LAhomes.csv")
 restNYC <- read_csv("data/restNYC.csv")
 change <- read_csv("data/coins.csv")
+
+LAhomes <- LAhomes %>%
+   filter(bed > 0)
 
 change <- change %>%
   mutate(Small= Dimes + Nickels + Pennies) %>%
@@ -191,26 +195,25 @@ You will need to run the linear model before answering the question:
 
 ```
 
-Consider data collected by Andrew Bray at Reed College on characteristics of LA Homes in 2010. The model is given below, and your task is to provide the appropriate interpretation of the coefficient on `log(sqft)`?  
+Consider data collected by Andrew Bray at Reed College on characteristics of LA Homes in 2010. T
 
 Note: you must be careful to avoid causative interpretations. Additional square footage does not necessarily cause the price of a specific house to go up. The interpretation of the coefficient describes the estimate of the average price of homes at a given square footage.
 
 
-```{r ex, exercise=TRUE}
-
+```{r quiz_1}
+quiz(
+  question("What is to provide the appropriate interpretation of the coefficient on `log(sqft)`?  
+", 
+           allow_retry = TRUE,
+    answer("Each additional square foot of house size produces an estimate of the average price which is $1.44 more.", message = "Remember that a log-log model has a special kind of interpretation."),
+  answer("Each additional square foot of house size produces an estimate of the average price which is $1,442 more.", message = "Remember that a log-log model has a special kind of interpretation."),
+  answer("Each additional square foot of house size produces an estimate of the average price which is 1.44% higher.", message = "Remember that a log-log model has a special kind of interpretation."),
+  answer("Each additional 1% of square footage produces an estimate of the average price which is $1.44 more.", message = "Remember that a log-log model has a special kind of interpretation."),
+    answer("Each additional 1% of square footage produces an estimate of the average price which is 1.44% higher.", correct = TRUE)
+  ), caption = ""
+)
 ```
 
-```{r ex-hint}
-Remember that a log-log model has a special kind of interpretation.
-```
-
-```{r ex-solution}
-- Each additional square foot of house size produces an estimate of the average price which is $1.44 more.
-- Each additional square foot of house size produces an estimate of the average price which is $1,442 more.
-- Each additional square foot of house size produces an estimate of the average price which is 1.44% higher.
-- Each additional 1% of square footage produces an estimate of the average price which is $1.44 more.
-- Each additional 1% of square footage produces an estimate of the average price which is 1.44% higher.
-```
 
 
 
@@ -561,28 +564,26 @@ lm(Price ~ Service + Food + Decor, data = restNYC) %>% tidy()
 ### Interpreting coefficients
 
 
-What is the correct interpretation of the coefficient on `Service` in the linear model which regresses `Price` on `Service`, `Food`, and `Decor`?
+
 
 
 You will need to run the linear model before answering the question:
 `lm(Price ~ Service + Food + Decor, data=restNYC) %>% tidy()`
 
 
-```{r ex56, exercise=TRUE}
 
+```{r quiz_2}
+quiz(
+  question("What is the correct interpretation of the coefficient on `Service` in the linear model which regresses `Price` on `Service`, `Food`, and `Decor`?", 
+           allow_retry = TRUE,
+    answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, given fixed values of `Food` and `Decor`.", correct = TRUE),
+    answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135.", message = "You have to consider the interpretation of a single variable while holding the other variables constant."),
+  answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, for any possible value of `Food` and `Decor`.", message = "You have to consider the interpretation of a single variable while holding the other variables constant."),
+  answer("Given that `Food` and `Decor` are in the model, `Service` is not significant, and we cannot know whether it has effect on modeling `Price`.", message = "You have to consider the interpretation of a single variable while holding the other variables constant.")
+  ), caption = ""
+)
 ```
 
-```{r ex56-hint}
-You have to consider the interpretation of a single variable while holding the other variables constant.
-```
-
-
-```{r ex56-solution}
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135.
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, given fixed values of `Food` and `Decor`.
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, for any possible value of `Food` and `Decor`.
-- Given that `Food` and `Decor` are in the model, `Service` is not significant, and we cannot know whether it has effect on modeling `Price`.
-```
 
 
 
@@ -610,6 +611,7 @@ As seen in other courses, linear regression is a modeling technique. And the mod
 As with the other inferential methods covered in this course sequence, the inferential analysis of a linear model can be approached as a hypothesis test or a confidence interval. The mathematical model provides one framework for the analysis and computational modeling (that is, randomization tests and bootstrapping) give an alternative way of producing inferential analyses.
 
 All are valid methods to use, and you should feel comfortable at this point using all of them.
+
 
 ## Congratulations!
 

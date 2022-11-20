@@ -16,6 +16,7 @@ library(knitr)
 library(infer)
 library(emo)
 
+
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # Read in the twins dataset
@@ -645,24 +646,21 @@ perm_slope %>%
 ### Inference on slope
 
 
-#### What can we conclude based on the p-value associated with the twins data?
 
-
-```{r ex27, exercise=TRUE}
-
+```{r quiz_1}
+quiz(
+  question("What can we conclude based on the p-value associated with the twins data?",
+           correct = "A p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.", 
+           allow_retry = TRUE,
+    answer("A biological twin's IQ being higher causes a foster twin's IQ to be higher.", message = "Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true."),
+    answer("If there were no association between foster and biological twin IQ (no nature) in the population, we would be extremely unlikely to have collected a sample of data like we did. ", correct=TRUE),
+    answer("Biological twins' IQs are higher than foster twins' IQs, on average.", message = "Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true."),
+    answer("Given the data, the probability of biological and foster twins' IQs being unrelated is close to zero.", message = "Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.")
+  ), caption = ""
+)
 ```
 
-```{r ex27-hint}
-Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.
-```
 
-
-```{r ex27-solution}
-- If there were no association between foster and biological twin IQ (no nature) in the population, we would be extremely unlikely to have collected a sample of data like we did. 
-- A biological twin's IQ being higher causes a foster twin's IQ to be higher.
-- Biological twins' IQs are higher than foster twins' IQs, on average.
-- Given the data, the probability of biological and foster twins' IQs being unrelated is close to zero.
-```
 
 
 
@@ -899,7 +897,7 @@ The bootstrapped estimates of `slope`, `boot_slope`, are loaded in your workspac
 - Create the confidence interval of `stat` using `quantile()` and the percentile cutoffs. Your interval ends should be named `lower` and `upper`.
 
 
-```{r echo=TRUE, eval=FALSE}
+```{r ex210_setup, echo=FALSE, eval=FALSE}
 set.seed(4747)
 boot_slope <- twins %>%
   specify(Foster ~ Biological) %>%
@@ -908,7 +906,7 @@ boot_slope <- twins %>%
 ```
 
 
-```{r ex210, exercise=TRUE}
+```{r ex210, exercise=TRUE, exercise.setup="ex210_setup"}
 # Set alpha
 alpha <- ___
 
@@ -956,25 +954,25 @@ boot_slope %>%
 
 ### Inference from randomization and bootstrapped distributions
 
-Throughout this lesson we have investigated the slope associated with the regression of `Foster` twins on `Biological` twins.  The inference question was based on a randomization test assuming no relationship between the two types of twins (i.e., a slope of zero).  The confidence intervals investigated a research question associated with a 100% nature relationship (i.e., a slope of one).  What are the appropriate conclusions of this study?
+Throughout this lesson we have investigated the slope associated with the regression of `Foster` twins on `Biological` twins.  The inference question was based on a randomization test assuming no relationship between the two types of twins (i.e., a slope of zero).  The confidence intervals investigated a research question associated with a 100% nature relationship (i.e., a slope of one).  
 
 
-```{r ex211, exercise=TRUE}
 
+
+```{r quiz_2}
+quiz(
+  question("What are the appropriate conclusions of this study?",
+           correct = "A p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.", 
+           allow_retry = TRUE,
+    answer("Zero is not a plausible value for the estimated slope, one is a plausible value for the estimated slope.", message = "Remember the difference between the population slope and the estimated slope. What do the inferential procedures you've performed say about each one?"),
+    answer("Zero is a plausible value for the population slope, one is not a plausible value for the population slope.", message = "Remember the difference between the population slope and the estimated slope. What do the inferential procedures you've performed say about each one?"),
+    answer("Zero is not a plausible value for the population slope, one is a plausible value for the population slope.", correct=TRUE),
+    answer("Zero is a plausible value for the estimated slope, one not is a plausible value for the estimated slope.", message = "Remember the difference between the population slope and the estimated slope. What do the inferential procedures you've performed say about each one?")
+  ), caption = ""
+)
 ```
 
 
-```{r ex211-hint}
-Remember the difference between the population slope and the estimated slope. What do the inferential procedures you've performed say about each one?
-```
-
-
-```{r ex211-solution}
-- Zero is not a plausible value for the population slope, one is a plausible value for the population slope.
-- Zero is not a plausible value for the estimated slope, one is a plausible value for the estimated slope.
-- Zero is a plausible value for the population slope, one is not a plausible value for the population slope.
-- Zero is a plausible value for the estimated slope, one not is a plausible value for the estimated slope.
-```
 
 
 ## Congratulations!

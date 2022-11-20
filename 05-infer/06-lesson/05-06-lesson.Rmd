@@ -169,7 +169,7 @@ y > z
 y < z
 ```
 
-```{r t-distribution-hint}
+```{r t-distribution-cutoffs-hint}
 
 - The first argument to the `qt()` function is the percentile you want find the cutoff for. For example, `qt(0.5, df = 5)` returns the 50th percentile of the t-distribution with 5 degrees of freedom.
 - The upper bound of the middle 95% is `0.975`.
@@ -498,19 +498,19 @@ textbooks %>%
 textbooks %>% 
   t_test(response = diff,
          conf_int = TRUE,
-         conf.level = 0.90)
+         conf_level = 0.90)
 
 # Same with 95% CI
 textbooks %>% 
   t_test(response = diff,
          conf_int = TRUE,
-         conf.level = 0.95)
+         conf_level = 0.95)
 
 # Same with 99% CI
 textbooks %>% 
   t_test(response = diff,
          conf_int = TRUE,
-         conf.level = 0.99)
+         conf_level = 0.99)
 ```
 
 ### 

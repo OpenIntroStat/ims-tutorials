@@ -16,6 +16,7 @@ library(infer)
 library(openintro)
 library(emo)
 
+
 # knitr options ----------------------------------------------------------------
 
 knitr::opts_chunk$set(fig.align = "center", 
@@ -400,6 +401,7 @@ degrees_of_freedom <- nrow(manhattan) - 1
   
 # Determine the critical value
 t_star <- qt(0.975, df = degrees_of_freedom)
+t_star
 ```
 
 ### 
@@ -526,9 +528,6 @@ quiz(
 ```
 
 
-```{r doctor_visit, exercise=TRUE}
-
-```
 ### Average number of doctor's visits
 
 Next, we construct a bootstrap interval for the average number of doctor's visits during pregnancy.
@@ -663,7 +662,7 @@ Fantastic! Quick mental check before you move on: How would you interpret this i
 
 Suppose now we're interested in the standard deviation of the number of doctor's visits throughout pregnancy.
 
-```{r doctor_4-setup, include=FALSE}
+```{r doctor_setup, include=FALSE}
 # Remove NA visits
 ncbirths_complete_visits <- ncbirths %>%
   filter(!is.na(visits))
@@ -671,7 +670,7 @@ ncbirths_complete_visits <- ncbirths %>%
 
 For the number of doctor's visits, first generate 15000 bootstrap replicates and calculate their standard deviations.
 
-```{r doctor_4, exercise=TRUE}
+```{r doctor_4, exercise=TRUE, exercise.setup="doctor_setup"}
 # Calculate 15000 bootstrap standard deviations of visits
 visit_sd_ci <- ncbirths_complete_visits %>%
   ___ %>%
@@ -704,7 +703,7 @@ visit_sd_ci
 
 Then, calculate a 90% confidence interval for the bootstrap standard deviations using the percentile method.
 
-```{r doctor_5, exercise=TRUE}
+```{r doctor_5, exercise=TRUE, exercise.setup="doctor_setup"}
 # From previous step
 visit_sd_ci <- ncbirths_complete_visits %>%
   specify(response = visits) %>%
@@ -937,7 +936,7 @@ quiz(
 )
 ```
 
-```{r apartments_4-setup, echo=TRUE}
+```{r apartments_4_setup, echo=FALSE}
 # Set seed so that same bootstrap sample can be reused later
 set.seed(20170802)
 # From previous step
@@ -1106,6 +1105,7 @@ weight_mean_ht %>%
     two_sided_p_val = 2 * one_sided_p_val
   )
 ```
+
 
 ## Congratulations!
 
