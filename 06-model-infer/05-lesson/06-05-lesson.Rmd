@@ -45,13 +45,13 @@ Note that when performing inferential analysis on transformed variables, an impo
 ### Interpreting coefficients - linear
 
 
-$Y = \beta\_0 + \beta\_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+$Y = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
 
-$E[Y\_X] = \beta\_0 + \beta\_1 \cdot X$
+$E[Y_X] = \beta_0 + \beta_1 \cdot X$
 
-$E[Y\_{X+1}] = \beta\_0 + \beta\_1 \cdot (X+1)$
+$E[Y_{X+1}] = \beta_0 + \beta_1 \cdot (X+1)$
 
-$\beta\_1 = E[Y\_{X+1}] - E[Y\_X]$
+$\beta_1 = E[Y_{X+1}] - E[Y_X]$
 
 
 Recall that in a simple linear model setting, the true population slope describes the change in expected response when X is one unit larger. That is, for every additional unit of X, we expect that the response variable, Y, is beta-1 units larger, on average.
@@ -61,13 +61,13 @@ Recall that in a simple linear model setting, the true population slope describe
 ### Interpreting coefficients - nonlinear X
 
 
-$Y = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+$Y = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
 
-$E[Y\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+$E[Y_{\ln(X)}] = \beta_0 + \beta_1 \cdot \ln(X)$
 
-$E[Y\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+$E[Y_{\ln(X)+1}] = \beta_0 + \beta_1 \cdot (\ln(X)+1)$
 
-$\beta\_1 = E[Y\_{\ln(X)+1}] - E[Y\_{\ln(X)}]$
+$\beta_1 = E[Y_{\ln(X)+1}] - E[Y_{\ln(X)}]$
 
 
 When X is non-linear, the slope coefficient gives the additional expected increase in non-linear units. Here, when the log of X goes up by one unit, the expected value of Y is beta-1 units larger. This interpretation would work for any function of X. That is, the slope represents the change average expected Y units for a one unit change in whatever function of X you are working with.
@@ -77,13 +77,13 @@ When X is non-linear, the slope coefficient gives the additional expected increa
 ### Interpreting coefficients - nonlinear Y
 
 
-$\ln(Y) = \beta\_0 + \beta\_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+$\ln(Y) = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
 
-$E[\ln(Y)\_X] = \beta\_0 + \beta\_1 \cdot X$
+$E[\ln(Y)_X] = \beta_0 + \beta_1 \cdot X$
 
-$E[\ln(Y)\_{X+1}] = \beta\_0 + \beta\_1 \cdot (X+1)$
+$E[\ln(Y)_{X+1}] = \beta_0 + \beta_1 \cdot (X+1)$
 
-$\beta\_1 = E[\ln(Y)\_{X+1}] - E[\ln(Y)\_X]$
+$\beta_1 = E[\ln(Y)_{X+1}] - E[\ln(Y)_X]$
 
 
 Similarly, when Y is non linear, you can interpret the slope coefficient by saying that a one unit increase in X provides an expected increase of beta-1 in log-Y units. The interpretation will again work for any functional transformation of Y in that the slope coefficient represents an average expected change in the new units given a one unit change in X.
@@ -93,13 +93,13 @@ Similarly, when Y is non linear, you can interpret the slope coefficient by sayi
 ### Interpreting coefficients - both nonlinear
 
 
-$\ln(Y) = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+$\ln(Y) = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
 
-$E[\ln(Y)\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+$E[\ln(Y)_{\ln(X)}] = \beta_0 + \beta_1 \cdot \ln(X)$
 
-$E[\ln(Y)\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+$E[\ln(Y)_{\ln(X)+1}] = \beta_0 + \beta_1 \cdot (\ln(X)+1)$
 
-$\beta\_1 = E[\ln(Y)\_{\ln(X)+1}] - E[\ln(Y)\_{\ln{X}}]$
+$\beta_1 = E[\ln(Y)_{\ln(X)+1}] - E[\ln(Y)_{\ln{X}}]$
 
 
 When the variables have been transformed so that both are on a non-linear scale, you can again model your interpretation based on the units at hand:
@@ -114,13 +114,13 @@ And again, the interpretation in transformed units will hold for any functional 
 
 
 
-$\ln(Y) = \beta\_0 + \beta\_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma\_\epsilon)$
+$\ln(Y) = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
 
-$E[\ln(Y)\_{\ln(X)}] = \beta\_0 + \beta\_1 \cdot \ln(X)$
+$E[\ln(Y)_{\ln(X)}] = \beta_0 + \beta_1 \cdot \ln(X)$
 
-$E[\ln(Y)\_{\ln(X)+1}] = \beta\_0 + \beta\_1 \cdot (\ln(X)+1)$
+$E[\ln(Y)_{\ln(X)+1}] = \beta_0 + \beta_1 \cdot (\ln(X)+1)$
 
-$\beta\_1 = E[\ln(Y)\_{\ln(X)+1}] - E[\ln(Y)\_{\ln{X}}]$
+$\beta_1 = E[\ln(Y)_{\ln(X)+1}] - E[\ln(Y)_{\ln{X}}]$
 
 
 
