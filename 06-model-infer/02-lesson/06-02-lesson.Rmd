@@ -897,7 +897,7 @@ The bootstrapped estimates of `slope`, `boot_slope`, are loaded in your workspac
 - Create the confidence interval of `stat` using `quantile()` and the percentile cutoffs. Your interval ends should be named `lower` and `upper`.
 
 
-```{r ex210_setup, echo=FALSE, eval=FALSE}
+```{r ex210_setup}
 set.seed(4747)
 boot_slope <- twins %>%
   specify(Foster ~ Biological) %>%
