@@ -307,7 +307,7 @@ comics_filtered %>%
 
 ```
 
-```{r hsb2-mutate-num-char-cat-hint}
+```{r ex2-hint}
 Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!
 ```
 
@@ -629,7 +629,7 @@ question("Using the tables above, approximately what proportion of all female ch
 )
 ```
 
-```{r hsb2-mutate-num-char-cat-hint}
+```{r mccp5-hint}
 "Take a look at the table that's conditional on gender!"
 ```
 
@@ -651,7 +651,7 @@ ggplot(comics, aes(x = ___, fill = ___)) +
   geom_bar(position = ___)
 ```
 
-```{r hsb2-mutate-num-char-cat-hint}
+```{r ex4-hint}
 The code for the second plot is the same as the first, except you'll provide a `position = "fill"` argument to `geom_bar()`.
 
 ```
