@@ -405,27 +405,29 @@ We are going to recreate scatterplots from the previous tutorial, jot down your 
 
 First, we will start with the relationship between `obp` and `slg` for all players in the `mlbbat10` dataset.
 
-```{r ex3, exercise = TRUE}
+```{r ex3a, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
   geom_point()
+```
 
+```{r ex3b, exercise = TRUE}
 # Find the correlation for all baseball players
 ___ %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3-hint-1}
+```{r ex3b-hint-1}
 mlbbat10 %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3-hint-2}
+```{r ex3b-hint-2}
 mlbbat10 %>%
   summarize(N = n(), r = cor(___, ___))
 ```
 
-```{r ex3-solution}
+```{r ex3b-solution}
 mlbbat10 %>%
   summarize(N = n(), r = cor(obp, slg))
 ```
@@ -434,38 +436,40 @@ mlbbat10 %>%
 
 Next, let's look at the plot of the filtered `mlbbat10` data, with only the players with at least 200 at-bats.
 
-```{r ex4, exercise = TRUE}
+```{r ex4a, exercise = TRUE}
 # Run this and look at the plot
 mlbbat10 %>% 
   filter(at_bat > 200) %>%
   ggplot(aes(x = obp, y = slg)) + 
   geom_point()
+```
 
+```{r ex4b, exercise = TRUE}
 # Correlation for all players with at least 200 ABs
 ___ %>%
   filter(___) %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4-hint-1}
+```{r ex4b-hint-1}
 mlbbat10 %>%
   filter(___) %>%
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4-hint-2}
+```{r ex4b-hint-2}
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(, ___))
 ```
 
-```{r ex4-hint-3}
+```{r ex4b-hint-3}
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(obp, ___))
 ```
 
-```{r ex4-solution}
+```{r ex4b-solution}
 mlbbat10 %>%
   filter(at_bat >= 200) %>%
   summarize(N = n(), r = cor(obp, slg))
