@@ -188,7 +188,7 @@ Let's get started.
 
 ### Number of males and females admitted
 
-The goal of this exercise is to determine the numbers of male and female applicants who got admitted and rejected. Specifically, we want to find out how many males are admitted and how many are rejected. And similarly we want to find how many females are admitted and how many are rejected.
+The goal of this exercise is to determine the number of male and female applicants who got admitted and rejected. Specifically, we want to find out how many males are admitted and how many are rejected. And similarly we want to find how many females are admitted and how many are rejected.
 
 To do so we will use the `count()` function. In one step, `count()` groups the data and then tallies the number of observations in each level of the grouping variable. These counts are available under a new variable called `n`.
 
@@ -225,7 +225,7 @@ Now, use this new function and your knowledge of creating new variables and filt
 To accomplish this task you will need to take the following steps: 
 
 1. Use `group_by()` to group the data by gender.
-2. Use `mutate()` to create the a new variable named`prop`, calculated as the proportion of males and females admitted. Remember, proportions for each row of the data frame we create can be calculated as `n / sum(n)`! 
+2. Use `mutate()` to create a new variable named`prop`, calculated as the proportion of males and females admitted. Remember, proportions for each row of the data frame we create can be calculated as `n / sum(n)`! 
 3. Use `filter()` to keep the data only for those who were admitted so that the resulting data frame only contains the proportions of males and females who were admitted.
 
 Then answer the following question: *Which gender had a higher admission rate, male or female?*
