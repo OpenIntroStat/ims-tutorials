@@ -145,7 +145,7 @@ Categorical variables that have ordered levels are called **ordinal**.
 
 Think about a survey question where you're asked how satisfied you are with the customer service you received and the options are very unsatisfied, unsatisfied, neutral, satisfied, and very satisfied. These levels have an inherent ordering, hence the variable would be called ordinal.
 
-If the levels of a categorical variable do not have an inherent ordering to them, then the variable is simply called categorical. For example, do you consume caffeine or not?
+If the levels of a categorical variable do not have an inherent ordering to them, then the variable is simply called **nominal**. For example, do you consume caffeine or not?
 
 ### Variables in `hsb2`
 
