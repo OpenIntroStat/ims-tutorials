@@ -270,7 +270,7 @@ p1 / p2
 
 One approach says that there are two mechanisms going on: one generating the zeros and the other generating the non-zeros, so we will analyze these two groups separately. A simpler approach is to think of the variable as two level categorical variable (zero or not zero) and to treat it like a categorical variable.
 
-```{r 9, fig.asp = 0.5}
+```{r 9, fig.asp = 0.5, warning=FALSE}
 email2 <- email %>%
   mutate(zero = exclaim_mess == 1, log_exclaim_mess = log(exclaim_mess))
 
@@ -285,7 +285,7 @@ email2 %>%
 
 To do so we create a new variable, we'll call it `zero` and use it to color in our bar chart.
 
-```{r facet, fig.asp = 0.5}
+```{r facet, fig.asp = 0.5, echo=TRUE}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
   ggplot(aes(x = zero, fill = zero)) +
@@ -299,7 +299,7 @@ In the resulting plot, yes, we've lost a lot of information. But it's become ver
 
 Another way that we've seen is using a stacked bar chart. For that plot, you move the second variable from the facet layer to the fill argument inside the aesthetics function. 
 
-```{r}
+```{r, echo=TRUE}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
   ggplot(aes(x = zero, fill = spam)) +
@@ -308,7 +308,7 @@ email %>%
 
 The other consideration you have to make is if you're more interested in counts or proportions. If the latter, you'll want to normalize the plot, which you can do by adding the position equals fill argument to `geom_bar()`. The result is a series of conditional proportions, where you're conditioning on whichever variable you're in.
 
-```{r}
+```{r, echo=TRUE}
 email %>%
   mutate(zero = exclaim_mess == 0) %>%
   ggplot(aes(x = zero, fill = spam)) +
@@ -450,7 +450,7 @@ When you have a specific question about a dataset, you can find your way to an a
 
 This can be answered with the following chain:
 
-```{r chain}
+```{r chain, echo=TRUE}
 email %>%
    filter(spam == "not spam") %>%
    group_by(to_multiple) %>%
@@ -690,7 +690,7 @@ comics %>%
   count(id)
 ```
 
-On the bar plot, it's quite difficult to tell how the `NA` group compares to the `Public` group, but this comparison is much easier in the bar plot. Also `Unknown` is barely visible in the bar plot and almost not there in the pie chart.
+On the pie chart, it's quite difficult to tell how the `NA` group compares to the `Public` group, but this comparison is much easier in the bar plot. Also `Unknown` is barely visible in the bar plot and almost not there in the pie chart.
 
 ```{r out.width = "100%"}
 p1 <- comics %>%
@@ -761,7 +761,7 @@ ggplot(comics, aes(x = appearances, y = id)) +
 
 In the third lesson, we discussed the common numerical measures of a distribution: measures of center, variability, shape, plus the presence of outliers. Our life was made much easier by using the combination of `group_by()` and `summarize()` to compute statistics on different groups within our data.
 
-```{r}
+```{r, echo=TRUE}
 comics %>%
   group_by(id) %>%
   summarise(
