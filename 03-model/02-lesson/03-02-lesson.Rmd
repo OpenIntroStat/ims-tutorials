@@ -739,7 +739,7 @@ knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
 In other cases it may not be so obvious what confounding variables are driving the spurious correlation. This plot shows that as the number of lemons imported into the U.S. from Mexico has increased over time, the number of U.S. highway fatalities has decreased. The relationship appears to be strong, but there is no plausible causative mechanism that could explain the relationship. 
 
 ```{r img11, out.width=500}
-knitr::include_graphics("http://www.tutor2u.net/_legacy/blog/files//blog-correlation-291209.gif")
+knitr::include_graphics("http://osu-wams-blogs-uploads.s3.amazonaws.com/blogs.dir/1015/files/2014/02/ci700332kn00001.gif")
 ```
 
 Now it's time for you to get your hands dirty with some truly spurious correlations.
