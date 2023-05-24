@@ -189,19 +189,19 @@ Answer the following question based on the plots below.
 
 ```{r mc3-pre, fig.width = 6, fig.height = 5}
 # Create hist of horsepwr with bw of 3
-p1 <- cars %>%
+p1 <- cars |>
   ggplot(aes(horsepwr)) +
   geom_histogram(binwidth = 3) +
   labs(title = "Plot A, bw = 3")
 
 # Create hist of horsepwr with bw of 30
-p2 <- cars %>%
+p2 <- cars |>
   ggplot(aes(horsepwr)) +
   geom_histogram(binwidth = 30) +
   labs(title = "Plot B, bw = 30")
 
 # Create hist of horsepwr with bw of 60
-p3 <- cars %>%
+p3 <- cars |>
   ggplot(aes(horsepwr)) +
   geom_histogram(binwidth = 60) +
   labs(title = "Plot C, bw = 60")
@@ -312,12 +312,12 @@ The boxplot is based around three summary statistics:
 ```{r box1q, fig.height=6, fig.width=6}
 set.seed(234)
 
-common_cyl <- cars %>%
-  filter(ncyl %in% c("4", "6", "8")) %>%
+common_cyl <- cars |>
+  filter(ncyl %in% c("4", "6", "8")) |>
   sample_n(100)
 
 split_dotplot <- function(split_val) {
-  common_cyl <- common_cyl %>%
+  common_cyl <- common_cyl |>
     mutate(col = city_mpg <= split_val)
 
   ggplot(data = common_cyl, 
@@ -610,7 +610,7 @@ ggplot(data = cars, aes(x = ___)) +
   ___
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(___)
 
 # Construct boxplot of msrp using the reduced dataset
@@ -620,12 +620,12 @@ ggplot(data = ___, aes(___)) +
 
 ```{r ex5-hint-1}
 # Construct boxplot of msrp
-cars %>%
+cars |>
   ggplot(aes(x = msrp)) +
   geom_boxplot()
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(msrp < ___)
   
 # Construct boxplot of msrp using the reduced dataset
@@ -635,12 +635,12 @@ ggplot(data = ___, aes(___)) +
 
 ```{r ex5-hint-2}
 # Construct boxplot of msrp
-cars %>%
+cars |>
   ggplot(aes(x = msrp)) +
   geom_boxplot()
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(msrp < 100000)
   
 # Construct boxplot of msrp using the reduced dataset
@@ -650,12 +650,12 @@ ggplot(data = ___, aes(___)) +
 
 ```{r ex5-hint-3}
 # Construct boxplot of msrp
-cars %>%
+cars |>
   ggplot(aes(x = msrp)) +
   geom_boxplot()
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(msrp < 100000)
   
 # Construct boxplot of msrp using the reduced dataset
@@ -665,27 +665,27 @@ ggplot(data = cars_no_out, aes(___)) +
 
 ```{r ex5-hint-4}
 # Construct boxplot of msrp
-cars %>%
+cars |>
   ggplot(aes(x = msrp)) +
   geom_boxplot()
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(msrp < 100000)
   
 # Construct boxplot of msrp using the reduced dataset
 ggplot(data = cars_no_out, aes(x = msrp)) + 
-  + geom_boxplot()
+  geom_boxplot()
 ```
 
 ```{r ex5-solution}
 # Construct boxplot of msrp
-cars %>%
+cars |>
   ggplot(aes(x = msrp)) +
   geom_boxplot()
 
 # Exclude outliers from data
-cars_no_out <- cars %>%
+cars_no_out <- cars |>
   filter(msrp < 100000)
   
 # Construct boxplot of msrp using the reduced dataset
@@ -780,7 +780,7 @@ First, let's see how many unique values number of cylinders there are in the dat
 We can use the `count()` function to find the unique values for a variable and also see how many observations there are for each value. 
 
 ```{r echo = TRUE}
-cars %>%
+cars |>
   count(ncyl)
 ```
 
@@ -796,7 +796,7 @@ Thus, the `%in%` operator always comes with the `c()` function, which makes the 
 Putting this all together, our code looks like: 
 
 ```{r ex2-setup, echo=FALSE}
-common_cyl <- cars %>%
+common_cyl <- cars |>
   filter(ncyl %in% c(4, 6, 8))
 ```
 
@@ -848,8 +848,8 @@ This workflow, however, is a bit inefficient, since we have no real interest in 
 We can solve this by linking these two components into a continuous data pipeline, like the one below.
 
 ```{r dp2, echo=TRUE, eval = FALSE}
-cars %>%
-  filter(eng_size < 2.0) %>%
+cars |>
+  filter(eng_size < 2.0) |>
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram()
 ```
@@ -872,7 +872,7 @@ Essentially a ridge plot separates each density plot, creating the impression of
 To create a ridge plot, you use the **ggridges** package, and the `geom_density_ridges()` function.
 
 ```{r, echo = TRUE}
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = city_mpg, y = as.factor(ncyl), fill = as.factor(ncyl))) +
   geom_density_ridges()
 ```
@@ -888,7 +888,7 @@ The `labs()` function controls the labels of the different plot aesthetics.
 To change the `y` axis label, we specify a new name inside quotations (`""`), like so: 
 
 ```{r, echo = TRUE}
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = city_mpg, y = as.factor(ncyl), fill = as.factor(ncyl))) +
   geom_density_ridges() + 
   labs(y = "Number of Cylinders")
@@ -900,7 +900,7 @@ To remove the legend, you add a `theme()` to the `ggplot()`.
 The theme specifies the `legend.position` and sets it to `"hide"`. 
 
 ```{r, echo = TRUE}
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = city_mpg, y = as.factor(ncyl), fill = as.factor(ncyl))) +
   geom_density_ridges() + 
   labs(y = "Number of Cylinders",
@@ -929,7 +929,7 @@ The code for this would look something like:
 
 
 ```{r pf3v, echo=TRUE}
-cars %>% 
+cars |> 
   ggplot(aes(x = msrp)) +
   geom_density() +
   facet_grid(vars(pickup), vars(rear_wheel))
@@ -939,7 +939,7 @@ Within the `facet_wrap()` function, whichever variable you put first will go in 
 Unfortunately, this plot is difficult to interpret since it doesn't remind us which variable is on the rows versus columns. We can solve this by adding an option to the facet grid layer: labeller is equal to `label_both`.
 
 ```{r labeller, echo=TRUE}
-cars %>% 
+cars |> 
   ggplot(aes(x = msrp)) +
   geom_density() +
   facet_grid(pickup ~ rear_wheel, labeller = label_both)
@@ -953,7 +953,7 @@ The code below should look familiar, with one addition: a second variable as an 
 When we add a second variable, the `count()` function will count the number of observations at the intersection of each of the two variables (e.g. non-rear wheel drive pickups). 
 
 ```{r echo = TRUE}
-cars %>% 
+cars |> 
   count(rear_wheel, pickup)
 ```
 
@@ -996,14 +996,14 @@ common_cyl <- filter(cars, ncyl %in% c(4, 6, 8))
 
 ```{r ex7, exercise = TRUE}
 # Facet histograms using hwy mileage and ncyl
-common_cyl %>%
+common_cyl |>
   ggplot(aes(x = ___)) +
   geom_histogram() +
   facet_grid(vars(___), vars(___), labeller = ___)
 ```
 
 ```{r ex7-hint-1}
-common_cyl %>%
+common_cyl |>
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
   facet_grid(vars(___), vars(___), labeller = ___)
@@ -1011,7 +1011,7 @@ common_cyl %>%
 ```
 
 ```{r ex7-hint-2}
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
   facet_grid(vars(ncyl), vars(___), labeller = ___)
@@ -1019,7 +1019,7 @@ common_cyl %>%
 ```
 
 ```{r ex7-hint-3}
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
   facet_grid(vars(ncyl), vars(suv), labeller = ___)
@@ -1028,7 +1028,7 @@ common_cyl %>%
 
 ```{r ex7-solution}
 # Facet histograms using hwy mileage and ncyl
-common_cyl %>% 
+common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
   facet_grid(vars(ncyl), vars(suv), labeller = label_both)
