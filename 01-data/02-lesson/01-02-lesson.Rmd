@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # Used in some exercises
 load("data/ucb_admit.RData")
 
-ucb_admission_counts <- ucb_admit %>%
+ucb_admission_counts <- ucb_admit |>
   count(Gender, Admit)
 ```
 
@@ -196,13 +196,13 @@ Pass the `Gender` and `Admit` columns from the `ucb_admit` dataset (which is alr
 
 ```{r count-male, exercise=TRUE}
 # Count number of male and female applicants admitted
-___ %>%
+___ |>
   count(___, ___)
 ```
 
 ```{r count-male-solution}
 # Count number of male and female applicants admitted
-ucb_admit %>%
+ucb_admit |>
   count(Gender, Admit)
 ```
 
@@ -215,8 +215,8 @@ Proportions for each row of the data frame we created in the previous exercise c
 The `group_by()` function takes as arguments the column names of the **categorical** variables for which you want to perform grouped operations. We add this grouping into our data wrangling pipeline, by inserting a `group_by()` statement before we perform our subsequent tasks. For example, we could have found the same admission table as before, if we first grouped the data based on `Gender`, and then counted how many students were admitted and rejected. This process would look like this:  
 
 ```{r grouped-count-male, exercise = TRUE}
-ucb_admit %>% 
-  group_by(Gender) %>% 
+ucb_admit |> 
+  group_by(Gender) |> 
   count(Admit)
 ```
 
@@ -231,51 +231,51 @@ To accomplish this task you will need to take the following steps:
 Then answer the following question: *Which gender had a higher admission rate, male or female?*
 
 ```{r gender-male, exercise=TRUE}
-ucb_admission_counts %>%
+ucb_admission_counts |>
   # Group by gender
-  ___(___) %>%
+  ___(___) |>
   # Create new variable
-  mutate(prop = ___ / ___) %>%
+  mutate(prop = ___ / ___) |>
   # Filter for admitted
   ___(___ == "___")
 ```
 
 ```{r gender-male-hint-1}
-ucb_admission_counts %>%
+ucb_admission_counts |>
   # Group by gender
-  group_by(Gender) %>%
+  group_by(Gender) |>
   # Create new variable
-  mutate(prop = ___ / ___) %>%
+  mutate(prop = ___ / ___) |>
   # Filter for admitted
   ___(___ == "___")
 ```
 
 ```{r gender-male-hint-2}
-ucb_admission_counts %>%
+ucb_admission_counts |>
   # Group by gender
-  group_by(Gender) %>%
+  group_by(Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for admitted
   ___(___ == "___")
 ```
 
 ```{r gender-male-hint-3}
-ucb_admission_counts %>%
+ucb_admission_counts |>
   # Group by gender
-  group_by(Gender) %>%
+  group_by(Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for admitted
   filter(Admit == "Admitted")
 ```
 
 ```{r gender-male-solution}
-ucb_admission_counts %>%
+ucb_admission_counts |>
   # Group by gender
-  group_by(Gender) %>%
+  group_by(Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for admitted
   filter(Admit == "Admitted")
 ```
@@ -287,7 +287,7 @@ Finally we'll make a table similar to the one we constructed earlier, except we'
 Proportions for each row of the data frame we create can be calculated as `n / sum(n)`. Note that since the data are grouped by department **and**  gender, `sum(n)` will be calculated for males and females separately **for each department**.
 
 ```{r prepare-gender2}
-ucb_admission_counts <- ucb_admit %>%
+ucb_admission_counts <- ucb_admit |>
   # Counts by department, then gender, then admission status
   count(Dept, Gender, Admit)
 ```
@@ -295,7 +295,7 @@ ucb_admission_counts <- ucb_admit %>%
 First, let's make a new object named `ucb_admission_counts` to store the `count()`s of `ucb_admit` by department, gender, and admission status. In this case, it doesn't matter what order you place `Dept`, `Gender`, or `Admit` inside of `count()`! 
 
 ```{r gender-male2, exercise=TRUE, exercise.setup="prepare-gender2"}
-ucb_admission_counts <- ucb_admit %>%
+ucb_admission_counts <- ucb_admit |>
   # Counts by department, gender, and admission status
   ___(___, ___, ___)
 
@@ -304,7 +304,7 @@ ucb_admission_counts
 ```
 
 ```{r gender-male2-solution}
-ucb_admission_counts <- ucb_admit %>%
+ucb_admission_counts <- ucb_admit |>
   # Counts by department, then gender, then admission status
   count(Dept, Gender, Admit)
 
@@ -319,61 +319,61 @@ Next, create a table with the proportions of male students admitted across depar
 3. Use `filter()` to filter the rows for those who are males **and** those who were admitted. To "join" our filters we insert a comma between the filters we are interested (e.g. `filter(grade == "middle school", class == "Music"))`). 
 
 ```{r gender-male3, exercise=TRUE, exercise.setup="prepare-gender2"}
- ucb_admission_counts  %>%
+ ucb_admission_counts  |>
   # Group by department, then gender
-  ___(___, ___) %>%
+  ___(___, ___) |>
   # Create new variable
-  ___(prop = ___) %>%
+  ___(prop = ___) |>
   # Filter for male and admitted
   ___(___, ___)
 ```
 
 ```{r gender-male3-hint-1}
- ucb_admission_counts  %>%
+ ucb_admission_counts  |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Create new variable
-  ___(prop = ___) %>%
+  ___(prop = ___) |>
   # Filter for male and admitted
   ___(___, ___)
 ```
 
 ```{r gender-male3-hint-2}
- ucb_admission_counts  %>%
+ ucb_admission_counts  |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   ___(___, ___)
 ```
 
 ```{r gender-male3-hint-3}
- ucb_admission_counts  %>%
+ ucb_admission_counts  |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   filter(Gender == "Male", ___)
 ```
 
 ```{r gender-male3-hint-4}
- ucb_admission_counts  %>%
+ ucb_admission_counts  |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   filter(Gender == "Male", Admit == "Admitted")
 ```
 
 ```{r gender-male3-solution}
-ucb_admission_counts  %>%
+ucb_admission_counts  |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   filter(Gender == "Male", Admit == "Admitted")
 ```
@@ -381,13 +381,13 @@ ucb_admission_counts  %>%
 ### Admission rates for males across departments
 
 ```{r prepare-gender3}
-perc_admit_by_dept <- ucb_admit %>%
+perc_admit_by_dept <- ucb_admit |>
   # Group by department, then gender
-  group_by(Dept, Gender) %>%
+  group_by(Dept, Gender) |>
   # Table of counts of admission status and gender and department
-  count(Admit) %>%
+  count(Admit) |>
   # Create new variable
-  mutate(prop = n / sum(n)) %>%
+  mutate(prop = n / sum(n)) |>
   # Filter for male and admitted
   filter(Admit == "Admitted")
 ```
