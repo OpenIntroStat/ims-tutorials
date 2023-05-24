@@ -401,7 +401,7 @@ quiz(
 ), caption = "")
 ```
 
-The final result from the previous exercise is available in your workspace as `perc_admit_by_dept`. Feel free to inspect the table to address the question above.  
+The final result from the previous exercise is available in your workspace as `perc_admit_by_dept`. Feel free to inspect the table and/or rerun the the above code without the gender filter to address the question above.  
 
 ```{r gender-male4, exercise=TRUE, exercise.setup="prepare-gender3"}
 
