@@ -21,10 +21,12 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning = FALSE)
 
-anscombe <- datasets::anscombe %>%
-  mutate(id = 1:nrow(.)) %>%
-  gather(key = "key", value = "val", -id) %>%
-  separate(key, into = c("variable", "set"), sep = 1) %>%
+ansc_rows <- nrow(anscombe)
+
+anscombe <- datasets::anscombe |>
+  mutate(id = 1:ansc_rows) |>
+  gather(key = "key", value = "val", -id) |>
+  separate(key, into = c("variable", "set"), sep = 1) |>
   spread(key = variable, value = val)
 ```
 
@@ -54,8 +56,8 @@ mu <- c(mu1, mu2) # Mean
 
 cor_plot <- function(n, rho) {
   sigma <- matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2), 2) # Covariance matrix
-  sim <- MASS::mvrnorm(n, mu = mu, Sigma = sigma) %>%
-    as.data.frame() %>%
+  sim <- MASS::mvrnorm(n, mu = mu, Sigma = sigma) |>
+    as.data.frame() |>
     rename(y = V1, x = V2)
   ggplot(sim, aes(x = x, y = y)) + 
     geom_point() + 
@@ -111,7 +113,7 @@ cor_plot(n, rho = -0.5)
 It is crucial to remember that the correlation coefficient only captures the strength of the *linear* relationship between two variables. It is quite common to encounter variables that are strongly-related, but in a non-linear way. Blindly computing and reporting the correlation between such variables **does not** yield meaningful results. 
 
 ```{r plot2}
-sim <- data.frame(x = rnorm(n)) %>%
+sim <- data.frame(x = rnorm(n)) |>
   mutate(y = 5 * x^2 + rnorm(n, sd = 1))
 
 ggplot(sim, aes(x = x, y = y)) + 
@@ -127,16 +129,16 @@ Here, this scatterplot shows a clear, quadratic relationship. To simply interpre
 Here is an example of real data from a 10-mile run. The pace of the top 10 finishers in each age group are plotted against their age. Note how the relationship between the pace and age is non-linear: 25-year-olds tend to actually be faster than 20-year-olds, but as people age beyond their thirties, they tend to get slower. This pattern is present for both men and women. 
 
 ```{r code1}
-run09 %>%
-  filter(div_place <= 10) %>%
+run09 |>
+  filter(div_place <= 10) |>
   ggplot(aes(x = age, y = pace, color = gender)) + 
   geom_point()
 ```
 
 ```{r}
-cor <- run09 %>%
-  filter(div_place <= 10) %>%
-  summarize(cor(pace, age)) %>% 
+cor <- run09 |>
+  filter(div_place <= 10) |>
+  summarize(cor(pace, age)) |> 
   pull()
 ```
 
@@ -211,36 +213,36 @@ Then, you will use `cor()` to compute the correlation between the birthweight (`
 
 ```{r ex1, exercise = TRUE}
 # Compute correlation of birthweight and mother's age
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___))
 
 # Compute correlation of birthweight and gestation for all non-missing pairs
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___, use = ___))
 ```
 
 ```{r ex1-hint-1}
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, mage))
 ```
 
 ```{r ex1-hint-2}
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___, use = "pairwise.complete.obs"))
 ```
 
 ```{r ex1-solution}
 # Compute correlation
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, mage))
 
 # Compute correlation for all non-missing pairs
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, weeks, use = "pairwise.complete.obs"))
 
@@ -263,8 +265,8 @@ Here we see four datasets, each having a very different graphical presentation. 
 The first set looks the most like "real data." Here we see a positive, linear, moderately strong relationship. As you gain experience working with real data, you will see lots of scatterplots that look similar to this one. Here, the correlation coefficient of 0.82 is giving us an accurate measurement of the strength of the linear relationship between $x$ and $y$. 
 
 ```{r ans2}
-anscombe %>%
-  filter(set == 1) %>%
+anscombe |>
+  filter(set == 1) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -272,8 +274,8 @@ anscombe %>%
 However, in the next set we see something quite different. The relationship here is clearly non-linear. But note also that while the value of the correlation coefficient is 0.82, the correlation---in an intuitive sense---is *perfect*. That is, knowing the value of $x$ tells you the value of $y$ exactly---there is no statistical noise. It's just that the relationship is not linear. 
 
 ```{r ans3}
-anscombe %>%
-  filter(set == 2) %>%
+anscombe |>
+  filter(set == 2) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -282,8 +284,8 @@ In the third data set, we have an outlier. Here again, our eyes tell us that wit
 
 
 ```{r ans4}
-anscombe %>%
-  filter(set == 3) %>%
+anscombe |>
+  filter(set == 3) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -291,8 +293,8 @@ anscombe %>%
 Finally, in the fourth data set we see a pathological example with almost the opposite problem. In the previous plot, we saw that the presence of a single outlier had lowered the correlation from 1 to 0.82. In this plot, the presence of a single outlier raises the correlation from undefined to 0.82. Note that here, with the exception of the outlier, knowing $x$ doesn't tell you anything about $y$. It is only the outlier that gives you the appearance of a correlation, but that correlation is very spurious! 
 
 ```{r ans5}
-anscombe %>%
-  filter(set == 4) %>%
+anscombe |>
+  filter(set == 4) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -325,8 +327,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 
 ```{r ex2, exercise = TRUE}
 # Compute properties of anscombe
- anscombe %>%
-  group_by(___) %>%
+ anscombe |>
+  group_by(___) |>
   summarize(
     N = ___, 
     mean_of_x = ___, 
@@ -338,14 +340,14 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 ```
 
 ```{r ex2-hint-1}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   ...
 ```
 
 ```{r ex2-hint-2}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     ...
@@ -353,8 +355,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 ```
 
 ```{r ex2-hint-3}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     mean_of_x = mean(x), 
@@ -364,8 +366,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 
 ```{r ex2-solution}
 # Compute properties of anscombe
-anscombe %>%
-  group_by(set) %>%
+anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     mean_of_x = mean(x), 
@@ -413,22 +415,22 @@ ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
 
 ```{r ex3b, exercise = TRUE}
 # Find the correlation for all baseball players
-___ %>%
+___ |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex3b-hint-1}
-mlbbat10 %>%
+mlbbat10 |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex3b-hint-2}
-mlbbat10 %>%
+mlbbat10 |>
   summarize(N = n(), r = cor(___, ___))
 ```
 
 ```{r ex3b-solution}
-mlbbat10 %>%
+mlbbat10 |>
   summarize(N = n(), r = cor(obp, slg))
 ```
 
@@ -438,40 +440,40 @@ Next, let's look at the plot of the filtered `mlbbat10` data, with only the play
 
 ```{r ex4a, exercise = TRUE}
 # Run this and look at the plot
-mlbbat10 %>% 
-  filter(at_bat > 200) %>%
+mlbbat10 |> 
+  filter(at_bat > 200) |>
   ggplot(aes(x = obp, y = slg)) + 
   geom_point()
 ```
 
 ```{r ex4b, exercise = TRUE}
 # Correlation for all players with at least 200 ABs
-___ %>%
-  filter(___) %>%
+___ |>
+  filter(___) |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex4b-hint-1}
-mlbbat10 %>%
-  filter(___) %>%
+mlbbat10 |>
+  filter(___) |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
 ```{r ex4b-hint-2}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(, ___))
 ```
 
 ```{r ex4b-hint-3}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(obp, ___))
 ```
 
 ```{r ex4b-solution}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(obp, slg))
 ```
 
@@ -485,36 +487,36 @@ ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
   geom_point() 
 
 # Correlation of body dimensions
-___ %>%
-  group_by(___) %>%
+___ |>
+  group_by(___) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-1}
-bdims %>%
-  group_by(___) %>%
+bdims |>
+  group_by(___) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-2}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-3}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = n(), 
             r = cor(___, ___))
 ```
 
 ```{r ex5-solution}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = n(), 
             r = cor(hgt, wgt))
 ```
@@ -531,35 +533,35 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   scale_y_log10()
 
 # Correlation among mammals, with and without log
-___ %>%
+___ |>
   summarize(N = ___, 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-1}
-mammals %>%
+mammals |>
   summarize(N = ___, 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-2}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-3}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-solution}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(body_wt), log(brain_wt)))
@@ -783,8 +785,8 @@ ggplot(data = noise, aes(x = x, y = y)) +
 
 ```{r ex8, exercise = TRUE, exercise.setup="prepare-noise"}
 # Compute correlations for each dataset
-noise_summary <- noise %>%
-  group_by(___) %>%
+noise_summary <- noise |>
+  group_by(___) |>
   summarize(N = n(), 
             spurious_cor = cor(___, ___))
 
@@ -792,15 +794,15 @@ noise_summary
 ```
 
 ```{r ex8-hint-1}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(___, ___))
 ```
 
 ```{r ex8-hint-2}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(x, y))
 ```
@@ -808,25 +810,25 @@ noise_summary <- noise %>%
 3. Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
 
 ```{r prepare-noise-summary, exercise.setup="prepare-noise"}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(x, y))
 ```
 
 ```{r ex9, exercise = TRUE, exercise.setup="prepare-noise-summary"}
 # Isolate sets with correlations above 0.2 in absolute strength
-noise_summary %>%
+noise_summary |>
   filter(abs(___) > ___)
 ```
 
 ```{r ex9-hint}
-noise_summary %>%
+noise_summary |>
   filter(abs(spurious_cor) > ___)
 ```
 
 ```{r ex9-solution}
-noise_summary %>%
+noise_summary |>
   filter(abs(spurious_cor) > 0.2)
 ```
 

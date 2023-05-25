@@ -32,10 +32,10 @@ knitr::opts_chunk$set(
 
 # data prep --------------------------------------------------------------------
 
-SAT <- mosaicData::SAT %>%
+SAT <- mosaicData::SAT |>
   rename(total = sat)
 
-mariokart <- mariokart %>%
+mariokart <- mariokart |>
   filter(total_pr < 100)
 ```
 
@@ -184,7 +184,7 @@ summary(mod)
 
 ```{r ex1-hint-2}
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
 ```
 
@@ -198,7 +198,7 @@ mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
 summary(mod)
 
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
   
 # compute new model
@@ -431,7 +431,7 @@ How about the percentage  (`frac`tion) of students eligible for taking the SAT? 
 First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. 
 
 ```{r echo=TRUE}
-SAT_bin <- SAT %>%
+SAT_bin <- SAT |>
   mutate(sat_bin = cut(frac, 3))
 ``` 
 

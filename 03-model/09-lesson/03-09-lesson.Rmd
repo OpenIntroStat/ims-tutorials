@@ -59,7 +59,7 @@ ggplot(data = heart_transplant, aes(x = age, y = survived)) +
 First, we have a technical problem, in that the levels of our response variable are labels, and you can't build a regression model to a variable that consists of words! We can get around this by creating a new variable that is binary (either 0 or 1), based on whether the patient `survived` to the end of the study. We call this new variable `is_alive`.
 
 ```{r echo=TRUE}
-heart_transplant <- heart_transplant %>%
+heart_transplant <- heart_transplant |>
   mutate(is_alive = ifelse(survived == "alive", 1, 0))
 ```
 
@@ -188,7 +188,7 @@ data_space +
 ```
 
 ```{r ex2-hint-1}
-MedGPA_middle <- MedGPA %>%
+MedGPA_middle <- MedGPA |>
   filter(GPA >= ___, GPA <= ___)
 ```
 
@@ -199,7 +199,7 @@ data_space +
 
 ```{r ex2-solution}
 # filter
-MedGPA_middle <- MedGPA %>%
+MedGPA_middle <- MedGPA |>
   filter(GPA >= 3.375, GPA <= 3.770)
 
 # scatterplot with jitter
@@ -295,8 +295,8 @@ How can we visually assess how well the logistic model fits the data? Since the 
 
 
 ```{r heart-data-binned, echo=TRUE}
-heart_breaks <- heart_transplant %>%
-  pull(age) %>%
+heart_breaks <- heart_transplant |>
+  pull(age) |>
   quantile(probs = 0:7/7)
 
 data_binned_space <- data_space + 
@@ -403,9 +403,9 @@ Note that the left hand side is the expected probability $y$ of being accepted t
 mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
 
 gpa_bins <- quantile(MedGPA$GPA, probs = 0:6/6)
-MedGPA_binned <- MedGPA %>%
-  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) %>%
-  group_by(bin) %>%
+MedGPA_binned <- MedGPA |>
+  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) |>
+  group_by(bin) |>
   summarize(mean_GPA = mean(GPA), 
             acceptance_rate = mean(Acceptance))
 ```
@@ -430,7 +430,7 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = acceptance_rate
 ```
 
 ```{r ex5-hint-2}
-MedGPA_plus <- mod %>%
+MedGPA_plus <- mod |>
   augment(type.predict = "response")
 ```
 
@@ -446,7 +446,7 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = acceptance_rate
   geom_line()
 
 # augmented model
-MedGPA_plus <- mod %>%
+MedGPA_plus <- mod |>
   augment(type.predict = "response")
 
 # logistic model on probability scale
@@ -469,8 +469,8 @@ $$
 Here, we compute the fitted probabilities using the `augment()` function.
 
 ```{r echo=TRUE}
-heart_transplant_plus <- mod_heart %>%
-  augment(type.predict = "response") %>%
+heart_transplant_plus <- mod_heart |>
+  augment(type.predict = "response") |>
   mutate(y_hat = .fitted)
 ```
 
@@ -499,7 +499,7 @@ $$
 Thus, if the probability of survival is 75%, then the odds of survival are 3:1, since you are three times more likely to survive than you are to die. Odds are commonly used to express uncertainty in a variety of contexts, most notably gambling.
 
 ```{r echo=TRUE}
-heart_transplant_plus <- heart_transplant_plus %>%
+heart_transplant_plus <- heart_transplant_plus |>
   mutate(odds_hat = y_hat / (1 - y_hat))
 ``` 
 
@@ -521,7 +521,7 @@ logit(\hat{y}) = \log{ \left[ \frac{\hat{y}}{1-\hat{y}} \right] } = \hat{\beta}_
 $$
 
 ```{r echo=TRUE}
-heart_transplant_plus <- heart_transplant_plus %>%
+heart_transplant_plus <- heart_transplant_plus |>
   mutate(log_odds_hat = log(odds_hat))
 ``` 
 
@@ -599,13 +599,13 @@ Already loaded for you are two data frames: the `MedGPA_binned` data frame conta
 mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
 
 gpa_bins <- quantile(MedGPA$GPA, probs = 0:6/6)
-MedGPA_binned <- MedGPA %>%
-  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) %>%
-  group_by(bin) %>%
+MedGPA_binned <- MedGPA |>
+  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) |>
+  group_by(bin) |>
   summarize(mean_GPA = mean(GPA), 
             acceptance_rate = mean(Acceptance))
             
-MedGPA_plus <- mod %>%
+MedGPA_plus <- mod |>
   augment(type.predict = "response")
 ```
 
@@ -627,7 +627,7 @@ data_space +
 
 
 ```{r ex6-hint-1}
-MedGPA_binned <- MedGPA_binned %>%
+MedGPA_binned <- MedGPA_binned |>
   mutate(odds = acceptance_rate / (1 - acceptance_rate))
 ```
 
@@ -638,13 +638,13 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = odds)) +
 ```
 
 ```{r ex6-hint-3}
-MedGPA_plus <- MedGPA_plus %>%
+MedGPA_plus <- MedGPA_plus |>
   mutate(odds_hat = .fitted / (1 - .fitted))
 ```
 
 ```{r ex6-solution}
 # compute odds for bins
-MedGPA_binned <- MedGPA_binned %>%
+MedGPA_binned <- MedGPA_binned |>
   mutate(odds = acceptance_rate / (1 - acceptance_rate))
 
 # plot binned odds
@@ -653,7 +653,7 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = odds)) +
   geom_line()
 
 # compute odds for observations
-MedGPA_plus <- MedGPA_plus %>%
+MedGPA_plus <- MedGPA_plus |>
   mutate(odds_hat = .fitted / (1 - .fitted))
 
 # logistic model on odds scale
@@ -689,13 +689,13 @@ Thus, the exponentiated coefficient $\beta_1$ tells us how the expected *odds* c
 mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
 
 gpa_bins <- quantile(MedGPA$GPA, probs = 0:6/6)
-MedGPA_binned <- MedGPA %>%
-  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) %>%
-  group_by(bin) %>%
+MedGPA_binned <- MedGPA |>
+  mutate(bin = cut(GPA, breaks = gpa_bins, include.lowest = TRUE)) |>
+  group_by(bin) |>
   summarize(mean_GPA = mean(GPA), 
             acceptance_rate = mean(Acceptance))
             
-MedGPA_plus <- mod %>%
+MedGPA_plus <- mod |>
   augment(type.predict = "response")
 ```
 
@@ -715,7 +715,7 @@ data_space +
 ```
 
 ```{r ex7-hint-1}
-MedGPA_binned <- MedGPA_binned %>%
+MedGPA_binned <- MedGPA_binned |>
   mutate(log_odds = log(acceptance_rate / (1 - acceptance_rate)))
 ```
 
@@ -726,13 +726,13 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = log_odds)) +
 ```
 
 ```{r ex7-hint-3}
-MedGPA_plus <- MedGPA_plus %>%
+MedGPA_plus <- MedGPA_plus |>
   mutate(log_odds_hat = log(.fitted / (1 - .fitted)))
 ```
 
 ```{r ex7-solution}
 # compute log odds for bins
-MedGPA_binned <- MedGPA_binned %>%
+MedGPA_binned <- MedGPA_binned |>
   mutate(log_odds = log(acceptance_rate / (1 - acceptance_rate)))
 
 # plot binned log odds
@@ -741,7 +741,7 @@ data_space <- ggplot(data = MedGPA_binned, aes(x = mean_GPA, y = log_odds)) +
   geom_line()
 
 # compute log odds for observations
-MedGPA_plus <- MedGPA_plus %>%
+MedGPA_plus <- MedGPA_plus |>
   mutate(log_odds_hat = log(.fitted / (1 - .fitted)))
 
 # logistic model on log odds scale
@@ -811,10 +811,10 @@ To compute this, we build a data frame with Cheney's data, and run it through ou
 ### Making binary predictions
 
 ```{r echo=TRUE}
-mod_plus <- augment(mod, type.predict = "response") %>%
+mod_plus <- augment(mod, type.predict = "response") |>
   mutate(alive_hat = round(.fitted))
   
-mod_plus %>%
+mod_plus |>
   select(is_alive, age, transplant, .fitted, alive_hat)
 ```
 
@@ -825,8 +825,8 @@ There are a number of different ways in which we could reasonably convert our pr
 ### Confusion matrix
 
 ```{r echo=TRUE}
-mod_plus %>%
-  select(is_alive, alive_hat) %>%
+mod_plus |>
+  select(is_alive, alive_hat) |>
   table()
 ```
 
@@ -893,30 +893,30 @@ mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
 tidy_mod <- ___
   
 # confusion matrix
-tidy_mod %>%
-  select(___, ___) %>% 
+tidy_mod |>
+  select(___, ___) |> 
   ___()
 ```
 
 ```{r ex9-hint-1}
-tidy_mod <- augment(mod, type.predict = "response") %>% 
+tidy_mod <- augment(mod, type.predict = "response") |> 
   mutate(Acceptance_hat = round(.fitted)) 
 ```
 
 ```{r ex9-hint-2}
-tidy_mod %>% 
-  select(Acceptance, Acceptance_hat) %>%
+tidy_mod |> 
+  select(Acceptance, Acceptance_hat) |>
   ___
 ```
 
 ```{r ex9-solution}
 # data frame with binary predictions
-tidy_mod <- augment(mod, type.predict = "response") %>% 
+tidy_mod <- augment(mod, type.predict = "response") |> 
   mutate(Acceptance_hat = round(.fitted)) 
   
 # confusion matrix
-tidy_mod %>% 
-  select(Acceptance, Acceptance_hat) %>%
+tidy_mod |> 
+  select(Acceptance, Acceptance_hat) |>
   table()
 ```
 
