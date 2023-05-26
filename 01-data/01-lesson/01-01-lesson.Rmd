@@ -268,14 +268,14 @@ You might be wondering what we mean by _"pipe it into the `count()` function"_?
 
 ### The pipe operator
 
-![](images/pipe-operator.png){width="30%"}
+![](images/native_pipe-operator.png){width="30%"}
 
 The **pipe operator**, which **is vertical bar greater than**, tells `R` to
 pass the object that comes before it into the first argument of the function
 that comes after it. Mathematically, **x pipe f(y)** becomes *f(x, y)*, since x
 is piped into the first argument of the function f().
 
-![](images/pipe-operator2.png){width="30%"}
+![](images/native_pipe-operator2.png){width="30%"}
 
 For example, one way of adding numbers in R is using the `sum()` function. The 
 `sum()` function has as many arguments as there are numbers you wish to add, 
