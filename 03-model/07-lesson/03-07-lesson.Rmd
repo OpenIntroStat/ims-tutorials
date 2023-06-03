@@ -222,7 +222,7 @@ The fitted model `mod` is already in your environment.
 - Compute the fitted values of the model as one column in a `data.frame` using `augment()`.
 
 
-```{r echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r ex2-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
@@ -499,11 +499,15 @@ A mild version of Simpson's paradox can be observed in the MarioKart auction dat
 
 However, a simple linear regression model reveals the opposite: longer auctions are associated with lower final prices. The problem is that all other things are *not* equal. In this case, the new MarioKarts - which people pay a premium for - were mostly sold in one-day auctions, while a plurality of the used MarioKarts were sold in the standard seven-day auctions. 
 
-```{r mariokart-plot, echo=TRUE}
+```{r ex5-setup}
 slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
 slr
+```
+
+```{r mariokart-plot, ref.label="ex5-setup", echo=TRUE}
+
 ```
 
 
