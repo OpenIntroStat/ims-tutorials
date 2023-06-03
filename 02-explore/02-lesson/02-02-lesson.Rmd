@@ -795,7 +795,7 @@ Thus, the `%in%` operator always comes with the `c()` function, which makes the 
 
 Putting this all together, our code looks like: 
 
-```{r, ex2-setup, echo=FALSE}
+```{r ex2-setup, echo=FALSE}
 common_cyl <- cars %>%
   filter(ncyl %in% c(4, 6, 8))
 ```
