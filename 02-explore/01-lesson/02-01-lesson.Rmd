@@ -27,10 +27,10 @@ knitr::opts_chunk$set(warning = FALSE,
                       fig.width = 5,
                       fig.align = "center")
 
-comics <- read_csv("data/comics.csv") %>% 
+comics <- read_csv("data/comics.csv") |> 
   filter(!is.na(align), 
          !is.na(id), 
-         !is.na(gender)) %>%
+         !is.na(gender)) |>
   droplevels()
 
 flavor <- rep(c("cherry", "key lime", "boston creme", "strawberry", 
@@ -68,14 +68,14 @@ The first case in the dataset is Peter Parker, alias: Spiderman, where his alias
 We can learn the different values of a particular character variable by using the `distinct()` function. It's clear that the alignment variable can be "good" or "neutral", but what other values are possible? Here, we pipe the `comics` data into the `distinct()` function, and then insert the `align` column into the `distinct()` function. 
 
 ```{r levels, exercise=TRUE}
-comics %>% 
+comics |> 
   distinct(align)
 ```
 
 Inspecting the resulting table, we learn that there are in fact four possible alignments, "Good", "Bad", "Neutral", and "Reformed criminals". Good thing we checked that! If we do the same for identity, we learn that there are four possible identities.
 
 ```{r levels2, exercise=TRUE}
-comics %>% 
+comics |> 
   distinct(id)
 ```
 
@@ -87,7 +87,7 @@ A common way to represent the number of cases that fall into each combination of
 
 ```{r levels3, exercise=TRUE}
 # to get the long table
-comics %>% 
+comics |> 
   count(align, id)
 ```
 
@@ -95,8 +95,8 @@ comics %>%
 
 ```{r levels4, exercise=TRUE}
 # to get a wider table
-comics %>% 
-  count(align, id) %>% 
+comics |> 
+  count(align, id) |> 
   pivot_wider(names_from = id, values_from = n)
 ```
 
@@ -192,7 +192,7 @@ Let's start by creating a contingency table, which is a useful way to represent 
 
 
 # Check levels of align
-comics %>% 
+comics |> 
   distinct(___)
 
 # Check the levels of gender
@@ -207,7 +207,7 @@ comics %>%
 glimpse(comics)
 
 # Check levels of align
-comics %>% 
+comics |> 
   distinct(___)
 
 # Check the levels of gender
@@ -222,11 +222,11 @@ comics %>%
 glimpse(comics)
 
 # Check levels of align
-comics %>% 
+comics |> 
   distinct(align)
 
 # Check the levels of gender
-comics %>% 
+comics |> 
   distinct(gender)
 
 # Create a 2-way contingency table
@@ -238,16 +238,16 @@ comics %>%
 glimpse(comics)
 
 # Check levels of align
-comics %>% 
+comics |> 
   distinct(align)
 
 # Check the levels of gender
-comics %>% 
+comics |> 
   distinct(gender)
 
 # Create a 2-way contingency table
-comics %>%
-  count(align, gender) %>% 
+comics |>
+  count(align, gender) |> 
   pivot_wider(names_from = align, values_from = n)
 ```
 
@@ -272,8 +272,8 @@ The contingency table from the last exercise is available in your workspace as `
 
 
 ```{r ex2-setup}
-tab <- comics %>%
-  count(align, gender) %>% 
+tab <- comics |>
+  count(align, gender) |> 
   pivot_wider(names_from = align, values_from = n)
 ```
 
@@ -282,12 +282,12 @@ tab <- comics %>%
 ___
 
 # Remove align level
-comics_filtered <- ___ %>%
-  ___(align != ___) %>%
+comics_filtered <- ___ |>
+  ___(align != ___) |>
   ___()
 
 # See the result
- comics_filtered %>%
+ comics_filtered |>
    ___(align)
 
 ```
@@ -297,12 +297,12 @@ comics_filtered <- ___ %>%
 tab
 
 # Remove align level
-comics_filtered <- comics %>%
-  filter(align != "Reformed Criminals") %>%
+comics_filtered <- comics |>
+  filter(align != "Reformed Criminals") |>
   droplevels()
 
 # See the result
-comics_filtered %>%
+comics_filtered |>
   distinct(align)
 
 ```
@@ -326,8 +326,8 @@ To create these plots, let's carry out the following steps:
 
 ```{r ex3-setup}
 comics <- as_tibble(comics)
-comics <- comics %>%
-  filter(align != "Reformed Criminals") %>%
+comics <- comics |>
+  filter(align != "Reformed Criminals") |>
   droplevels()
 ```
 
@@ -397,8 +397,8 @@ ggplot(comics, aes(x = gender, fill = align)) +
 
 ```{r barchartex, echo=FALSE, fig.height=3, fig.width=8}
 
-comics <- comics %>%
-  filter(align != "Reformed Criminals") %>%
+comics <- comics |>
+  filter(align != "Reformed Criminals") |>
   droplevels()
 
 # Create plot of gender by alignment
@@ -434,22 +434,22 @@ Let's return to our table of counts of cases by identity and alignment. If we wa
 After counting the number of observations at each level of `id` and `align`, we use the `mutate()` function to calculate the proportion of observations that fell in those levels. We save these proportions into a new variable named `prop`. Similar to before, we then pivot our table from long to wide, but here we need to specify what columns we are interested in pivoting. This is because we have one additional column in our dataframe which we are not interested in including in our table (`n`). To select variables, we specify a vector of column names to the `id_cols` argument, excluding any variables used in `names_from` and `values_from`.  
 
 ```{r fctp, echo = TRUE, eval = FALSE}
-comics %>% 
-  count(id, align) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(id, align) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 
 ```
 
 ```{r fctp2kable, echo=FALSE}
-comics %>% 
-  count(id, align) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(id, align) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = id, 
-              names_from = align, values_from = prop) %>% 
-  mutate_if(is.numeric, format, digits = 2) %>% 
-  gt() %>%
+              names_from = align, values_from = prop) |> 
+  mutate_if(is.numeric, format, digits = 2) |> 
+  gt() |>
   tab_style(
     style = cell_fill(color = "lightblue"),
     locations = cells_body(
@@ -473,24 +473,24 @@ We see here that around 57% of all secret characters are bad. Because we're cond
 **Condition on the rows (i.e. rows sum to 1)**
 
 ```{r cp, echo = TRUE, eval = FALSE}
-comics %>% 
-  count(id, align) %>% 
-  group_by(id) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(id, align) |> 
+  group_by(id) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
 ```{r cpkable, echo=FALSE}
-comics %>% 
-  count(id, align) %>%
-  group_by(id) %>% 
-  mutate(prop = n / sum(n)) %>% 
-  ungroup() %>%
+comics |> 
+  count(id, align) |>
+  group_by(id) |> 
+  mutate(prop = n / sum(n)) |> 
+  ungroup() |>
   pivot_wider(id_cols = id, 
-              names_from = align, values_from = prop) %>% 
-  mutate_if(is.numeric, format, digits = 2) %>% 
-  gt() %>%
+              names_from = align, values_from = prop) |> 
+  mutate_if(is.numeric, format, digits = 2) |> 
+  gt() |>
   tab_style(
     style = cell_fill(color = "lightblue"),
     locations = cells_body(
@@ -506,24 +506,24 @@ As the number of cells in these tables gets large, it becomes much easier to mak
 **Condition on the columns (i.e. columns sum to 1)**
 
 ```{r cp2, echo = TRUE, eval = FALSE}
-comics %>% 
-  count(id, align) %>% 
-  group_by(align) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(id, align) |> 
+  group_by(align) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = id, 
               names_from = align, values_from = prop)
 ```
 
 ```{r cp2kable, echo = FALSE}
-comics %>% 
-  count(id, align) %>% 
-  group_by(align) %>% 
-  mutate(prop = n / sum(n)) %>% 
-  ungroup() %>% 
+comics |> 
+  count(id, align) |> 
+  group_by(align) |> 
+  mutate(prop = n / sum(n)) |> 
+  ungroup() |> 
   pivot_wider(id_cols = id, 
-              names_from = align, values_from = prop) %>% 
-  mutate_if(is.numeric, format, digits = 2) %>% 
-  gt() %>%
+              names_from = align, values_from = prop) |> 
+  mutate_if(is.numeric, format, digits = 2) |> 
+  gt() |>
   tab_style(
     style = cell_fill(color = "lightblue"),
     locations = cells_body(
@@ -597,24 +597,24 @@ ggplot(comics, aes(x = align, fill = id)) +
 The following code generates tables of joint and conditional proportions, respectively. Go ahead and run it in the console:
 
 ```{r prob5-setup, echo = FALSE}
-comics <- comics %>%
-  filter(align != "Reformed Criminals") %>%
+comics <- comics |>
+  filter(align != "Reformed Criminals") |>
   droplevels()
 ```
 
 ```{r prob5, exercise = TRUE}
 # Joint proportions
-comics %>% 
-  count(align, gender) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(align, gender) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = align, 
               names_from = gender, values_from = prop)
 
 # Conditional on columns
-comics %>% 
-  count(align, gender) %>% 
-  group_by(gender) %>% 
-  mutate(prop = n / sum(n)) %>% 
+comics |> 
+  count(align, gender) |> 
+  group_by(gender) |> 
+  mutate(prop = n / sum(n)) |> 
   pivot_wider(id_cols = gender, 
               names_from = align, values_from = prop) 
 ```
@@ -677,30 +677,29 @@ You might not have noticed, but already you've been creating plots that illustra
 To compute a table of counts for a single variable like `id`, we can use our previous tools for counting a variable with the `count()` function. One way to think of this simpler table is that we've taken the original two-way table (with two categorical variables) and added up the cells across each level of `align`. Since we've added over the margins of the other variables, this is sometimes known as a **marginal distribution**.
 
 ```{r md1, eval=FALSE, include=TRUE}
-comics %>% 
+comics |> 
   count(id)
 ```
 
 ```{r md1kable, echo=FALSE}
-comics %>% 
-  count(id) %>% 
-  kable(format = "html") %>% 
-  kable_styling(full_width = F) %>%
+comics |> 
+  count(id) |> 
+  kable(format = "html") |> 
+  kable_styling(full_width = F) |>
   row_spec(1, bold = T, background = "lightblue", color = "white") 
   
 ```
 
 ```{r md2, eval=FALSE, include=TRUE}
-comics %>% 
-  count(id, align) %>% 
+comics |> 
+  count(id, align) |> 
   pivot_wider(names_from = align, values_from = n)
 ```
 
 ```{r md2kable, echo=FALSE}
-comics %$% 
-  table(id, align) %>% 
-  kable(format = "html") %>% 
-  kable_styling(full_width = F) %>%
+table(comics$id, comics$align) |>   
+  kable(format = "html") |> 
+  kable_styling(full_width = F) |>
   row_spec(1, bold = T, background = "lightblue", color = "white") 
 ```
 
@@ -788,7 +787,7 @@ The pie chart is a common way to display categorical data where the size of the 
 If we represent this data using a barchart the answer is obvious: the proportion of public is greater. For that reason, it's generally a good idea to stick to barcharts.
 
 ```{r pie, echo=FALSE, fig.height=3, fig.width=6, cache = TRUE}
-plot1 <- ggplot(comics %>% group_by(id)%>%count, aes(x = "", y = n, fill = id))+
+plot1 <- ggplot(comics |> group_by(id)|>count, aes(x = "", y = n, fill = id))+
  geom_bar(stat="identity", width=1)+
  coord_polar("y", start=0) +
    theme(axis.text = element_blank(),
@@ -818,7 +817,7 @@ Luckily, R has a built-in `factor()` function specifically for these types of da
 Converting a variable from a character to a factor looks something like this:
 
 ```{r, eval = FALSE}
-comics %>% 
+comics |> 
   mutate(gender = factor(id, 
                          levels = c("Secret", "Public", "No Dual", "Unknown")
                          )
@@ -837,7 +836,7 @@ Once you've reordered the `align` variable, create a barchart of counts of the
 
 ```{r ex5, exercise = TRUE}
 # Change the order of the levels in align
-comics_updated <- comics %>% 
+comics_updated <- comics |> 
   mutate(align = factor(___, 
                        levels = c("___", "___", "___"))
   )
@@ -849,7 +848,7 @@ ggplot(___, aes(x = ___)) +
 
 ```{r ex5-hint-1}
 # Change the order of the levels in align
-comics_updated <- comics %>% 
+comics_updated <- comics |> 
   mutate(align = factor(align, 
                        levels = c("___", "___", "___"))
   )
@@ -857,7 +856,7 @@ comics_updated <- comics %>%
 
 ```{r ex5-hint-2}
 # Change the order of the levels in align
-comics_updated <- comics %>% 
+comics_updated <- comics |> 
   mutate(align = factor(align, 
                        levels = c("Good", "Neutral", "Bad"))
   )
@@ -870,7 +869,7 @@ ggplot(___, aes(x = ___)) +
 
 ```{r ex5-solution}
 # Change the order of the levels in align
-comics_updated <- comics %>% 
+comics_updated <- comics |> 
   mutate(align = factor(align, 
                        levels = c("Good", "Neutral", "Bad"))
   )
@@ -891,7 +890,7 @@ You could make these by creating multiple filtered datasets (one for each gender
 Create a barchart of `align` faceted by `gender`.
 
 ```{r ex6-setup}
-comics_updated <- comics %>% 
+comics_updated <- comics |> 
   mutate(align = factor(align, 
                        levels = c("Good", "Neutral", "Bad"))
   )
@@ -950,11 +949,11 @@ This is a piechart of a dataset called `pies` that contains the favorite pie fla
 
 ```{r ex7, exercise = TRUE}
 # Discover what the counts of pie flavors are 
-pies %>% 
+pies |> 
   count(flavor)
 
 # Put levels of flavor in descending order
-pies_updated <- pies %>% 
+pies_updated <- pies |> 
   mutate(flavor = factor(flavor, 
                          levels = c("apple", "key lime", "boston creme",
                                     "blueberry", "cherry", "pumpkin", "strawberry")

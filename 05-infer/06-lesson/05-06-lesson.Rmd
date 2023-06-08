@@ -28,10 +28,10 @@ knitr::opts_chunk$set(fig.align = "center",
 
 set.seed(20170801)
 
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 
-hsb2 <- hsb2 %>% 
+hsb2 <- hsb2 |> 
   mutate(diff = read - write)
 ```
 
@@ -263,7 +263,7 @@ Let's use data from the 2010 General Social Survey to estimate the number of hou
 > Estimate the average number of hours Americans work during their "usual" schedule (variable: `hours`) using data from the 2010 General Social Survey (data: `gss`).
 
 ```{r echo=TRUE}
-gss %>% 
+gss |> 
   t_test(response = hours,
          conf_int = TRUE,
          conf_level = 0.95)
@@ -288,11 +288,11 @@ In the exercise below,
 
 ```{r Average_commute_time_of_Americans, exercise=TRUE}
 # Filter for employed respondents
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(___)
 
 # Construct 95% CI for avg time_to_work
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = ___, 
          conf_int = TRUE, 
          conf_level = ___)
@@ -306,11 +306,11 @@ acs12_emp %>%
 
 ```{r Average_commute_time_of_Americans-solution}
 # Filter for employed respondents
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 
 # Construct 95% CI for avg time_to_work
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = time_to_work, 
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -334,14 +334,14 @@ In this exercise,
 - *Compare the interval to the one obtained in the `gss` data. Do both intervals paint the same picture?*
 
 ```{r Average_number_of_hours_worked-setup, include = FALSE}
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 ```
 
 
 ```{r Average_number_of_hours_worked, exercise=TRUE}
 # Run a t-test on hrs_work and look at the CI
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = ___, 
          conf_int = ___, 
          conf_level = ___)
@@ -357,7 +357,7 @@ acs12_emp %>%
 
 ```{r Average_number_of_hours_worked-solution}
 # Run a t-test on hrs_work and look at the CI
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = hrs_work, 
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -422,7 +422,7 @@ Notice here we are talking about the "mean difference" rather than the "differen
 Implementation-wise there is not much new here. Our data is in a singe column, `diff`, so we simply build an interval for the mean of this single variable using the `t_test()` function.
 
 ```{r echo=TRUE}
-hsb2 %>% 
+hsb2 |> 
   t_test(response = diff,
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -460,26 +460,26 @@ In this exercise you will:
 
 ```{r t-interval_at_various_levels-setup, include=FALSE}
 # Calculate diff
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(diff = ucla_new - amaz_new)
 ```
 
 
 ```{r t-interval_at_various_levels, exercise=TRUE}
 # Run a t-test on diff with a 90% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = TRUE,
          conf_level = ___)
 
 # Same with 95% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = ___,
          conf_level = ___)
 
 # Same with 99% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = ___,
          conf_level = ___)
@@ -495,19 +495,19 @@ textbooks %>%
 
 ```{r t-interval_at_various_levels-solution}
 # Run a t-test on diff with a 90% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.90)
 
 # Same with 95% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.95)
 
 # Same with 99% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.99)
@@ -560,7 +560,7 @@ The alternative hypothesis, which follows from the research question, says that 
 ### Testing for a mean with a t-test
 
 ```{r, eval=FALSE, echo=TRUE}
-hsb2 %>% 
+hsb2 |> 
   t_test(response = diff,
          null = 0, 
          alternative = "two-sided", 
@@ -586,9 +586,9 @@ First, for the price differences, generate 1000 bootstrap replicates and calcula
 
 ```{r estimate_the_median_difference_in_textbook_prices, exercise=TRUE}
 # Calculate 1000 bootstrap medians of diff
-textdiff_med_ci <- textbooks %>%
-  sepecify(response = ___) %>%
-  generate(reps = ___, type = ___) %>%
+textdiff_med_ci <- textbooks |>
+  sepecify(response = ___) |>
+  generate(reps = ___, type = ___) |>
   calculate(stat = ___)
 ```
 
@@ -602,9 +602,9 @@ textdiff_med_ci <- textbooks %>%
 
 ```{r estimate_the_median_difference_in_textbook_prices-solution}
 # Calculate 10000 bootstrap medians of diff
-textdiff_med_ci <- textbooks %>%
-  specify(response = diff) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+textdiff_med_ci <- textbooks |>
+  specify(response = diff) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
 
@@ -614,9 +614,9 @@ Then, calculate a 95% confidence interval for the bootstrap median price differe
 
 ```{r estimate_the_median_difference_in_textbook_prices_2-setup, include = FALSE}
 # From previous step
-textdiff_med_ci <- textbooks %>%
-  specify(response = diff) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+textdiff_med_ci <- textbooks |>
+  specify(response = diff) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "median")
 
 ```
@@ -624,7 +624,7 @@ textdiff_med_ci <- textbooks %>%
 
 ```{r estimate_the_median_difference_in_textbook_prices_2, exercise=TRUE}
 # Calculate the 95% CI via percentile method
-textdiff_med_ci %>% 
+textdiff_med_ci |> 
   get_confidence_interval(level = ___, 
                           type = ___)
 ```
@@ -635,7 +635,7 @@ textdiff_med_ci %>%
 
 ```{r estimate_the_median_difference_in_textbook_prices_2-solution}
 # Calculate the 95% CI via percentile method
-textdiff_med_ci %>% 
+textdiff_med_ci |> 
   get_confidence_interval(level = 0.95, 
                           type = "percentile")
  
@@ -656,7 +656,7 @@ First, add a column to `hsb2` named `diff` containing the `math` scores minus th
 
 ```{r test-for-a-difference-in-median-test-scores, exercise=TRUE}
 # Add a column, diff, of math minus science
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = ___)
 ```
 
@@ -666,7 +666,7 @@ hsb2 <- hsb2 %>%
 
 ```{r test-for-a-difference-in-median-test-scores-solution}
 # Add a column, diff, of math minus science
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 ```
 
@@ -681,7 +681,7 @@ Then,
 
 ```{r test-for-a-difference-in-median-test-scores_2-setup, include = FALSE}
 # From previous step
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 
 ```
@@ -689,10 +689,10 @@ hsb2 <- hsb2 %>%
 
 ```{r test-for-a-difference-in-median-test-scores_2, exercise=TRUE}
 # Generate 1000 bootstrap medians centered at null
-scorediff_med_ht <- hsb2 %>%
-  specify(response = ___) %>%
-  hypothesize(null = "point", med = ___) %>% 
-  generate(reps = ___, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = ___) |>
+  hypothesize(null = "point", med = ___) |> 
+  generate(reps = ___, type = "bootstrap") |> 
   calculate(stat = ___)
 ```
 
@@ -705,10 +705,10 @@ scorediff_med_ht <- hsb2 %>%
 </div>
 
 ```{r test-for-a-difference-in-median-test-scores_2-solution}
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 ```
 
@@ -717,13 +717,13 @@ scorediff_med_ht <- hsb2 %>%
 Next, find the observed median difference (`diff`) using the `summarize()` function.   
 
 ```{r test-for-a-difference-in-median-test-scores_3-setup, include = FALSE}
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 
 ```
@@ -731,7 +731,7 @@ scorediff_med_ht <- hsb2 %>%
 
 ```{r test-for-a-difference-in-median-test-scores_3, exercise=TRUE}
 # Calculate observed median of differences
-scorediff_med_obs <- hsb2 %>%
+scorediff_med_obs <- hsb2 |>
   summarize(median_diff = ___) 
 
 ## See what the value is 
@@ -747,7 +747,7 @@ scorediff_med_obs
 
 ```{r test-for-a-difference-in-median-test-scores_3-solution}
 # Calculate observed median of differences
-scorediff_med_obs <- hsb2 %>%
+scorediff_med_obs <- hsb2 |>
   summarize(median_diff = median(diff))
 
 ## See what the value is 
@@ -759,23 +759,23 @@ scorediff_med_obs
 And finally, calculate the two-sided p-value using the `get_p_value()` function. Remember, you need to specify what the observed median difference is (`scorediff_med_obs`) and the direction of the alternative hypothesis (`"two-sided"`). 
 
 ```{r test-for-a-difference-in-median-test-scores_4-setup, include = FALSE}
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 
-scorediff_med_obs <- hsb2 %>%
-  summarize(median_diff = median(diff)) %>%
+scorediff_med_obs <- hsb2 |>
+  summarize(median_diff = median(diff)) |>
   pull()
 ```
 
 
 ```{r test-for-a-difference-in-median-test-scores_4, exercise=TRUE}
 # Calculate two-sided p-value
-scorediff_med_ht %>%
+scorediff_med_ht |>
   get_p_value(obs_stat = ___, 
               direction = ___)
 ```
@@ -789,7 +789,7 @@ scorediff_med_ht %>%
 
 ```{r test-for-a-difference-in-median-test-scores_4-solution}
 # Calculate two-sided p-value
-scorediff_med_ht %>%
+scorediff_med_ht |>
   get_p_value(obs_stat = scorediff_med_obs, 
               direction = "two-sided")
 ```

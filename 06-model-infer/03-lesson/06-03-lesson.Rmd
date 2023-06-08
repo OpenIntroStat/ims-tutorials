@@ -25,30 +25,30 @@ starbucks <- read_delim("data/starbucks.txt",
                         trim_ws = TRUE)
 
 set.seed(4747)
-starFatCal <-  starbucks %>%
-  rep_sample_n(113, 5000, replace=FALSE) %>%
-  mutate(PermFat = sample(Fat, replace=FALSE)) %>%
-  do(tidy(lm(Calories ~ PermFat, data=.))) %>%
+starFatCal <-  starbucks |>
+  rep_sample_n(113, 5000, replace=FALSE) |>
+  mutate(PermFat = sample(Fat, replace=FALSE)) |>
+  do(tidy(lm(Calories ~ PermFat, data=.))) |>
   filter(term=="PermFat")
 
 set.seed(4747)
-starCarbCal <-  starbucks %>%
-  rep_sample_n(113, 1000, replace=FALSE) %>%
-  mutate(PermCal = sample(Calories, replace=FALSE)) %>%
-  do(tidy(lm(PermCal ~ Carbs, data=.))) %>%
+starCarbCal <-  starbucks |>
+  rep_sample_n(113, 1000, replace=FALSE) |>
+  mutate(PermCal = sample(Calories, replace=FALSE)) |>
+  do(tidy(lm(PermCal ~ Carbs, data=.))) |>
   filter(term=="Carbs")
 
 set.seed(4747)
-starProFib <-  starbucks %>%
-  rep_sample_n(113, 5000, replace=FALSE) %>%
-  mutate(PermFib = sample(Fiber, replace=FALSE)) %>%
-  do(tidy(lm(Protein ~ PermFib, data=.))) %>%
+starProFib <-  starbucks |>
+  rep_sample_n(113, 5000, replace=FALSE) |>
+  mutate(PermFib = sample(Fiber, replace=FALSE)) |>
+  do(tidy(lm(Protein ~ PermFib, data=.))) |>
   filter(term=="PermFib")
 
 set.seed(4747)
-BS_slope <- starbucks %>%
-  specify(Calories ~ Fat) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+BS_slope <- starbucks |>
+  specify(Calories ~ Fat) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope")
 
 alpha <- .05
@@ -58,8 +58,8 @@ newfood <- data.frame(Fat = c(0,10,20,30))
 
 
 alpha <- .05
-predMeans <- augment(lm(Calories ~ Fat, data=starbucks), se_fit = TRUE) %>%
-  dplyr::select(Calories, Fat, .fitted, .se.fit) %>%
+predMeans <- augment(lm(Calories ~ Fat, data=starbucks), se_fit = TRUE) |>
+  dplyr::select(Calories, Fat, .fitted, .se.fit) |>
   mutate(lowMean = .fitted - crit_val*.se.fit,
          upMean = .fitted + crit_val*.se.fit) 
 
@@ -67,19 +67,19 @@ FatCal_lm <- lm(Calories ~ Fat, data = starbucks)
 FatCal_gl <- broom::glance(FatCal_lm)
 FatCal_sig <- dplyr::pull(FatCal_gl, sigma)
 
-FatCal_pred <- broom::augment(FatCal_lm, se_fit = TRUE) %>%
+FatCal_pred <- broom::augment(FatCal_lm, se_fit = TRUE) |>
   mutate(.se.pred = sqrt(FatCal_sig^2 + .se.fit^2))
 
-predResp <- FatCal_pred %>%
+predResp <- FatCal_pred |>
   mutate(lowResp = .fitted - crit_val*.se.pred,
          upResp = .fitted + crit_val*.se.pred)
 
 set.seed(4747)
-starbucks2 <- starbucks %>% 
+starbucks2 <- starbucks |> 
   sample_n(size=20) 
-starbucks3 <- starbucks %>%
+starbucks3 <- starbucks |>
   sample_n(size=20)
-starbucks_many <- starbucks %>%
+starbucks_many <- starbucks |>
   rep_sample_n(size=20, replace=FALSE, reps=50)
 ```
 
@@ -94,7 +94,7 @@ In this lesson, we'll be using mathematical approximations to test and estimate 
 
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") +
   geom_smooth(method="lm", se=FALSE)
 ```
@@ -252,9 +252,9 @@ Using the permuted datasets (recall, the randomization forces the null hypothesi
 
 ```{r echo=TRUE, message=FALSE, eval=FALSE}
 set.seed(4747)
-twins_perm <- twins %>% rep_sample_n(size=nrow(twins), reps=500) %>%
-  group_by(replicate) %>%
-  mutate(Biological_perm = sample(Biological)) %>%
+twins_perm <- twins |> rep_sample_n(size=nrow(twins), reps=500) |>
+  group_by(replicate) |>
+  mutate(Biological_perm = sample(Biological)) |>
   do(tidy(lm(Foster ~ Biological_perm, data=.)))
 ```
 
@@ -270,7 +270,7 @@ twins_perm <- twins %>% rep_sample_n(size=nrow(twins), reps=500) %>%
 twins_perm
 
 # Filter for Biological_perm
-biological_perm <- twins_perm %>%
+biological_perm <- twins_perm |>
   ___
 
 # Calculate degrees of freedom of twins
@@ -291,7 +291,7 @@ degrees_of_freedom <- ___
 twins_perm
 
 # Filter for Biological_perm
-biological_perm <- twins_perm %>%
+biological_perm <- twins_perm |>
   filter(term == "Biological_perm")
 
 # Calculate degrees of freedom of twins
@@ -312,7 +312,7 @@ degrees_of_freedom <- nrow(twins) - 2
 
 ```{r ex33, exercise=TRUE}
 # From previous step
-biological_perm <- twins_perm %>%
+biological_perm <- twins_perm |>
   filter(term == "Biological_perm")
 degrees_of_freedom <- nrow(twins) - 2
 
@@ -336,7 +336,7 @@ ___ +
 
 ```{r ex33-solution}
 # From previous step
-biological_perm <- twins_perm %>%
+biological_perm <- twins_perm |>
   filter(term == "Biological_perm")
 degrees_of_freedom <- nrow(twins) - 2
 
@@ -369,13 +369,13 @@ The linear regression model of `Foster` vs. `Biological`, `model`, is provided i
 model <- lm(Foster ~ Biological, data = twins)
 
 # Get the Biological model coefficient
-biological_term <- model %>% 
+biological_term <- model |> 
   # Tidy the model
-  ___ %>%
+  ___ |>
   # Filter for term equal to "Biological"
   ___ 
 
-biological_term %>%
+biological_term |>
   # Add a column of one-sided p-values
   ___(one_sided_p_value = ___)
 ```
@@ -392,13 +392,13 @@ biological_term %>%
 model <- lm(Foster ~ Biological, data = twins)
 
 # Get the Biological model coefficient
-biological_term <- model %>% 
+biological_term <- model |> 
   # Tidy the model
-  tidy() %>% 
+  tidy() |> 
   # Filter for term equal to "Biological"
   filter(term == "Biological")
 
-biological_term %>%
+biological_term |>
   # Add a column of one-sided p-values
   mutate(one_sided_p_value = p.value / 2)
 ```
@@ -430,8 +430,8 @@ The biological term from the model is available as `biological_term`.
 
 ```{r echo=TRUE, eval=FALSE}
 model <- lm(Foster ~ Biological, data = twins)
-biological_term <- model %>% 
-  tidy() %>% 
+biological_term <- model |> 
+  tidy() |> 
   filter(term == "Biological")
 
 # Make sure all columns print
@@ -443,7 +443,7 @@ options(tibble.width = Inf)
 # Calculate the degrees of freedom of twins
 degrees_of_freedom <- nrow(twins) - 2
 
-biological_term %>%
+biological_term |>
   mutate(
     # Calculate the test statistic
     test_statistic = ___,
@@ -470,7 +470,7 @@ biological_term %>%
 # Calculate the degrees of freedom of twins
 degrees_of_freedom <- nrow(twins) - 2
 
-biological_term %>%
+biological_term |>
   mutate(
     # Calculate the test statistic
     test_statistic = (estimate - 1) / std.error,
@@ -493,16 +493,16 @@ When technical conditions hold (see next lesson) , the inference from the random
 
 ```{r echo=TRUE, eval=FALSE}
 set.seed(4747)
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "slope") 
   
-obs_slope <- lm(Foster ~ Biological, data = twins) %>%
-  tidy() %>%   
-  filter(term == "Biological") %>%
-  select(estimate) %>%   
+obs_slope <- lm(Foster ~ Biological, data = twins) |>
+  tidy() |>   
+  filter(term == "Biological") |>
+  select(estimate) |>   
   pull() 
 ```
 
@@ -516,9 +516,9 @@ perm_slope
 abs_obs_slope <- ___
 
 # Find the p-value
-perm_slope %>%
+perm_slope |>
   # Add a column for the absolute value of stat
-  ___ %>%
+  ___ |>
   summarize(
     # Calculate prop'n permuted values at least as extreme as observed
     p_value = ___
@@ -546,9 +546,9 @@ perm_slope
 abs_obs_slope <- abs(obs_slope)
 
 # Find the p-value
-perm_slope %>%
+perm_slope |>
   # Add a column for the absolute value of stat
-  mutate(abs_perm_slope = abs(stat)) %>%
+  mutate(abs_perm_slope = abs(stat)) |>
   summarize(
     # Calculate prop'n permuted values at least as extreme as observed
     p_value = mean(abs_perm_slope >= abs_obs_slope)
@@ -567,7 +567,7 @@ Hypothesis testing of slopes is only one part of our inferential tool box. Often
 
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + 
   ggtitle("Fat vs. Calories for Starbucks Food Items") 
 ```
@@ -579,7 +579,7 @@ For the Starbucks data, it seems obvious that there is a linear model. But what 
 ### Fat & calories, a linear model
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + 
   ggtitle("Fat vs. Calories for Starbucks Food Items") +
   geom_smooth(method="lm", se=FALSE)
@@ -598,10 +598,10 @@ But what if you are interested in estimating the number of extra calories for fo
 alpha = 0.05
 crit_val <- qt((1-alpha/2), df = nrow(starbucks) - 2)
 
-lm(Calories ~ Fat, data=starbucks) %>% 
+lm(Calories ~ Fat, data=starbucks) |> 
   tidy(conf.int = TRUE, conf.level=1-alpha)
 
-lm(Calories ~ Fat, data=starbucks) %>% tidy() %>%
+lm(Calories ~ Fat, data=starbucks) |> tidy() |>
    mutate(lower = estimate - crit_val*std.error,
           upper = estimate + crit_val*std.error)
 
@@ -615,7 +615,7 @@ As you've seen in previous lessons, a confidence interval for a given parameter 
 
 
 ```{r echo=TRUE, eval=TRUE}
-tidy_mod <- lm(Calories ~ Fat, data = starbucks) %>% 
+tidy_mod <- lm(Calories ~ Fat, data = starbucks) |> 
   tidy(conf.int = TRUE, conf.level=1-alpha)
 
 tidy_mod
@@ -623,8 +623,8 @@ tidy_mod
 
 
 ```{r echo=TRUE, eval=TRUE}
-tidy_mod %>% 
-  filter(term == "(Intercept)") %>% 
+tidy_mod |> 
+  filter(term == "(Intercept)") |> 
   select(conf.low, conf.high)
 ```
 
@@ -639,7 +639,7 @@ Here we say that for the set of food items with zero fat, we are 95% confident t
 
 
 ```{r echo=TRUE, eval=TRUE}
-tidy_mod <- lm(Calories ~ Fat, data = starbucks) %>% 
+tidy_mod <- lm(Calories ~ Fat, data = starbucks) |> 
   tidy(conf.int = TRUE, conf.level=1-alpha)
 
 tidy_mod
@@ -648,8 +648,8 @@ tidy_mod
 
 
 ```{r echo=TRUE, eval=TRUE}
-tidy_mod %>% 
-  filter(term == "Fat") %>% 
+tidy_mod |> 
+  filter(term == "Fat") |> 
   select(conf.low, conf.high)
   
 ```
@@ -667,12 +667,12 @@ the correct interpretation of the confidence interval for the slope parameter is
 
 
 ```{r echo=TRUE, eval=TRUE}
-BS_slope <- starbucks %>%
-   specify(Calories ~ Fat) %>%
-   generate(reps = 1000, type = "bootstrap") %>%
+BS_slope <- starbucks |>
+   specify(Calories ~ Fat) |>
+   generate(reps = 1000, type = "bootstrap") |>
    calculate(stat = "slope")
 
-BS_slope %>% 
+BS_slope |> 
    summarize(low=quantile(stat, alpha / 2), 
              high=quantile(stat, 1 - alpha / 2))
 
@@ -751,11 +751,11 @@ confidence_level <- 1 - alpha
 p_upper <- 1 - alpha / 2
 critical_value <- qt(p_upper, df = degrees_of_freedom)
 
-tidied_model <- lm(Foster ~ Biological, data = twins) %>% 
+tidied_model <- lm(Foster ~ Biological, data = twins) |> 
   # Tidy the model, with a confidence interval
   ___ 
 
-tidied_model %>%
+tidied_model |>
   # Manually calculate the same interval
   mutate(
     lower = ___,
@@ -781,11 +781,11 @@ confidence_level <- 1 - alpha
 p_upper <- 1 - alpha / 2
 critical_value <- qt(p_upper, df = degrees_of_freedom)
 
-tidied_model <- lm(Foster ~ Biological, data = twins) %>% 
+tidied_model <- lm(Foster ~ Biological, data = twins) |> 
   # Tidy the model, with a confidence interval
   tidy(conf.int = TRUE, conf.level = confidence_level)
 
-tidied_model %>%
+tidied_model |>
   # Manually calculate the same interval
   mutate(
     lower = estimate - critical_value * std.error,
@@ -802,9 +802,9 @@ Note that the bootstrap and t-intervals will not be exactly the same because the
 
 ```{r echo=TRUE, eval=FALSE}
 set.seed(4747)
-boot_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+boot_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope")
 ```
 
@@ -867,16 +867,16 @@ p_lower <- alpha / 2
 p_upper <- 1 - alpha / 2
 
 # Tidy the model, including a confidence interval
-tidied_model <- lm(Foster ~ Biological, data = twins) %>% 
+tidied_model <- lm(Foster ~ Biological, data = twins) |> 
    ___
 
 # Recall the t-confidence interval
-tidied_model %>%
-  filter(term == "Biological") %>%
+tidied_model |>
+  filter(term == "Biological") |>
   select(conf.low, conf.high)
 
 # Create the bootstrap confidence interval
-boot_slope %>% 
+boot_slope |> 
   summarize(
     lower = ___, 
     upper = ___
@@ -901,16 +901,16 @@ p_lower <- alpha / 2
 p_upper <- 1 - alpha / 2
 
 # Tidy the model, including a confidence interval
-tidied_model <- lm(Foster ~ Biological, data = twins) %>% 
+tidied_model <- lm(Foster ~ Biological, data = twins) |> 
    tidy(conf.int = TRUE, conf.level = confidence_level)
 
 # Recall the t-confidence interval
-tidied_model %>%
-  filter(term == "Biological") %>%
+tidied_model |>
+  filter(term == "Biological") |>
   select(conf.low, conf.high)
 
 # Create the bootstrap confidence interval
-boot_slope %>% 
+boot_slope |> 
   summarize(
     lower = quantile(stat, p_lower), 
     upper = quantile(stat, p_upper)
@@ -929,7 +929,7 @@ However, in regression, it is often of interest to put an interval estimate onto
 ### Fat & calories, a linear model
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + 
   ggtitle("Fat vs. Calories for Starbucks Food Items") +
   geom_smooth(method="lm", se=FALSE)
@@ -965,7 +965,7 @@ newfood <- data.frame(Fat = c(0,10,20,30))
  
 augment(lm(Calories ~ Fat, data=starbucks), 
         se_fit = TRUE,
-        newdata = newfood) %>%
+        newdata = newfood) |>
    mutate(lowMean = .fitted - crit_val*.se.fit,
           upMean = .fitted + crit_val*.se.fit)
 ```
@@ -987,8 +987,8 @@ Additionally, you can see the intervals which capture the average calorie conten
 
 ```{r echo=TRUE, eval=TRUE}
 predMeans <- augment(lm(Calories ~ Fat, data = starbucks),
-                     se_fit = TRUE) %>%
-   select(Calories, Fat, .fitted, .se.fit) %>%
+                     se_fit = TRUE) |>
+   select(Calories, Fat, .fitted, .se.fit) |>
    mutate(lowMean = .fitted - crit_val*.se.fit,
           upMean =  .fitted + crit_val*.se.fit) 
 
@@ -1027,10 +1027,10 @@ FatCal_gl <- glance(FatCal_lm)
 FatCal_sig <- pull(FatCal_gl, sigma)
 
 FatCal_pred <- augment(FatCal_lm,
-                       se_fit = TRUE) %>%
+                       se_fit = TRUE) |>
   mutate(.se.pred = sqrt(FatCal_sig^2 + .se.fit^2))
 
-predResp <- FatCal_pred %>%
+predResp <- FatCal_pred |>
   mutate(lowResp = .fitted - crit_val*.se.pred, 
          upResp = .fitted + crit_val*.se.pred)
 
@@ -1139,7 +1139,7 @@ model <- lm(Foster ~ Biological, data = twins)
 new_twins <- data.frame(Biological = seq(70, 130, 15))
 
 # Augment the model with the new dataset
-augmented_model <- model %>%   
+augmented_model <- model |>   
   augment(newdata = new_twins, se_fit = TRUE)
 
 # See the result
@@ -1158,9 +1158,9 @@ Calculate a confidence interval of the predicted IQs of the foster twin, based o
 # From previous steps
 model <- lm(Foster ~ Biological, data = twins)
 new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model %>% augment(newdata = new_twins, se_fit = TRUE)
+augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
 
-augmented_model %>%
+augmented_model |>
   # Calculate a confidence interval on the predicted values
   mutate(
     lower_mean_prediction = ___,
@@ -1180,9 +1180,9 @@ augmented_model %>%
 # From previous steps
 model <- lm(Foster ~ Biological, data = twins)
 new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model %>% augment(newdata = new_twins, se_fit = TRUE)
+augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
 
-augmented_model %>%
+augmented_model |>
   # Calculate a confidence interval on the predicted values
   mutate(
     lower_mean_prediction = .fitted - critical_value * .se.fit,
@@ -1220,9 +1220,9 @@ p_upper <- 1 - alpha / 2
 critical_value <- qt(p_upper, df = degrees_of_freedom)
 model <- lm(Foster ~ Biological, data = twins)
 new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model %>% augment(newdata = new_twins, se_fit = TRUE)
+augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
 
-predictions <- augmented_model %>%
+predictions <- augmented_model |>
   # Calculate a confidence interval on the predicted values
   mutate(
     lower_mean_prediction = .fitted - critical_value * .se.fit,
@@ -1306,9 +1306,9 @@ p_upper <- 1 - alpha / 2
 critical_value <- qt(p_upper, df = degrees_of_freedom)
 model <- lm(Foster ~ Biological, data = twins)
 new_twins <- data.frame(Biological = seq(70, 130, 15))
-augmented_model <- model %>% augment(newdata = new_twins, se_fit = TRUE)
+augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
 
-predictions <- augmented_model %>%
+predictions <- augmented_model |>
   # Calculate a confidence interval on the predicted values
   mutate(
     lower_mean_prediction = .fitted - critical_value * .se.fit,
@@ -1328,13 +1328,13 @@ model <- lm(Foster ~ Biological, data = twins)
 
 
 ```{r ex316, exercise=TRUE}
-twins_sigma <- model %>%
+twins_sigma <- model |>
   # Get model-level information
-  ___ %>%
+  ___ |>
   # Pull out sigma
   ___
 
-predictions %>%
+predictions |>
   # Calculate the std err of the predictions
   mutate(std_err_of_predictions = ___)
 ```
@@ -1347,13 +1347,13 @@ predictions %>%
 ```
 
 ```{r ex316-solution}
-twins_sigma <- model %>%
+twins_sigma <- model |>
   # Get model-level information
-  glance() %>%
+  glance() |>
   # Pull out sigma
   pull(sigma)
 
-predictions %>%
+predictions |>
   # Calculate the std err of the predictions
   mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
 ```
@@ -1369,11 +1369,11 @@ predictions %>%
 
 ```{r ex317, exercise=TRUE}
 # From previous step
-twins_sigma <- model %>% glance() %>% pull(sigma)
-predictions2 <- predictions %>%
+twins_sigma <- model |> glance() |> pull(sigma)
+predictions2 <- predictions |>
   mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
 
-predictions3 <- predictions2 %>%
+predictions3 <- predictions2 |>
   # Calculate the prediction intervals
   mutate(
     lower_response_prediction = ___,
@@ -1393,11 +1393,11 @@ predictions3
 
 ```{r ex317-solution}
 # From previous step
-twins_sigma <- model %>% glance() %>% pull(sigma)
-predictions2 <- predictions %>%
+twins_sigma <- model |> glance() |> pull(sigma)
+predictions2 <- predictions |>
   mutate(std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2))
 
-predictions3 <- predictions2 %>%
+predictions3 <- predictions2 |>
   # Calculate the prediction intervals
   mutate(
     lower_response_prediction = .fitted - critical_value * std_err_of_predictions,
@@ -1423,8 +1423,8 @@ Update the plot to add a ribbon layer of prediction intervals.
 
 ```{r ex318, exercise=TRUE}
 # From previous step3
-twins_sigma <- model %>% glance() %>% pull(sigma)
-predictions3 <- predictions %>%
+twins_sigma <- model |> glance() |> pull(sigma)
+predictions3 <- predictions |>
   mutate(
     std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2),
     lower_response_prediction = .fitted - critical_value * std_err_of_predictions,
@@ -1458,8 +1458,8 @@ ggplot() +
 
 ```{r ex318-solution}
 # From previous step3
-twins_sigma <- model %>% glance() %>% pull(sigma)
-predictions3 <- predictions %>%
+twins_sigma <- model |> glance() |> pull(sigma)
+predictions3 <- predictions |>
   mutate(
     std_err_of_predictions = sqrt(twins_sigma ^ 2 + .se.fit ^ 2),
     lower_response_prediction = .fitted - critical_value * std_err_of_predictions,

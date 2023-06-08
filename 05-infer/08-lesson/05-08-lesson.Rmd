@@ -16,6 +16,7 @@ library(broom)
 library(emo)
 library(openintro)
 library(ggridges)
+library(magrittr)
 
 # knitr options ----------------------------------------------------------------
 
@@ -234,7 +235,7 @@ Here is a look at what the parametric (theoretical) output of an ANOVA model loo
 
 
 ```{r echo=TRUE}
-aov(wordsum ~ class, gss) %>%
+aov(wordsum ~ class, gss) |>
   tidy()
 ```
 
@@ -270,17 +271,17 @@ These degrees of freedom are called the "numerator" and "denominator" degrees of
 A plot of the $F$-distribution used to calculate the p-value for this hypothesis test is shown below. 
 
 ```{r, echo = FALSE}
-values <- rf(100000, df1 = 3, df2 = 791) %>% 
+values <- data.frame(val=rf(100000, df1 = 3, df2 = 791)) |> 
   tibble()
 
-obs_stat <- aov(wordsum ~ class, gss) %>%
-  tidy() %>% 
-  filter(term == "class") %>% 
-    select(statistic) %>% 
+obs_stat <- aov(wordsum ~ class, gss) |>
+  tidy() |> 
+  filter(term == "class") |> 
+    select(statistic) |> 
   pull()
 
-values %>% 
-ggplot(aes(x = .)) + 
+values |> 
+ggplot(aes(x = val)) + 
   geom_density() + 
   xlim(c(0, 25)) + 
   labs(x = "F-statistic", 
@@ -298,7 +299,7 @@ The p-value is the area under the $F$-distribution beyond the observed $F$-stati
 
 
 ```{r}
-aov(wordsum ~ class, gss) %>%
+aov(wordsum ~ class, gss) |>
   tidy()
 ``` 
 
@@ -309,17 +310,17 @@ aov(wordsum ~ class, gss) %>%
 The same $F$-distribution as above is shown below, with the observed $F$-statistic is displayed in red. 
 
 ```{r, echo = FALSE}
-values <- rf(100000, df1 = 3, df2 = 791) %>% 
+values <- data.frame(val=rf(100000, df1 = 3, df2 = 791)) |> 
   tibble()
 
-obs_stat <- aov(wordsum ~ class, gss) %>%
-  tidy() %>% 
-  filter(term == "class") %>% 
-    select(statistic) %>% 
+obs_stat <- aov(wordsum ~ class, gss) |>
+  tidy() |> 
+  filter(term == "class") |> 
+    select(statistic) |> 
   pull()
 
-values %>% 
-ggplot(aes(x = .)) + 
+values |> 
+ggplot(aes(x = val)) + 
   geom_density() + 
   xlim(c(0, 25)) + 
   labs(x = "F-statistic", 
@@ -445,9 +446,9 @@ Use these calculations to decide if it seems reasonable to assume that the group
 
 
 ```{r vocabulary_3, exercise=TRUE}
-gss %>%
+gss |>
   # Group by class
-  group_by(___) %>%
+  group_by(___) |>
   # Calculate the std dev of wordsum as std_dev_wordsum
   summarize(___ = ___)
 ```
@@ -459,9 +460,9 @@ gss %>%
 </div>
 
 ```{r vocabulary_3-solution}
-gss %>%
+gss |>
   # Group by class
-  group_by(class) %>%
+  group_by(class) |>
   # Calculate the std dev of wordsum as std_dev_wordsum
   summarize(sd_wordsum = sd(wordsum))
 ```
@@ -475,7 +476,7 @@ Let's see what these standard deviations *look* like.
 Create ridge plots of the distribution of `wordsum` across the different self-identified social `class`es.  
 
 ```{r vocabulary_4, exercise=TRUE}
-gss %>%
+gss |>
   # Map wordsum to the x-axis and class to the y-axis
   ggplot(aes(x = ___, y = ___)) +
   # Add density ridges to the plot! 
@@ -488,7 +489,7 @@ gss %>%
 </div>
 
 ```{r vocabulary_4-solution}
-gss %>%
+gss |>
   # Map wordsum to the x-axis and class to the y-axis
   ggplot(aes(x = wordsum, y = class)) +
   # Add density ridges to the plot! 
@@ -511,8 +512,8 @@ In the case of an ANOVA, the statistic we are interested in is the F-statistic. 
 We can `calculate` the F-statistic using the tools from the infer package we are familiar with. The only part that is new is the `stat` that we calculate. Here, we use the `"F"` statistic. This is what this looks like: 
 
 ```{r, echo = TRUE}
-obs_stat <- gss %>% 
-  specify(wordsum ~ class) %>% 
+obs_stat <- gss |> 
+  specify(wordsum ~ class) |> 
   calculate(stat = "F")
 ```
 
@@ -535,10 +536,10 @@ Let's start with steps 1-4. Using the code below, fill in the missing pieces nec
 Once you've filled in the code, take a look at what the F-statistics stored inside of `null_dist` look like!
 
 ```{r anova-sim, exercise = TRUE}
-null_dist <- gss %>% 
-  specify(___ ~ ___) %>% 
-  hypothesize(null = "___") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+null_dist <- gss |> 
+  specify(___ ~ ___) |> 
+  hypothesize(null = "___") |> 
+  generate(reps = 1000, type = "permute") |> 
   calculate(stat = "___")
 
 ```
@@ -560,15 +561,15 @@ calculate(stat = "F")
 Now that we have our observed F-statistic and our null distribution, we can calculate our p-value! Let's visualize where the observed statistic lies on the null distribution first. 
 
 ```{r, include = FALSE}
-null_dist <- gss %>% 
-  specify(wordsum ~ class) %>% 
-  hypothesize(null = "independence") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+null_dist <- gss |> 
+  specify(wordsum ~ class) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
   calculate(stat = "F")
 ```
 
 ```{r, echo = TRUE}
-null_dist %>% 
+null_dist |> 
   visualise() +
   shade_p_value(obs_stat = obs_stat, direction = "greater")
 ```
@@ -693,11 +694,11 @@ t_test_results <- gss %$%
 t_test_results <- pairwise.t.test(gss$wordsum, gss$class, p.adjust.method = "bonferroni")
 
 # Tidy the result
-tidy(___)
+tidy(t_test_results)
 
 ## Compare with un-adjusted pairwise t-tests
 gss %$% 
-  pairwise.t.test(wordsum, class, p.adjust.method = "none") %>% 
+  pairwise.t.test(wordsum, class, p.adjust.method = "none") |> 
   tidy()
 
 ```

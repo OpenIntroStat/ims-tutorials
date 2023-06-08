@@ -19,11 +19,11 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # Used in some exercises
 load("data/us_regions.RData")
 
-county_noDC <- county %>%
-  filter(state != "District of Columbia") %>%
+county_noDC <- county |>
+  filter(state != "District of Columbia") |>
   droplevels()
 
-county_srs <- county_noDC %>%
+county_srs <- county_noDC |>
   slice_sample(n = 150)
 ```
 
@@ -143,8 +143,8 @@ That is, we will create a new data frame, called `county_noDC` that `filter()`s 
 We'll also `droplevels()` for good measure, so that the level District of Columbia is removed completely from the data frame.
 
 ```{r remove-dc, exercise=TRUE}
-county_noDC <- county %>%
-  filter(state != "District of Columbia") %>%
+county_noDC <- county |>
+  filter(state != "District of Columbia") |>
   droplevels()
 ```
 
@@ -158,7 +158,7 @@ We start with the `county_noDC` data frame and pipe it into the `slice_sample()`
 
 ```{r random-sample, exercise=TRUE}
 # Simple random sample of 150 counties
-county_srs <- county_noDC %>%
+county_srs <- county_noDC |>
   slice_sample(n = 150)
 
 # Glimpse
@@ -177,8 +177,8 @@ To do so we will start with the `county_srs` data frame: first group these data 
 
 ```{r random-sample3, exercise=TRUE}
 # State distribution of SRS counties
-county_srs %>%
-  group_by(state) %>%
+county_srs |>
+  group_by(state) |>
   count()
 ```
 
@@ -194,8 +194,8 @@ A quick glimpse at the resulting data frame confirms that we indeed have _150_ o
 
 ```{r stratified-sample, exercise=TRUE}
 # Stratified sample of 150 counties, each state is a stratum
-county_str <- county_noDC %>%
-  group_by(state) %>%
+county_str <- county_noDC |>
+  group_by(state) |>
   slice_sample(n = 3)
 
 # Glimpse
@@ -216,21 +216,21 @@ The dplyr package and `us_regions` data frame have been loaded.
 
 ```{r simple-random-sample, exercise=TRUE}
 # Simple random sample: states_srs
-states_srs <- ___ %>%
+states_srs <- ___ |>
   ___
 
 # Count states by region
-states_srs %>%
+states_srs |>
   ___(___)
 ```
 
 ```{r simple-random-sample-solution}
 # Simple random sample
-states_srs <- us_regions %>%
+states_srs <- us_regions |>
   slice_sample(n = 8)
 
 # Count states by region
-states_srs %>%
+states_srs |>
   count(region)
 ```
 
@@ -252,23 +252,23 @@ in your sample to confirm that each region is represented equally in your sample
 
 ```{r stratified-sample4, exercise=TRUE}
 # Stratified sample
-states_str <- ___ %>%
-  group_by(___) %>%
+states_str <- ___ |>
+  group_by(___) |>
   slice_sample(___)
 
 # Use the states_str data to count states by region
-___ %>%
+___ |>
   ___
 ```
 
 ```{r stratified-sample4-solution}
 # Stratified sample
-states_str <- us_regions %>%
-  group_by(region) %>%
+states_str <- us_regions |>
+  group_by(region) |>
   slice_sample(n = 2)
 
 # Count states by region
-states_str %>%
+states_str |>
   count(region)
 ```
 

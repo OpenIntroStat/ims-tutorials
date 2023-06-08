@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Used in some exercises
 # Recode cls_students as cls_type
-evals <- evals %>%
+evals <- evals |>
   mutate(cls_type = case_when(
     cls_students <= 18                      ~ "small",
     cls_students >= 19 & cls_students <= 59 ~ "midsize",
@@ -51,7 +51,7 @@ Inspect the `evals` data frame using techniques you learned in previous lessons.
 Note that for the purposes of this analysis we have added an additional variable to the dataset, `cls_type`. This variable classifies classes as small, midsize, or large, depending on the number of students in the class. This was done using the following.
 
 ```{r echo = TRUE}
-evals <- evals %>%
+evals <- evals |>
   mutate(cls_type = case_when(
     cls_students <= 18                      ~ "small",
     cls_students >= 19 & cls_students <= 59 ~ "midsize",
@@ -170,7 +170,7 @@ The `cls_students` variable in `evals` tells you the number of students in the c
 
 ```{r type-of-variable, exercise=TRUE}
 # Recode cls_students as cls_type
-evals <- evals %>%
+evals <- evals |>
   mutate(
     ___ = case_when(
       ___ ~ "small",
@@ -182,7 +182,7 @@ evals <- evals %>%
 
 ```{r type-of-variable-solution}
 # Recode cls_students as cls_type
-evals <- evals %>%
+evals <- evals |>
   mutate(
     cls_type = case_when(
       cls_students <= 18                      ~ "small",

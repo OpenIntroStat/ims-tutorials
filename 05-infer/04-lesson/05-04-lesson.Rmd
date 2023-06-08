@@ -32,14 +32,14 @@ knitr::opts_chunk$set(fig.align = "center",
 iran <- read_csv("data/iran.csv")
 iowa <- read_csv("data/iowa.csv")
 
-gss2016 <- read_rds("data/gss-sampled-2016.rds") %>%
+gss2016 <- read_rds("data/gss-sampled-2016.rds") |>
   mutate(party = case_when(
     str_detect(partyid, "DEMOCRAT")   ~ "Dem",
     str_detect(partyid, "REPUBLICAN") ~ "Rep",
     str_detect(partyid, "IND")        ~ "Ind",
     TRUE                              ~ "Oth"
-  )) %>% 
-  filter(party != "Oth") %>%
+  )) |> 
+  filter(party != "Oth") |>
   droplevels()
 ```
 
@@ -114,7 +114,7 @@ knitr::include_graphics("images/ahmedinejad-mousavi.png")
 One of the key points of evidence that was used in arguing fraud were the vote counts, which are available in a data set called Iran.
 
 ```{r message=FALSE}
-iran %>%
+iran |>
   select(city, ahmadinejad, mousavi, total_votes_cast)
 ```
 
@@ -149,8 +149,8 @@ Along the way, you'll use a very useful function called `gather()`. This allows 
 
 ```{r message=FALSE}
 get_first <- function(x) {
-    substr(as.character(x), 1, 1) %>%
-      as.numeric() %>%
+    substr(as.character(x), 1, 1) |>
+      as.numeric() |>
       as.factor()
 }
 ```
@@ -160,7 +160,7 @@ get_first <- function(x) {
 
 ```{r ex1, exercise=TRUE}
 # Compute and save candidate totals
-totals <- ___ %>%
+totals <- ___ |>
   ___(ahmadinejad = ___,
             rezai = ___,
             karrubi = ___,
@@ -176,7 +176,7 @@ totals
 
 ```{r ex1-solution}
 # Compute and save candidate totals
-totals <- iran %>%
+totals <- iran |>
   summarize(ahmadinejad = sum(ahmadinejad),
             rezai = sum(rezai),
             karrubi = sum(karrubi),
@@ -198,14 +198,14 @@ totals
 
 ```{r ex2, exercise=TRUE}
 # From previous step
-totals <- iran %>%
+totals <- iran |>
   summarize(ahmadinejad = sum(ahmadinejad),
             rezai = sum(rezai),
             karrubi = sum(karrubi),
             mousavi = sum(mousavi))
 
 # Gather data
-gathered_totals <- totals %>%
+gathered_totals <- totals |>
   gather(key = ___, value = ___)
 
 # Inspect gathered totals
@@ -218,14 +218,14 @@ gathered_totals
 
 ```{r ex2-solution}
 # From previous step
-totals <- iran %>%
+totals <- iran |>
   summarize(ahmadinejad = sum(ahmadinejad),
             rezai = sum(rezai),
             karrubi = sum(karrubi),
             mousavi = sum(mousavi))
 
 # Gather data
-gathered_totals <- totals %>%
+gathered_totals <- totals |>
   gather(key = "candidate", value = "votes")
 
 # Inspect gathered totals
@@ -240,12 +240,12 @@ gathered_totals
 
 ```{r ex3, exercise=TRUE}
 # From previous steps
-totals <- iran %>%
+totals <- iran |>
   summarize(ahmadinejad = sum(ahmadinejad),
             rezai = sum(rezai),
             karrubi = sum(karrubi),
             mousavi = sum(mousavi))
-gathered_totals <- totals %>%
+gathered_totals <- totals |>
   gather(key = "candidate", value = "votes")
 
 # Plot total votes for each candidate
@@ -260,12 +260,12 @@ ___ +
 
 ```{r ex3-solution}
 # From previous steps
-totals <- iran %>%
+totals <- iran |>
   summarize(ahmadinejad = sum(ahmadinejad),
             rezai = sum(rezai),
             karrubi = sum(karrubi),
             mousavi = sum(mousavi))
-gathered_totals <- totals %>%
+gathered_totals <- totals |>
   gather(key = "candidate", value = "votes")
 
 # Plot total votes for each candidate
@@ -293,11 +293,11 @@ Did Ahmadinejad win throughout the country, or were there provinces where the se
 
 ```{r message=FALSE, warning=FALSE}
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
@@ -306,9 +306,9 @@ get_first <- function(x) {
 
 ```{r ex4, exercise=TRUE}
 # Construct province-level dataset
-province_totals <- ___ %>%
+province_totals <- ___ |>
   # Group by province
-  ___ %>%
+  ___ |>
   # Sum up votes for top two candidates
   ___ 
 
@@ -317,7 +317,7 @@ province_totals <- ___ %>%
 province_totals
 
 # Filter for won provinces won by #2
-___ %>%
+___ |>
   ___(___ > ___)
 ```
 
@@ -329,9 +329,9 @@ ___ %>%
 
 ```{r ex4-solution}
 # Construct province-level dataset
-province_totals <- iran %>%
+province_totals <- iran |>
   # Group by province
-  group_by(province) %>%
+  group_by(province) |>
   # Sum up votes for top two candidates
   summarize(mousavi = sum(mousavi),
             ahmadinejad = sum(ahmadinejad))
@@ -340,7 +340,7 @@ province_totals <- iran %>%
 province_totals
 
 # Filter for won provinces won by #2
-province_totals %>%
+province_totals |>
   filter(mousavi > ahmadinejad)
 ```
 
@@ -361,11 +361,11 @@ Once you create a new variable containing only the first digit, you can get a se
 
 ```{r message=FALSE}
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
@@ -377,11 +377,11 @@ get_first <- function(x) {
 get_first
 
 # Create first_digit variable
-iran <- iran %>%
+iran <- iran |>
   ___
   
 # Check if get_first worked
-___ %>%
+___ |>
   ___
 
 # Construct bar plot
@@ -403,11 +403,11 @@ ___ +
 get_first
 
 # Create first_digit
-iran <- iran %>%
+iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
 
 # Check if get_first worked
-iran %>%
+iran |>
   select(total_votes_cast, first_digit)
   
 # Construct bar plot
@@ -658,8 +658,8 @@ ggplot(gss2016, aes(x = party)) +
 ```
 
 ```{r }
-tab <- gss2016 %>%
-     select(party) %>%
+tab <- gss2016 |>
+     select(party) |>
      table()
 tab
 ```
@@ -680,9 +680,9 @@ Let's walk through an example with the gss data of using the Chi-squared to asse
 
 
 ```{r }
-gss2016 %>%
-  specify(response = party) %>%
-  hypothesize(null = "point", p = p_uniform) %>%
+gss2016 |>
+  specify(response = party) |>
+  hypothesize(null = "point", p = p_uniform) |>
   generate(reps = 1, type = "simulate")
 ```
 
@@ -697,9 +697,9 @@ I'd like to visualize this data, so we'll go ahead and save it to sim_1, then co
 
 
 ```{r }
-sim_1 <- gss2016 %>%
-   specify(response = party) %>%
-   hypothesize(null ="point",p = p_uniform) %>%
+sim_1 <- gss2016 |>
+   specify(response = party) |>
+   hypothesize(null ="point",p = p_uniform) |>
    generate(reps = 1, type = "simulate")
 ```
 
@@ -740,18 +740,19 @@ In this exercise, you'll use simulation to build up the null distribution of the
 
 
 ```{r message=FALSE, warning=FALSE}
-p_benford <- 1:9 %>% setNames(log10(1 + 1 / .), .)
+#p_benford <- 1:9 |> setNames(log10(1 + 1 / .), .)
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
 
-iran <- iran %>%
+iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
 ```
 
@@ -788,17 +789,17 @@ null <- ___
 p_benford
 
 # Compute observed stat
-chi_obs_stat <- iran %>%
+chi_obs_stat <- iran |>
   chisq_stat(response = first_digit, p = p_benford)
 
 # Form null distribution
-null <- iran %>%
+null <- iran |>
   # Specify the response
-  specify(response = first_digit) %>%
+  specify(response = first_digit) |>
   # Set up the null hypothesis
-  hypothesize(null = "point", p = p_benford) %>%
+  hypothesize(null = "point", p = p_benford) |>
   # Generate 500 reps
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "simulate") |>
   # Calculate statistics
   calculate(stat = "Chisq")
 ```
@@ -817,26 +818,26 @@ In this exercise you'll compare these two approaches to calculate a p-value that
 ```{r message=FALSE, warning=FALSE}
 set.seed(123)
 
-p_benford <- 1:9 %>% setNames(log10(1 + 1 / .), .)
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
 
-iran <- iran %>%
+iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
-tab <- iran %>%
-  select(first_digit) %>%
+tab <- iran |>
+  select(first_digit) |>
   table()
-null <- iran %>%
-  specify(response = first_digit) %>%
-  hypothesize(null = "point", p = p_benford) %>%
-  generate(reps = 500, type = "simulate") %>%
+null <- iran |>
+  specify(response = first_digit) |>
+  hypothesize(null = "point", p = p_benford) |>
+  generate(reps = 500, type = "simulate") |>
   calculate(stat = "Chisq")
 chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 ```
@@ -853,9 +854,9 @@ chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 
 ```{r ex7, exercise=TRUE}
 # Compute degrees of freedom
-degrees_of_freedom <- ___ %>%
+degrees_of_freedom <- ___ |>
   # Pull out first_digit vector
-  pull("first_digit") %>% 
+  pull("first_digit") |> 
   # Calculate n levels and subtract 1
   ___
 
@@ -877,9 +878,9 @@ ___
 
 ```{r ex7-solution}
 # Compute degrees of freedom
-degrees_of_freedom <- iran %>% 
+degrees_of_freedom <- iran |> 
   # Pull out first_digit vector
-  pull(first_digit) %>% 
+  pull(first_digit) |> 
   # Calculate n levels and subtract 1
   nlevels() - 1
 
@@ -902,12 +903,12 @@ ggplot(null, aes(x = stat)) +
 
 ```{r ex8, exercise=TRUE}
 # From previous step
-degrees_of_freedom <- iran %>% 
-  pull(first_digit) %>% 
+degrees_of_freedom <- iran |> 
+  pull(first_digit) |> 
   nlevels() - 1
 
 # Permutation p-value
-___ %>%
+___ |>
   ___(pval = ___)
   
 # Approximation p-value
@@ -923,12 +924,12 @@ ___
 
 ```{r ex8-solution}
 # From previous step
-degrees_of_freedom <- iran %>% 
-  pull(first_digit) %>% 
+degrees_of_freedom <- iran |> 
+  pull(first_digit) |> 
   nlevels() - 1
 
 # Permutation p-value
-null %>%
+null |>
   summarize(pval = mean(stat >= chi_obs_stat))
 
 # Approximation p-value
@@ -1070,11 +1071,11 @@ For this analysis, look at totals at the *county* level in Iowa and focus on the
 
 ```{r message=FALSE}
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
@@ -1088,9 +1089,9 @@ Using the `iowa` data set, filter the rows so they contain only the two main par
 
 ```{r ex9, exercise=TRUE}
 # Get Iowa county vote totals
-iowa_county <- ___ %>%
+iowa_county <- ___ |>
   # Filter for rep/dem
-  ___(candidate %in% c(___, ___)) %>%
+  ___(candidate %in% c(___, ___)) |>
   # Group by county
   ___
   # Compute total votes in each county
@@ -1108,11 +1109,11 @@ iowa_county
 
 ```{r ex9-solution}
 # Get Iowa county vote totals
-iowa_county <- iowa %>%
+iowa_county <- iowa |>
   # Filter for rep/dem
-  filter(candidate %in% c("Hillary Clinton / Tim Kaine", "Donald Trump / Mike Pence")) %>%
+  filter(candidate %in% c("Hillary Clinton / Tim Kaine", "Donald Trump / Mike Pence")) |>
   # Group by county
-  group_by(county) %>%
+  group_by(county) |>
   # Compute total votes in each county
   summarize(dem_rep_votes = sum(votes))
   
@@ -1129,14 +1130,14 @@ Extract the first digit from the `dem_rep_votes` column using the custom functio
 
 ```{r ex10, exercise=TRUE}
 # From previous step
-iowa_county <- iowa %>%
+iowa_county <- iowa |>
   filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
+         candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
   summarize(dem_rep_votes = sum(votes)) 
   
 # Add first_digit
-iowa_county <- iowa_county %>%
+iowa_county <- iowa_county |>
   ___
   
 # See the result
@@ -1149,14 +1150,14 @@ iowa_county
 
 ```{r ex10-solution}
 # From previous step
-iowa_county <- iowa %>%
+iowa_county <- iowa |>
   filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
+         candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
   summarize(dem_rep_votes = sum(votes)) 
   
 # Add first digit
-iowa_county <- iowa_county %>%
+iowa_county <- iowa_county |>
   mutate(first_digit = get_first(dem_rep_votes))
   
 # See the result
@@ -1173,11 +1174,11 @@ Construct a bar plot of `first_digit`.
 
 ```{r ex11, exercise=TRUE}
 # From previous steps
-iowa_county <- iowa %>%
+iowa_county <- iowa |>
   filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
-  summarize(dem_rep_votes = sum(votes)) %>%
+         candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
+  summarize(dem_rep_votes = sum(votes)) |>
   mutate(first_digit = get_first(dem_rep_votes))
   
 # Using iowa_county, plot first_digit
@@ -1195,11 +1196,11 @@ iowa_county
 
 ```{r ex11-solution}
 # From previous steps
-iowa_county <- iowa %>%
+iowa_county <- iowa |>
   filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
-  summarize(dem_rep_votes = sum(votes)) %>%
+         candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
+  summarize(dem_rep_votes = sum(votes)) |>
   mutate(first_digit = get_first(dem_rep_votes))
   
 # Using iowa_county, plot first_digit
@@ -1222,22 +1223,22 @@ This is a prime example of when a hypothesis test is handy. It can tell you if t
 
 
 ```{r message=FALSE}
-p_benford <- 1:9 %>% setNames(log10(1 + 1 / .), .)
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
 
-iowa_county <- iowa %>%
-  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
+iowa_county <- iowa |>
+  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
   summarize(dem_rep_votes = sum(votes))
-iowa_county <- iowa_county %>%
+iowa_county <- iowa_county |>
   mutate(first_digit = get_first(dem_rep_votes))
 ```
 
@@ -1250,7 +1251,7 @@ Starting with `iowa_county`, compute the observed chi-squared statistic using `c
 
 ```{r ex12, exercise=TRUE}
 # Compute observed stat
-chi_obs_stat <- ___ %>%
+chi_obs_stat <- ___ |>
   ___
 ```
 
@@ -1260,7 +1261,7 @@ chi_obs_stat <- ___ %>%
 
 ```{r ex12-solution}
 # Compute observed stat
-chi_obs_stat <- iowa_county %>%
+chi_obs_stat <- iowa_county |>
   chisq_stat(response = first_digit, p = p_benford)
 ```
 
@@ -1290,13 +1291,13 @@ null <- ___
 
 ```{r ex13-solution}
 # Form null distribution
-null <- iowa_county %>%
+null <- iowa_county |>
   # Specify response
-  specify(response = first_digit) %>%
+  specify(response = first_digit) |>
   # Set up null
-  hypothesize(null = "point", p = p_benford) %>%
+  hypothesize(null = "point", p = p_benford) |>
   # Generate 500 reps
-  generate(reps = 500, type = "simulate") %>%
+  generate(reps = 500, type = "simulate") |>
   # Calculate statistics
   calculate(stat = "Chisq")
 ```
@@ -1311,12 +1312,12 @@ Construct a density plot of the distribution of the `null` statistics and add a 
 
 ```{r ex14, exercise=TRUE}
 # From previous steps
-chi_obs_stat <- iowa_county %>%
+chi_obs_stat <- iowa_county |>
   chisq_stat(response = first_digit, p = p_benford)
-null <- iowa_county %>%
-  specify(response = first_digit) %>%
-  hypothesize(null = "point", p = p_benford) %>%
-  generate(reps = 500, type = "simulate") %>%
+null <- iowa_county |>
+  specify(response = first_digit) |>
+  hypothesize(null = "point", p = p_benford) |>
+  generate(reps = 500, type = "simulate") |>
   calculate(stat = "Chisq")
 
 # Visualize null stat
@@ -1333,12 +1334,12 @@ ___
 
 ```{r ex14-solution}
 # From previous steps
-chi_obs_stat <- iowa_county %>%
+chi_obs_stat <- iowa_county |>
   chisq_stat(response = first_digit, p = p_benford)
-null <- iowa_county %>%
-  specify(response = first_digit) %>%
-  hypothesize(null = "point", p = p_benford) %>%
-  generate(reps = 500, type = "simulate") %>%
+null <- iowa_county |>
+  specify(response = first_digit) |>
+  hypothesize(null = "point", p = p_benford) |>
+  generate(reps = 500, type = "simulate") |>
   calculate(stat = "Chisq")
 
 # Visualize null stat
@@ -1368,33 +1369,33 @@ question("Based on the null distribution that you constructed in the last exerci
 
 
 ```{r message=FALSE, warning=FALSE}
-p_benford <- 1:9 %>% setNames(log10(1 + 1 / .), .)
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
 get_first <- function(x) {
-  x %>%
+  x |>
     # Convert the numbers to strings
-    as.character() %>%
+    as.character() |>
     # Extract the first digit
-    substr(1, 1) %>%
+    substr(1, 1) |>
     # Make it a categorical variable, with levels from 1 to 9 
     factor(levels = 1:9)
 }
 
-iowa <- iowa %>%
-  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") %>%
-  group_by(county) %>%
+iowa <- iowa |>
+  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
   summarize(dem_rep_votes = sum(votes, na.rm = T))
-iowa <- iowa %>%
+iowa <- iowa |>
   mutate(first_digit = get_first(dem_rep_votes))
-tab <- iowa %>%
-  select(first_digit) %>%
+tab <- iowa |>
+  select(first_digit) |>
   table()
 chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 
 # Form null distribution
-null <- iowa %>%
-  specify(response = first_digit) %>%
-  hypothesize(null = "point", p = p_benford) %>%
-  generate(reps = 500, type = "simulate") %>%
+null <- iowa |>
+  specify(response = first_digit) |>
+  hypothesize(null = "point", p = p_benford) |>
+  generate(reps = 500, type = "simulate") |>
   calculate(stat = "Chisq")
 ```
 

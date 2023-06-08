@@ -67,8 +67,8 @@ In fact we can. Recall that we initially considered any number of lines. We sett
 ```{r possum_augment_total_tail}
 total_tail_mod <- lm(total_l ~ tail_l, data = possum)
 
-total_tail_mod %>%
-  augment() %>%
+total_tail_mod |>
+  augment() |>
   ggplot(aes(x = tail_l, y = total_l)) +
   geom_smooth(method = "lm", se = 0) +
   geom_segment(aes(xend = tail_l, yend = .fitted),
@@ -96,8 +96,8 @@ After using the `augment()` function to tidy up our model, the sum of the square
 Keep in mind the column of the `augment()`-ed model we are interested in is named `.resid`. The period before it is part of its name and must be included!
 
 ```{r total_tail_mod-summary-1, echo = TRUE}
-total_tail_mod %>%
-  augment() %>%
+total_tail_mod |>
+  augment() |>
   summarize(SSE = sum(.resid^2),
             SSE_also = (n() - 1) * var(.resid))
 ```
@@ -219,9 +219,9 @@ This model is often called the **null model**. This model makes sense to use as 
 ```{r possum-null}
 null_mod <- lm(total_l ~ 1, data = possum)
 
-null_mod %>%
-  augment() %>%
-  mutate(tail_l = possum$tail_l) %>%
+null_mod |>
+  augment() |>
+  mutate(tail_l = possum$tail_l) |>
   ggplot(aes(x = tail_l, y = total_l)) +
   geom_smooth(method = "lm", se = 0, formula = y ~ 1) +
   geom_segment(aes(xend = tail_l, yend = .fitted),
@@ -239,8 +239,8 @@ possum_null <- lm(total_l ~ 1, data = possum)
 ```
 
 ```{r, echo = TRUE}
-null_mod %>%
-  augment(possum) %>%
+null_mod |>
+  augment(possum) |>
   summarize(SST = sum(.resid^2))
 ```
 
@@ -249,8 +249,8 @@ null_mod %>%
 Compare this number to the SSE for our possum model that uses tail length as an explanatory variable. The SSE in this case is 1301.488.
 
 ```{r possum-total-summary, echo = TRUE}
-total_tail_mod %>%
-  augment() %>%
+total_tail_mod |>
+  augment() |>
   summarize(SSE = sum(.resid^2))
 ```
 
@@ -329,16 +329,16 @@ wgt_hgt_augment <- augment(wgt_hgt_mod)
 
 
 # Compute R-squared
-wgt_hgt_augment %>%
+wgt_hgt_augment |>
   summarize(var_y = ___,
-            var_e = ___) %>%
+            var_e = ___) |>
   mutate(R_squared = ___)
 ```
 
 ```{r ex3-hint}
-wgt_hgt_augment %>%
+wgt_hgt_augment |>
   summarize(var_y = var(wgt),
-            var_e = var(.resid)) %>%
+            var_e = var(.resid)) |>
   mutate(R_squared = ___)
 ```
 
@@ -347,9 +347,9 @@ wgt_hgt_augment %>%
 summary(wgt_hgt_mod)
 
 # Compute R-squared
-wgt_hgt_augment %>%
+wgt_hgt_augment |>
   summarize(var_y = var(wgt),
-            var_e = var(.resid)) %>%
+            var_e = var(.resid)) |>
   mutate(R_squared = 1 - var_e / var_y)
 ```
 
@@ -360,7 +360,7 @@ wgt_hgt_augment %>%
 The $R^2$ reported for the regression model for poverty rate of U.S. counties in terms of high school graduation rate is 0.464.
 
 ```{r ir, echo = TRUE}
-lm(formula = poverty_2010 ~ hs_grad_2010, data = county_complete) %>%
+lm(formula = poverty_2010 ~ hs_grad_2010, data = county_complete) |>
   summary()
 ```
 
@@ -381,7 +381,7 @@ In our previous discussion of outliers, we learned how to identify points that s
 Recall the data we examined previously about Major League Baseball players during the 2010 season. We considered the relationship between the number of home runs hit by each player, and the corresponding number of bases that each player stole. The first statistic is a measurement of power, while the latter is a measurement of speed. As these skills are considered complementary, it should not be surprising that a simple linear regression model has a negative slope. In this case, we have fit the model to only those players with at least 400 at-bats, in a simple attempt to control for the confounding influence of playing time.
 
 ```{r up2, echo = TRUE}
-regulars <- mlbbat10 %>%
+regulars <- mlbbat10 |>
   filter(at_bat > 400)
 
 ggplot(data = regulars, aes(x = stolen_base, y = home_run)) +
@@ -410,9 +410,9 @@ The `slice_max()` allows for you to **both** order a dataframe and select how ma
 ```{r up3, echo = TRUE}
 mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars)
 
-mod_hr_sb %>%
-  augment() %>%
-  select(home_run, stolen_base, .hat) %>%
+mod_hr_sb |>
+  augment() |>
+  select(home_run, stolen_base, .hat) |>
   slice_max(order_by = .hat,
             n = 5)
 ```
@@ -424,16 +424,16 @@ Observations of high leverage, by virtue of their extreme values of the explanat
 However, suppose that there was a player with a similar number of stolen bases, but a decent number of home runs as well. In fact, Hall of Famer Rickey Henderson was such a player, and in his MVP-winning season of 1990, he stole 65 bases while hitting 28 home runs. Let's add this observation to our plot.
 
 ```{r up4}
-outlier <- Batting %>%
-  filter(SB > 60 & SB < 70 & HR > 20) %>%
-  arrange(desc(HR)) %>%
-  select(playerID, yearID, teamID, SB, HR) %>%
-  head(1) %>%
+outlier <- Batting |>
+  filter(SB > 60 & SB < 70 & HR > 20) |>
+  arrange(desc(HR)) |>
+  select(playerID, yearID, teamID, SB, HR) |>
+  head(1) |>
   rename(stolen_base = SB,
          home_run = HR)
 
-regulars_plus <- regulars %>%
-  select(name, team, stolen_base, home_run) %>%
+regulars_plus <- regulars |>
+  select(name, team, stolen_base, home_run) |>
   bind_rows(outlier)
 
 ggplot(data = regulars_plus, aes(x = stolen_base, y = home_run)) +
@@ -457,9 +457,9 @@ In fact, a measurement known as Cook's distance combines these two quantities (l
 ```{r cook, echo = TRUE}
 mod_hr_sb <- lm(home_run ~ stolen_base, data = regulars_plus)
 
-mod_hr_sb %>%
-  augment() %>%
-  select(home_run, stolen_base, .fitted, .resid, .hat, .cooksd) %>%
+mod_hr_sb |>
+  augment() |>
+  select(home_run, stolen_base, .fitted, .resid, .hat, .cooksd) |>
   slice_max(order_by = .cooksd,
             n = 5)
 ```
@@ -474,32 +474,32 @@ The `augment()` function from the **broom** package automatically adds the lever
 
 ```{r ex5, exercise = TRUE}
 # Rank points of high leverage
-mod_slg_obp %>%
-  ___ %>%
+mod_slg_obp |>
+  ___ |>
   slice_max(order_by = ___,
             n = ___)
 ```
 
 ```{r ex5-hint-1}
 # Rank points of high leverage
-mod_slg_obp %>%
-  augment() %>%
+mod_slg_obp |>
+  augment() |>
   slice_max(order_by = ___,
             n = ___)
 ```
 
 ```{r ex5-hint-2}
 # Rank points of high leverage
-mod_slg_obp %>%
-  augment() %>%
+mod_slg_obp |>
+  augment() |>
   slice_max(order_by = .hat,
             n = ___)
 ```
 
 ```{r ex5-solution}
 # Rank points of high leverage
-mod_slg_obp %>%
-  augment() %>%
+mod_slg_obp |>
+  augment() |>
   slice_max(order_by = .hat,
             n = 6)
 ```
@@ -525,8 +525,8 @@ Use `augment()` and `slice_max()` to list the top 6 observations by their Cook's
 
 ```{r ex6-solution}
 # Rank influential points
-mod_slg_obp %>%
-  augment() %>%
+mod_slg_obp |>
+  augment() |>
   slice_max(order_by = .cooksd,
             n = 6)
 ```
@@ -536,16 +536,16 @@ mod_slg_obp %>%
 Previously, we learned about how leverage and influence can help us understand how outliers affect our regression model. Suppose you have determined that an influential observation is affecting the slope of your regression line in a way that undermines the scientific merit of your model. What can you do about it?
 
 ```{r o1}
-regulars <- mlbbat10 %>%
+regulars <- mlbbat10 |>
   filter(at_bat > 400)
 
-outlier <- Batting %>%
-  filter(SB > 60 & SB < 70 & HR > 20) %>%
-  select(name = playerID, team = teamID, stolen_base = SB, home_run = HR) %>%
+outlier <- Batting |>
+  filter(SB > 60 & SB < 70 & HR > 20) |>
+  select(name = playerID, team = teamID, stolen_base = SB, home_run = HR) |>
   slice_max(order_by = home_run, n = 1)
 
-regulars_plus <- regulars %>%
-  select(name, team, stolen_base, home_run) %>%
+regulars_plus <- regulars |>
+  select(name, team, stolen_base, home_run) |>
   bind_rows(outlier)
 ```
 
@@ -563,7 +563,7 @@ The short answer is that there isn't much you can do about it other than removin
 In the full model of all the regular players from 2010 and Rickey Henderson from 1990, the slope of the regression line was -0.21 home runs per stolen base. In other words, players who steal five extra bases hit about one fewer home run, on average.
 
 ```{r o3, echo = TRUE}
-lm(home_run ~ stolen_base, data = regulars_plus) %>%
+lm(home_run ~ stolen_base, data = regulars_plus) |>
   coef()
 ```
 
@@ -572,7 +572,7 @@ lm(home_run ~ stolen_base, data = regulars_plus) %>%
 Now, in this case, there is an easy argument that Rickey Henderson does not fit with the rest of these data. It is a bit of a contrived argument, since we added him previously for effect, but nonetheless there are good reasons to assert that Henderson doesn't belong. If we remove him, note how the slope of the regression line decreases. Now, it's only four extra stolen bases that are associated with hitting one fewer home run.
 
 ```{r o4}
-lm(home_run ~ stolen_base, data = regulars) %>%
+lm(home_run ~ stolen_base, data = regulars) |>
   coef()
 ```
 
@@ -595,10 +595,10 @@ Again, ask yourself:
 - How does the scope of inference change?
 
 ```{r o5, echo = TRUE}
-regulars_new <- regulars %>%
+regulars_new <- regulars |>
   filter(stolen_base < 60)
 
-lm(home_run ~ stolen_base, data = regulars_new) %>%
+lm(home_run ~ stolen_base, data = regulars_new) |>
   coef()
 ```
 
@@ -617,7 +617,7 @@ Nevertheless, we can demonstrate how removing him will affect our model.
 
 ```{r ex7, exercise = TRUE}
 # Create nontrivial_players
-nontrivial_players <- mlbbat10 %>%
+nontrivial_players <- mlbbat10 |>
   ___(___)
 
 # Visualize new model
@@ -634,7 +634,7 @@ ggplot(data = mlbbat10,
 ```
 
 ```{r ex7-hint-1}
-nontrivial_players <- mlbbat10 %>%
+nontrivial_players <- mlbbat10 |>
   filter(at_bat >= 10,
          obp < 0.5)
 ```
@@ -652,11 +652,11 @@ ggplot(data = mlbbat10, aes(x = at_bat, y = obp)) +
 ```
 
 ```{r ex7-solution}
-nontrivial_players <- mlbbat10 %>%
+nontrivial_players <- mlbbat10 |>
   filter(at_bat >= 10,
          obp < 0.5)
 
-ggplot(data = nontrivial_players, aes(x = at-bat, y = obp)) +
+ggplot(data = nontrivial_players, aes(x = at_bat, y = obp)) +
   geom_point() +
   geom_smooth(method = "lm")
 
@@ -674,7 +674,7 @@ Next, let's compare the models for these two datasets.
 3. View the `summary()` of the new model and compare the slope and $R^2$ to the original model fit to the data on all players.
 
 ```{r ex8-setup}
-nontrivial_players <- mlbbat10 %>%
+nontrivial_players <- mlbbat10 |>
   filter(at_bat >= 10,
          obp < 0.5)
 ```
