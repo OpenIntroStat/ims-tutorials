@@ -27,32 +27,32 @@ starbucks <- read_delim("data/starbucks.txt",
                         trim_ws = TRUE)
 
 set.seed(4747)
-starbucks2 <- starbucks %>% 
+starbucks2 <- starbucks |> 
   sample_n(size=20) 
-starbucks3 <- starbucks %>%
+starbucks3 <- starbucks |>
   sample_n(size=20)
-starbucks_many <- starbucks %>%
+starbucks_many <- starbucks |>
   rep_sample_n(size = 20, replace = FALSE, reps = 50)
 
 ride_lm <- lm(volume ~ hightemp, data=RailTrail)
 
 set.seed(4747)
-railtrail_n10 <- RailTrail %>%
+railtrail_n10 <- RailTrail |>
   rep_sample_n(size=10, replace=FALSE, reps=50)
-railtrail_n50 <- RailTrail %>%
+railtrail_n50 <- RailTrail |>
   rep_sample_n(size=50, replace=FALSE, reps=50)
 
-railtrail_tight <- augment(ride_lm) %>%
-  mutate(resid2 = .resid/3) %>%
+railtrail_tight <- augment(ride_lm) |>
+  mutate(resid2 = .resid/3) |>
   mutate(volume_tight = .fitted + resid2)
 
 set.seed(4747)
-railtrail_n50_tight <- railtrail_tight %>%
+railtrail_n50_tight <- railtrail_tight |>
   rep_sample_n(size = 50, replace = FALSE, reps = 50)
 
-railtrail_n50_lessx <- RailTrail %>%
-  filter(hightemp < 85) %>%
-  filter(hightemp > 55) %>%
+railtrail_n50_lessx <- RailTrail |>
+  filter(hightemp < 85) |>
+  filter(hightemp > 55) |>
   rep_sample_n(size=50, replace=FALSE, reps=50)
 ```
 
@@ -78,7 +78,7 @@ In this tutorial, you will be building on your previous work to now make inferen
 
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") 
 ```
 
@@ -88,7 +88,7 @@ We will be working primarily with two continuous variables.  Consider the scatte
 ### Fat & calories: linear model
 
 ```{r echo = FALSE}
-starbucks %>% 
+starbucks |> 
   ggplot(aes(x=Fat, y=Calories)) + geom_point() + ggtitle("Fat vs. Calories for Starbucks Food Items") +
   geom_smooth(method="lm", se=FALSE)
 ```
@@ -162,9 +162,9 @@ Indeed, when we take repeated samples of size 20 (here we took 50 different samp
 
 
 ```{r echo = FALSE}
-starbucks_many_lm <- starbucks_many %>% 
-  group_by(replicate) %>% 
-  do(tidy(lm(Calories ~ Fat, data=.))) %>%
+starbucks_many_lm <- starbucks_many |> 
+  group_by(replicate) |> 
+  do(tidy(lm(Calories ~ Fat, data=.))) |>
   filter(term=="Fat")
 
 ggplot(starbucks_many_lm, aes(x=estimate)) + geom_density() +
@@ -210,9 +210,9 @@ The same analysis can be done with different variables.  Here, consider fat and 
 ### Fat & carbohydrates: sampling distribution of slopes
 
 ```{r echo = FALSE}
-starbucks_many_lm <- starbucks_many %>% 
-  group_by(replicate) %>% 
-  do(tidy(lm(Carbs ~ Fat, data=.))) %>%
+starbucks_many_lm <- starbucks_many |> 
+  group_by(replicate) |> 
+  do(tidy(lm(Carbs ~ Fat, data=.))) |>
   filter(term=="Fat")
 
 ggplot(starbucks_many_lm, aes(x=estimate)) + geom_density() +
@@ -346,7 +346,7 @@ ggplot(popdata, aes(x = explanatory, y = response)) +
 set.seed(4747)
 
 # From popdata, randomly sample 50 rows without replacement
-sample1 <- ___ %>%
+sample1 <- ___ |>
    sample_n(size = ___)
 
 # Do the same again
@@ -368,11 +368,11 @@ Each time, pipe `popdata` to `sample_n()`, setting `size` to `50`.
 set.seed(4747)
 
 # From popdata, randomly sample 50 rows without replacement
-sample1 <- popdata %>%
+sample1 <- popdata |>
   sample_n(size = 50)
 
 # Do the same again
-sample2 <- popdata %>%
+sample2 <- popdata |>
   sample_n(size = 50)
 
 # Combine both samples
@@ -390,8 +390,8 @@ glimpse(both_samples)
 # From previous step
 set.seed(4747)
 both_samples <- bind_rows(
-  popdata %>% sample_n(size = 50), 
-  popdata %>% sample_n(size = 50), 
+  popdata |> sample_n(size = 50), 
+  popdata |> sample_n(size = 50), 
   .id = "replicate"
 )
 
@@ -415,8 +415,8 @@ ___ +
 # From previous step
 set.seed(4747)
 both_samples <- bind_rows(
-  popdata %>% sample_n(size = 50), 
-  popdata %>% sample_n(size = 50), 
+  popdata |> sample_n(size = 50), 
+  popdata |> sample_n(size = 50), 
   .id = "replicate"
 )
 
@@ -450,7 +450,7 @@ The function `do()` from **dplyr** will allow you to run the `lm` call separatel
 set.seed(4747)
 
 # Repeatedly sample the population without replacement
-many_samples <- popdata %>%
+many_samples <- popdata |>
   ___
 
 # See the result
@@ -468,7 +468,7 @@ After the pipe, call `rep_sample_n()`, setting `size` to `50` and `reps` to `100
 set.seed(4747)
 
 # Repeatedly sample the population without replacement
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # See the result
@@ -485,7 +485,7 @@ glimpse(many_samples)
 ```{r ex15, exercise=TRUE, exercise.setup="popdata_setup"}
 # From previous step
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
 
 # Using many_samples, plot response vs. explanatory, grouped by replicate
 ___ + 
@@ -505,7 +505,7 @@ ___ +
 ```{r ex15-solution}
 # From previous step
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
 
 # Using many_samples, plot response vs. explanatory, grouped by replicate
 ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) + 
@@ -528,13 +528,13 @@ ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) +
 ```{r ex16, exercise=TRUE, exercise.setup="popdata_setup"}
 # From previous step
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
 
-many_lms <- many_samples %>% 
+many_lms <- many_samples |> 
   # Group by replicate
-  ___ %>% 
+  ___ |> 
   # Run the model on each replicate, then tidy it
-  do(___(___, data = ___) %>% ___) %>%
+  do(___(___, data = ___) |> ___) |>
   # Filter for rows where the term is explanatory
   ___
 
@@ -555,13 +555,13 @@ many_lms
 ```{r ex16-solution}
 # From previous step
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
 
-many_lms <- many_samples %>% 
+many_lms <- many_samples |> 
   # Group by replicate
-  group_by(replicate) %>% 
+  group_by(replicate) |> 
   # Run the model on each replicate, then tidy it
-  do(lm(response ~ explanatory, data = .) %>% tidy()) %>%
+  do(lm(response ~ explanatory, data = .) |> tidy()) |>
   # Filter for rows where the term is explanatory
   filter(term == "explanatory")
 
@@ -580,10 +580,10 @@ many_lms
 ```{r ex17, exercise=TRUE, exercise.setup="popdata_setup"}
 # From previous steps
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
-many_lms <- many_samples %>% 
-  group_by(replicate) %>% 
-  do(lm(response ~ explanatory, data=.) %>% tidy()) %>%
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
+many_lms <- many_samples |> 
+  group_by(replicate) |> 
+  do(lm(response ~ explanatory, data=.) |> tidy()) |>
   filter(term == "explanatory")
 
 # Using many_lms, plot estimate
@@ -601,10 +601,10 @@ ___ +
 ```{r ex17-solution}
 # From previous steps
 set.seed(4747)
-many_samples <- popdata %>% rep_sample_n(size = 50, reps = 100)
-many_lms <- many_samples %>% 
-  group_by(replicate) %>% 
-  do(lm(response ~ explanatory, data=.) %>% tidy()) %>%
+many_samples <- popdata |> rep_sample_n(size = 50, reps = 100)
+many_lms <- many_samples |> 
+  group_by(replicate) |> 
+  do(lm(response ~ explanatory, data=.) |> tidy()) |>
   filter(term == "explanatory")
 
 # Using many_lms, plot estimate
@@ -648,7 +648,7 @@ summary(lm(Carbs ~ Protein, data = starbucks))
 
 
 ```{r echo=TRUE}
-lm(Carbs ~ Protein, data = starbucks) %>% tidy()
+lm(Carbs ~ Protein, data = starbucks) |> tidy()
 ``` 
 
 
@@ -722,7 +722,7 @@ In the next few exercises, we will investigate what parts of the model drive the
 ### RailTrails -- original data
 
 ```{r echo = FALSE}
-RailTrail %>%
+RailTrail |>
   ggplot(aes(x = hightemp, y = volume)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE, col = "#569BBD")
@@ -847,7 +847,7 @@ ___ +
 set.seed(4747)
 
 # Generate 100 random samples of size 50
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Using many_samples, plot response vs. explanatory, grouped by replicate
@@ -868,7 +868,7 @@ Edit the code for many samples to reduce the `size` from `50` to `10`.
 set.seed(4747)
 
 # Edit the code to take samples of size 10
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Draw the plot again; how is it different?
@@ -888,7 +888,7 @@ In the call to `rep_sample_n()`, change `size` from `50` to `10`.
 set.seed(4747)
 
 # Edit the code to take samples of size 10
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 10, reps = 100)
 
 # Draw the plot again; how is it different?
@@ -917,7 +917,7 @@ explanatory <- rnorm(1000, 0, 5)
 response <- 40 + explanatory*2 + rnorm(1000,0,10)
 popdata <- data.frame(explanatory,response)
 
-manysamples <- popdata %>%
+manysamples <- popdata |>
 rep_sample_n(size=50, reps=100)
 
 ggplot(manysamples, aes(x=explanatory, y=response, group=replicate)) + 
@@ -934,7 +934,7 @@ new_popdata <- data.frame(explanatory,response)
 
 ```{r ex19, exercise=TRUE, exercise.setup="ex19_setup"}
 # Update the sampling to use new_popdata
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Rerun the plot; how does it change?
@@ -952,7 +952,7 @@ Just replace `popdata` with `new_popdata` and look at how the plots change.
 
 ```{r ex19-solution}
 # Update the sampling to use new_popdata
-many_samples <- new_popdata %>%
+many_samples <- new_popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Rerun the plot; how does it change?
@@ -983,7 +983,7 @@ explanatory <- rnorm(1000, 0, 5)
 response <- 40 + explanatory*2 + rnorm(1000,0,10)
 popdata <- data.frame(explanatory,response)
 
-manysamples <- popdata %>%
+manysamples <- popdata |>
 rep_sample_n(size=50, reps=100)
 
 ggplot(manysamples, aes(x=explanatory, y=response, group=replicate)) + 
@@ -999,7 +999,7 @@ even_newer_popdata <- data.frame(explanatory,response)
 
 ```{r ex110, exercise=TRUE, exercise.setup="ex110_setup"}
 # Update the sampling to use even_newer_popdata
-many_samples <- popdata %>%
+many_samples <- popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Update and rerun the plot; how does it change?
@@ -1020,7 +1020,7 @@ ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) +
 
 ```{r ex110-solution}
 # Take 100 samples of size 50
-many_samples <- even_newer_popdata %>%
+many_samples <- even_newer_popdata |>
   rep_sample_n(size = 50, reps = 100)
 
 # Update and rerun the plot; how does it change?

@@ -32,10 +32,10 @@ opportunity <- data.frame(
   group = c(rep("control", 56), rep("treatment", 41), rep("control", 19), rep("treatment", 34))
 )
 
-diff_obs <- opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  summarize(diff(prop_buy)) %>% 
+diff_obs <- opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  summarize(diff(prop_buy)) |> 
   pull()
 
 opp_perm <- read_rds("data/opp_perm.rds")
@@ -60,10 +60,10 @@ Of the 75 students assigned to the control group, 56, or about 75%, bought the D
 
 ```{r the data}
 dt <- tibble(Group = c('Control group','Treatment group', 'Total'), Buy_DVD = c(56,41,97), 
-             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) %>%
+             Not_buy_DVD = c(19,34,53), Total = c(75,75,150), Proportion = c('0.7467', '0.5467','-')) |>
   mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F)
 
 ```
@@ -83,34 +83,34 @@ In this exercise, you'll use the data from the study to find the sample statisti
 
 ```{r opportunity_cost_1, exercise=TRUE}
 # Tabulate the data
-opportunity %>%
+opportunity |>
   ___(decision, group)
 
 # Find the proportion who bought the DVD in each group
-opportunity %>%
-  group_by(___) %>%
+opportunity |>
+  group_by(___) |>
   summarize(buy_prop = ___(___))
 ```
 
 ```{r opportunity_cost_1-hint-1}
-opportunity %>%
+opportunity |>
   count(decision, group)
 ```
 
 ```{r opportunity_cost_1-hint-2}
-opportunity %>%
-  group_by(group) %>%
+opportunity |>
+  group_by(group) |>
   summarize(buy_prop = ___(___))
 ```
 
 ```{r opportunity_cost_1-solution}
 # Tabulate the data
-opportunity %>%
+opportunity |>
   count(decision, group)
 
 # Find the proportion who bought the DVD in each group
-opportunity %>%
-  group_by(group) %>%
+opportunity |>
+  group_by(group) |>
   summarize(buy_prop = mean(decision == "buyDVD"))
 ```
 
@@ -167,49 +167,49 @@ Using the new data and the methods from the previous lesson, create a randomizat
 
 ```{r randomizing_cost_1, exercise=TRUE}
 # Calculate the observed difference in purchase rate
-diff_obs <- opportunity %>%
+diff_obs <- opportunity |>
   # Group by group
-  ___(___) %>%
+  ___(___) |>
   # Calculate proportion deciding to buy a DVD
-  ___(prop_buy = ___(___)) %>%
+  ___(prop_buy = ___(___)) |>
   # Calculate difference between groups
-  ___(stat = ___) %>% 
+  ___(stat = ___) |> 
   pull()
 ```
 
 ```{r randomizing_cost_1-hint-1}
-opportunity %>%
-  group_by(group) %>%
-  ___(prop_buy = ___(___)) %>%
-  ___(stat = ___) %>% 
+opportunity |>
+  group_by(group) |>
+  ___(prop_buy = ___(___)) |>
+  ___(stat = ___) |> 
   pull()
 ```
 
 ```{r randomizing_cost_1-hint-2}
-opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  ___(stat = ___) %>% 
+opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  ___(stat = ___) |> 
   pull()
 ```
 
 ```{r randomizing_cost_1-hint-3}
-opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  summarize(stat = ___) %>% 
+opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  summarize(stat = ___) |> 
   pull()
 ```
 
 ```{r randomizing_cost_1-solution}
 # Calculate the observed difference in purchase rate
-diff_obs <- opportunity %>%
+diff_obs <- opportunity |>
   # Group by group
-  group_by(group) %>%
+  group_by(group) |>
   # Calculate proportion deciding to buy a DVD
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
   # Calculate difference between groups
-  summarize(stat = diff(prop_buy)) %>% 
+  summarize(stat = diff(prop_buy)) |> 
   pull()
     
 # Review the result
@@ -226,13 +226,13 @@ diff_obs
 
 ```{r randomizing_cost_2, exercise=TRUE}
 # Create data frame of permuted differences in purchase rates
-opp_perm <- opportunity %>%
+opp_perm <- opportunity |>
   # Specify decision vs. group, where success is buying a DVD
-  ___(___, success = ___) %>%
+  ___(___, success = ___) |>
   # Set the null hypothesis to independence
-  __(null = ___) %>%
+  __(null = ___) |>
   # Generate 1000 reps of type permute
-  ___(reps = ___, type = ___) %>%
+  ___(reps = ___, type = ___) |>
   # Calculate the summary stat difference in proportions
   ___(stat = ___, order = c("treatment", "control"))
     
@@ -241,38 +241,38 @@ opp_perm
 ```
 
 ```{r randomizing_cost_2-hint-1}
-opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  __(null = ___) %>%
-  ___(reps = ___, type = ___) %>%
+opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  __(null = ___) |>
+  ___(reps = ___, type = ___) |>
   ___(stat = ___, order = c("treatment", "control"))
 ```
 
 ```{r randomizing_cost_2-hint-2}
-opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  hypothesize(null = "independence") %>%
-  ___(reps = ___, type = ___) %>%
+opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  ___(reps = ___, type = ___) |>
   ___(stat = ___, order = c("treatment", "control"))
 ```
 
 ```{r randomizing_cost_2-hint-3}
-opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   ___(stat = ___, order = c("treatment", "control"))
 ```
 
 ```{r randomizing_cost_2-solution}
 # Create data frame of permuted differences in purchase rates
-opp_perm <- opportunity %>%
+opp_perm <- opportunity |>
   # Specify decision vs. group, where success is buying a DVD
-  specify(decision ~ group, success = "buyDVD") %>%
+  specify(decision ~ group, success = "buyDVD") |>
   # Set the null hypothesis to independence
-  hypothesize(null = "independence") %>%
+  hypothesize(null = "independence") |>
   # Generate 1000 reps of type permute
-  generate(reps = 1000, type = "permute") %>%
+  generate(reps = 1000, type = "permute") |>
   # Calculate the summary stat difference in proportions
   calculate(stat = "diff in props", order = c("treatment", "control"))
     
@@ -291,16 +291,16 @@ Draw a histogram of permuted differences.
 
 ```{r randomizing_cost_3, exercise=TRUE}
 # From previous steps
-diff_obs <- opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  summarize(stat = diff(prop_buy)) %>% 
+diff_obs <- opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  summarize(stat = diff(prop_buy)) |> 
   pull()
 
-opp_perm <- opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+opp_perm <- opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("treatment", "control"))
   
 # Using the permuation data, plot stat
@@ -331,16 +331,16 @@ ggplot(opp_perm, aes(x = stat)) +
 
 ```{r randomizing_cost_3-solution}
 # From previous steps
-diff_obs <- opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  summarize(stat = diff(prop_buy)) %>% 
+diff_obs <- opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  summarize(stat = diff(prop_buy)) |> 
   pull()
 
-opp_perm <- opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+opp_perm <- opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("treatment", "control"))
   
 # Using the permuation data, plot stat
@@ -372,39 +372,39 @@ opp_perm <- read_rds("data/opp_perm2.rds")
 
 ```{r summarizing_opportunity_cost, exercise=TRUE}
 # Visualize the statistic 
-opp_perm %>%
+opp_perm |>
   ___(___, ___)
 
 # Calculate the p-value using `get_p_value()`
-opp_perm %>%
+opp_perm |>
   ___(___, ___)
 
 # Calculate the p-value using `summarize`
-opp_perm %>%
+opp_perm |>
   summarize(p_value = ___)
 ```
 
 ```{r summarizing_opportunity_cost-hint-1}
-opp_perm %>%
+opp_perm |>
   visualize(obs_stat = diff_obs, direction = "less")
 ```
 
 ```{r summarizing_opportunity_cost-hint-2}
-opp_perm %>%
+opp_perm |>
   get_p_value(obs_stat = diff_obs, direction = "less")
 ```
 
 ```{r summarizing_opportunity_cost-solution}
 # Visualize the statistic 
-opp_perm %>%
+opp_perm |>
   visualize(obs_stat = diff_obs, direction = "less")
 
 # Calculate the p-value using `get_p_value()`
-opp_perm %>%
+opp_perm |>
   get_p_value(obs_stat = diff_obs, direction = "less")
 
 # Calculate the p-value using `summarize`
-opp_perm %>%
+opp_perm |>
   summarize(p_value = mean(stat <= diff_obs))
 ```
 
@@ -416,7 +416,7 @@ Great work! The small p-value indicates that the observed data are inconsistent 
 In the last exercise, you computed the p-value, or the proportion of permuted differences less than or equal to the observed difference:
 
 ```{r opportunity_cost_conclusion}
-opp_perm %>%
+opp_perm |>
   summarize(p_value = mean(stat <= diff_obs))
 ```
 
@@ -436,16 +436,16 @@ From the null distribution that you just created, it seems that reminding studen
 
 ```{r plot_errors_and_their_consequences}
 # From previous steps
-diff_obs <- opportunity %>%
-  group_by(group) %>%
-  summarize(prop_buy = mean(decision == "buyDVD")) %>%
-  summarize(stat = diff(prop_buy)) %>% 
+diff_obs <- opportunity |>
+  group_by(group) |>
+  summarize(prop_buy = mean(decision == "buyDVD")) |>
+  summarize(stat = diff(prop_buy)) |> 
   pull()
 
-opp_perm <- opportunity %>%
-  specify(decision ~ group, success = "buyDVD") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+opp_perm <- opportunity |>
+  specify(decision ~ group, success = "buyDVD") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("treatment", "control"))
   
 # Using the permuation data, plot stat
@@ -543,7 +543,7 @@ Use `opp_perm` to compute the two-sided p-value, or twice the proportion of perm
 
 ```{r opportunity_costs, exercise=TRUE}
 # Calculate the two-sided p-value
-opp_perm %>%
+opp_perm |>
   summarize(p_value = ___)
 ```
 
@@ -553,7 +553,7 @@ This should be double what you calculated as one-tailed p-value before.
 
 ```{r opportunity_costs-solution}
 # Calculate the two-sided p-value
-opp_perm %>%
+opp_perm |>
   summarize(p_value = 2 * mean(stat <= diff_obs))
 ```
 
@@ -566,12 +566,12 @@ Great work! Take a moment to remind yourself why you used the proportion of perm
 The difference in observed proportions is not consistent with the null hypothesis. Only seven of the 1000 permutations for a p-value of 0.007 were smaller than the observed data value. Even if we had performed a more conservative two-sided test, the p-value would still have been equal to just 14 out of 1000, or 0.014.
 
 ```{r}
-opp_perm <- opp_perm %>%
+opp_perm <- opp_perm |>
   mutate(diff_perm = stat)
 ```
 
 ```{r echo = TRUE}
-opp_perm %>%
+opp_perm |>
   summarize(pvalue = mean(diff_perm <= diff_obs))
 ```
 

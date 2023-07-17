@@ -146,17 +146,17 @@ The **standard error**, which describes how variable the statistic is around the
 
 ```{r eval = TRUE}
 # Compute p-hat for each poll
-ex1_props <- all_polls %>%
-  group_by(poll) %>%
+ex1_props <- all_polls |>
+  group_by(poll) |>
   summarize(prop_yes = mean(vote == "yes"))
 
 # Select one poll from which to resample
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 
 # Variability of p-hat
-ex1_props %>%
+ex1_props |>
   summarize(sd(prop_yes))
 ```
 
@@ -172,15 +172,15 @@ Notice that the resampled $\hat{p}^*$ values have a standard deviation of 0.084,
 
 ```{r eval = TRUE}
 # Generate 1000 resamples of one poll
-one_poll_boot_30 <- one_poll %>%
+one_poll_boot_30 <- one_poll |>
   rep_sample_n(30, replace = TRUE, reps = 1000)
 
 # Compute p-hat for each resampled poll
-ex2_props <- one_poll_boot_30 %>%
+ex2_props <- one_poll_boot_30 |>
   summarize(prop_yes = mean(vote == "yes"))
 
 # Variability of p-hat
-ex2_props %>%
+ex2_props |>
   summarize(sd(prop_yes))
 ```
 
@@ -209,9 +209,9 @@ We have created 1000 random samples, each of size 30, from the population. The r
 
 ```{r resampling, exercise=TRUE}
 # Compute p-hat for each poll
-ex1_props <- all_polls %>% 
+ex1_props <- all_polls |> 
   # Group by poll
-  ___(___) %>% 
+  ___(___) |> 
   # Calculate proportion of yes votes
   ___(stat = ___(___))
   
@@ -220,22 +220,22 @@ ex1_props
 ```
 
 ```{r resampling-hint-1}
-all_polls %>% 
-  group_by(poll) %>% 
+all_polls |> 
+  group_by(poll) |> 
   ___(stat = ___(___))
 ```
 
 ```{r resampling-hint-2}
-all_polls %>% 
-  group_by(poll) %>% 
+all_polls |> 
+  group_by(poll) |> 
   summarize(stat = mean(vote == "yes"))
 ```
 
 ```{r resampling-solution}
 # Compute p-hat for each poll
-ex1_props <- all_polls %>% 
+ex1_props <- all_polls |> 
   # Group by poll
-  group_by(poll) %>% 
+  group_by(poll) |> 
   # Calculate proportion of yes votes
   summarize(stat = mean(vote == "yes"))
   
@@ -258,62 +258,62 @@ ex1_props
 
 ```{r resampling2, exercise=TRUE}
 # Select one poll from which to resample
-one_poll <- all_polls %>%
+one_poll <- all_polls |>
   # Filter for the first poll
-  ___(___) %>%
+  ___(___) |>
   # Select vote
   ___(___)
   
 # Compute p-hat* for each resampled poll
-ex2_props <- one_poll %>%
+ex2_props <- one_poll |>
   # Specify vote as the response, where yes means success
-  ___(response = ___, success = ___) %>%
+  ___(response = ___, success = ___) |>
   # Generate 1000 reps of type bootstrap
-  ___(reps = ___, type = ___) %>% 
+  ___(reps = ___, type = ___) |> 
   # Calculate the summary stat "prop"
   ___(stat = ___)
 ```
 
 ```{r resampling2-hint-1}
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   ___
 ```
 
 ```{r resampling2-hint-2}
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 ```
 
 ```{r resampling2-hint-3}
-ex2_props <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  ___(reps = ___, type = ___) %>% 
+ex2_props <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  ___(reps = ___, type = ___) |> 
   ___(stat = ___)
 ```
 
 ```{r resampling2-hint-4}
-ex2_props <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+ex2_props <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   ___(stat = ___)
 ```
 
 ```{r resampling2-solution}
 # Select one poll from which to resample
-one_poll <- all_polls %>%
+one_poll <- all_polls |>
   # Filter for the first poll
-  filter(poll == 1) %>%
+  filter(poll == 1) |>
   # Select vote
   select(vote)
   
 # Compute p-hat* for each resampled poll
-ex2_props <- one_poll %>%
+ex2_props <- one_poll |>
   # Specify vote as the response, where yes means success
-  specify(response = vote, success = "yes") %>%
+  specify(response = vote, success = "yes") |>
   # Generate 1000 reps of type bootstrap
-  generate(reps = 1000, type = "bootstrap") %>% 
+  generate(reps = 1000, type = "bootstrap") |> 
   # Calculate the summary stat "prop"
   calculate(stat = "prop")
 ```
@@ -329,23 +329,23 @@ ex2_props <- one_poll %>%
 
 ```{r resampling3, exercise=TRUE}
 # From previous steps
-ex1_props <- all_polls %>% 
-  group_by(poll) %>% 
+ex1_props <- all_polls |> 
+  group_by(poll) |> 
   summarize(stat = mean(vote == "yes"))
 
-ex2_props <- all_polls %>%
-  filter(poll == 1) %>%
-  select(vote) %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+ex2_props <- all_polls |>
+  filter(poll == 1) |>
+  select(vote) |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
   
 # Calculate variability of p-hat
-ex1_props %>% 
+ex1_props |> 
   summarize(variability = ___)
   
 # Calculate variability of p-hat*
-ex2_props %>% 
+ex2_props |> 
   ___
 ```
 
@@ -355,22 +355,22 @@ Use the `sd()` function in the `summarize()` call to calculate `variability`.
 
 ```{r resampling3-solution}
 # From previous steps
-ex1_props <- all_polls %>% 
-  group_by(poll) %>% 
+ex1_props <- all_polls |> 
+  group_by(poll) |> 
   summarize(stat = mean(vote == "yes"))
-ex2_props <- all_polls %>%
-  filter(poll == 1) %>%
-  select(vote) %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+ex2_props <- all_polls |>
+  filter(poll == 1) |>
+  select(vote) |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
   
 # Calculate variability of p-hat
-ex1_props %>% 
+ex1_props |> 
   summarize(variability = sd(stat))
   
 # Calculate variability of p-hat*
-ex2_props %>% 
+ex2_props |> 
   summarize(variability = sd(stat))
 ```
 
@@ -392,17 +392,17 @@ In order to compare the variability of the sampled $\hat{p}$ and $\hat{p}^*$ val
 
 ```{r variability_phat-setup}
 # Select one poll from which to resample
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 
-ex1_props <- all_polls %>% 
-  group_by(poll) %>% 
+ex1_props <- all_polls |> 
+  group_by(poll) |> 
   summarize(stat = mean(vote == "yes"))
   
-ex2_props <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+ex2_props <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
 ```
 
@@ -462,12 +462,12 @@ The image below shows that the re-sampled proportions center around $\hat{p}$, b
 
 ```{r}
 set.seed(4747)
-all_polls %>%
-  group_by(poll) %>%
-  summarize(prop_yes = mean(vote == "yes")) %>%
-  sample_n(200) %>%
-  arrange(prop_yes) %>%
-  mutate(pointer = c(rep("col1", 90), "col2", rep("col1", 105), "col3", rep("col1", 3))) %>%
+all_polls |>
+  group_by(poll) |>
+  summarize(prop_yes = mean(vote == "yes")) |>
+  sample_n(200) |>
+  arrange(prop_yes) |>
+  mutate(pointer = c(rep("col1", 90), "col2", rep("col1", 105), "col3", rep("col1", 3))) |>
 ggplot() + 
   geom_dotplot(aes(x = prop_yes, fill = pointer, color = pointer), binwidth = 0.01) +
   xlab("re-sampled proportions") +
@@ -490,7 +490,7 @@ The variability of the $\hat{p}$ statistics gives a measure for how far apart an
 Note that bootstrapping, or resampling with replacement the same number of observations as were in the original sample, provided approximately the same standard error as sampling many $\hat{p}$ values from the population. The standard error is measured by the width of the distribution and here we can see that the green bootstrap distribution is approximately the same width as the black distribution, which measured the true variability of $\hat{p}$ values from the population.
 
 ```{r, fig.width=8}
-data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) %>% 
+data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
 ggplot() + 
   geom_line(aes(x = ex, y = samp, col = "sample from population")) +
   geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) +
@@ -524,7 +524,7 @@ We can use the value of the standard error to count the number of sample $\hat{p
 It turns out that because the distribution of $\hat{p}$ values is symmetric and bell shaped, roughly 95% of samples will produce $\hat{p}$s that are within two standard errors of the center. This idea is called the **empirical rule** and comes from theory which describes bell-shaped distributions.
 
 ```{r, fig.width=8}
-data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) %>% 
+data.frame(samp = dnorm(seq(0.2,1,.01), mean = 0.6, sd = 0.09), boot = dnorm(seq(0.2,1,.01), mean = 0.72, sd = 0.09), ex = seq(0.2,1,.01), col1 = rep(openintro::COL[5,1], length(seq(0.2,1,.01))), col2 = rep(openintro::COL[2,1], length(seq(0.2,1,.01)))) |> 
 ggplot() + 
   geom_line(aes(x = ex, y = samp, col = "sample from population")) +
   geom_point(x = 0.6, y = dnorm(0.507, 0.6,0.09), col = openintro::COL[5,1]) +
@@ -558,12 +558,12 @@ Here, in red, we see all the sample $\hat{p}$ values that are close to the true 
 
 ```{r, fig.width=6}
 set.seed(4747)
-all_polls %>%
-  group_by(poll) %>%
-  summarize(prop_yes = mean(vote == "yes")) %>%
-  sample_n(200) %>%
-  arrange(prop_yes) %>%
-  mutate(pointer = ifelse(prop_yes <= .42, "col1", ifelse(prop_yes >= 0.78, "col1", "col2"))) %>%
+all_polls |>
+  group_by(poll) |>
+  summarize(prop_yes = mean(vote == "yes")) |>
+  sample_n(200) |>
+  arrange(prop_yes) |>
+  mutate(pointer = ifelse(prop_yes <= .42, "col1", ifelse(prop_yes >= 0.78, "col1", "col2"))) |>
 ggplot() + 
   geom_dotplot(aes(x = prop_yes, fill = pointer, color = pointer), binwidth = 0.01) +
   xlab("sample p-hat values") +
@@ -605,17 +605,17 @@ Note that you will use the R function `sd()` which calculates the variability of
 
 ```{r emperical_rule_1, exercise=TRUE}
 # Proportion of yes votes by poll
-props <- all_polls %>% 
-  group_by(poll) %>% 
+props <- all_polls |> 
+  group_by(poll) |> 
   summarize(prop_yes = mean(vote == "yes"))
 
 # The true population proportion of yes votes
 true_prop_yes <- 0.6
 
 # Proportion of polls within 2SE
-props %>%
+props |>
   # Add column: is prop_yes in 2SE of 0.6
-  mutate(is_in_conf_int = abs(___ - ___) < ___ * sd(___)) %>%
+  mutate(is_in_conf_int = abs(___ - ___) < ___ * sd(___)) |>
   # Calculate  proportion in conf int
   summarize(prop_in_conf_int = ___(___))
 ```
@@ -631,17 +631,17 @@ Inside the call to `mutate()`, calculate `is_in_conf_int` using the following:
 
 ```{r emperical_rule_1-solution}
 # Proportion of yes votes by poll
-props <- all_polls %>% 
-  group_by(poll) %>% 
+props <- all_polls |> 
+  group_by(poll) |> 
   summarize(prop_yes = mean(vote == "yes"))
 
 # The true population proportion of yes votes
 true_prop_yes <- 0.6
 
 # Proportion of polls within 2SE
-props %>%
+props |>
   # Add column: is prop_yes in 2SE of 0.6
-  mutate(is_in_conf_int = abs(prop_yes - true_prop_yes) < 2 * sd(prop_yes)) %>%
+  mutate(is_in_conf_int = abs(prop_yes - true_prop_yes) < 2 * sd(prop_yes)) |>
   # Calculate  proportion in conf int
   summarize(prop_in_conf_int = mean(is_in_conf_int))
 ```
@@ -674,23 +674,23 @@ As in the previous exercise, when discussing the variability of a statistic, the
 
 ```{r bootstrap, exercise=TRUE}
 # From previous exercises
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
   
-p_hat <- one_poll %>%
+p_hat <- one_poll |>
   # Calculate proportion of yes votes
-  summarize(stat = ___) %>%
+  summarize(stat = ___) |>
   # Pull out as numeric vector
   pull()
 
 # Create an interval of plausible values
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     # Lower bound is p_hat minus 2 std errors
     lower = ___,
@@ -705,22 +705,22 @@ one_poll_boot %>%
 
 ```{r bootstrap-solution}
 # From previous exercises
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
   
-p_hat <- one_poll %>%
+p_hat <- one_poll |>
   # Calculate proportion of yes votes
-  summarize(stat = mean(vote == "yes")) %>%
+  summarize(stat = mean(vote == "yes")) |>
   # Pull out as numeric vector
   pull()
 
 # Create an interval of plausible values
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     # Lower bound is p_hat minus 2 std errors
     lower = p_hat - 2 * sd(stat),
@@ -741,19 +741,25 @@ Instead of using $\pm 2 SE$ as a way to measure the middle 95% of the sampled $\
 
 The bootstrapped resamples, `one_poll_boot`, and the proportion of yes votes, `p_hat` are available in your workspace.
 
+<<<<<<< HEAD
 ```{r bootstrap_percentile_setup, echo=FALSE}
 one_poll <- all_polls %>%
   filter(poll == 1) %>%
+=======
+```{r bootstrap_percentile-setup}
+one_poll <- all_polls |>
+  filter(poll == 1) |>
+>>>>>>> 75d94152fd554e2ed0d65b25c99dfedaa014cc94
   select(vote)
   
-p_hat <- one_poll %>%
-  summarize(mean(vote == "yes")) %>%
+p_hat <- one_poll |>
+  summarize(mean(vote == "yes")) |>
   pull()
 
 # Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
 ```
 
@@ -768,14 +774,14 @@ one_poll_boot <- one_poll %>%
 
 ```{r bootstrap_percentile, exercise=TRUE, exercise.setup="bootstrap_percentile_setup"}
 # From previous exercise: bootstrap t-confidence interval
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = p_hat - 2 * sd(stat),
     upper = p_hat + 2 * sd(stat)
   )
   
 # Manually calculate a 95% percentile interval
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = ___(stat, p = ___),
     upper = ___
@@ -790,14 +796,14 @@ one_poll_boot %>%
 
 ```{r bootstrap_percentile-solution}
 # From previous exercise: bootstrap t-confidence interval
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = p_hat - 2 * sd(stat),
     upper = p_hat + 2 * sd(stat)
   )
   
 # Manually calculate a 95% percentile interval
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = quantile(stat, 0.025),
     upper = quantile(stat, 0.975)
@@ -820,14 +826,14 @@ Perform the same calculation using infer's convenience function, `get_confidence
 
 ```{r bootstrap_percentile_2, exercise=TRUE, exercise.setup="bootstrap_percentile_setup"}
 # From previous step
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = quantile(stat, 0.025),
     upper = quantile(stat, 0.975)
   )
   
 # Calculate the same interval, more conveniently
-percentile_ci <- one_poll_boot %>% 
+percentile_ci <- one_poll_boot |> 
   ___
   
 # Review the value
@@ -841,14 +847,14 @@ After the pipe, get the confidence interval by calling `get_confidence_interrval
 
 ```{r bootstrap_percentile_2-solution}
 # From previous step
-one_poll_boot %>%
+one_poll_boot |>
   summarize(
     lower = quantile(stat, 0.025),
     upper = quantile(stat, 0.975)
   )
   
 # Calculate the same interval, more conveniently
-percentile_ci <- one_poll_boot %>% 
+percentile_ci <- one_poll_boot |> 
   get_confidence_interval(level = 0.95)
   
 # Review the value
@@ -866,10 +872,10 @@ percentile_ci
 
 ```{r bootstrap_percentile_3, exercise=TRUE, exercise.setup="bootstrap_percentile_setup"}
 # From previous step
-percentile_ci <- one_poll_boot %>% 
+percentile_ci <- one_poll_boot |> 
   get_confidence_interval(level = 0.95)
   
-one_poll_boot %>% 
+one_poll_boot |> 
   # Visualize in-between the endpoints given by percentile_ci
   ___
 ```
@@ -880,10 +886,10 @@ After the pipe, visualize the interval by calling `visualize()`, setting `endpoi
 
 ```{r bootstrap_percentile_3-solution}
 # From previous step
-percentile_ci <- one_poll_boot %>% 
+percentile_ci <- one_poll_boot |> 
   get_confidence_interval(level = 0.95)
   
-one_poll_boot %>% 
+one_poll_boot |> 
   # Visualize in-between the endpoints given by percentile_ci
   visualize(endpoints = percentile_ci, direction = "between")
 ```
@@ -905,26 +911,26 @@ We can see that the two intervals are different because they used different meth
 
 ```{r echo=FALSE}
 set.seed(47)
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
 ```
 
 
 ```{r echo=TRUE}
 # Look at the bootstrap t-confidence interval for comparison
-one_poll_boot %>%
+one_poll_boot |>
   summarize(lower = stat - 2 * sd(stat),
             upper = stat + 2 * sd(stat))
 
 one_poll_boot
 
 # Find the 2.5% and 97.5% of the p-hat values
-one_poll_boot %>%
+one_poll_boot |>
   summarize(q025_prop = quantile(stat, p = .025),
             q975_prop = quantile(stat, p = .975))
 ```
@@ -969,32 +975,32 @@ Here, you will use the *incorrect* standard error (based on the incorrect sample
 
 
 ```{r bootstrap_ci-setup}
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 
-one_poll_boot <- one_poll %>%
-  rep_sample_n(30, replace = TRUE, reps = 1000) %>%
+one_poll_boot <- one_poll |>
+  rep_sample_n(30, replace = TRUE, reps = 1000) |>
   summarize(stat = mean(vote == "yes"))
   
 # Resample the data using samples of size 300 (an incorrect strategy!)
-one_poll_boot_300 <- one_poll %>%
-  rep_sample_n(300, replace = TRUE, reps = 1000) %>%
+one_poll_boot_300 <- one_poll |>
+  rep_sample_n(300, replace = TRUE, reps = 1000) |>
   summarize(stat = mean(vote == "yes"))
   
 # Resample the data using samples of size 3 (an incorrect strategy!)
-one_poll_boot_3 <- one_poll %>%
-  rep_sample_n(3, replace = TRUE, reps = 1000) %>%
+one_poll_boot_3 <- one_poll |>
+  rep_sample_n(3, replace = TRUE, reps = 1000) |>
   summarize(stat = mean(vote == "yes")) 
 
-p_hat <- one_poll %>%
-  summarize(mean(vote == "yes")) %>%
+p_hat <- one_poll |>
+  summarize(mean(vote == "yes")) |>
   pull()
 ```
 
 ```{r bootstrap_ci, exercise=TRUE}
 calc_t_conf_int <- function(resampled_dataset) {
-  resampled_dataset %>%
+  resampled_dataset |>
     summarize(
       lower = p_hat - 2 * sd(stat),
       upper = p_hat + 2 * sd(stat)
@@ -1017,7 +1023,7 @@ Use `calc_t_conf_int()` on `one_poll_boot`, `one_poll_boot_300`, and `one_poll_b
 
 ```{r bootstrap_ci-solution}
 calc_t_conf_int <- function(resampled_dataset) {
-  resampled_dataset %>%
+  resampled_dataset |>
     summarize(
       lower = p_hat - 2 * sd(stat),
       upper = p_hat + 2 * sd(stat)
@@ -1058,14 +1064,14 @@ Generally, when the true parameter is close to 0.5, the standard error of $\hat{
 ```{r bootstrap_ci_2-setup}
 set.seed(47)
 
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
 
 # Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop") 
 
 set.seed(470)  
@@ -1073,20 +1079,20 @@ set.seed(470)
 one_poll_0.8 <- tibble(vote = ifelse(rbinom(30, 1, .8) == 1L, "yes", "no"))
 
 # Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot_0.8 <- one_poll_0.8 %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot_0.8 <- one_poll_0.8 |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
 ```
 
 ```{r bootstrap_ci_2, exercise=TRUE}
 calc_p_hat <- function(dataset) {
-  dataset %>%
-    summarize(stat = mean(vote == "yes")) %>%
+  dataset |>
+    summarize(stat = mean(vote == "yes")) |>
     pull()
 }
 calc_t_conf_int <- function(resampled_dataset, p_hat) {
-  resampled_dataset %>%
+  resampled_dataset |>
     summarize(
       lower = p_hat - 2 * sd(stat),
       upper = p_hat + 2 * sd(stat)
@@ -1119,12 +1125,12 @@ calc_t_conf_int(___, ___)
 
 ```{r bootstrap_ci_2-solution}
 calc_p_hat <- function(dataset) {
-  dataset %>%
-    summarize(stat = mean(vote == "yes")) %>%
+  dataset |>
+    summarize(stat = mean(vote == "yes")) |>
     pull()
 }
 calc_t_conf_int <- function(resampled_dataset, p_hat) {
-  resampled_dataset %>%
+  resampled_dataset |>
     summarize(
       lower = p_hat - 2 * sd(stat),
       upper = p_hat + 2 * sd(stat)
@@ -1179,18 +1185,18 @@ The previous bootstrapped $\hat{p}^*$ values have been loaded for you and are av
 ```{r bootstrap_ci_3-setup}
 set.seed(47)
 
-one_poll <- all_polls %>%
-  filter(poll == 1) %>%
+one_poll <- all_polls |>
+  filter(poll == 1) |>
   select(vote)
   
-p_hat <- one_poll %>%
-  summarize(mean(vote == "yes")) %>%
+p_hat <- one_poll |>
+  summarize(mean(vote == "yes")) |>
   pull()
 
 # Bootstrap to find the SE of p-hat: one_poll_boot
-one_poll_boot <- one_poll %>%
-  specify(response = vote, success = "yes") %>%
-  generate(reps = 1000, type = "bootstrap") %>% 
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "prop")
   
 p <- c(0.005, 0.025, 0.05, 0.95, 0.975, 0.995) 
@@ -1205,15 +1211,15 @@ conf_int_data <- tibble(
 
 ```{r bootstrap_ci_3, exercise=TRUE}
 # Calculate a 95% bootstrap percentile interval
-one_poll_boot %>% 
+one_poll_boot |> 
   ___(___) 
 
 # Calculate a 99% bootstrap percentile interval
-___ %>% 
+___ |> 
   ___(___) 
 
 # Calculate a 90% bootstrap percentile interval
-___ %>% 
+___ |> 
   ___(___) 
 
 # Plot ci_endpoints vs. ci_percent to compare the intervals
@@ -1230,15 +1236,15 @@ ggplot(conf_int_data, aes(___, ___)) +
 
 ```{r bootstrap_ci_3-solution}
 # Calculate a 95% bootstrap percentile interval
-one_poll_boot %>% 
+one_poll_boot |> 
   get_confidence_interval(level = 0.95) 
 
 # Calculate a 99% bootstrap percentile interval
-one_poll_boot %>% 
+one_poll_boot |> 
   get_confidence_interval(level = 0.99) 
 
 # Calculate a 90% bootstrap percentile interval
-one_poll_boot %>% 
+one_poll_boot |> 
   get_confidence_interval(level = 0.90) 
 
 # Plot ci_endpoints vs. ci_percent to compare the intervals

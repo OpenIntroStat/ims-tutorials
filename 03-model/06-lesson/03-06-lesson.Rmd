@@ -27,7 +27,7 @@ knitr::opts_chunk$set(fig.align = "center",
 
 # data prep --------------------------------------------------------------------
 
-mpg_manuals <- mpg %>%
+mpg_manuals <- mpg |>
   filter(grepl("manual", trans))
 
 mariokart <- filter(mariokart, total_pr < 100)

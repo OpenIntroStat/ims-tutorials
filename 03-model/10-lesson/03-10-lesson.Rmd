@@ -15,6 +15,9 @@ library(openintro)
 library(Stat2Data)
 library(tidyverse)
 library(emo)
+library(modelr)
+library(plotly)
+library(broom)
 
 # knitr options ----------------------------------------------------------------
 
@@ -78,8 +81,8 @@ Our data come in the form of Zagat reviews from 168 Italian restaurants in New Y
 
 
 ```{r nyc-pairs, echo=TRUE}
-nyc %>%
-  select(-Restaurant) %>%
+nyc |>
+  select(-Restaurant) |>
   pairs()
 ```
 
@@ -197,8 +200,8 @@ knitr::include_graphics("images/dividing-city.jpg")
 
 
 ```{r echo=TRUE}
-nyc %>% 
-  group_by(East) %>% 
+nyc |> 
+  group_by(East) |> 
   summarize(mean_price = mean(Price))
 ```
 
@@ -277,20 +280,20 @@ Next, let's visually assess our model using `plotly`. The `x` and `y` vectors, a
 ```{r ex4-setup}
 mod <- lm(Price ~ Food + Service, data = nyc)
 
-grid <- nyc %>%
+grid <- nyc |>
   modelr::data_grid(
     Food = seq_range(Food, n = 50),
     Service = seq_range(Service, n = 50)
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$Food)
 y <- unique(grid$Service)
 
-plane <- tidy_planes %>%
-  pull(.fitted) %>%
+plane <- tidy_planes |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
@@ -299,11 +302,11 @@ plane <- tidy_planes %>%
 
 
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
   add_markers() 
 
 # draw a plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) 
 ```
 
@@ -316,11 +319,11 @@ Remember `add_surface()`?
 lm(Price ~ Food + Service, data = nyc)
 
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
   add_markers() 
 
 # draw a plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
 ```
 
@@ -366,8 +369,8 @@ Consider for a moment what a full model that included all of these explanatory v
 
 
 ```{r echo=TRUE}
-nyc %>%
-  mutate(Price_cents = Price / 100) %>%
+nyc |>
+  mutate(Price_cents = Price / 100) |>
   summarize(cor_collinear = cor(Price, Price_cents))
 ```
 
@@ -462,27 +465,27 @@ Another way is to examine the impact of location in the context of the variabili
 ```{r ex6-setup}
 mod <- lm(Price ~ Food + Service + East, data = nyc)
 
-grid <- nyc %>%
+grid <- nyc |>
   modelr::data_grid(
     Food = seq_range(Food, n = 50),
     Service = seq_range(Service, n = 50),
     East
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$Food)
 y <- unique(grid$Service)
 
-plane0 <- tidy_planes %>%
-  filter(East == 0) %>%
-  pull(.fitted) %>%
+plane0 <- tidy_planes |>
+  filter(East == 0) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
   
-plane1 <- tidy_planes %>%
-  filter(East == 1) %>%
-  pull(.fitted) %>%
+plane1 <- tidy_planes |>
+  filter(East == 1) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
   
 col1 <- c('#BF382A', '#0C4B8E')
@@ -491,12 +494,12 @@ col3 <- colorRamp(c("orange"))
 
 ```{r ex6, exercise=TRUE}
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
   add_markers(color = ~factor(East)) 
 
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
@@ -506,12 +509,12 @@ In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the oth
 
 ```{r ex6-solution}
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
   add_markers(color = ~factor(East)) 
 
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
 ```
 

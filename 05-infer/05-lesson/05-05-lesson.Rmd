@@ -93,8 +93,8 @@ We repeat steps one and two many times to create the bootstrap distribution. Thi
 
 ```{r eval=FALSE, echo=TRUE}
 
-___ %>%                               # start with data frame
-  specify(response = ___) %>%         # specify the variable of interest
+___ |>                               # start with data frame
+  specify(response = ___) |>         # specify the variable of interest
 ```
 
 Next let's discuss is implementing bootstrapping in R using the infer package. We can construct the bootstrap distribution in one pipe.
@@ -104,9 +104,9 @@ We start with our data frame, and first specify the variable of interest, which 
 ### 
 
 ```{r eval=FALSE, echo=TRUE}
-___ %>%                               # start with data frame
-  specify(response = ___) %>%         # specify the variable of interest
-  generate(reps = ___, type = "bootstrap") %>%  # generate bootstrap samples
+___ |>                               # start with data frame
+  specify(response = ___) |>         # specify the variable of interest
+  generate(reps = ___, type = "bootstrap") |>  # generate bootstrap samples
 ```
 
 Then we generate bootstrap samples, many many of them!
@@ -114,9 +114,9 @@ Then we generate bootstrap samples, many many of them!
 ### 
 
 ```{r eval=FALSE, echo=TRUE}
-___ %>%                               # start with data frame
-  specify(response = ___) %>%         # specify the variable of interest
-  generate(reps = ___, type = "bootstrap") %>%  # generate bootstrap samples
+___ |>                               # start with data frame
+  specify(response = ___) |>         # specify the variable of interest
+  generate(reps = ___, type = "bootstrap") |>  # generate bootstrap samples
   calculate(stat = "___")             # calculate bootstrap statistic
 ```
 
@@ -125,9 +125,9 @@ And finally we calculate the statistic in each one of these samples, which in th
 ### Constructing the bootstrap interval
 
 ```{r eval=FALSE, echo=TRUE}
-___ %>%                               # start with data frame
-  specify(response = ___) %>%         # specify the variable of interest
-  generate(reps = ___, type = "bootstrap") %>%  # generate bootstrap samples
+___ |>                               # start with data frame
+  specify(response = ___) |>         # specify the variable of interest
+  generate(reps = ___, type = "bootstrap") |>  # generate bootstrap samples
   calculate(stat = "___")             # calculate bootstrap statistic
 ```
 
@@ -138,9 +138,9 @@ The result is the bootstrap distribution.
 ### 
 
 ```{r eval=FALSE, echo=TRUE}
-___ %>%                               # start with data frame
-  specify(response = ___) %>%         # specify the variable of interest
-  generate(reps = ___, type = "bootstrap") %>%  # generate bootstrap samples
+___ |>                               # start with data frame
+  specify(response = ___) |>         # specify the variable of interest
+  generate(reps = ___, type = "bootstrap") |>  # generate bootstrap samples
   calculate(stat = "___")             # calculate bootstrap statistic
 ```
 
@@ -167,11 +167,11 @@ Next is a two part exercise: First, generate 15000 bootstrap distributions of `r
 
 ```{r bootstrap_distribution, exercise=TRUE}
 # Generate bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
+rent_med_ci <- manhattan |>
   # Specify the variable of interest
-  ___(response = ___) %>%  
+  ___(response = ___) |>  
   # Generate 15000 bootstrap samples
-  ___(reps = ___, type = "___") %>% 
+  ___(reps = ___, type = "___") |> 
   # Calculate the median of each bootstrap sample
   ___(stat = "___")
   
@@ -188,11 +188,11 @@ glimpse(rent_med_ci)
 
 ```{r bootstrap_distribution-solution}
 # Generate bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
+rent_med_ci <- manhattan |>
   # Specify the variable of interest
-  specify(response = rent) %>%  
+  specify(response = rent) |>  
   # Generate 15000 bootstrap samples
-  generate(reps = 15000, type = "bootstrap") %>%
+  generate(reps = 15000, type = "bootstrap") |>
   # Calculate the median of each bootstrap sample
   calculate(stat = "median")
   
@@ -212,9 +212,9 @@ Then, plot a histogram of the bootstrap medians.
 set.seed(20170801)
 
 # Create bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+rent_med_ci <- manhattan |>
+  specify(response = rent) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
 
@@ -294,9 +294,9 @@ Using our bootstrap distribution from an earlier exercise, we can calculate boot
 set.seed(20170801)
 
 # Create bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+rent_med_ci <- manhattan |>
+  specify(response = rent) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
 
@@ -310,7 +310,7 @@ Next up is a 4 part exercise. First, calculate a 95% bootstrap confidence interv
 
 ```{r bootstrap_interval, exercise=TRUE}
 # Calculate bootstrap CI as lower and upper quantiles
-rent_med_ci %>%
+rent_med_ci |>
   summarize(
     l = quantile(___, ___),
     u = ___
@@ -325,7 +325,7 @@ rent_med_ci %>%
 
 ```{r bootstrap_interval-solution}
 # Calculate bootstrap CI as lower and upper quantiles
-rent_med_ci %>%
+rent_med_ci |>
   summarize(
     l = quantile(stat, 0.025),
     u = quantile(stat, 0.975)
@@ -341,9 +341,9 @@ Then, calculate the observed median rent.
 
 
 ```{r bootstrap_interval_2, exercise=TRUE}
-rent_med_obs <- manhattan %>%
+rent_med_obs <- manhattan |>
   # Calculate observed median rent
-  ___(median_rent = ___) %>%
+  ___(median_rent = ___) |>
   # Pull out the value
   ___
   
@@ -358,9 +358,9 @@ rent_med_obs
 ```
 
 ```{r bootstrap_interval_2-solution}
-rent_med_obs <- manhattan %>%
+rent_med_obs <- manhattan |>
   # Calculate observed median rent
-  summarize(median_rent = median(rent)) %>%
+  summarize(median_rent = median(rent)) |>
   # Pull out the value
   pull()
   
@@ -376,8 +376,8 @@ Then, determine the critical value.
 - Use the t-distribution to determine the critical value for a 95% confidence interval. *`qt()` takes the percentile of the t-distribution you want to find and the degrees of freedom as arguments.*
 
 ```{r bootstrap_interval_3-setup, include=FALSE}
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
+rent_med_obs <- manhattan |>
+  summarize(median_rent = median(rent)) |>
   pull()
 ```
 
@@ -417,13 +417,13 @@ And finally, complete the calculation of the 95% bootstrap confidence interval u
 set.seed(20170801)
 
 # Create bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+rent_med_ci <- manhattan |>
+  specify(response = rent) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
+rent_med_obs <- manhattan |>
+  summarize(median_rent = median(rent)) |>
   pull()
 
 degrees_of_freedom <- nrow(manhattan) - 1 
@@ -432,9 +432,9 @@ t_star <- qt(0.975, df = degrees_of_freedom)
 
 ```{r bootstrap_interval_4, exercise=TRUE}
 # Calculate the CI using the std error method
-rent_med_ci %>%
+rent_med_ci |>
   # Calculate the std error of the statistic
-  summarize(boot_se = ___) %>%
+  summarize(boot_se = ___) |>
   # Calculate the lower and upper limits of the CI
   summarize(
     l = ___ - ___ * ___,
@@ -450,9 +450,9 @@ rent_med_ci %>%
 
 ```{r bootstrap_interval_4-solution}
 # Calculate the CI using the std error method
-rent_med_ci %>%
+rent_med_ci |>
   # Calculate the std error of the statistic
-  summarize(boot_se = sd(stat)) %>%
+  summarize(boot_se = sd(stat)) |>
   # Calculate the lower and upper limits of the CI
   summarize(
     l_se = rent_med_obs - t_star * boot_se,
@@ -465,15 +465,15 @@ rent_med_ci %>%
 set.seed(20170801)
 
 # Create bootstrap distribution of medians
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+rent_med_ci <- manhattan |>
+  specify(response = rent) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
 
 ```{r bootstrap_interval_5, exercise = TRUE}
 # Recall the CI using the percentile method from step 1
-rent_med_ci %>%
+rent_med_ci |>
   summarize(
     l = quantile(stat, 0.025),
     u = quantile(stat, 0.975)
@@ -500,9 +500,9 @@ quiz(
 ```
 
 ```{r}
-rent_med_ci <- manhattan %>%
-  specify(response = rent) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+rent_med_ci <- manhattan |>
+  specify(response = rent) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "median")
 
 ggplot(data = rent_med_ci, mapping = aes(x = stat)) +
@@ -536,7 +536,7 @@ First, filter `ncbirths` for rows where `visits` is not missing.
 
 ```{r doctor, exercise=TRUE}
 # Filter for rows with non-missing visits
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   ___
   
 # See the result
@@ -553,7 +553,7 @@ glimpse(ncbirths_complete_visits)
 
 ```{r doctor-solution}
 # Filter for rows with non-missing visits
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
   
 # See the result
@@ -572,15 +572,15 @@ Then, generate 15000 bootstrap means of the number of visits.
 
 ```{r doctor_2, exercise=TRUE}
 # From previous step
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
 
 # Generate 15000 bootstrap means
-visit_mean_ci <- ncbirths_complete_visits %>%
+visit_mean_ci <- ncbirths_complete_visits |>
   # Specify visits as the response
-  ___(response = ___) %>%
+  ___(response = ___) |>
   # Generate 15000 bootstrap replicates
-  ___(reps = ___, type = ___) %>%
+  ___(reps = ___, type = ___) |>
   # Calculate the mean
   ___(stat = ___)
 ```
@@ -594,15 +594,15 @@ visit_mean_ci <- ncbirths_complete_visits %>%
 
 ```{r doctor_2-solution}
 # From previous step
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
 
 # Generate 15000 bootstrap means
-visit_mean_ci <- ncbirths_complete_visits %>%
+visit_mean_ci <- ncbirths_complete_visits |>
   # Specify visits as the response
-  specify(response = visits) %>%
+  specify(response = visits) |>
   # Generate 15000 bootstrap replicates
-  generate(reps = 15000, type = "bootstrap") %>%
+  generate(reps = 15000, type = "bootstrap") |>
   # Calculate the mean
   calculate(stat = "mean")
 ```
@@ -615,15 +615,15 @@ And finally, calculate the 90% confidence interval via percentile method.
 
 ```{r doctor_3, exercise=TRUE}
 # From previous steps
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
-visit_mean_ci <- ncbirths_complete_visits %>%
-  specify(response = visits) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+visit_mean_ci <- ncbirths_complete_visits |>
+  specify(response = visits) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "mean")
   
 # Calculate the 90% CI via percentile method
-visit_mean_ci %>%
+visit_mean_ci |>
   summarize(
     l = ___,
     u = ___
@@ -638,15 +638,15 @@ visit_mean_ci %>%
 
 ```{r doctor_3-solution}
 # From previous steps
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
-visit_mean_ci <- ncbirths_complete_visits %>%
-  specify(response = visits) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+visit_mean_ci <- ncbirths_complete_visits |>
+  specify(response = visits) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "mean")
   
 # Calculate the 90% CI via percentile method
-visit_mean_ci %>%
+visit_mean_ci |>
   summarize(
     l = quantile(stat, 0.05),
     u = quantile(stat, 0.95)
@@ -664,7 +664,7 @@ Suppose now we're interested in the standard deviation of the number of doctor's
 
 ```{r doctor_setup, include=FALSE}
 # Remove NA visits
-ncbirths_complete_visits <- ncbirths %>%
+ncbirths_complete_visits <- ncbirths |>
   filter(!is.na(visits))
 ```
 
@@ -672,9 +672,9 @@ For the number of doctor's visits, first generate 15000 bootstrap replicates and
 
 ```{r doctor_4, exercise=TRUE, exercise.setup="doctor_setup"}
 # Calculate 15000 bootstrap standard deviations of visits
-visit_sd_ci <- ncbirths_complete_visits %>%
-  ___ %>%
-  ___ %>%
+visit_sd_ci <- ncbirths_complete_visits |>
+  ___ |>
+  ___ |>
   ___
   
 # See the result
@@ -690,9 +690,9 @@ visit_sd_ci
 
 ```{r doctor_4-solution}
 # Calculate 15000 bootstrap standard deviations of visits
-visit_sd_ci <- ncbirths_complete_visits %>%
-  specify(response = visits) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+visit_sd_ci <- ncbirths_complete_visits |>
+  specify(response = visits) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "sd")
   
 # See the result
@@ -705,13 +705,13 @@ Then, calculate a 90% confidence interval for the bootstrap standard deviations 
 
 ```{r doctor_5, exercise=TRUE, exercise.setup="doctor_setup"}
 # From previous step
-visit_sd_ci <- ncbirths_complete_visits %>%
-  specify(response = visits) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+visit_sd_ci <- ncbirths_complete_visits |>
+  specify(response = visits) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "sd")
   
 # Calculate the 90% CI via percentile method
-visit_sd_ci %>%
+visit_sd_ci |>
   ___(
     l = ___,
     u = ___
@@ -726,13 +726,13 @@ visit_sd_ci %>%
 
 ```{r doctor_5-solution}
 # From previous step
-visit_sd_ci <- ncbirths_complete_visits %>%
-  specify(response = visits) %>%
-  generate(reps = 15000, type = "bootstrap") %>%
+visit_sd_ci <- ncbirths_complete_visits |>
+  specify(response = visits) |>
+  generate(reps = 15000, type = "bootstrap") |>
   calculate(stat = "sd")
   
 # Calculate the 90% CI via percentile method
-visit_sd_ci %>%
+visit_sd_ci |>
   summarize(
     l = quantile(stat, 0.05),
     u = quantile(stat, 0.95)
@@ -782,11 +782,11 @@ First, let's generate 15000 bootstrap samples centered at null. *The specify, ge
 n_replicates <- 15000
 
 # Generate 15000 bootstrap samples centered at null
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
   # Use a point hypothesis with a median of 2500
-  ___(null = "___", med = ___) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+  ___(null = "___", med = ___) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
   
 # See the result
@@ -801,11 +801,11 @@ Call `hypothesize()`, setting `null` to `"point"` and `med` to `2500`.
 n_replicates <- 15000
 
 # Generate 15000 bootstrap samples centered at null
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
   # Use a point hypothesis with a median of 2500
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
   
 # See the result
@@ -823,15 +823,15 @@ Then, calculate the observed median rent.
 ```{r apartments_2, exercise=TRUE}
 # From previous step
 n_replicates <- 15000
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
   
-rent_med_obs <- manhattan %>%
+rent_med_obs <- manhattan |>
   # Calculate observed median rent
-  ___(median_rent = ___) %>%
+  ___(median_rent = ___) |>
   # Pull out the value
   ___
   
@@ -848,15 +848,15 @@ rent_med_obs
 ```{r apartments_2-solution}
 # From previous step
 n_replicates <- 15000
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
   
-rent_med_obs <- manhattan %>%
+rent_med_obs <- manhattan |>
   # Calculate observed median rent
-  summarize(median_rent = median(rent)) %>%
+  summarize(median_rent = median(rent)) |>
   # Pull out the value
   pull()
   
@@ -876,18 +876,18 @@ And finally, calculate the p-value as the proportion of bootstrap statistics gre
 ```{r apartments_3, exercise=TRUE}
 # From previous step
 n_replicates <- 15000
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
+rent_med_obs <- manhattan |>
+  summarize(median_rent = median(rent)) |>
   pull()
   
-rent_med_ht %>%
+rent_med_ht |>
   # Filter for bootstrap stat greater than or equal to observed stat
-  filter(___ >= ___) %>%
+  filter(___ >= ___) |>
   # Calculate the p-value
   summarize(p_val = ___ / ___)
 ```
@@ -901,18 +901,18 @@ rent_med_ht %>%
 ```{r apartments_3-solution}
 # From previous step
 n_replicates <- 15000
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
+rent_med_obs <- manhattan |>
+  summarize(median_rent = median(rent)) |>
   pull()
   
-rent_med_ht %>%
+rent_med_ht |>
   # Filter for bootstrap stat greater than or equal to observed stat
-  filter(stat >= rent_med_obs) %>%
+  filter(stat >= rent_med_obs) |>
   # Calculate the p-value
   summarize(p_val = n() / n_replicates)
 ```
@@ -941,18 +941,18 @@ quiz(
 set.seed(20170802)
 # From previous step
 n_replicates <- 15000
-rent_med_ht <- manhattan %>%
-  specify(response = rent) %>%
-  hypothesize(null = "point", med = 2500) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+rent_med_ht <- manhattan |>
+  specify(response = rent) |>
+  hypothesize(null = "point", med = 2500) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "median")
-rent_med_obs <- manhattan %>%
-  summarize(median_rent = median(rent)) %>%
+rent_med_obs <- manhattan |>
+  summarize(median_rent = median(rent)) |>
   pull()
   
-rent_p_value <- rent_med_ht %>%
+rent_p_value <- rent_med_ht |>
   # Filter for bootstrap stat greater than or equal to observed stat
-  filter(stat >= rent_med_obs) %>%
+  filter(stat >= rent_med_obs) |>
   # Calculate the p-value
   summarize(p_val = n() / n_replicates)
 ```
@@ -967,13 +967,13 @@ Calculate 1500 bootstrap replicates of the mean `weight`. Use a point null hypot
 ```{r babies, exercise=TRUE}
 n_replicates <- 1500
 
-weight_mean_ht <- ncbirths %>%
+weight_mean_ht <- ncbirths |>
   # Specify weight as the response
-  ___ %>%
+  ___ |>
   # Set the hypothesis that weights are 7 pounds
-  ___ %>% 
+  ___ |> 
   # Generate 1500 bootstrap replicates
-  ___ %>% 
+  ___ |> 
   # Calculate the mean
   ___
 ```
@@ -989,13 +989,13 @@ weight_mean_ht <- ncbirths %>%
 ```{r babies-solution}
 n_replicates <- 1500
 
-weight_mean_ht <- ncbirths %>%
+weight_mean_ht <- ncbirths |>
   # Specify weight as the response
-  specify(response = weight) %>%
+  specify(response = weight) |>
   # Set the hypothesis that weights are 7 pounds
-  hypothesize(null = "point", mu = 7) %>% 
+  hypothesize(null = "point", mu = 7) |> 
   # Generate 1500 bootstrap replicates
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   # Calculate the mean
   calculate(stat = "mean")
 ```
@@ -1007,16 +1007,16 @@ First, calculate the mean observed weight and pull out the value.
 
 ```{r babies_2, exercise=TRUE}
 n_replicates <- 1500
-weight_mean_ht <- ncbirths %>%
-  specify(response = weight) %>%
-  hypothesize(null = "point", mu = 7) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+weight_mean_ht <- ncbirths |>
+  specify(response = weight) |>
+  hypothesize(null = "point", mu = 7) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "mean")
 
 # Calculate observed mean
-weight_mean_obs <- ncbirths %>%
+weight_mean_obs <- ncbirths |>
   # Summarize to calculate the mean observed weight
-  ___(mean_weight = ___) %>% 
+  ___(mean_weight = ___) |> 
   # Pull out the value
   ___
 ```
@@ -1030,16 +1030,16 @@ weight_mean_obs <- ncbirths %>%
 ```{r babies_2-solution}
 # From previous step
 n_replicates <- 1500
-weight_mean_ht <- ncbirths %>%
-  specify(response = weight) %>%
-  hypothesize(null = "point", mu = 7) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+weight_mean_ht <- ncbirths |>
+  specify(response = weight) |>
+  hypothesize(null = "point", mu = 7) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "mean")
 
 # Calculate observed mean
-weight_mean_obs <- ncbirths %>%
+weight_mean_obs <- ncbirths |>
   # Summarize to calculate the mean observed weight
-  summarize(mean_weight = mean(weight)) %>%
+  summarize(mean_weight = mean(weight)) |>
   # Pull out the value
   pull()
 ```
@@ -1056,19 +1056,19 @@ Then, calculate the two-sided p-value.
 ```{r babies_3, exercise=TRUE}
 # From previous steps
 n_replicates <- 1500
-weight_mean_ht <- ncbirths %>%
-  specify(response = weight) %>%
-  hypothesize(null = "point", mu = 7) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+weight_mean_ht <- ncbirths |>
+  specify(response = weight) |>
+  hypothesize(null = "point", mu = 7) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "mean")
-weight_mean_obs <- ncbirths %>%
-  summarize(mean_weight = mean(weight)) %>%
+weight_mean_obs <- ncbirths |>
+  summarize(mean_weight = mean(weight)) |>
   pull()
 
 # Calculate p-value
-weight_mean_ht %>%
+weight_mean_ht |>
   # Filter on stat greater than or equal to weight_mean_obs
-  filter(___ >= ___) %>%
+  filter(___ >= ___) |>
   # p_val is twice the number of filtered rows divided by the total number of rows
   summarize(
     one_sided_p_val = ___ / ___,
@@ -1086,19 +1086,19 @@ weight_mean_ht %>%
 ```{r babies_3-solution}
 # From previous steps
 n_replicates <- 1500
-weight_mean_ht <- ncbirths %>%
-  specify(response = weight) %>%
-  hypothesize(null = "point", mu = 7) %>% 
-  generate(reps = n_replicates, type = "bootstrap") %>% 
+weight_mean_ht <- ncbirths |>
+  specify(response = weight) |>
+  hypothesize(null = "point", mu = 7) |> 
+  generate(reps = n_replicates, type = "bootstrap") |> 
   calculate(stat = "mean")
-weight_mean_obs <- ncbirths %>%
-  summarize(mean_weight = mean(weight)) %>%
+weight_mean_obs <- ncbirths |>
+  summarize(mean_weight = mean(weight)) |>
   pull()
 
 # Calculate p-value
-weight_mean_ht %>%
+weight_mean_ht |>
   # Filter on stat greater than or equal to weight_mean_obs
-  filter(stat >= weight_mean_obs) %>%
+  filter(stat >= weight_mean_obs) |>
   # p_val is twice the number of filtered rows divided by the total number of rows
   summarize(
     one_sided_p_val = n() / n_replicates,

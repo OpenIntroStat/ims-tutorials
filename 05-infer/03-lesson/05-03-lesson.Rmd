@@ -31,7 +31,7 @@ knitr::opts_chunk$set(fig.align = "center",
 
 # load data
 
-gss2016 <- read_rds("data/gss-sampled-2016.rds") %>%
+gss2016 <- read_rds("data/gss-sampled-2016.rds") |>
   mutate(party = case_when(
     str_detect(partyid, "DEMOCRAT")   ~ "Dem",
     str_detect(partyid, "REPUBLICAN") ~ "Rep",
@@ -41,8 +41,8 @@ gss2016 <- read_rds("data/gss-sampled-2016.rds") %>%
 
 # objects to be used later
 
-gss_party <- gss2016 %>%
-  filter(party != "Oth") %>%
+gss_party <- gss2016 |>
+  filter(party != "Oth") |>
   droplevels()
 
 # set seed
@@ -62,8 +62,8 @@ In the last lesson you opened up methods that allow you to learn about the relat
 ### Politics and military spending
 
 ```{r}
-gss2016 %>%
-  select(party, natarms) %>%
+gss2016 |>
+  select(party, natarms) |>
   glimpse()
 ```
 
@@ -101,8 +101,8 @@ This process of moving between a data frame involves working with untidy data, s
 ### Tables and tidy data
 
 ```{r}
-tab <- gss2016 %>%
-  select(natarms, party) %>%
+tab <- gss2016 |>
+  select(natarms, party) |>
   table()
 tab
 ```
@@ -127,8 +127,8 @@ It's very common to run across data presented in a table like this. It's a fine 
 
 
 ```{r}
-tab <- gss2016 %>%
-  select(natarms, party) %>%
+tab <- gss2016 |>
+  select(natarms, party) |>
   table()
 tab
 ```
@@ -136,7 +136,7 @@ tab
 
 
 ```{r}
-tab %>%
+tab |>
   tidy()
 ```
 
@@ -153,16 +153,16 @@ OK, now we're back to our original data frame, so we've gone from tidy to table 
 
 
 ```{r}
-tab <- gss2016 %>%
-  select(natarms, party) %>%
+tab <- gss2016 |>
+  select(natarms, party) |>
   table()
 tab
 ```
 
 
 ```{r}
-tab %>%
-  tidy() %>%
+tab |>
+  tidy() |>
   uncount(n)
 ```
 
@@ -188,7 +188,7 @@ filter(party != "Oth")
 
 ```{r ex1-solution}
 # Subset data
-gss_party <- gss2016 %>%
+gss_party <- gss2016 |>
   # Filter out the "Oth"
   filter(party != "Oth")
 ```
@@ -211,7 +211,7 @@ geom_bar(position = "fill")
 
 ```{r ex2-solution}
 # Visualize distribution take 1
-gss_party %>%
+gss_party |>
   ggplot(aes(x = party, fill = natspac)) +
   # Add bar layer of proportions
   geom_bar(position = "fill")
@@ -236,7 +236,7 @@ Just `geom_bar()` this time!
 
 ```{r ex3-solution}
 # Visualize distribution take 2 
-gss_party %>%
+gss_party |>
   ggplot(aes(x = party, fill = natspac)) +
   # Add bar layer of counts
   geom_bar()
@@ -293,9 +293,9 @@ ___ <- ___
 
 ```{r ex4-solution}
 # Create table of natspac and party
-Obs <- gss_party %>%
+Obs <- gss_party |>
   # Select columns of interest
-  select(natspac, party) %>%
+  select(natspac, party) |>
   # Create table
   table()
 ```
@@ -308,8 +308,8 @@ Starting with your observed contingency table `Obs`, convert it to a tidy data f
 
 ```{r ex5, exercise=TRUE}
 # From previous step
-Obs <- gss_party %>%
-  select(natspac, party) %>%
+Obs <- gss_party |>
+  select(natspac, party) |>
   table()
   
 # Convert table back to tidy df
@@ -326,14 +326,14 @@ Call `tidy()`, then find the name of the column that will provide the counts tha
 
 ```{r ex5-solution}
 # From previous step
-Obs <- gss_party %>%
-  select(natspac, party) %>%
+Obs <- gss_party |>
+  select(natspac, party) |>
   table()
   
 # Convert table back to tidy df
-Obs %>%
+Obs |>
   # Tidy the table
-  tidy() %>%
+  tidy() |>
   # Expand out the counts
   uncount(n)
 ```
@@ -364,10 +364,10 @@ The plot on the left shows little relationship between party affiliation and spa
 Recall that in a hypothesis test you specify the variables you're studying, assume a hypothesis that can generate data, then for each data set calculate a relevant test statistic that you can compare to your observed test statistic. In this case, since we're interested in the association between two variables, we can use the same null as before, that these variables are in fact independent. That allows us to generate data through permutation. The question is: what test statistic should we use?
 
 ```{r eval=FALSE}
-null <- data %>%
-  specify(var1 ~ var2) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 100, type = "permute") %>%
+null <- data |>
+  specify(var1 ~ var2) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 100, type = "permute") |>
   calculate(stat = ?)
 ```
 
@@ -414,7 +414,7 @@ expected_counts
 ``` 
 
 ```{r echo=FALSE}
-chisq.test(table(gss_party$natspac, gss_party$party))$expected %>% round(1)
+chisq.test(table(gss_party$natspac, gss_party$party))$expected |> round(1)
 ```
 
 ### 
@@ -472,11 +472,11 @@ Take a look at some of the exercises from the last lesson for a refresher on how
 
 ```{r ex6-solution}
 # Create one permuted data set
-perm_1 <- gss_party %>%
+perm_1 <- gss_party |>
   # Specify the variables of interest
-  specify(natarms ~ party) %>%
+  specify(natarms ~ party) |>
   # Set up the null
-  hypothesize(null = "independence") %>%
+  hypothesize(null = "independence") |>
   # Generate a single permuted data set
   generate(reps = 1, type = "permute")
 ```
@@ -485,9 +485,9 @@ Using `perm_1`, visualize the relationship between `natarms` and `party` by cons
 
 ```{r ex7, exercise=TRUE}
 # From previous step
-perm_1 <- gss_party %>%
-  specify(natarms ~ party) %>%
-  hypothesize(null = "independence") %>%
+perm_1 <- gss_party |>
+  specify(natarms ~ party) |>
+  hypothesize(null = "independence") |>
   generate(reps = 1, type = "permute")
   
 # Visualize permuted data
@@ -502,9 +502,9 @@ Map `x` to `party` and `fill` to `natarms` to make your bar plot.
 
 ```{r ex7-solution}
 # From previous step
-perm_1 <- gss_party %>%
-  specify(natarms ~ party) %>%
-  hypothesize(null = "independence") %>%
+perm_1 <- gss_party |>
+  specify(natarms ~ party) |>
+  hypothesize(null = "independence") |>
   generate(reps = 1, type = "permute")
   
 # Visualize permuted data
@@ -522,7 +522,7 @@ Calculate the chi-squared test statistic associated with by running the `gss_par
 
 ```{r ex8, exercise=TRUE}
 # Compute chi-squared stat
-gss_party %>%
+gss_party |>
   chisq_stat(___)
 ```
 
@@ -532,7 +532,7 @@ To get the statistic, add the argument that specifies the variables: `natarms ~ 
 
 ```{r ex8-solution}
 # Compute chi-squared stat
-gss_party %>%
+gss_party |>
   chisq_stat(natarms ~ party)
 ```
 
@@ -555,10 +555,10 @@ chi_obs_arms <- chisq_stat(gss_party, natarms ~ party)
 
 ```{r ex9, exercise=TRUE}
 # Create null
-___ <- gss_party %>%
-  specify(natspac ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = ___, type = "permute") %>%
+___ <- gss_party |>
+  specify(natspac ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = ___, type = "permute") |>
   calculate(stat = "Chisq")
 
 # Visualize null
@@ -577,10 +577,10 @@ ___ +
 
 ```{r ex9-solution}
 # Create null
-null_spac <- gss_party %>%
-  specify(natspac ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null_spac <- gss_party |>
+  specify(natspac ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Visualize null
@@ -601,10 +601,10 @@ ggplot(null_spac, aes(x = stat)) +
 
 ```{r ex10, exercise=TRUE}
 # Create null that natarms and party are indep
-___ <- gss_party %>%
-  specify(___) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+___ <- gss_party |>
+  specify(___) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Visualize null
@@ -617,10 +617,10 @@ ggplot(___, aes(x = stat)) +
 
 ```{r ex10-solution}
 # Create null
-null_arms <- gss_party %>%
-  specify(natarms ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null_arms <- gss_party |>
+  specify(natarms ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Visualize null
@@ -639,7 +639,7 @@ In general, it's a good idea to use *two-tailed* p-values, which you have calcul
 
 ```{r eval=FALSE}
 # Compute two-tailed p-value
-null %>%
+null |>
   summarize(pval = 2 * mean(stat <= d_hat))
 ```
 
@@ -653,16 +653,16 @@ Using the objects that you created in the previous exercise (`null_spac`, `null_
 chi_obs_spac <- chisq_stat(gss_party, natspac ~ party)
 chi_obs_arms <- chisq_stat(gss_party, natarms ~ party)
 
-null_spac <- gss_party %>%
-  specify(natspac ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null_spac <- gss_party |>
+  specify(natspac ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
  
-null_arms <- gss_party %>%
-  specify(natarms ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null_arms <- gss_party |>
+  specify(natarms ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
 ```
 
@@ -724,10 +724,10 @@ In the case of the chi-squared statistic, the distribution is called, convenient
 
 
 ```{r}
-null_spac <- gss_party %>%
-  specify(natspac ~ party) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 100, type = "permute") %>%
+null_spac <- gss_party |>
+  specify(natspac ~ party) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 100, type = "permute") |>
   calculate(stat = "Chisq")
 ```
 
@@ -751,8 +751,8 @@ In the last exercises, you conducted permutation test to assess if natspac was i
 ### H-test via approximation
 
 ```{r}
-gss_party %>%
-  select(natarms, party) %>%
+gss_party |>
+  select(natarms, party) |>
   table()
 ```
 
@@ -848,7 +848,7 @@ ___ +
   ___
   
 # Calculate and save observed statistic
-chi_obs <- ___ %>%
+chi_obs <- ___ |>
   ___
 
 # See the result
@@ -869,7 +869,7 @@ ggplot(gss2016, aes(x = region, fill = happy)) +
   geom_bar(position = "fill")
   
 # Calculate and save observed statistic
-chi_obs <- gss2016 %>%
+chi_obs <- gss2016 |>
   chisq_stat(region ~ happy)
 
 # See the result
@@ -918,13 +918,13 @@ ___ <- ___
 
 ```{r ex12-solution}
 # Generate null distribution
-null <- gss2016 %>%
+null <- gss2016 |>
   # Specify variables
-  specify(happy ~ region, success = "HAPPY") %>%
+  specify(happy ~ region, success = "HAPPY") |>
   # Set up null
-  hypothesize(null = "independence") %>%
+  hypothesize(null = "independence") |>
   # Generated 500 permuted data sets
-  generate(reps = 500, type = "permute") %>%
+  generate(reps = 500, type = "permute") |>
   # Calculate statistics
   calculate(stat = "Chisq")
 ```
@@ -938,10 +938,10 @@ Create a density plot of `null`, add a vertical red line at `chi_obs`, and overl
 
 ```{r ex13, exercise=TRUE}
 # From previous step
-null <- gss2016 %>%
-  specify(happy ~ region, success = "HAPPY") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null <- gss2016 |>
+  specify(happy ~ region, success = "HAPPY") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Visualize null
@@ -960,10 +960,10 @@ The degrees of freedom is calculated from the contingency table as the (number o
 
 ```{r ex13-solution}
 # From previous step
-null <- gss2016 %>%
-  specify(happy ~ region, success = "HAPPY") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null <- gss2016 |>
+  specify(happy ~ region, success = "HAPPY") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Visualize null
@@ -984,14 +984,14 @@ ggplot(null, aes(x = stat)) +
 
 ```{r ex14, exercise=TRUE}
 # From previous step
-null <- gss2016 %>%
-  specify(happy ~ region, success = "HAPPY") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null <- gss2016 |>
+  specify(happy ~ region, success = "HAPPY") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Calculate computational pval
-___ %>%
+___ |>
   summarize(pval = ___)
 
 # Calculate approximate pval
@@ -1005,14 +1005,14 @@ pchisq(chi_obs, df = ___, lower.tail = ___)
 
 ```{r ex14-solution}
 # From previous step
-null <- gss2016 %>%
-  specify(happy ~ region, success = "HAPPY") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+null <- gss2016 |>
+  specify(happy ~ region, success = "HAPPY") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "Chisq")
   
 # Calculate computational pval
-null %>% 
+null |> 
   summarize(pval = mean(stat >= chi_obs))
 
 # Calculate approximate pval

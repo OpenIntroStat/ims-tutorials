@@ -16,7 +16,7 @@ library(emo)
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
 # Setup for in some exercise chunks
-hsb2_public <- hsb2 %>%
+hsb2_public <- hsb2 |> 
   filter(schtyp == "public")
 
 avg_read <- mean(hsb2$read)
@@ -160,8 +160,8 @@ Using the `glimpse()` function, we can obtain a list of the variables in the dat
 The first variable is id, which is an identifier variable for the student. 
 
 ```{r glimpse-hsb2-id}
-hsb2 %>% 
-  select(id) %>% 
+hsb2 |> 
+  select(id)  |>  
   glimpse()
 ```
 
@@ -180,8 +180,8 @@ the race variable, which has levels of `"white"`, `"african american"`,
 `"hispanic"`, and `"asian"`.
 
 ```{r glimpse-hsb2-race-gender}
-hsb2 %>% 
-  select(race, gender) %>% 
+hsb2 |> 
+  select(race, gender) |> 
   glimpse()
 ```
 
@@ -190,16 +190,16 @@ and `"high"` that have an inherent ordering, hence this variable is an *ordinal*
 categorical variable.
 
 ```{r glimpse-hsb2-ses}
-hsb2 %>% 
-  select(ses) %>% 
+hsb2 |> 
+  select(ses) |> 
   glimpse()
 ```
 
 School type and program are also both categorical variables, with no inherent ordering to their levels.
 
 ```{r glimpse-hsb2-schtyp-prog}
-hsb2 %>% 
-  select(schtyp, prog) %>% 
+hsb2 |> 
+  select(schtyp, prog) |> 
   glimpse()
 ```
 
@@ -252,7 +252,7 @@ Suppose we want to do an analysis of only the students in public schools in the 
 One option for obtaining this information in R uses the `count()` function from the **dplyr** package, one of the packages included in the tidyverse. This package provides a variety of functions for wrangling and summarizing data. Once such function is `count()` which gives the frequencies of occurrence of the unique values in a given column. In this case we're interested in the number of students for each level of the `schtyp` (school type) column.
 
 ```{r hsb2-count-schtyp, exercise=TRUE}
-hsb2 %>% 
+hsb2 |> 
   count(schtyp)
 ```
 
@@ -268,14 +268,14 @@ You might be wondering what we mean by _"pipe it into the `count()` function"_?
 
 ### The pipe operator
 
-![](images/pipe-operator.png){width="30%"}
+![](images/native_pipe-operator.png){width="30%"}
 
-The **pipe operator**, which **is percent greater than percent**, tells `R` to
+The **pipe operator**, which **is vertical bar greater than**, tells `R` to
 pass the object that comes before it into the first argument of the function
 that comes after it. Mathematically, **x pipe f(y)** becomes *f(x, y)*, since x
 is piped into the first argument of the function f().
 
-![](images/pipe-operator2.png){width="30%"}
+![](images/native_pipe-operator2.png){width="30%"}
 
 For example, one way of adding numbers in R is using the `sum()` function. The 
 `sum()` function has as many arguments as there are numbers you wish to add, 
@@ -295,7 +295,7 @@ function, which looks like `sum(3, 4)`.
 
 ```{r sumdata2, echo=TRUE}
 # Sum of 3 and 4, with pipe
-3 %>% sum(4)
+3 |> sum(4)
 ```
 
 Piping 3 into the `sum()` function may seem a bit silly, especially since it's 
@@ -310,7 +310,7 @@ Next, let's use the `filter()` function to filter the data to only include
 public school students. 
 
 ```{r hsb2-filter-schtyp-public, exercise=TRUE}
-hsb2_public <- hsb2 %>%
+hsb2_public <- hsb2 |>
   filter(schtyp == "public")
 ```
 
@@ -337,7 +337,7 @@ Now, if we make another frequency table of school type in the filtered dataset,
 we should only see public school in the output.
 
 ```{r hsb2-count-schtyp-again, exercise=TRUE}
-hsb2_public %>%
+hsb2_public |>
   count(schtyp)
 ```
 
@@ -354,7 +354,7 @@ Modify the code below to:
 
 ```{r email50-filter-number-big, exercise=TRUE}
 # Subset of emails with big numbers: email50_big
-email50_big <- ___ %>%
+email50_big <- ___ |>
   filter(___)
 
 # Glimpse the subset 
@@ -368,13 +368,13 @@ email50_big <- ___ %>%
 
 ```{r email50-filter-number-big-hint-2}
 # Subset of emails with big numbers: email50_big
-email50_big <- email50 %>%
+email50_big <- email50 |>
   filter(number == "big")
 ```
 
 ```{r email50-filter-number-big-solution}
 # Subset of emails with big numbers: email50_big
-email50_big <- email50 %>%
+email50_big <- email50 |>
   filter(number == "big")
 
 # Glimpse the subset
@@ -417,7 +417,7 @@ Instead we can create a new variable, named `read_cat`, with the `mutate()`
 function and the helpful `if_else()` function. 
 
 ```{r hsb2-mutate-read-cat, exercise=TRUE}
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(read_cat = if_else(read < avg_read,
                             "below average",
                             "at or above average")
@@ -459,14 +459,14 @@ The `email50` dataset is available in your workspace. Modify the code below to:
 med_num_char <- median(___)
 
 # Create num_char_cat variable in email50
-email50_updated <- email50 %>%
+email50_updated <- email50 |>
   mutate(num_char_cat = if_else(num_char < med_num_char,
                                 "[VALUE IF TRUE]",
                                 "[VALUE IF FALSE]")
          )
   
 # Count emails in each category
-email50_updated %>%
+email50_updated |>
   count(___)
 ```
 
@@ -485,7 +485,7 @@ med_num_char <- median(email50$num_char)
 
 ```{r hsb2-mutate-num-char-cat-hint-3}
 # Create num_char_cat variable in email50
-email50_updated <- email50 %>%
+email50_updated <- email50 |>
   mutate(num_char_cat = if_else(num_char < med_num_char,
                                 "below median",
                                 "at or above median")
@@ -494,7 +494,7 @@ email50_updated <- email50 %>%
 
 ```{r hsb2-mutate-num-char-cat-hint-4}
 # Count emails in each category
-email50_updated %>%
+email50_updated |>
   count(num_char_cat)
 ```
 
@@ -504,14 +504,14 @@ email50_updated %>%
 med_num_char <- median(email50$num_char)
 
 # Create num_char_cat variable in email50
-email50_updated <- email50 %>%
+email50_updated <- email50 |>
   mutate(num_char_cat = if_else(num_char < med_num_char,
                                 "below median",
                                 "at or above median")
          )
   
 # Count emails in each category
-email50_updated %>%
+email50_updated |>
   count(num_char_cat)
 ```
 
@@ -539,7 +539,7 @@ Use what you know about the `mutate` and `if_else()` functions to:
 
 ```{r email50-fortified, exercise=TRUE}
 # Create number_cat column in email50
-email50_updated <- email50 %>%
+email50_updated <- email50 |>
   mutate(___ = if_else(___, 
                           "[VALUE IF TRUE]", 
                           "[VALUE IF FALSE]")
@@ -573,7 +573,7 @@ number_cat = if_else(number == "none",
 
 ```{r email50-fortified-solution}
 # Create number_cat column in email50
-email50_updated <- email50 %>%
+email50_updated <- email50 |>
   mutate(number_cat = if_else(number == "none",
                               "no", # if number is "none", make number_cat "no"
                               "yes" # if number is not "none", make number_cat "yes"

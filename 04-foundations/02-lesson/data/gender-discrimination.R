@@ -4,6 +4,7 @@ set.seed(474444)
 
 library(openintro)
 library(infer)
+library(readr)
 
 # Create data frame of permuted differences in promotion rates -----------------
 
@@ -58,23 +59,23 @@ gender_discrimination_new_perm <- gender_discrimination_new %>%
 
 # Save everything --------------------------------------------------------------
 
-write_rds(gender_discrimination_big, 
+write_rds(gender_discrimination_big,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_big.rds")
 
-write_rds(gender_discrimination_big_perm, 
+write_rds(gender_discrimination_big_perm,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_big_perm.rds")
 
-write_rds(gender_discrimination_new, 
+write_rds(gender_discrimination_new,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_new.rds")
 
-write_rds(gender_discrimination_new_perm, 
+write_rds(gender_discrimination_new_perm,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_new_perm.rds")
 
-write_rds(gender_discrimination_small, 
+write_rds(gender_discrimination_small,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_small.rds")
 
-write_rds(gender_discrimination_small_perm, 
+write_rds(gender_discrimination_small_perm,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_small_perm.rds")
 
-write_rds(gender_discrimination_perm, 
+write_rds(gender_discrimination_perm,
           path = "05-introduction-to-statistical-inference/02-lesson/data/gender_discrimination_perm.rds")

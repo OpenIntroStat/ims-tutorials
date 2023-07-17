@@ -32,10 +32,10 @@ knitr::opts_chunk$set(
 
 # data prep --------------------------------------------------------------------
 
-SAT <- mosaicData::SAT %>%
+SAT <- mosaicData::SAT |>
   rename(total = sat)
 
-mariokart <- mariokart %>%
+mariokart <- mariokart |>
   filter(total_pr < 100)
 ```
 
@@ -184,7 +184,7 @@ summary(mod)
 
 ```{r ex1-hint-2}
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
 ```
 
@@ -198,7 +198,7 @@ mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
 summary(mod)
 
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
   
 # compute new model
@@ -222,7 +222,7 @@ The fitted model `mod` is already in your environment.
 - Compute the fitted values of the model as one column in a `data.frame` using `augment()`.
 
 
-```{r echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r ex2-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
@@ -431,7 +431,7 @@ How about the percentage  (`frac`tion) of students eligible for taking the SAT? 
 First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. 
 
 ```{r echo=TRUE}
-SAT_bin <- SAT %>%
+SAT_bin <- SAT |>
   mutate(sat_bin = cut(frac, 3))
 ``` 
 
@@ -499,11 +499,14 @@ A mild version of Simpson's paradox can be observed in the MarioKart auction dat
 
 However, a simple linear regression model reveals the opposite: longer auctions are associated with lower final prices. The problem is that all other things are *not* equal. In this case, the new MarioKarts - which people pay a premium for - were mostly sold in one-day auctions, while a plurality of the used MarioKarts were sold in the standard seven-day auctions. 
 
-```{r mariokart-plot, echo=TRUE}
+```{r ex5-setup}
 slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
 slr
+```
+
+```{r mariokart-plot, ref.label="ex5-setup", echo=TRUE}
 ```
 
 

@@ -40,7 +40,7 @@ Data were collected on 73 textbooks required for a few randomly selected courses
 > What factors are associated with the price of each book at the UCLA bookstore?
 
 ```{r}
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(course_number = readr::parse_number(course))
 ```
 
@@ -55,7 +55,7 @@ One might suppose that more advanced books cost more. Our best guess for the lev
 
 
 ```{r 2, echo = TRUE}
-textbooks %>%
+textbooks |>
   ggplot(aes(x = course_number, y = ucla_new)) +
     geom_point()
 ```
@@ -113,7 +113,7 @@ When interpreting slope coefficients, one must pay careful attention to units an
 Here, we create a new variable for the price at Amazon in cents, and re-fit the model. Note that while the coefficient has changed, the underlying meaning has not. Here, we say that for each additional cent that a book costs on Amazon, the expected price at the UCLA bookstore increases by about 0.01199 dollars, or 1.2 cents. Thus, in both cases, the price of a book at the UCLA bookstore is about 20% higher, on average, than the corresponding price on Amazon.com. 
 
 ```{r 6, echo = TRUE}
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(amaz_new_cents = amaz_new * 100) 
 lm(ucla_new ~ amaz_new_cents, data = textbooks)
 ```
@@ -443,8 +443,8 @@ books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
 By examining the residuals, we can learn about whether particular textbooks appear to be under- or over-priced. In this case, the most overpriced book cost $197 at the UCLA bookstore, but just $131 on Amazon---a markup of $66! The model predicts a cost of $158, resulting in a residual of $39. 
 
 ```{r lm2, echo = TRUE}
-augment(books_mod) %>%
-  arrange(desc(.resid)) %>%
+augment(books_mod) |>
+  arrange(desc(.resid)) |>
   head()
 ```
 
@@ -453,7 +453,7 @@ augment(books_mod) %>%
 This turns out to be the management textbook "Financial Statement Analysis and Security Valuation". Does this qualify as irony? 
 
 ```{r lm3, echo = TRUE}
-textbooks %>%
+textbooks |>
   filter(ucla_new == 197)
 ```
 
@@ -545,8 +545,8 @@ Use `geom_abline()` to add a line defined in the `hgt_wgt_coefs` data frame to a
 
 ```{r ex7-setup}
 hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
-hgt_wgt_coefs <- coef(hgt_wgt_mod) %>%
-  t() %>%
+hgt_wgt_coefs <- coef(hgt_wgt_mod) |>
+  t() |>
   as.data.frame()
 ```
 

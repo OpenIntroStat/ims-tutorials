@@ -146,10 +146,10 @@ Use the code chunk below to experiment with different values (to the nearest int
 ```{r ex2-setup}
 add_line <- function (my_slope) {
 
-  bdims_summary <- bdims %>%
+  bdims_summary <- bdims |>
     summarize(N = n(), r = cor(hgt, wgt),
               mean_hgt = mean(hgt), mean_wgt = mean(wgt),
-              sd_hgt = sd(hgt), sd_wgt = sd(wgt)) %>%
+              sd_hgt = sd(hgt), sd_wgt = sd(wgt)) |>
     mutate(true_slope = r * sd_wgt / sd_hgt, 
            true_intercept = mean_wgt - true_slope * mean_hgt)
   p <- ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
@@ -158,7 +158,7 @@ add_line <- function (my_slope) {
                aes(x = mean_hgt, y = mean_wgt), 
                color = "red", size = 3)
   
-  my_data <- bdims_summary %>%
+  my_data <- bdims_summary |>
     mutate(my_slope = my_slope, 
            my_intercept = mean_wgt - my_slope * mean_hgt)
   p + geom_abline(data = my_data, 
@@ -343,7 +343,7 @@ In this exercise, you will find the slope and intercept of the least squares reg
 The `bdims_summary` table has been added to your workspace. Use the `glimpse()` function to preview what the table looks like! 
 
 ```{r preview-setup}
-bdims_summary <- bdims %>%
+bdims_summary <- bdims |>
   summarize(N = n(), r = cor(hgt, wgt),  
             mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
             mean_wgt = mean(wgt), sd_wgt = sd(wgt))
@@ -358,14 +358,14 @@ bdims_summary <- bdims %>%
 Now, use `mutate()` and some algebra to add the `slope` and `intercept` to the `bdims_summary` table.
 
 ```{r ex3-setup}
-bdims_summary <- bdims %>%
+bdims_summary <- bdims |>
   summarize(N = n(), r = cor(hgt, wgt),  
             mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
             mean_wgt = mean(wgt), sd_wgt = sd(wgt))
 ```
 
 ```{r ex3, exercise = TRUE}
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = ___, 
          intercept = ___)
 ```
@@ -374,7 +374,7 @@ bdims_summary %>%
 ## Remember the slope can be calculated from 
 ## 1. the correlation 
 ## 2. the sd of height and weight
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r  * (sd_wgt / sd_hgt), 
          intercept = ___)
 ```
@@ -382,14 +382,14 @@ bdims_summary %>%
 ```{r ex3-hint-2}
 ## Remember that x-bar and y-bar lie on the regression line! 
 
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r  * (sd_wgt / sd_hgt), 
          intercept = mean_wgt  - ___)
 ```
 
 
 ```{r ex3-solution}
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r * sd_wgt / sd_hgt, 
          intercept = mean_wgt - slope * mean_hgt)
 ```
@@ -413,9 +413,9 @@ The answer turns out to be "yes, but not as tall as their fathers." This effect 
 In the plot, we see the relationship between the heights of a group of 465 men that Galton measured in the 1880s, and their fathers. The height of the son is on the $y$ axis, while the height of the corresponding father is on the $x$ axis. The diagonal indicates sons who are as tall as their fathers. The slope of the regression line---shown in blue---is more gentle. This reflects the observation that while tall fathers are still likely to have tall sons, the sons are not likely to be *as tall* as their fathers. Their height has been "regressed" towards the mean height. 
 
 ```{r}
-Galton_men <- mosaicData::Galton %>%
+Galton_men <- mosaicData::Galton |>
  filter(sex == "M")
-Galton_summary <- Galton_men %>%
+Galton_summary <- Galton_men |>
  summarize(N = n(),
            mean_height = mean(height), sd_height = sd(height),
            mean_father = mean(father), sd_father = sd(father))

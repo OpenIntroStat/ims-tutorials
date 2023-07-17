@@ -105,7 +105,7 @@ We can connect these ideas by discretizing our explanatory variable. This can be
 Here, we are creating a new variable named `tail_cut` from using the `cut()` function on the original `tail_l` variable. We are then saving this new variable back into the original `possum` dataset.
 
 ```{r cut, echo = TRUE}
-possum <- possum %>%
+possum <- possum |>
   mutate(tail_cut = cut(tail_l, breaks = 5))
 ```
 
@@ -171,7 +171,7 @@ The `cut()` function takes two arguments: the continuous variable you want to di
 First, we will make a new variable, named `weeks_cut`, which discretizes the original `weeks` variable. We will use the `cut()` function, specifying four breaks.
 
 ```{r cut-ex, exercise = TRUE}
-ncbirths <- ncbirths %>%
+ncbirths <- ncbirths |>
   mutate(weeks_cut = cut(___, breaks = ___))
 ```
 
@@ -182,7 +182,7 @@ The `cut()` function should cut the `weeks` variable into 4 different categories
 Next, using the new `weeks_cut` variable, make side-by-side boxplots illustrating how the birth weight of these babies varies according to the number of weeks of gestation.
 
 ```{r ex2-setup}
-ncbirths <- ncbirths %>%
+ncbirths <- ncbirths |>
   mutate(weeks_cut = cut(weeks, breaks = 4))
 ```
 
@@ -489,8 +489,8 @@ ggplot(data = mlbbat10, aes(x = stolen_base, y = home_run)) +
 In this plot, there are two points that stand out as potential outliers: the one in the lower-right hand corner, and the one at the very top. We will discuss later in the course how to handle these outliers, but for now, it is enough to simply identify them and investigate them. In this case, we can use the `filter()` function to identify those players with **at least** 60 stolen bases or **at least** 50 home runs. As it turns out, the player in the lower-right hand corner is Juan Pierre, who is one of the speediest and least powerful hitters in recent memory. The player at the top is Jose Bautista, one of the game's most revered sluggers.
 
 ```{r id-outliers, echo = TRUE}
-mlbbat10 %>%
-  filter(stolen_base > 60 | home_run > 50) %>%
+mlbbat10 |>
+  filter(stolen_base > 60 | home_run > 50) |>
   select(name, team, position, stolen_base, home_run)
 ```
 
@@ -513,7 +513,7 @@ Let's make a scatterplot of the same relationship as before, but only for player
 
 ```{r ex9, exercise = TRUE}
 # Filter for AB greater than or equal to 200
-ab_gt_200 <- mlbbat10 %>%
+ab_gt_200 <- mlbbat10 |>
   filter(___)
 
 # Scatterplot of slg vs. obp
@@ -522,7 +522,7 @@ ggplot(ab_gt_200, aes(x = ___, y = ___)) +
 ```
 
 ```{r ex9-hint-1}
-mlbbat10 %>%
+mlbbat10 |>
   filter(at_bat >= 200)
 ```
 
@@ -533,7 +533,7 @@ ggplot(ab_gt_200, aes(x = obp, y = slg)) +
 
 ```{r ex9-solution}
 # Filter for AB greater than or equal to 200
-ab_gt_200 <- mlbbat10 %>%
+ab_gt_200 <- mlbbat10 |>
   filter(at_bat >= 200)
 
 # Scatterplot of slg vs. obp
@@ -548,18 +548,18 @@ Notice, there is still one player who seems to be far from the rest of the data.
 Use `filter()` to find the observation (row) that corresponds to the player from the `ab_gt_200` dataset with whose OBP was below 0.200.
 
 ```{r ex10-setup}
-ab_gt_200 <- mlbbat10 %>%
+ab_gt_200 <- mlbbat10 |>
   filter(at_bat >= 200)
 ```
 
 ```{r ex10, exercise = TRUE}
-ab_gt_200 %>%
+ab_gt_200 |>
   filter(___)
 ```
 
 ```{r ex10-solution}
 # Identify the outlying player
-ab_gt_200 %>%
+ab_gt_200 |>
   filter(obp < 0.2)
 ```
 
