@@ -29,6 +29,7 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 set.seed(47)
 
+
 all_polls <- read_rds("data/all_polls.rds")
 
 one_poll <- all_polls |>
