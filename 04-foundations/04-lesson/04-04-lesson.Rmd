@@ -27,7 +27,6 @@ knitr::opts_chunk$set(fig.align = "center",
                       warning = FALSE)
 
 # data prep --------------------------------------------------------------------
-set.seed(47)
 
 all_polls <- read_rds("data/all_polls.rds")
 
