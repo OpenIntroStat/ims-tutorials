@@ -173,7 +173,7 @@ The `email` dataset is still available in your workspace.
 - Construct an appropriate plot to visualize the association between the same two variables, adding in a log-transformation step if necessary.
 - If you decide to use a log transformation, remember that `log(0)` is `-Inf` in R, which isn't a very useful value! You can get around this by adding a small number (like `0.01`) to the quantity inside the `log()` function. This way, your value is never zero. This small shift to the right won't affect your results.
 
-**Hint:** Take a look at how we calculated the summary statistics for `num_char` with the `median()` and `IQR()` functions in the `summarize()` call earlier.
+ Take a look at how we calculated the summary statistics for `num_char` with the `median()` and `IQR()` functions in the `summarize()` call earlier.
 
 ```{r ex2, exercise = TRUE}
 # Compute center and spread for exclaim_mess by spam

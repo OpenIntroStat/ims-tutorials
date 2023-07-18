@@ -547,9 +547,9 @@ opp_perm |>
   summarize(p_value = ___)
 ```
 
-<div id="opportunity_costs-hint">
-**Hint:** This should be double what you calculated as one-tailed p-value before.
-</div>
+```{r opportunity_costs-hint}
+ This should be double what you calculated as one-tailed p-value before.
+```
 
 ```{r opportunity_costs-solution}
 # Calculate the two-sided p-value
