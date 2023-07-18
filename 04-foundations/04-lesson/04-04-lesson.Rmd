@@ -30,6 +30,20 @@ knitr::opts_chunk$set(fig.align = "center",
 
 all_polls <- read_rds("data/all_polls.rds")
 
+one_poll <- all_polls |>
+  filter(poll == 1) |>
+  select(vote)
+
+p_hat <- one_poll |>
+  summarize(mean(vote == "yes")) |>
+  pull()
+
+# Bootstrap to find the SE of p-hat: one_poll_boot
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
+  calculate(stat = "prop")
+
 set.seed(47)
 ```
 
