@@ -147,9 +147,9 @@ data_space +
   ___
 ```
 
-<div id="ex1-hint">
-**Hint:** In `geom_smooth()` define the `method` and `se` arguments for a straight line fit without the standard error band.
-</div>
+```{r ex1-hint}
+ In `geom_smooth()` define the `method` and `se` arguments for a straight line fit without the standard error band.
+```
 
 ```{r ex1-solution}
 # scatterplot with jitter
@@ -234,9 +234,9 @@ Use `glm()` to fit a logistic regression model for `Acceptance` as a function of
 glm(___, data = ___, family = ___)
 ```
 
-<div id="ex3-hint">
-**Hint:** The only difference in syntax for `lm()` and `glm()` is that in `glm()` you also have to specify `family = binomial`.
-</div>
+```{r ex3-hint}
+ The only difference in syntax for `lm()` and `glm()` is that in `glm()` you also have to specify `family = binomial`.
+```
 
 ```{r ex3-solution}
 # fit model

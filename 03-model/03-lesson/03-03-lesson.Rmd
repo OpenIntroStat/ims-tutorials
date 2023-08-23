@@ -173,9 +173,9 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
  add_line(my_slope = ___)
 ```
 
-<div id="ex2-hint">
-**Hint:** Input your best guess for the slope of the regression line between height and weight. 
-</div>
+```{r ex2-hint}
+ Input your best guess for the slope of the regression line between height and weight. 
+```
 
 ```{r ex2-solution}
 # Estimate optimal value of my_slope

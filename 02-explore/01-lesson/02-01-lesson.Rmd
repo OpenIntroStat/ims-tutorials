@@ -307,9 +307,9 @@ comics_filtered |>
 
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!
-</div>
+```{r hsb2-mutate-num-char-cat-hint}
+"Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!"
+```
 
 
 ### Side-by-side barcharts
@@ -629,9 +629,9 @@ question("Using the tables above, approximately what proportion of all female ch
 )
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** "Take a look at the table that's conditional on gender!"
-</div>
+```{r mccp5-hint}
+ "Take a look at the table that's conditional on gender!"
+```
 
 </br>
 
@@ -651,10 +651,10 @@ ggplot(comics, aes(x = ___, fill = ___)) +
   geom_bar(position = ___)
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** The code for the second plot is the same as the first, except you'll provide a `position = "fill"` argument to `geom_bar()`.
+```{r ex4-hint}
+"The code for the second plot is the same as the first, except you'll provide a `position = \"fill\"` argument to `geom_bar()`."
 
-</div>
+```
 
 ```{r ex4-solution}
 # Plot of gender by align
