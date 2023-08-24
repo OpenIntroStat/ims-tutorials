@@ -348,9 +348,9 @@ p_hat_consci <- ___ |>
 p_hat_consci
 ```
 
-<div id="ex2-hint">
-**Hint:** Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
-</div>
+```{r ex2-hint}
+ Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
+```
 
 
 ```{r ex2-solution}
@@ -430,9 +430,9 @@ boot_1_consci |>
   pull()
 ```
 
-<div id="ex4-hint">
-**Hint:** Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
-</div>
+```{r ex4-hint}
+ Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
+```
 
 ```{r ex4-solution}
 # Calculate proportion with High confidence
@@ -560,9 +560,9 @@ And finally, let's use that SE to construct an approximate 95% confidence interv
 c(___, ___)
 ```
 
-<div id="ex8-hint">
-**Hint:** The lower bound of the confidence interval is `p_hat - 2 * SE`.
-</div>
+```{r ex8-hint}
+ The lower bound of the confidence interval is `p_hat - 2 * SE`.
+```
 
 ```{r ex8-solution}
 c(p_hat_consci - 2 * SE_consci, p_hat_consci + 2 * SE_consci)

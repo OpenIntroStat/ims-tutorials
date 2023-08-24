@@ -230,9 +230,9 @@ ___
   ___
 ```
 
-<div id="ex3-hint">
-**Hint:** Just `geom_bar()` this time!
-</div>
+```{r ex3-hint}
+ Just `geom_bar()` this time!
+```
 
 ```{r ex3-solution}
 # Visualize distribution take 2 
@@ -285,11 +285,11 @@ ___ <- ___
   ___
 ```
 
-<div id="ex4-hint">
-**Hint:** 
+```{r ex4-hint}
+ 
 - Select the `natspac` and `party` columns.
 - Call `table()` without arguments to make a contingency table.
-</div>
+```
 
 ```{r ex4-solution}
 # Create table of natspac and party
@@ -320,9 +320,9 @@ ___
   ___
 ```
 
-<div id="ex5-hint">
-**Hint:** Call `tidy()`, then find the name of the column that will provide the counts that you will `uncount()`.
-</div>
+```{r ex5-hint}
+ Call `tidy()`, then find the name of the column that will provide the counts that you will `uncount()`.
+```
 
 ```{r ex5-solution}
 # From previous step
@@ -466,9 +466,9 @@ ___ <- ___
   ___
 ```
 
-<div id="ex6-hint">
-**Hint:** Take a look at some of the exercises from the last lesson for a refresher on how to create a permuted dataset.
-</div>
+```{r ex6-hint}
+ Take a look at some of the exercises from the last lesson for a refresher on how to create a permuted dataset.
+```
 
 ```{r ex6-solution}
 # Create one permuted data set
@@ -496,9 +496,9 @@ ___ +
   ___
 ```
 
-<div id="ex7-hint">
-**Hint:** Map `x` to `party` and `fill` to `natarms` to make your bar plot.
-</div>
+```{r ex7-hint}
+ Map `x` to `party` and `fill` to `natarms` to make your bar plot.
+```
 
 ```{r ex7-solution}
 # From previous step
@@ -526,9 +526,9 @@ gss_party |>
   chisq_stat(___)
 ```
 
-<div id="ex8-hint">
-**Hint:** To get the statistic, add the argument that specifies the variables: `natarms ~ party`.
-</div>
+```{r ex8-hint}
+ To get the statistic, add the argument that specifies the variables: `natarms ~ party`.
+```
 
 ```{r ex8-solution}
 # Compute chi-squared stat
@@ -569,11 +569,11 @@ ___ +
   ___
 ```
 
-<div id="ex9-hint">
-**Hint:** 
+```{r ex9-hint}
+ 
 - The `stat` you're after is the `"Chisq"`.
 - Use `geom_density()` to make a density plot.
-</div>
+```
 
 ```{r ex9-solution}
 # Create null
@@ -855,12 +855,12 @@ chi_obs <- ___ |>
 chi_obs
 ```
 
-<div id="ex11-hint">
-**Hint:** 
+```{r ex11-hint}
+ 
 - Map the values of `happy` to the `fill` aesthetic.
 - `select()` the variables of interest before using the `table()` function.
 - The function `chisq_stat()` takes a formula that specifies the response and explanatory variables.
-</div>
+```
 
 ```{r ex11-solution}
 # Visualize distribution of region and happy
@@ -910,11 +910,11 @@ ___ <- ___
   ___
 ```
 
-<div id="ex12-hint">
-**Hint:** 
+```{r ex12-hint}
+ 
 - Be sure to start by specifying the response and explanatory variables, along with what constitutes a `success`.
 - Under a null hypothesis of `"independence"`, the type of data generation is `"permute"`.
-</div>
+```
 
 ```{r ex12-solution}
 # Generate null distribution
@@ -954,9 +954,9 @@ ___
   stat_function(fun = dchisq, args = list(df = ___), color = "___")
 ```
 
-<div id="ex13-hint">
-**Hint:** The degrees of freedom is calculated from the contingency table as the (number of rows - 1)x(number of columns - 1).
-</div>
+```{r ex13-hint}
+ The degrees of freedom is calculated from the contingency table as the (number of rows - 1)x(number of columns - 1).
+```
 
 ```{r ex13-solution}
 # From previous step
@@ -998,11 +998,11 @@ ___ |>
 pchisq(chi_obs, df = ___, lower.tail = ___)
 ```
 
-<div id="ex14-hint">
-**Hint:**
+```{r ex14-hint}
+
 - For the permutation p-value, find the proportion (`mean()`) of `stat`s that are greater than or equal to the observed statistic.
 - Use the argument `df = 3` again.
-</div>
+```
 
 ```{r ex14-solution}
 # From previous step

@@ -1104,9 +1104,9 @@ ___ |>
   ___(___, ___)
 ```
 
-<div id="pvalue-hint">
-**Hint:** Argument of the both functions should be `obs_stat = diff_orig, direction = "greater"`, but remember to use the correct dataset! 
-</div>
+```{r pvalue-hint}
+ Argument of the both functions should be `obs_stat = diff_orig, direction = "greater"`, but remember to use the correct dataset! 
+```
 
 ```{r pvalue-solution}
 # Visualize and calculate the p-value for the original dataset
@@ -1157,9 +1157,9 @@ gender_discrimination |>
 ___
 ```
 
-<div id="pvalue_2-hint">
-**Hint:** Change the data frame to `gender_discrimination_new`.
-</div>
+```{r pvalue_2-hint}
+ Change the data frame to `gender_discrimination_new`.
+```
 
 ```{r pvalue_2-solution}
 # Recall the original data
@@ -1225,7 +1225,7 @@ gender_discrimination_new_perm |>
 
 Great work!  Notice that the permutation differences (the two histograms) are essentially the same regardless of whether the original or the new dataset is used. Why do you think that is? 
 
-**Hint:** Does the null hypothesis depend on the dataset, or is it the same for both? 
+ Does the null hypothesis depend on the dataset, or is it the same for both? 
 
 ### Calculating two-sided p-values
 

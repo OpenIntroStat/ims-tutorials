@@ -307,9 +307,9 @@ comics_filtered |>
 
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!
-</div>
+```{r hsb2-mutate-num-char-cat-hint}
+"Remember, to filter out observations, the not equal to (`!=`) comparison comes in handy!"
+```
 
 
 ### Side-by-side barcharts
@@ -629,9 +629,9 @@ question("Using the tables above, approximately what proportion of all female ch
 )
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** "Take a look at the table that's conditional on gender!"
-</div>
+```{r mccp5-hint}
+ "Take a look at the table that's conditional on gender!"
+```
 
 </br>
 
@@ -651,10 +651,10 @@ ggplot(comics, aes(x = ___, fill = ___)) +
   geom_bar(position = ___)
 ```
 
-<div id="hsb2-mutate-num-char-cat-hint">
-**Hint:** The code for the second plot is the same as the first, except you'll provide a `position = "fill"` argument to `geom_bar()`.
+```{r ex4-hint}
+"The code for the second plot is the same as the first, except you'll provide a `position = \"fill\"` argument to `geom_bar()`."
 
-</div>
+```
 
 ```{r ex4-solution}
 # Plot of gender by align
@@ -787,7 +787,7 @@ The pie chart is a common way to display categorical data where the size of the 
 If we represent this data using a barchart the answer is obvious: the proportion of public is greater. For that reason, it's generally a good idea to stick to barcharts.
 
 ```{r pie, echo=FALSE, fig.height=3, fig.width=6, cache = TRUE}
-plot1 <- ggplot(comics |> group_by(id)|>count, aes(x = "", y = n, fill = id))+
+plot1 <- ggplot(comics |> group_by(id)|>count(), aes(x = "", y = n, fill = id))+
  geom_bar(stat="identity", width=1)+
  coord_polar("y", start=0) +
    theme(axis.text = element_blank(),

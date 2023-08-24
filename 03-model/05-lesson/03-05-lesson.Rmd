@@ -167,9 +167,9 @@ ___(residuals(wgt_hgt_mod))
  sqrt(sum(___(___)^2) / df.residual(___))
 ```
 
-<div id="ex2-hint">
-**Hint:** RMSE is calculated as the sum of squared residuals divided by the degrees of freedom of the model: `sqrt(sum(residuals(wgt_hgt_mod)^2) / df.residual(wgt_hgt_mod))`
-</div>
+```{r ex2-hint}
+ RMSE is calculated as the sum of squared residuals divided by the degrees of freedom of the model: `sqrt(sum(residuals(wgt_hgt_mod)^2) / df.residual(wgt_hgt_mod))`
+```
 
 ```{r ex2-solution}
 # View summary of model
@@ -519,9 +519,9 @@ Use `augment()` and `slice_max()` to list the top 6 observations by their Cook's
 
 ```
 
-<div id="ex6-hint">
-**Hint:** Take a peek at the previous exercise, and note that this time we want to arrange the output by `.cooksd` this time!
-</div>
+```{r ex6-hint}
+ Take a peek at the previous exercise, and note that this time we want to arrange the output by `.cooksd` this time!
+```
 
 ```{r ex6-solution}
 # Rank influential points

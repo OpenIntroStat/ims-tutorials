@@ -27,10 +27,25 @@ knitr::opts_chunk$set(fig.align = "center",
                       warning = FALSE)
 
 # data prep --------------------------------------------------------------------
+set.seed(47)
+
 
 all_polls <- read_rds("data/all_polls.rds")
 
-set.seed(47)
+one_poll <- all_polls |>
+  filter(poll == 1) |>
+  select(vote)
+
+p_hat <- one_poll |>
+  summarize(mean(vote == "yes")) |>
+  pull()
+
+# Bootstrap to find the SE of p-hat: one_poll_boot
+one_poll_boot <- one_poll |>
+  specify(response = vote, success = "yes") |>
+  generate(reps = 1000, type = "bootstrap") |> 
+  calculate(stat = "prop")
+
 ```
 
 ## Parameters and confidence intervals
@@ -349,9 +364,9 @@ ex2_props |>
   ___
 ```
 
-<div id="resampling3-hint">
-**Hint:** Use the `sd()` function in the `summarize()` call to calculate `variability`.
-</div>
+```{r resampling3-hint}
+ Use the `sd()` function in the `summarize()` call to calculate `variability`.
+```
 
 ```{r resampling3-solution}
 # From previous steps
@@ -620,14 +635,14 @@ props |>
   summarize(prop_in_conf_int = ___(___))
 ```
 
-<div id="emperical_rule_1-hint">
-**Hint:** 
+```{r emperical_rule_1-hint}
+ 
 Inside the call to `mutate()`, calculate `is_in_conf_int` using the following: 
 
 - The difference from truth is `abs(prop_yes - true_prop_yes)`. 
 - The limit of the confidence interval is `2 * sd(prop_yes)`.
 - Inside the call to `summarize()`, calculate `prop_in_conf_int` as `mean(is_in_conf_int)`.
-</div>
+```
 
 ```{r emperical_rule_1-solution}
 # Proportion of yes votes by poll
@@ -699,9 +714,9 @@ one_poll_boot |>
   )
 ```
 
-<div id="bootstrap-hint">
-**Hint:** `p_hat` is the `mean()` of `vote == "yes"` and $SE$ is indicated by `sd(stat)`.
-</div>
+```{r bootstrap-hint}
+ `p_hat` is the `mean()` of `vote == "yes"` and $SE$ is indicated by `sd(stat)`.
+```
 
 ```{r bootstrap-solution}
 # From previous exercises
@@ -782,12 +797,12 @@ one_poll_boot |>
   )
 ```
 
-<div id="bootstrap_percentile-hint">
-**Hint:** 
+```{r bootstrap_percentile-hint}
+ 
 
 - Inside the `summarize()` call, calculate `lower` as the `0.025` `quantile()` of stat.
 - Calculate `upper` as the `0.975` quantile of `stat`.
-</div>
+```
 
 ```{r bootstrap_percentile-solution}
 # From previous exercise: bootstrap t-confidence interval
@@ -835,9 +850,9 @@ percentile_ci <- one_poll_boot |>
 percentile_ci
 ```
 
-<div id="bootstrap_percentile_2-hint">
-**Hint:** After the pipe, get the confidence interval by calling `get_confidence_interrval()` and setting `level` to `0.95`.
-</div>
+```{r bootstrap_percentile_2-hint}
+ After the pipe, get the confidence interval by calling `get_confidence_interrval()` and setting `level` to `0.95`.
+```
 
 
 ```{r bootstrap_percentile_2-solution}
@@ -875,9 +890,9 @@ one_poll_boot |>
   ___
 ```
 
-<div id="bootstrap_percentile_3-hint">
-**Hint:** After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
-</div>
+```{r bootstrap_percentile_3-hint}
+ After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
+```
 
 ```{r bootstrap_percentile_3-solution}
 # From previous step
@@ -1012,9 +1027,9 @@ ___
 ___
 ```
 
-<div id="bootstrap_ci-hint">
-**Hint:** Use `calc_t_conf_int()` on `one_poll_boot`, `one_poll_boot_300`, and `one_poll_boot_3`, in that order.
-</div>
+```{r bootstrap_ci-hint}
+ Use `calc_t_conf_int()` on `one_poll_boot`, `one_poll_boot_300`, and `one_poll_boot_3`, in that order.
+```
 
 ```{r bootstrap_ci-solution}
 calc_t_conf_int <- function(resampled_dataset) {
@@ -1113,12 +1128,12 @@ p_hat_0.8
 calc_t_conf_int(___, ___)
 ```
 
-<div id="bootstrap_ci_2-hint">
-**Hint:**   
+```{r bootstrap_ci_2-hint}
+   
 
 - `p_hat_0.8` is calculated in the same way as `p_hat`, but starting with `one_poll_0.8`.
 - To calculate the new confidence interval, call `calc_t_conf_int()`, passing `one_poll_boot_0.8` and `p_hat_0.8`.
-</div>
+```
 
 ```{r bootstrap_ci_2-solution}
 calc_p_hat <- function(dataset) {
@@ -1225,12 +1240,12 @@ ggplot(conf_int_data, aes(___, ___)) +
   ___()
 ```
 
-<div id="bootstrap_ci_3-hint">
-**Hint:** 
+```{r bootstrap_ci_3-hint}
+ 
 
 - Call `get_confidence_interval()` with `level = p`, replacing `p` with `0.95` then `0.99` then `0.9`.
 - Inside the call to `aes()`, map `x` to `ci_percent` and `y` to `ci_endpoints`.
-</div>
+```
 
 ```{r bootstrap_ci_3-solution}
 # Calculate a 95% bootstrap percentile interval

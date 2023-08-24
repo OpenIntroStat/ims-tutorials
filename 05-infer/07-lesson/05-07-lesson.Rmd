@@ -202,9 +202,9 @@ stem_cell <- stem_cell |>
   ___(change = ___)
 ```
 
-<div id="stem_cell-hint">
-**Hint:** Call `mutate()`, setting `change` equal to `after` minus `before`.
-</div>
+```{r stem_cell-hint}
+ Call `mutate()`, setting `change` equal to `after` minus `before`.
+```
 
 ```{r stem_cell-solution}
 # Calculate difference between before and after
@@ -238,11 +238,11 @@ diff_mean <- stem_cell |>
 diff_mean
 ```
 
-<div id="stem_cell_2-hint">
-**Hint:**   
+```{r stem_cell_2-hint}
+   
 - Use `change ~ trmt` to specify the response and explanatory variables.   
 - Use `"diff in means"` to calculate the difference in means for each group, and `order = c("esc", "ctrl")` to get the correct order of subtraction. 
-</div>
+```
 
 ### 
 
@@ -284,13 +284,13 @@ diff_mean_ht <- stem_cell |>
   calculate(stat = "___", order = c("esc", "___")) 
 ```
 
-<div id="stem_cell_3-hint">
-**Hint:**
+```{r stem_cell_3-hint}
+
 - Call `specify()`, setting `formula` to a formula with `change` as the response variable and `trmt` as the explanatory variable.
 - Call `hypothesize()`, setting `null` to `"independence"`.
 - Call `generate()`, setting `reps` to `n_replicates` and `type` to `"permute"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("esc", "ctrl")`.
-</div>
+```
 
 ```{r stem_cell_3-solution}
 # Generate 1000 differences in means via randomization
@@ -414,11 +414,11 @@ diff_mean_obs <- ncbirths_complete_habit |>
   calculate(stat = " ", order = c("nonsmoker", " "))
 ```
 
-<div id="smoking_2-hint">
-**Hint:**   
+```{r smoking_2-hint}
+   
 - Use `weight ~ habit` to specify the response and explanatory variables.   
 - Use `"diff in means"` to calculate the difference in means for each group, and `order = c("nonsmoker", "smoker")` to get the correct order of subtraction. 
-</div>
+```
 
 ```{r smoking_2-solution}
 
@@ -465,13 +465,13 @@ diff_mean_ht <- ncbirths_complete_habit |>
   calculate(___)
 ```
 
-<div id="smoking_3-hint">
-**Hint:** 
+```{r smoking_3-hint}
+ 
 - Call `specify()`, passing a formula of `weight ~ habit`.
 - Call `hypothesize()`, setting `null` to `"independence"`.
 - Call `generate()`, setting `reps` to 1000 and `type` to `"permute"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 
 ```{r smoking_3-solution}
@@ -524,11 +524,11 @@ diff_mean_ht <- ncbirths_complete_habit |>
 
 ```
 
-<div id="smoking_4-hint">
-**Hint:** 
+```{r smoking_4-hint}
+ 
 - Use `diff_mean_obs` as the input to `obs_stat`. 
 - Use a direction of `"two-sided"` for a two-sided hypothesis test. 
-</div>
+```
 
 ```{r smoking_4-solution}
 # Calculate p-value
@@ -594,13 +594,13 @@ diff_mean_ci <- ncbirths_complete_habit |>
   calculate(___)
 ```
 
-<div id="smoking_bs-hint">
-**Hint:**  
+```{r smoking_bs-hint}
+  
 
 - Call `specify()`, passing a formula of `weight ~ habit`.
 - Call `generate()`, setting `reps` to `1500` and `type` to `"bootstrap"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 ```{r smoking_bs-solution}
 # Generate 1500 bootstrap difference in means
@@ -636,12 +636,12 @@ diff_mean_ci |>
   get_confidence_interval(level = , type = " ")
 ```
 
-<div id="smoking_bs_2-hint">
-**Hint:**  
+```{r smoking_bs_2-hint}
+  
 
 - Specify the confidence `level` to be 0.95 for a 95% confidence interval. 
 - Specify the `type` of interval to be "percentile". 
-</div>
+```
 
 ```{r smoking_bs_2-solution}
 # From previous step
@@ -674,11 +674,11 @@ ncbirths_complete_habit_weeks <- ncbirths |>
   filter(___, ___) 
 ```
 
-<div id="smoking_bs_3-hint">
-**Hint:** Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `habit` and `weeks` are not `NA`.  
+```{r smoking_bs_3-hint}
+ Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `habit` and `weeks` are not `NA`.  
 
 Specifically, the conditions should look like: `!is.na(habit)` and `!is.na(weeks)`. These should be joined with a comma to indicate that they *both* need to be satisfied.  
-</div>
+```
 
 ```{r smoking_bs_3-solution}
 # Filter for non-missing habit & non-missing weeks
@@ -712,12 +712,12 @@ diff_med_ci <- ncbirths_complete_habit_weeks |>
   calculate(___)
 ```
 
-<div id="smoking_bs_4-hint">
-**Hint:** 
+```{r smoking_bs_4-hint}
+ 
 - Call `specify()`, passing a formula of `weeks` versus `habit`.
 - Call `generate()`, setting `reps` to `1500` and `type` to `"bootstrap"`.
 - Call `calculate()`, setting `stat` to `"diff in medians"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 ```{r smoking_bs_4-solution}
 # Generate 1500 bootstrap difference in medians
@@ -752,11 +752,11 @@ diff_med_ci |>
   get_confidence_interval(level = , type = " ")
 ```
 
-<div id="smoking_bs_2-hint">
-**Hint:** 
+```{r smoking_bs_5-hint}
+ 
 - Specify the confidence `level` to be 0.92 for a 92% confidence interval. 
 - Specify the `type` of interval to be "percentile". 
-</div>
+```
 
 
 ```{r smoking_bs_5-solution}
@@ -904,11 +904,11 @@ acs12_complete_hrlypay_citizen <- acs12 |>
   filter(___, ___)
 ```
 
-<div id="citizens-hint">
-**Hint:** Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `hrly_pay` and `citizen` are not `NA`.  
+```{r citizens-hint}
+ Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `hrly_pay` and `citizen` are not `NA`.  
 
 Specifically, the arguments should look like: `!is.na(hrly_pay)` and `!is.na(citizen)`.  
-</div>
+```
 
 ```{r citizens-solution}
 # Filter for non-missing hrly_pay and non-missing citizen
@@ -944,12 +944,12 @@ acs12_complete_hrlypay_citizen |>
   )
 ```
 
-<div id="citizens_3-hint">
-**Hint:**   
+```{r citizens_3-hint}
+   
 
 - Call `group_by()`, passing `citizen` as the argument.
 - Call `summarize()`, using `mean()` to calculate the mean of `hrly_pay`, `sd()` to calculate the standard deviation of `hrly_pay`, and `n()` to find the number of observations in each group. 
-</div>
+```
 
 ```{r citizens_3-solution}
 acs12_complete_hrlypay_citizen |>
@@ -989,14 +989,14 @@ acs12_complete_hrlypay_citizen |>
   facet_wrap(vars(___))
 ```
 
-<div id="citizens_4-hint">
-**Hint:**    
+```{r citizens_4-hint}
+    
 
 - Call ggplot() with `acs12_complete_hrlypay_citizen` as the dataset.
 - Inside `aes()`, map `x` to `hrly_pay`.
 - Add `geom_histogram()`, setting `binwidth` to 5.  
 - Use `facet_wrap(vars(citizen))` to facet the plots by citizenship status. 
-</div>
+```
 
 ```{r citizens_4-solution}
 # Using acs12_complete_hrlypay_citizen, plot hrly_pay
@@ -1036,14 +1036,14 @@ test_results <- acs12_complete_hrlypay_citizen |>
 test_results
 ```
 
-<div id="citizens_5-hint">
-**Hint:**   
+```{r citizens_5-hint}
+   
 
 - Use the formula of `hrly_pay ~ citizen` 
 - Add "Non-citizen" to the order of subtraction 
 - Specify the alternative to be "two-sided"  
 - Specify the confidence level to be 0.90
-</div>
+```
 
 ```{r citizens_5-solution}
 # Construct 90% CI using a t-test
