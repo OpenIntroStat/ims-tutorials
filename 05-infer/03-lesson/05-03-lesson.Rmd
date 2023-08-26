@@ -1122,11 +1122,11 @@ What's next?
 ## Submit
 
 ```{r, echo=FALSE, context="server"}
-source(here::here("encoder_logic.R"))
+source(here::here("R/encoder_logic.R"))
 encoder_logic()
 ```
 
 ```{r encode, echo=FALSE}
-source(here::here("encoder_ui.R"))
+source(here::here("R/encoder_ui.R"))
 learnrhash::encoder_ui(ui_before = hash_encoder_ui)
 ```
