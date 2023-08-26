@@ -832,9 +832,11 @@ noise_summary |>
   filter(abs(spurious_cor) > 0.2)
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 2 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -863,3 +865,16 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+source(here::here("R/encoder_logic.R"))
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+source(here::here("R/encoder_ui.R"))
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

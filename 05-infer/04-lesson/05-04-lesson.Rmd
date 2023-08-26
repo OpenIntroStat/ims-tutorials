@@ -1602,6 +1602,7 @@ The final step is to simply assess the distribution of these null statistics and
 ## Congratulations!
 
 You have successfully completed Lesson 4 in Tutorial 5: Statistical inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1626,3 +1627,18 @@ What's next?
 `r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+source(here::here("R/encoder_logic.R"))
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+source(here::here("R/encoder_ui.R"))
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

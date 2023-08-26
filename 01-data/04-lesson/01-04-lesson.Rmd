@@ -232,9 +232,11 @@ ggplot(evals, aes(x = bty_avg, y = score, color = cls_type)) +
   geom_point()
 ```
 
+
 ## Congratulations!
 
 You have successfully completed all of the lessons in Tutorial 1: Introduction to data.
+If you need to generate a hash for submission, click "Next Topic".
 
 You now know how to get started with data analysis! In this tutorial you have learned concepts and terminology related to study design and the first steps of working with a dataset. We have also laid the foundation for using certain R packages, like dplyr for data wrangling and ggplot2 for data visualization.
 
@@ -255,3 +257,17 @@ What's next?
 `r emo::ji("four")` [Tutorial 1 - Lesson 4: Case study](https://openintro.shinyapps.io/ims-01-data-04/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+source(here::here("R/encoder_logic.R"))
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+source(here::here("R/encoder_ui.R"))
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

@@ -1196,9 +1196,13 @@ Note that the `NHANES` data is thought to be a good representative sample of the
 
 OK, now that we've covered the basics, let's move on to completing a full hypothesis test on actual data.
     
+    
+    
+
 ## Congratulations!
 
 You have successfully completed Lesson 1 in Tutorial 4: Foundations of inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1215,3 +1219,18 @@ What's next?
 `r emo::ji("four")` [Tutorial 4 - Lesson 4: Parameters and confidence intervals](https://openintro.shinyapps.io/ims-04-foundations-04/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+source(here::here("R/encoder_logic.R"))
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+source(here::here("R/encoder_ui.R"))
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+

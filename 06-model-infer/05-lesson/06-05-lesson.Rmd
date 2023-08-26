@@ -611,9 +611,11 @@ As with the other inferential methods covered in this course sequence, the infer
 
 All are valid methods to use, and you should feel comfortable at this point using all of them.
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 5 in Tutorial 6: Inferential modeling. 
+If you need to generate a hash for submission, click "Next Topic".
 
 We hope you've had fun with inference on linear models and working through the examples.
 
@@ -634,3 +636,16 @@ What's next?
 `r emo::ji("five")` [Tutorial 6 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-06-model-infer-05/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+source(here::here("R/encoder_logic.R"))
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+source(here::here("R/encoder_ui.R"))
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+
