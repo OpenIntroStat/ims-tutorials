@@ -8,10 +8,10 @@ library(readr)
 
 # Create data frame of permuted differences in promotion rates -----------------
 
-gender_discrimination_perm <- gender_discrimination %>%
-  specify(decision ~ gender, success = "promoted") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+gender_discrimination_perm <- gender_discrimination |>
+  specify(decision ~ gender, success = "promoted") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # Create big data - x10 --------------------------------------------------------
@@ -30,16 +30,16 @@ gender_discrimination_small <- data.frame(
 
 # Permute big and small data ---------------------------------------------------
 
-gender_discrimination_big_perm <- gender_discrimination_big %>%
-  specify(decision ~ gender, success = "promoted") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+gender_discrimination_big_perm <- gender_discrimination_big |>
+  specify(decision ~ gender, success = "promoted") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("male", "female"))
 
-gender_discrimination_small_perm <- gender_discrimination_small %>%
-  specify(decision ~ gender, success = "promoted") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+gender_discrimination_small_perm <- gender_discrimination_small |>
+  specify(decision ~ gender, success = "promoted") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # Create new data frame --------------------------------------------------------
@@ -51,10 +51,10 @@ gender_discrimination_new <- data.frame(
 
 # Permute new data frame -------------------------------------------------------
 
-gender_discrimination_new_perm <- gender_discrimination_new %>%
-  specify(decision ~ gender, success = "promoted") %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+gender_discrimination_new_perm <- gender_discrimination_new |>
+  specify(decision ~ gender, success = "promoted") |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # Save everything --------------------------------------------------------------
