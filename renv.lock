@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.0",
+    "Version": "4.3.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -651,7 +651,7 @@
     },
     "fontawesome": {
       "Package": "fontawesome",
-      "Version": "0.5.1",
+      "Version": "0.5.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -659,7 +659,7 @@
         "htmltools",
         "rlang"
       ],
-      "Hash": "1e22b8cabbad1eae951a75e9f8b52378"
+      "Hash": "c2efdd5f0bcd1ea861c2d4e2a883a67d"
     },
     "forcats": {
       "Package": "forcats",
@@ -947,7 +947,7 @@
     },
     "gtable": {
       "Package": "gtable",
-      "Version": "0.3.3",
+      "Version": "0.3.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -958,7 +958,7 @@
         "lifecycle",
         "rlang"
       ],
-      "Hash": "b44addadb528a0d227794121c00572a0"
+      "Hash": "b29cf3031f49b04ab9c852c912547eef"
     },
     "haven": {
       "Package": "haven",
@@ -980,6 +980,16 @@
         "vctrs"
       ],
       "Hash": "9b302fe352f9cfc5dcf0a4139af3a565"
+    },
+    "here": {
+      "Package": "here",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "rprojroot"
+      ],
+      "Hash": "24b224366f9c2e7534d2344d10d59211"
     },
     "highr": {
       "Package": "highr",
@@ -1303,6 +1313,31 @@
       ],
       "Hash": "dc1688afc60662f96f6f847f7bf86402"
     },
+    "learnrhash": {
+      "Package": "learnrhash",
+      "Version": "0.2.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "learnrhash",
+      "RemoteUsername": "rundel",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "be00e49fd90386c7d322eb1e6749a98a67d2554e",
+      "Requirements": [
+        "R",
+        "base64enc",
+        "clipr",
+        "dplyr",
+        "learnr",
+        "magrittr",
+        "purrr",
+        "rlang",
+        "shiny",
+        "tibble",
+        "tidyr"
+      ],
+      "Hash": "9dc490989ac89d7a0553cc09a8137960"
+    },
     "lifecycle": {
       "Package": "lifecycle",
       "Version": "1.0.3",
@@ -1341,7 +1376,7 @@
     },
     "markdown": {
       "Package": "markdown",
-      "Version": "1.7",
+      "Version": "1.8",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1350,7 +1385,7 @@
         "utils",
         "xfun"
       ],
-      "Hash": "0ffaea87c070a56d140ce00b0727b278"
+      "Hash": "93cecf1e5f828d0fc1605a00ad48e3a2"
     },
     "memoise": {
       "Package": "memoise",
@@ -1896,7 +1931,7 @@
     },
     "rsconnect": {
       "Package": "rsconnect",
-      "Version": "1.0.1",
+      "Version": "1.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1914,7 +1949,7 @@
         "tools",
         "yaml"
       ],
-      "Hash": "00bed55b8a510c8a6b5bfe331ff03032"
+      "Hash": "1f82a3e9e7e52f095b0f57869d957246"
     },
     "rstudioapi": {
       "Package": "rstudioapi",
@@ -2284,13 +2319,13 @@
     },
     "uuid": {
       "Package": "uuid",
-      "Version": "1.1-0",
+      "Version": "1.1-1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "f1cb46c157d080b729159d407be83496"
+      "Hash": "3d78edfb977a69fc7a0341bee25e163f"
     },
     "vctrs": {
       "Package": "vctrs",
