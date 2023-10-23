@@ -41,9 +41,78 @@ soda <- data.frame(
 
 homeown_perm <- read_rds("data/homeown_perm.rds")
 
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("Own", "Rent"))
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 
@@ -164,10 +233,10 @@ The original sample proportions are $\hat{p}_{East}$ of 0.82 and $\hat{p}_{West}
 *Original data*
 
 ```{r}
-dt <- tibble(Location = c('East','West'), Cola = c(28,19), Orange = c(6,7), Proportion = c('28/(28 + 6) = 0.82',' 19/(19 + 7) = 0.73')) %>%
+dt <- tibble(Location = c('East','West'), Cola = c(28,19), Orange = c(6,7), Proportion = c('28/(28 + 6) = 0.82',' 19/(19 + 7) = 0.73')) |>
   mutate(Proportion = cell_spec(Proportion, "html", color = '#144efa', bold = T))
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F)
 ```
 
@@ -179,7 +248,7 @@ The first shuffle of the drink variable gives the exact same summaries as the ob
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(28,19), Orange = c(6,7)) 
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F, position = "float_left")
 ```
 
@@ -204,7 +273,7 @@ The second shuffle, on the other hand, gives 27 people on the East Coast who pre
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(27,20), Orange = c(7,6), ) 
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F, position = "float_left")
 ```
 
@@ -229,7 +298,7 @@ The next few shuffles give differences in proportions centered around zero.
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(28,21), Orange = c(6,5)) 
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F, position = "float_left")
   
 ```
@@ -252,7 +321,7 @@ ggplot(randdiff) +
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(27,20), Orange = c(7,6), ) 
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F, position = "float_left")
   
 ```
@@ -279,7 +348,7 @@ Note that the 5th difference is -0.16, which is farther from zero than the origi
 ```{r}
 dt <- tibble(Location = c('East','West'), Cola = c(29,18), Orange = c(5,8), ) 
 
-kable(dt, format = "html", escape = F) %>%
+kable(dt, format = "html", escape = F) |>
   kable_styling("striped", full_width = F, position = "float_left")
 ```
 
@@ -307,14 +376,14 @@ Generally, the simulated null differences are between -0.2 and 0.2, and about on
 ```{r}
 set.seed(470)
 
-soda %>%
-  rep_sample_n(size = nrow(soda), reps = 50) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda |>
+  rep_sample_n(size = nrow(soda), reps = 50) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
-            diff_orig = diff(prop_cola)) %>% # West - East
+            diff_orig = diff(prop_cola)) |> # West - East
 
 ggplot() +
   geom_dotplot(aes(x=diff_perm), binwidth = .02) + 
@@ -339,11 +408,11 @@ Now that we have seen a visual representation of the null distribution, let's se
 Using the `mutate()` and `sample()` functions, the vector of soda preference is mixed up, or permuted, such that whether someone is on the East or West Coast can't possibly be causing any difference in proportions. However, due to inherent natural variability, there is also no expectation that the soda preferences are exactly the same for any sample. We use the `sample()` function to create the shuffled soda preferences, and then save that shuffled dataset into a new variable named `drink_perm`, using the `mutate()` function. 
 
 ```{r one_random_permutation, echo = TRUE}
-soda %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(location) %>%
+soda |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm), 
             diff_orig = diff(prop_cola))  # West - East
 ```
@@ -365,12 +434,12 @@ By repeating the permuting and difference calculations five times, the permuted 
 The `rep_sample_n()` function performs repeated sampling of a dataset, where the `size` of the sample is specified in the first argument and the number of repetitions is specified in the `reps` argument. We notice that the sample `size` is the same size as the soda dataset, since it equals the number of rows in the original dataset. We are also specifying that the sampling of the datset should be done without replacement (`replace = FALSE`), since we want each row to only be selected once. You can think of this as creating five copies of the original `soda` dataset. 
 
 ```{r many_random_permutations, echo = TRUE}
-soda %>%
-  rep_sample_n(size = nrow(soda), reps = 5, replace = FALSE) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda |>
+  rep_sample_n(size = nrow(soda), reps = 5, replace = FALSE) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
             diff_orig = diff(prop_cola)) # West - East
 ```
@@ -384,14 +453,14 @@ By repeating the permutation process 100 times, the null differences are seen to
 ```{r}
 set.seed(474740)
 
-soda %>%
-  rep_sample_n(size = nrow(soda), reps = 100) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda |>
+  rep_sample_n(size = nrow(soda), reps = 100) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
-            diff_orig = diff(prop_cola)) %>% # West - East
+            diff_orig = diff(prop_cola)) |> # West - East
 
 ggplot() +
   geom_dotplot(aes(x=diff_perm), binwidth = .015) + 
@@ -539,36 +608,36 @@ The dplyr, ggplot2, infer, and NHANES packages have been loaded for you.
 
 
 ```{r statistic_of_interest, exercise=TRUE}
-homes <- NHANES %>%
+homes <- NHANES |>
   # Select Gender and HomeOwn
-  ___(___, ___) %>%
+  ___(___, ___) |>
   # Filter for HomeOwn equal to "Own" or "Rent"
   ___(___ %in% c("___", "___"))
 ```
 
 ```{r statistic_of_interest-hint-1}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   ___(___ %in% c("___", "___"))
 ```
 
 ```{r statistic_of_interest-hint-2}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(___ %in% c("___", "___"))
 ```
 
 ```{r statistic_of_interest-hint-3}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("___", "___"))
 ```
 
 ```{r statistic_of_interest-solution}
 # Subset the data: homes
-homes <- NHANES %>%
+homes <- NHANES |>
   # Select Gender and HomeOwn
-  select(Gender, HomeOwn) %>%
+  select(Gender, HomeOwn) |>
   # Filter for HomeOwn equal to "Own" or "Rent"
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
@@ -583,15 +652,15 @@ homes <- NHANES %>%
 
 ```{r statistic_of_interest2, exercise=TRUE}
 # From previous step
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("Own", "Rent"))
 
-diff_orig <- homes %>%   
+diff_orig <- homes |>   
   # Group by gender
-  ___(___) %>%
+  ___(___) |>
   # Summarize proportion of homeowners
-  ___(prop_own = ___) %>%
+  ___(prop_own = ___) |>
   # Summarize difference in proportion of homeowners
   ___(obs_diff_prop = ___(prop_own)) # male - female
   
@@ -600,37 +669,37 @@ diff_orig
 ```
 
 ```{r statistic_of_interest2-hint-1}
-diff_orig <- homes %>%   
-  group_by(Gender) %>%
-  ___(prop_own = ___) %>%
+diff_orig <- homes |>   
+  group_by(Gender) |>
+  ___(prop_own = ___) |>
   ___(obs_diff_prop = ___(prop_own)) # male - female
 ```
 
 ```{r statistic_of_interest2-hint-2}
-diff_orig <- homes %>%   
-  group_by(Gender) %>%
-  summarize(prop_own = mean(HomeOwn == "Own")) %>%
+diff_orig <- homes |>   
+  group_by(Gender) |>
+  summarize(prop_own = mean(HomeOwn == "Own")) |>
   ___(obs_diff_prop = ___(prop_own)) # male - female
 ```
 
 ```{r statistic_of_interest2-hint-3}
-diff_orig <- homes %>%   
-  group_by(Gender) %>%
-  summarize(prop_own = mean(HomeOwn == "Own")) %>%
+diff_orig <- homes |>   
+  group_by(Gender) |>
+  summarize(prop_own = mean(HomeOwn == "Own")) |>
   summarize(obs_diff_prop = diff(prop_own)) # male - female
 ```
 
 ```{r statistic_of_interest2-solution}
 # From previous step
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("Own", "Rent"))
 
-diff_orig <- homes %>%   
+diff_orig <- homes |>   
   # Group by gender
-  group_by(Gender) %>%
+  group_by(Gender) |>
   # Summarize proportion of homeowners
-  summarize(prop_own = mean(HomeOwn == "Own")) %>%
+  summarize(prop_own = mean(HomeOwn == "Own")) |>
   # Summarize difference in proportion of homeowners
   summarize(obs_diff_prop = diff(prop_own)) # male - female
   
@@ -652,10 +721,10 @@ Using these steps in the context of creating a randomization distribution, looks
 like the following: 
 
 ```{r, eval = FALSE}
-dataset_name %>%
+dataset_name |>
   specify(response_variable ~ explanatory_variable,
-          success = "[what value of the explanatory variable is a success]") %>% 
-  hypothesize(null = "independence") %>% 
+          success = "[what value of the explanatory variable is a success]") |> 
+  hypothesize(null = "independence") |> 
   generate(reps = 10, type = "permute") 
 ```
 
@@ -663,8 +732,8 @@ dataset_name %>%
 The dplyr, ggplot2, NHANES, and infer packages have been loaded for you and the `homes` dataset you created in the last exercise is available in your workspace.
 
 ```{r null_model-setup, include=FALSE}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
@@ -676,20 +745,20 @@ homes <- NHANES %>%
 
 ```{r null_model, exercise=TRUE}
 # Specify variables
-homeown_perm <- homes %>%
+homeown_perm <- homes |>
   ___(___ ~ ___, success = "___")
 
 # Print results to console
 homeown_perm
 ```
 
-<div id="null_model-hint">
-**Hint:** `specify()` takes a formula, `HomeOwn ~ Gender`, and `success` is `"Own"`.
-</div>
+```{r null_model-hint}
+ `specify()` takes a formula, `HomeOwn ~ Gender`, and `success` is `"Own"`.
+```
 
 ```{r null_model-solution}
 # Specify variables
-homeown_perm <- homes %>%
+homeown_perm <- homes |>
   specify(HomeOwn ~ Gender, success = "Own") 
  
 # Print results to console
@@ -705,22 +774,22 @@ homeown_perm
 
 ```{r null_model2, exercise=TRUE}
 # Hypothesize independence
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
   ___(null = "___")  
 
 # Print results to console
 homeown_perm
 ```
 
-<div id="null_model2-hint">
-**Hint:** `hypothesize(null = "independence")`
-</div>
+```{r null_model2-hint}
+ `hypothesize(null = "independence")`
+```
 
 ```{r null_model2-solution}
 # Hypothesize independence
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
   hypothesize(null = "independence") 
 
 # Print results to console
@@ -737,9 +806,9 @@ homeown_perm
 
 ```{r null_model3, exercise=TRUE}
 # Perform 10 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
   ___(reps = ___, type = "permute") 
 
 
@@ -747,15 +816,15 @@ homeown_perm <- homes %>%
 homeown_perm
 ```
 
-<div id="null_model3-hint">
-**Hint:** `generate(reps = 10, type = "permute")`
-</div>
+```{r null_model3-hint}
+ `generate(reps = 10, type = "permute")`
+```
 
 ```{r null_model3-solution}
 # Perform 10 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
   generate(reps = 10, type = "permute") 
   
 # Print results to console
@@ -786,8 +855,8 @@ The dplyr, ggplot2, NHANES, and infer packages have been loaded for you. Repeat 
 
 
 ```{r randomized_statistics-setup}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
   filter(HomeOwn %in% c("Own", "Rent"))
 ```
 
@@ -799,26 +868,26 @@ homes <- NHANES %>%
 
 ```{r randomized_statistics, exercise=TRUE}
 # Perform 100 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 100, type = "permute") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 100, type = "permute") |> 
   ___(___, order = ___)
   
 # Print results to console
 homeown_perm
 ```
 
-<div id="randomized_statistics-hint">
-**Hint:** `calculate(stat = "diff in props", order = c("male", "female"))`
-</div>
+```{r randomized_statistics-hint}
+ `calculate(stat = "diff in props", order = c("male", "female"))`
+```
 
 ```{r randomized_statistics-solution}
 # Perform 100 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 100, type = "permute") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 100, type = "permute") |> 
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # Print results to console
@@ -832,10 +901,10 @@ homeown_perm
 
 ```{r randomized_statistics2, exercise=TRUE}
 # Perform 100 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 100, type = "permute") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 100, type = "permute") |> 
   calculate(stat = "diff in props", order = c("male", "female"))
   
 # Dotplot of 100 permuted differences in proportions
@@ -850,10 +919,10 @@ ggplot(___, aes(x = stat)) +
 
 ```{r randomized_statistics2-solution}
 # Perform 100 permutations
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 100, type = "permute") %>% 
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 100, type = "permute") |> 
   calculate(stat = "diff in props", order = c("male", "female"))
 
 # Dotplot of 100 permuted differences in proportions
@@ -889,21 +958,21 @@ The dplyr, ggplot2, NHANES, and infer packages have been loaded for you.
 
 
 ```{r randomization_density-setup, include=FALSE}
-homes <- NHANES %>%
-  select(Gender, HomeOwn) %>%
-  filter(HomeOwn %in% c("Own", "Rent")) %>%
+homes <- NHANES |>
+  select(Gender, HomeOwn) |>
+  filter(HomeOwn %in% c("Own", "Rent")) |>
   sample_n(2500)
 ```
 
 ```{r randomization_density, exercise=TRUE}
 # Perform 1000 permutations
-homeown_perm <- homes %>%
+homeown_perm <- homes |>
   # Specify HomeOwn vs. Gender, with `"Own" as success
-  ___(___ ~ ___, success = "___") %>%
+  ___(___ ~ ___, success = "___") |>
   # Use a null hypothesis of independence
-  ___(___) %>% 
+  ___(___) |> 
   # Generate 1000 repetitions (by permutation)
-  ___(reps = ___, type = "permute") %>% 
+  ___(reps = ___, type = "permute") |> 
   # Calculate the difference in proportions (male then female)
   ___(___, order = ___))
 
@@ -913,46 +982,46 @@ ggplot(homeown_perm, aes(x = stat)) +
 ```
 
 ```{r randomization_density-hint-1}
-homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  ___(___) %>% 
-  ___(reps = ___, type = "permute") %>% 
+homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  ___(___) |> 
+  ___(reps = ___, type = "permute") |> 
   ___(___, order = ___))
 ```
 
 ```{r randomization_density-hint-2}
-homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  ___(reps = ___, type = "permute") %>% 
+homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  ___(reps = ___, type = "permute") |> 
   ___(___, order = ___))
 ```
 
 ```{r randomization_density-hint-3}
-homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
   ___(___, order = ___))
 ```
 
 ```{r randomization_density-hint-4}
-homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
-  hypothesize(null = "independence") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
   calculate(stat = "diff in props", order = c("male", "female"))
 ```
 
 ```{r randomization_density-solution}
 # Perform 1000 permutations
   # Specify HomeOwn vs. Gender, with `"Own" as success
-homeown_perm <- homes %>%
-  specify(HomeOwn ~ Gender, success = "Own") %>%
+homeown_perm <- homes |>
+  specify(HomeOwn ~ Gender, success = "Own") |>
   # Use a null hypothesis of independence
-  hypothesize(null = "independence") %>% 
+  hypothesize(null = "independence") |> 
   # Generate 1000 repetitions (by permutation)
-  generate(reps = 1000, type = "permute") %>% 
+  generate(reps = 1000, type = "permute") |> 
   # Calculate the difference in proportions (male then female)
   calculate(stat = "diff in props", order = c("male", "female"))
 
@@ -971,14 +1040,14 @@ Remember that each dot that gets generated is from a different permutation of th
 
 ```{r, eval = TRUE}
 set.seed(47)
-soda %>%
-  rep_sample_n(size = nrow(soda), reps = 10) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda |>
+  rep_sample_n(size = nrow(soda), reps = 10) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
-            diff_orig = diff(prop_cola)) %>% # West - East
+            diff_orig = diff(prop_cola)) |> # West - East
 
   ggplot() +
   geom_dotplot(aes(x=diff_perm), binwidth = .03) + 
@@ -1017,8 +1086,8 @@ grid.lines(x = unit(c(0.29, 0.41), "npc"),
 Using R, recall that 9% more people on the East Coast prefer cola than those on the West Coast.
 
 ```{r data_consistent_with_null_code_in_slide, echo = TRUE}
-soda %>%
- group_by(location) %>%
+soda |>
+ group_by(location) |>
  summarize(prop_cola = mean(drink == "Cola"))
 ```
 
@@ -1029,15 +1098,15 @@ On the dot plot, the null statistics, which are more extreme compared to the obs
 ```{r}
 set.seed(474740)
 
-soda %>%
-  rep_sample_n(size = nrow(soda), reps = 100) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda |>
+  rep_sample_n(size = nrow(soda), reps = 100) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
-            diff_orig = diff(prop_cola)) %>% # West - East
-  mutate(extreme = ifelse(diff_perm <= 19/(19+7) - 28/(28+6), "bigger", "smaller")) %>%
+            diff_orig = diff(prop_cola)) |> # West - East
+  mutate(extreme = ifelse(diff_perm <= 19/(19+7) - 28/(28+6), "bigger", "smaller")) |>
 
 ggplot() +
   geom_dotplot(aes(x=diff_perm, fill = extreme), binwidth = .015) + 
@@ -1059,16 +1128,16 @@ To be more precise, R can count the number of times the null data were more extr
 
 
 ```{r extreme_observe_data, echo = TRUE}
-soda_perm <- soda %>%
-  rep_sample_n(size = nrow(soda), reps = 100) %>%
-  mutate(drink_perm = sample(drink)) %>%
-  group_by(replicate, location) %>%
+soda_perm <- soda |>
+  rep_sample_n(size = nrow(soda), reps = 100) |>
+  mutate(drink_perm = sample(drink)) |>
+  group_by(replicate, location) |>
   summarize(prop_cola_perm = mean(drink_perm == "Cola"),
-            prop_cola = mean(drink == "Cola")) %>%
+            prop_cola = mean(drink == "Cola")) |>
   summarize(diff_perm = diff(prop_cola_perm),
             diff_orig = diff(prop_cola)) # West - East
 
-soda_perm %>%
+soda_perm |>
   summarize(count = sum(diff_orig >= diff_perm),
             proportion = mean(diff_orig >= diff_perm))
 ```
@@ -1104,7 +1173,7 @@ ggplot(homeown_perm, aes(x = ___)) +
   ___(aes(xintercept = ___), color = "red")
 
 # Compare permuted differences to observed difference
-homeown_perm %>%
+homeown_perm |>
   summarize(n_perm_le_obs = sum(___ <= ___))
 ```
 
@@ -1135,7 +1204,7 @@ ggplot(homeown_perm, aes(x = diff_perm)) +
   geom_vline(aes(xintercept = diff_orig), color = "red")
 
 # Compare permuted differences to observed difference
-homeown_perm %>%
+homeown_perm |>
   summarize(n_perm_le_obs = sum(diff_perm <= diff_orig))
 ```
 
@@ -1163,8 +1232,8 @@ However, this does not mean that we know for sure the gender doesn't play a role
 > We fail to reject the null hypothesis: There is no evidence that our data are inconsistent with the null hypothesis.
 
 ```{r}
-homeown_perm %>%
-  mutate(extreme = ifelse(diff_perm <= diff_orig, "extreme", "not")) %>%
+homeown_perm |>
+  mutate(extreme = ifelse(diff_perm <= diff_orig, "extreme", "not")) |>
 ggplot() +
   geom_dotplot(aes(x=diff_perm, fill = extreme), binwidth = .0007) + 
   xlab("Difference in Proportions") +
@@ -1196,9 +1265,13 @@ Note that the `NHANES` data is thought to be a good representative sample of the
 
 OK, now that we've covered the basics, let's move on to completing a full hypothesis test on actual data.
     
+    
+    
+
 ## Congratulations!
 
 You have successfully completed Lesson 1 in Tutorial 4: Foundations of inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1215,3 +1288,16 @@ What's next?
 `r emo::ji("four")` [Tutorial 4 - Lesson 4: Parameters and confidence intervals](https://openintro.shinyapps.io/ims-04-foundations-04/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+

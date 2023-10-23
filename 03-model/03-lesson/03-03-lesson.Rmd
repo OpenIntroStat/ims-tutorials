@@ -8,7 +8,6 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-
 library(emo)
 library(learnr)
 library(tidyverse)
@@ -22,6 +21,75 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 
 tutorial_options(exercise.eval = FALSE)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Visualization of linear models
@@ -146,10 +214,10 @@ Use the code chunk below to experiment with different values (to the nearest int
 ```{r ex2-setup}
 add_line <- function (my_slope) {
 
-  bdims_summary <- bdims %>%
+  bdims_summary <- bdims |>
     summarize(N = n(), r = cor(hgt, wgt),
               mean_hgt = mean(hgt), mean_wgt = mean(wgt),
-              sd_hgt = sd(hgt), sd_wgt = sd(wgt)) %>%
+              sd_hgt = sd(hgt), sd_wgt = sd(wgt)) |>
     mutate(true_slope = r * sd_wgt / sd_hgt, 
            true_intercept = mean_wgt - true_slope * mean_hgt)
   p <- ggplot(data = bdims, aes(x = hgt, y = wgt)) + 
@@ -158,7 +226,7 @@ add_line <- function (my_slope) {
                aes(x = mean_hgt, y = mean_wgt), 
                color = "red", size = 3)
   
-  my_data <- bdims_summary %>%
+  my_data <- bdims_summary |>
     mutate(my_slope = my_slope, 
            my_intercept = mean_wgt - my_slope * mean_hgt)
   p + geom_abline(data = my_data, 
@@ -173,9 +241,9 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
  add_line(my_slope = ___)
 ```
 
-<div id="ex2-hint">
-**Hint:** Input your best guess for the slope of the regression line between height and weight. 
-</div>
+```{r ex2-hint}
+ Input your best guess for the slope of the regression line between height and weight. 
+```
 
 ```{r ex2-solution}
 # Estimate optimal value of my_slope
@@ -343,7 +411,7 @@ In this exercise, you will find the slope and intercept of the least squares reg
 The `bdims_summary` table has been added to your workspace. Use the `glimpse()` function to preview what the table looks like! 
 
 ```{r preview-setup}
-bdims_summary <- bdims %>%
+bdims_summary <- bdims |>
   summarize(N = n(), r = cor(hgt, wgt),  
             mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
             mean_wgt = mean(wgt), sd_wgt = sd(wgt))
@@ -358,14 +426,14 @@ bdims_summary <- bdims %>%
 Now, use `mutate()` and some algebra to add the `slope` and `intercept` to the `bdims_summary` table.
 
 ```{r ex3-setup}
-bdims_summary <- bdims %>%
+bdims_summary <- bdims |>
   summarize(N = n(), r = cor(hgt, wgt),  
             mean_hgt = mean(hgt), sd_hgt = sd(hgt), 
             mean_wgt = mean(wgt), sd_wgt = sd(wgt))
 ```
 
 ```{r ex3, exercise = TRUE}
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = ___, 
          intercept = ___)
 ```
@@ -374,7 +442,7 @@ bdims_summary %>%
 ## Remember the slope can be calculated from 
 ## 1. the correlation 
 ## 2. the sd of height and weight
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r  * (sd_wgt / sd_hgt), 
          intercept = ___)
 ```
@@ -382,14 +450,14 @@ bdims_summary %>%
 ```{r ex3-hint-2}
 ## Remember that x-bar and y-bar lie on the regression line! 
 
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r  * (sd_wgt / sd_hgt), 
          intercept = mean_wgt  - ___)
 ```
 
 
 ```{r ex3-solution}
-bdims_summary %>%
+bdims_summary |>
   mutate(slope = r * sd_wgt / sd_hgt, 
          intercept = mean_wgt - slope * mean_hgt)
 ```
@@ -413,9 +481,9 @@ The answer turns out to be "yes, but not as tall as their fathers." This effect 
 In the plot, we see the relationship between the heights of a group of 465 men that Galton measured in the 1880s, and their fathers. The height of the son is on the $y$ axis, while the height of the corresponding father is on the $x$ axis. The diagonal indicates sons who are as tall as their fathers. The slope of the regression line---shown in blue---is more gentle. This reflects the observation that while tall fathers are still likely to have tall sons, the sons are not likely to be *as tall* as their fathers. Their height has been "regressed" towards the mean height. 
 
 ```{r}
-Galton_men <- mosaicData::Galton %>%
+Galton_men <- mosaicData::Galton |>
  filter(sex == "M")
-Galton_summary <- Galton_men %>%
+Galton_summary <- Galton_men |>
  summarize(N = n(),
            mean_height = mean(height), sd_height = sd(height),
            mean_father = mean(father), sd_father = sd(father))
@@ -515,9 +583,12 @@ question("The author is arguing that...",
 
 -->
 
+
+
 ## Congratulations!
 
 You have successfully completed Lesson 3 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -546,3 +617,15 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

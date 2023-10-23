@@ -37,46 +37,115 @@ gss2016_smaller <- read_rds("data/gss2016-n10.rds")
 
 # recode
 
-gss2016 <- gss2016 %>%
+gss2016 <- gss2016 |>
   mutate(consci = if_else(consci == 1, "Low", "High"))
 
 # objects to be used later
 
-p_hat_happy <- gss2016 %>%
-  summarize(prop_happy = mean(happy == "HAPPY")) %>%
+p_hat_happy <- gss2016 |>
+  summarize(prop_happy = mean(happy == "HAPPY")) |>
   pull()
   
-p_hat_consci <- gss2016 %>%
-  summarize(prop_high = mean(consci == "High")) %>%
+p_hat_consci <- gss2016 |>
+  summarize(prop_high = mean(consci == "High")) |>
   pull()
 
 # happy
 set.seed(47)
-boot_dist_happy <- gss2016 %>%
-  specify(response = happy, success = "HAPPY") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_happy <- gss2016 |>
+  specify(response = happy, success = "HAPPY") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
- SE_happy <- boot_dist_happy %>%
-  summarize(se = sd(stat)) %>%
+ SE_happy <- boot_dist_happy |>
+  summarize(se = sd(stat)) |>
   pull()
 
 # consci, just one
 set.seed(47)
-boot_1_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
+boot_1_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
   generate(reps = 1, type = "bootstrap")
 
 # consci
 set.seed(47)
-boot_dist_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_consci <- boot_dist_consci %>%
-  summarize(se = sd(stat)) %>%
+SE_consci <- boot_dist_consci |>
+  summarize(se = sd(stat)) |>
   pull()
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Inference for a single parameter
@@ -139,7 +208,7 @@ glimpse(gss)
 We're going to focus on data from 2016, so we'll filter the data set to only include those rows and save it as a new data set called `gss2016`.
 
 ```{r echo=TRUE}
-gss2016 <- gss %>%
+gss2016 <- gss |>
   filter(year == 2016)
 ```
 
@@ -157,8 +226,8 @@ But let's go a step farther and calculate exact proportion of the sample that re
 To do that we want to summarize the happy variable with a single proportion.  Look to the middle of this line we ask for which respondents their happy value is exactly equal to "happy". This results in a column of `TRUE`s and `FALSE`s. You can find the proportion of `TRUE`s by simply taking the mean. We'll save that as `p_hat`. 
 
 ```{r echo = TRUE}  
-p_hat_happy <- gss2016 %>%
-  summarize(prop_happy = mean(happy == "HAPPY")) %>%
+p_hat_happy <- gss2016 |>
+  summarize(prop_happy = mean(happy == "HAPPY")) |>
   pull()
 
 p_hat_happy
@@ -276,9 +345,9 @@ To implement this, we start with our gss2016 data and then *specify* that we wil
 When we print this new object, we see we now have a data frame that contains 500 p-hats.
 
 ```{r echo = TRUE}
-boot_dist_happy <- gss2016 %>%
-  specify(response = happy, success = "HAPPY") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_happy <- gss2016 |>
+  specify(response = happy, success = "HAPPY") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
 boot_dist_happy
@@ -298,8 +367,8 @@ ggplot(boot_dist_happy, aes(x = stat)) +
 The standard deviation of the `stat` variable in this data frame (the bootstrap distribution) is the **bootstrap standard error** and it can be calculated using the `summarize()` function.
 
 ```{r echo = TRUE}
-SE_happy <- boot_dist_happy %>%
-  summarize(se = sd(stat)) %>%
+SE_happy <- boot_dist_happy |>
+  summarize(se = sd(stat)) |>
   pull()
 
 SE_happy
@@ -341,21 +410,21 @@ ggplot(gss2016, aes(x = consci)) +
 Next, we compute the sample proportion of people that reported having "High" confidence.
 
 ```{r ex2, exercise=TRUE}
-p_hat_consci <- ___ %>%
-  summarize(prop_high = mean(___ == "___")) %>%
+p_hat_consci <- ___ |>
+  summarize(prop_high = mean(___ == "___")) |>
   pull()
 
 p_hat_consci
 ```
 
-<div id="ex2-hint">
-**Hint:** Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
-</div>
+```{r ex2-hint}
+ Inside `summarize()`, use the `mean()` function calculate a proportion with something like `mean(column == "value")`.
+```
 
 
 ```{r ex2-solution}
-p_hat_consci <- gss2016 %>%
-  summarize(prop_high = mean(consci == "High")) %>%
+p_hat_consci <- gss2016 |>
+  summarize(prop_high = mean(consci == "High")) |>
   pull()
 
 p_hat_consci
@@ -377,9 +446,9 @@ set.seed(47)
 
 ```{r ex3, exercise=TRUE}
 # Create single bootstrap data set
-boot_1_consci <- gss2016 %>%
+boot_1_consci <- gss2016 |>
   # Specify the response
-  ___(response = ___, success = "___") %>%
+  ___(response = ___, success = "___") |>
   # Generate one bootstrap replicate
   ___(reps = ___, type = "___")
 
@@ -389,28 +458,28 @@ ggplot(___) +
 ```
 
 ```{r ex3-hint-1}
-boot_1_consci <- gss2016 %>%
-  specify(response = consci, success = "___") %>%
+boot_1_consci <- gss2016 |>
+  specify(response = consci, success = "___") |>
   ___(reps = ___, type = "___")
 ```
 
 ```{r ex3-hint-2}
-boot_1_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
+boot_1_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
   ___(reps = ___, type = "___")
 ```
 
 ```{r ex3-hint-3}
-boot_1_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
+boot_1_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
   generate(reps = ___, type = "___")
 ```
 
 ```{r ex3-solution}
 # Create single bootstrap data set
-boot_1_consci <- gss2016 %>%
+boot_1_consci <- gss2016 |>
   # Specify the response
-  specify(response = consci, success = "High") %>%
+  specify(response = consci, success = "High") |>
   # Generate one bootstrap replicate
   generate(reps = 1, type = "bootstrap")
 
@@ -425,19 +494,19 @@ We can guess-timate what the sample proportion of people that reported having "H
 
 ```{r ex4, exercise=TRUE}
 # Calculate proportion with High confidence
-boot_1_consci %>%
-  summarize(prop_high = ___) %>%
+boot_1_consci |>
+  summarize(prop_high = ___) |>
   pull()
 ```
 
-<div id="ex4-hint">
-**Hint:** Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
-</div>
+```{r ex4-hint}
+ Use `mean()` to calculate a proportion by doing something like `mean(column == "value")`.
+```
 
 ```{r ex4-solution}
 # Calculate proportion with High confidence
-boot_1_consci %>%
-  summarize(prop_high = mean(consci == "High")) %>%
+boot_1_consci |>
+  summarize(prop_high = mean(consci == "High")) |>
   pull()
 ```
 
@@ -461,11 +530,11 @@ set.seed(47)
 
 ```{r ex5, exercise=TRUE}
 # Create bootstrap distribution for proportion with High conf
-boot_dist_consci <- gss2016 %>%
+boot_dist_consci <- gss2016 |>
   # Specify the response and success
-  specify(response = ___, ___ = "___") %>%
+  specify(response = ___, ___ = "___") |>
   # Generate 500 bootstrap reps
-  generate(___ = ___, type = "bootstrap") %>%
+  generate(___ = ___, type = "bootstrap") |>
   # Calculate proportions
   calculate(stat = "___")
 
@@ -474,26 +543,26 @@ boot_dist_consci
 ```
 
 ```{r ex5-hint-1}
-boot_dist_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
-  generate(___ = ___, type = "bootstrap") %>%
+boot_dist_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
+  generate(___ = ___, type = "bootstrap") |>
   calculate(stat = "___")
 ```
 
 ```{r ex5-hint-2}
-boot_dist_consci <- gss2016 %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_consci <- gss2016 |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "___")
 ```
 
 ```{r ex5-solution}
 # Create bootstrap distribution for proportion with High conf
-boot_dist_consci <- gss2016 %>%
+boot_dist_consci <- gss2016 |>
   # Specify the response and success
-  specify(response = consci, success = "High") %>%
+  specify(response = consci, success = "High") |>
   # Generate 500 bootstrap reps
-  generate(reps = 500, type = "bootstrap") %>%
+  generate(reps = 500, type = "bootstrap") |>
   # Calculate proportions
   calculate(stat = "prop")
 
@@ -525,28 +594,28 @@ ggplot(boot_dist_consci, aes(x = stat)) +
 And let's also calculate the standard error by `summarize`ing the distribution with its standard deviation, `sd()`, then `pull()` it out.
 
 ```{r ex7, exercise=TRUE}
-SE_consci <- boot_dist_consci %>%
-  ___(se = ___) %>%
+SE_consci <- boot_dist_consci |>
+  ___(se = ___) |>
   ___
 
 SE_consci
 ```
 
 ```{r ex7-hint-1}
-boot_dist_consci %>%
-  summarize(se = sd(___)) %>%
+boot_dist_consci |>
+  summarize(se = sd(___)) |>
   ___
 ```
 
 ```{r ex7-hint-2}
-boot_dist_consci %>%
-  summarize(se = sd(stat)) %>%
+boot_dist_consci |>
+  summarize(se = sd(stat)) |>
   ___
 ```
 
 ```{r ex7-solution}
-SE_consci <- boot_dist_consci %>%
-  summarize(se = sd(stat)) %>%
+SE_consci <- boot_dist_consci |>
+  summarize(se = sd(stat)) |>
   pull()
 
 SE_consci
@@ -560,9 +629,9 @@ And finally, let's use that SE to construct an approximate 95% confidence interv
 c(___, ___)
 ```
 
-<div id="ex8-hint">
-**Hint:** The lower bound of the confidence interval is `p_hat - 2 * SE`.
-</div>
+```{r ex8-hint}
+ The lower bound of the confidence interval is `p_hat - 2 * SE`.
+```
 
 ```{r ex8-solution}
 c(p_hat_consci - 2 * SE_consci, p_hat_consci + 2 * SE_consci)
@@ -695,18 +764,18 @@ set.seed(1234)
 ```
 
 ```{r echo=TRUE}
-gss2014 <- gss %>%
+gss2014 <- gss |>
   filter(year == 2014)
 
-p_hat_happy <- gss2014 %>%
-  summarize(prop_happy = mean(happy == "HAPPY")) %>%
+p_hat_happy <- gss2014 |>
+  summarize(prop_happy = mean(happy == "HAPPY")) |>
   pull()
 
-SE_happy <- gss2014 %>%
-  specify(response = happy, success = "HAPPY") %>%
-  generate(reps = 500, type = "bootstrap") %>%
-  calculate(stat = "prop") %>%
-  summarize(se = sd(stat)) %>%
+SE_happy <- gss2014 |>
+  specify(response = happy, success = "HAPPY") |>
+  generate(reps = 500, type = "bootstrap") |>
+  calculate(stat = "prop") |>
+  summarize(se = sd(stat)) |>
   pull()
 
 c(p_hat_happy - 2 * SE_happy, p_hat_happy + 2 * SE_happy)
@@ -727,18 +796,18 @@ set.seed(1234)
 ```
 
 ```{r echo=TRUE}
-gss2012 <- gss %>%
+gss2012 <- gss |>
   filter(year == 2012)
 
-p_hat_happy <- gss2012 %>%
-  summarize(prop_happy = mean(happy == "HAPPY")) %>%
+p_hat_happy <- gss2012 |>
+  summarize(prop_happy = mean(happy == "HAPPY")) |>
   pull()
 
-SE_happy <- gss2012 %>%
-  specify(response = happy, success = "HAPPY") %>%
-  generate(reps = 500, type = "bootstrap") %>%
-  calculate(stat = "prop") %>%
-  summarize(se = sd(stat)) %>%
+SE_happy <- gss2012 |>
+  specify(response = happy, success = "HAPPY") |>
+  generate(reps = 500, type = "bootstrap") |>
+  calculate(stat = "prop") |>
+  summarize(se = sd(stat)) |>
   pull()
 
 c(p_hat_happy - 2 * SE_happy, p_hat_happy + 2 * SE_happy)
@@ -820,11 +889,11 @@ set.seed(47)
 
 ```{r ex9, exercise=TRUE}
 # Create bootstrap distribution for proportion
-boot_dist_small_n <- ___ %>%
+boot_dist_small_n <- ___ |>
   # Specify the variable and success
-  ___ %>%
+  ___ |>
   # Generate 500 bootstrap reps
-  ___ %>%
+  ___ |>
   # Calculate the statistic
   ___
 
@@ -833,33 +902,33 @@ glimpse(boot_dist_small_n)
 ```
 
 ```{r ex9-hint-1}
-boot_dist_small_n <- gss2016_small %>%
-  specify(response = consci, success = "High") %>%
-  ___ %>%
+boot_dist_small_n <- gss2016_small |>
+  specify(response = consci, success = "High") |>
+  ___ |>
   ___
 ```
 
 ```{r ex9-hint-2}
-boot_dist_small_n <- gss2016_small %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_small_n <- gss2016_small |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   ___
 ```
 
 ```{r ex9-hint-3}
-boot_dist_small_n <- gss2016_small %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_small_n <- gss2016_small |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "___")
 ```
 
 ```{r ex9-solution}
 # Create bootstrap distribution for proportion
-boot_dist_small_n <- gss2016_small %>%
+boot_dist_small_n <- gss2016_small |>
   # Specify the variable and success
-  specify(response = consci, success = "High") %>%
+  specify(response = consci, success = "High") |>
   # Generate 500 bootstrap reps
-  generate(reps = 500, type = "bootstrap") %>%
+  generate(reps = 500, type = "bootstrap") |>
   # Calculate the statistic
   calculate(stat = "prop")
 
@@ -874,31 +943,31 @@ Next, summarize the `boot_dist_small_n`'s SE with its standard deviation then pu
 ```{r ex10-setup}
 set.seed(47)
 
-boot_dist_small_n <- gss2016_small %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_small_n <- gss2016_small |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 ```
 
 ```{r ex10, exercise=TRUE}
-SE_small_n <- ___ %>%
-  summarize(se = ___) %>%
+SE_small_n <- ___ |>
+  summarize(se = ___) |>
   pull()
 
 SE_small_n
 ```
 
 ```{r ex10-hint}
-SE_small_n <- boot_dist_small_n %>%
-  summarize(se = sd(___)) %>%
+SE_small_n <- boot_dist_small_n |>
+  summarize(se = sd(___)) |>
   pull()
 
 SE_small_n
 ```
 
 ```{r ex10-solution}
-SE_small_n <- boot_dist_small_n %>%
-  summarize(se = sd(stat)) %>%
+SE_small_n <- boot_dist_small_n |>
+  summarize(se = sd(stat)) |>
   pull()
 
 SE_small_n
@@ -913,39 +982,39 @@ set.seed(47)
 ```
 
 ```{r ex11, exercise=TRUE}
-boot_dist_smaller_n <-___ %>%
-  ___ %>%
-  ___ %>%
+boot_dist_smaller_n <-___ |>
+  ___ |>
+  ___ |>
   ___
 
 glimpse(boot_dist_smaller_n)
 ```
 
 ```{r ex11-hint-1}
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  ___ %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  ___ |>
   ___
 ```
 
 ```{r ex11-hint-2}
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   ___
 ```
 
 ```{r ex11-hint-3}
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(___)
 ```
 
 ```{r ex11-solution}
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
 glimpse(boot_dist_smaller_n)
@@ -957,27 +1026,27 @@ Also repeat this process of extracting the SE of `boot_dist_smaller_n` and save 
 
 ```{r ex12-setup}
 set.seed(47)
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 ```
 
 ```{r ex12, exercise=TRUE}
-SE_smaller_n <- ___ %>%
-  ___ %>%
+SE_smaller_n <- ___ |>
+  ___ |>
   ___
 ```
 
 ```{r ex12-hint, exercise=TRUE}
-SE_smaller_n <- boot_dist_smaller %>%
-  summarize(se = sd(stat)) %>%
+SE_smaller_n <- boot_dist_smaller_n |>
+  summarize(se = sd(stat)) |>
   ___
 ```
 
 ```{r ex12-solution, exercise=TRUE}
-SE_smaller_n <- boot_dist_smaller %>%
-  summarize(se = sd(stat)) %>%
+SE_smaller_n <- boot_dist_smaller_n |>
+  summarize(se = sd(stat)) |>
   pull()
 ```
 
@@ -987,23 +1056,23 @@ Finally compare the two results! Run the code in the exercise below to see which
 
 ```{r ex13-setup}
 set.seed(47)
-boot_dist_small_n <- gss2016_small %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_small_n <- gss2016_small |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_small_n <- boot_dist_small_n %>%
-  summarize(se = sd(stat)) %>%
+SE_small_n <- boot_dist_small_n |>
+  summarize(se = sd(stat)) |>
   pull()
 
 set.seed(47)
-boot_dist_smaller_n <- gss2016_smaller %>%
-  specify(response = consci, success = "High") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_smaller_n <- gss2016_smaller |>
+  specify(response = consci, success = "High") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_smaller_n <- boot_dist_smaller_n %>%
-  summarize(se = sd(stat)) %>%
+SE_smaller_n <- boot_dist_smaller_n |>
+  summarize(se = sd(stat)) |>
   pull()
 ```
 
@@ -1021,7 +1090,7 @@ Remember that the proportion of "High" confidence in science in 2016 was pretty 
 In this exercise, you'll be looking at the variable `meta_region`, which records whether or not the respondent lives in the pacific region of the US. These respondents were fairly rare, which allows you to study how SEs behave in a setting where the proportion is is very far from 0.5, e.g. like the proportion of pacific or not pacific in the plot below.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-gss2016 <- gss2016 %>%
+gss2016 <- gss2016 |>
   mutate(meta_region = fct_collapse(region, pacific = "PACIFIC", other_level = "not pacific"))
 
 ggplot(gss2016, aes(x = meta_region)) +
@@ -1037,41 +1106,41 @@ set.seed(47)
 ```
 
 ```{r ex14, exercise=TRUE}
-boot_dist_low_p <- gss2016 %>%
-  ___ %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_low_p <- gss2016 |>
+  ___ |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_low_p <- boot_dist %>%
-  ___(se = ___) %>%
+SE_low_p <- boot_dist |>
+  ___(se = ___) |>
   ___
 
 SE_low_p
 ```
 
 ```{r ex14-hint-1}
-boot_dist_low_p <- gss2016 %>%
-  specify(response = meta_region, success = "pacific") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_low_p <- gss2016 |>
+  specify(response = meta_region, success = "pacific") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 ```
 
 ```{r ex14-hint-2}
-SE_low_p <- boot_dist_low_p %>%
-  summarize(se = sd(stat)) %>%
+SE_low_p <- boot_dist_low_p |>
+  summarize(se = sd(stat)) |>
   pull()
 ```
 
 ```{r ex14-solution}
 # Construct the bootstrap distribution
-boot_dist_low_p <- gss2016 %>%
-  specify(response = meta_region, success = "pacific") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_low_p <- gss2016 |>
+  specify(response = meta_region, success = "pacific") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
 # Calculate the standard error
-SE_low_p <- boot_dist_low_p %>%
-  summarize(se = sd(stat)) %>%
+SE_low_p <- boot_dist_low_p |>
+  summarize(se = sd(stat)) |>
   pull()
 
 # Compare SEs
@@ -1155,8 +1224,8 @@ OK, let's try our hand at using this shortcut to find the standard error for the
 Let's check the rule-of-thumb to see if our sample size is large enough by multiplying n times p-hat and n times 1 minus p-hat. This gives 116 and 35, so our sample size should be sufficiently large. We also know that the gss uses random sampling to draw these observations, so is safe to assume that one person's answer is independent of the next. 
 
 ```{r echo=TRUE}
-p_hat_happy <- gss2016 %>%
-  summarize(mean(happy == "HAPPY")) %>%
+p_hat_happy <- gss2016 |>
+  summarize(mean(happy == "HAPPY")) |>
   pull()
 
 n <- nrow(gss2016)
@@ -1176,12 +1245,12 @@ SE_happy_approx
 How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for p-hat, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.032. Those are remarkably similar values! Let's go a step farther.
 
 ```{r echo=TRUE}
-boot_dist_happy <- gss2016 %>%
-  specify(response = happy, success = "HAPPY") %>%
-  generate(reps = 500, type = "bootstrap") %>%
+boot_dist_happy <- gss2016 |>
+  specify(response = happy, success = "HAPPY") |>
+  generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
-SE_happy_boot <- boot_dist_happy %>%
-  summarize(sd(stat)) %>%
+SE_happy_boot <- boot_dist_happy |>
+  summarize(sd(stat)) |>
   pull()
 SE_happy_boot
 ``` 
@@ -1233,8 +1302,8 @@ When building _any_ confidence interval, note that you use three ingredients: th
 n <- ___(gss2016)
 
 # Calculate p_hat as the proportion in pacific meta region
-p_hat_meta <- gss2016 %>%
-  ___(prop_pacific = ___(___ == "___")) %>%
+p_hat_meta <- gss2016 |>
+  ___(prop_pacific = ___(___ == "___")) |>
   pull()
 
 # View the result
@@ -1246,8 +1315,8 @@ n <- nrow(gss2016)
 ```
 
 ```{r ex15-hint-2}
-p_hat_meta <- gss2016 %>%
-  summarize(prop_pacific = mean(meta_region == "pacific")) %>%
+p_hat_meta <- gss2016 |>
+  summarize(prop_pacific = mean(meta_region == "pacific")) |>
   pull()
 ```
 
@@ -1256,8 +1325,8 @@ p_hat_meta <- gss2016 %>%
 n <- nrow(gss2016)
 
 # Calculate p_hat as the proportion in pacific meta region
-p_hat_meta <- gss2016 %>%
-  summarize(prop_pacific = mean(meta_region == "pacific")) %>%
+p_hat_meta <- gss2016 |>
+  summarize(prop_pacific = mean(meta_region == "pacific")) |>
   pull()
 
 # View the result
@@ -1276,8 +1345,8 @@ Now we'll construct the confidence interval around this proportion.
 ```{r ex16, exercise=TRUE}
 # From previous step
 n <- nrow(gss2016)
-p_hat_meta <- gss2016 %>%
-  summarize(prop_pacific = mean(meta_region == "pacific")) %>%
+p_hat_meta <- gss2016 |>
+  summarize(prop_pacific = mean(meta_region == "pacific")) |>
   pull()
 
 # Check conditions
@@ -1303,8 +1372,8 @@ SE_approx <- sqrt(p_hat_meta * (1 - p_hat_meta) / n)
 ```{r ex16-solution}
 # From previous step
 n <- nrow(gss2016)
-p_hat <- gss2016 %>%
-  summarize(prop_pacific = mean(meta_region == "pacific")) %>%
+p_hat <- gss2016 |>
+  summarize(prop_pacific = mean(meta_region == "pacific")) |>
   pull()
 
 # Check conditions
@@ -1333,9 +1402,11 @@ question(
 )
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 1 in Tutorial 5: Statistical inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1361,3 +1432,15 @@ What's next?
 
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+

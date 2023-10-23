@@ -9,24 +9,24 @@ library(shiny)
 
 # check all indexes compile -------------------------------------------------------
 
-indexes <- dir_info(recurse = 2, glob = "*x.Rmd") %>% pull(path)
+indexes <- dir_info(recurse = 2, glob = "*x.Rmd") |> pull(path)
 walk(indexes, render)
 
 # check all tutorials compile --------------------------------------------------
 
 rmds      <- dir_info(recurse = 2, glob = "*.Rmd")
 indexes   <- dir_info(recurse = 2, glob = "*x.Rmd")
-tutorials <- anti_join(rmds, indexes, by = "path") %>% pull(path)
+tutorials <- anti_join(rmds, indexes, by = "path") |> pull(path)
 # walk(tutorials, run_tutorial) -- doesn't work, need a way to shut down each tutorial
 
 # get a list of directories ----------------------------------------------------
 
-tutorial_dirs <- dir_info(recurse = 1) %>%
+tutorial_dirs <- dir_info(recurse = 1) |>
   filter(
     type == "directory",
     str_detect(path, "/"),
     str_detect(path, "lesson")
-    ) %>%
+    ) |>
   pull(path)
 
 # tutorials to deploy ----------------------------------------------------------
@@ -38,20 +38,26 @@ dirs_to_deploy <- str_subset(tutorial_dirs, which_tutorials_regex)
 
 # lessons ----------------------------------------------------------------------
 
-tutorials <- tibble(dir_to_deploy = dirs_to_deploy, lesson = dirs_to_deploy) %>%
-  separate(col = lesson, into = c("tutorial", "lesson"), sep = "/") %>%
-  mutate(lesson = str_remove(lesson, "-lesson")) %>%
+tutorials <- tibble(dir_to_deploy = dirs_to_deploy, lesson = dirs_to_deploy) |>
+  separate(col = lesson, into = c("tutorial", "lesson"), sep = "/") |>
+  mutate(lesson = str_remove(lesson, "-lesson")) |>
   mutate(title = glue("ims-{tutorial}-{lesson}"))
 
 # deploy all -------------------------------------------------------------------
 
+<<<<<<< HEAD:deploy.R
 #for(i in 4:length(dirs_to_deploy)){
 for(i in 8:8){
+=======
+for(i in 1:length(dirs_to_deploy)){
+#for(i in 3:3){
+>>>>>>> 33145a5ec41c018da31eea841823c382c59de4f2:R/deploy.R
   deployApp(
     appDir = tutorials$dir_to_deploy[i],
+    appName = tutorials$title[i],
     appTitle = tutorials$title[i],
     account = "openintro",
     forceUpdate = TRUE,
-    launch.browser = FALSE
+    launch.browser = FALSE,
   )
 }

@@ -20,7 +20,7 @@ library(emo)
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # From http://www.rossmanchance.com/iscam2/data/movies03.txt
-hypdata_nonequalvar <- read_delim("data/movies03.txt", "\t") %>%
+hypdata_nonequalvar <- read_delim("data/movies03.txt", "\t") |>
   select(response = box.office, explanatory = score)
 
 set.seed(47474)
@@ -46,32 +46,32 @@ nonequaldata <- data.frame(explanatory, response)
 nonequal_lm <- augment(lm(response ~ explanatory, data=nonequaldata))
 
 starbucks <- readr::read_delim("data/starbucks.txt", "\t", escape_double = FALSE, trim_ws = TRUE)
-starbucks_lowFib <- starbucks %>% filter(Fiber < 15)
+starbucks_lowFib <- starbucks |> filter(Fiber < 15)
 
-obs_slope <- lm(Protein ~ Fiber, starbucks) %>%
-  tidy() %>%
-  filter(term == "Fiber") %>%
-  dplyr::select(estimate) %>%
+obs_slope <- lm(Protein ~ Fiber, starbucks) |>
+  tidy() |>
+  filter(term == "Fiber") |>
+  dplyr::select(estimate) |>
   pull() 
 
-obs_slope_lowFib <- lm(Protein ~ Fiber, starbucks_lowFib) %>%
-  tidy() %>%
-  filter(term == "Fiber") %>%
-  dplyr::select(estimate) %>%
+obs_slope_lowFib <- lm(Protein ~ Fiber, starbucks_lowFib) |>
+  tidy() |>
+  filter(term == "Fiber") |>
+  dplyr::select(estimate) |>
   pull() 
 
 set.seed(4747)
-perm_slope <- starbucks %>%
-  specify(Protein ~ Fiber) %>%
-  hypothesize("independence") %>%
-  generate(reps=1000, type="permute") %>%
+perm_slope <- starbucks |>
+  specify(Protein ~ Fiber) |>
+  hypothesize("independence") |>
+  generate(reps=1000, type="permute") |>
   calculate(stat = "slope")
 
 set.seed(4747)
-perm_slope_lowFib <- starbucks_lowFib %>%
-  specify(Protein ~ Fiber) %>%
-  hypothesize("independence") %>%
-  generate(reps=1000, type="permute") %>%  
+perm_slope_lowFib <- starbucks_lowFib |>
+  specify(Protein ~ Fiber) |>
+  hypothesize("independence") |>
+  generate(reps=1000, type="permute") |>  
   calculate(stat = "slope")
 
 n = 100
@@ -90,6 +90,75 @@ set.seed(4747)
 explanatory = runif(n,1,4)
 e = rnorm(n, 0, 1)
 data_nonnorm = data.frame(explanatory = explanatory, response = exp(beta0 + beta1 * explanatory + e))
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Technical Conditions in linear regression
@@ -136,7 +205,7 @@ linear_lm <- augment(
 )
 
 ggplot(linear_lm, 
-       aes(x =. fitted, 
+       aes(x = .fitted, 
            y = .resid)) +
   geom_point() +
   geom_hline(yintercept=0)
@@ -649,15 +718,15 @@ The two regression lines have been superimposed so that the change in relationsh
 
 
 ```{r echo=TRUE, eval=FALSE}
-starbucks_lowFib <- starbucks %>% filter(Fiber < 15)
+starbucks_lowFib <- starbucks |> filter(Fiber < 15)
 
-lm(Protein ~ Fiber, data = starbucks) %>% tidy()
+lm(Protein ~ Fiber, data = starbucks) |> tidy()
 #          term estimate std.error statistic      p.value
 # 1 (Intercept) 7.526138 0.9924180  7.583637 1.101756e-11
 # 2       Fiber 1.383684 0.2451395  5.644476 1.286752e-07
 
 
-lm(Protein ~ Fiber, data = starbucks_lowFib) %>% tidy()
+lm(Protein ~ Fiber, data = starbucks_lowFib) |> tidy()
 #          term estimate std.error statistic      p.value
 # 1 (Intercept) 6.537053 1.0633640  6.147521 1.292803e-08
 # 2       Fiber 1.796844 0.2995901  5.997675 2.600224e-08
@@ -675,9 +744,9 @@ As expected, the values of the slope and intercept change depending on which dat
 
 ### Full data set
 ```{r echo=TRUE, eval=FALSE}
-perm_slope %>% mutate(
+perm_slope |> mutate(
     abs_perm_slope = abs(stat)
-) %>%
+) |>
   summarize(
     p_value = mean(
       abs_perm_slope > abs(obs_slope)
@@ -694,9 +763,9 @@ perm_slope %>% mutate(
 
 ### Low fiber data set
 ```{r echo=TRUE, eval=FALSE}
-perm_slope_lowFib %>% mutate(
+perm_slope_lowFib |> mutate(
   abs_perm_slope = abs(stat)
-) %>%
+) |>
   summarize(
     p_value = mean(
       abs_perm_slope > 
@@ -766,7 +835,7 @@ p <- ggplot(hypdata_outlier, aes(x = explanatory, y = response)) +
   geom_smooth(method = "lm", se = FALSE) 
 
 # Filter to remove the outlier
-hypdata_no_outlier <- hypdata_outlier %>% 
+hypdata_no_outlier <- hypdata_outlier |> 
   filter(response < 200)
 
 p +
@@ -799,7 +868,7 @@ The datasets with and without the outlier are provided as `hypdata_outlier` and 
 set.seed(4747)
 hypdata_outlier <- tibble(explanatory = rnorm(200, 3, 1), response = explanatory * 3 + 12 + rnorm(200, 0, 2))
 hypdata_outlier$response[47] <- 500
-hypdata_no_outlier <- hypdata_outlier %>% 
+hypdata_no_outlier <- hypdata_outlier |> 
   filter(response < 200)
 ```
 
@@ -847,45 +916,45 @@ response <- explanatory*3 + 12 + rnorm(50, 0, 10)
 response[47] <- 500
 hypdata_out <-  data.frame(explanatory, response)
 
-obs_slope_out <- lm(response ~ explanatory, hypdata_out) %>%
-  tidy() %>%
-  filter(term == "explanatory") %>%
-  select(estimate) %>%
+obs_slope_out <- lm(response ~ explanatory, hypdata_out) |>
+  tidy() |>
+  filter(term == "explanatory") |>
+  select(estimate) |>
   pull() 
 
-hypdata_noout <- hypdata_out %>% filter(explanatory < 4.6) 
+hypdata_noout <- hypdata_out |> filter(explanatory < 4.6) 
 
-obs_slope_noout <- lm(response ~ explanatory, hypdata_noout) %>%
-  tidy() %>%
-  filter(term == "explanatory") %>%
-  select(estimate) %>%
+obs_slope_noout <- lm(response ~ explanatory, hypdata_noout) |>
+  tidy() |>
+  filter(term == "explanatory") |>
+  select(estimate) |>
   pull() 
 
 set.seed(4747)
-perm_slope_out <- hypdata_out %>%
-  specify(response ~ explanatory) %>%
-  hypothesize("independence") %>%
-  generate(reps=500, type="permute") %>%
+perm_slope_out <- hypdata_out |>
+  specify(response ~ explanatory) |>
+  hypothesize("independence") |>
+  generate(reps=500, type="permute") |>
   calculate(stat = "slope")
 
 set.seed(4747)
-perm_slope_noout <- hypdata_noout %>%
-  specify(response ~ explanatory) %>%
-  hypothesize("independence") %>%
-  generate(reps=500, type="permute") %>%  
+perm_slope_noout <- hypdata_noout |>
+  specify(response ~ explanatory) |>
+  hypothesize("independence") |>
+  generate(reps=500, type="permute") |>  
   calculate(stat = "slope")
 ```
 
 
 ```{r ex46, exercise=TRUE}
 # Calculate the p-value with the outlier
-perm_slope_out %>% 
-  mutate(abs_perm_slope = ___) %>%
+perm_slope_out |> 
+  mutate(abs_perm_slope = ___) |>
   summarize(p_value = ___)
 
 # Calculate the p-value without the outlier
-perm_slope_noout %>% 
-  mutate(abs_perm_slope = ___) %>%
+perm_slope_noout |> 
+  mutate(abs_perm_slope = ___) |>
   summarize(p_value = ___)
 ```
 
@@ -899,13 +968,13 @@ Repeat the same procedure twice and compare the p-values.
 
 ```{r ex46-solution}
 # Calculate the p-value with the outlier
-perm_slope_out %>% 
-  mutate(abs_perm_slope = abs(stat)) %>%
+perm_slope_out |> 
+  mutate(abs_perm_slope = abs(stat)) |>
   summarize(p_value = mean(abs_perm_slope >= abs(obs_slope_out)))
 
 # Calculate the p-value without the outlier
-perm_slope_noout %>% 
-  mutate(abs_perm_slope = abs(stat)) %>%
+perm_slope_noout |> 
+  mutate(abs_perm_slope = abs(stat)) |>
   summarize(p_value = mean(abs_perm_slope >= abs(obs_slope_noout)))
 ```
 
@@ -1428,9 +1497,11 @@ ggplot(modeled_observations, aes(x = .fitted, y = .resid)) +
   geom_hline(yintercept = 0)
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 4 in Tutorial 6: Inferential modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1449,3 +1520,15 @@ What's next?
 `r emo::ji("five")` [Tutorial 6 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-06-model-infer-05/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

@@ -32,6 +32,75 @@ knitr::opts_chunk$set(fig.align = "center",
 tutorial_options(exercise.blanks = TRUE)
 
 mariokart <- filter(mariokart, total_pr < 100)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Multiple Regression
@@ -126,7 +195,7 @@ library(modelr)
 library(broom)
 
 # Step 1: Generate an evenly spaced grid of points from the data
-grid <- babies %>%
+grid <- babies |>
   data_grid(
     gestation = seq_range(gestation, by = 1), 
     age = seq_range(age, by = 1)
@@ -186,27 +255,27 @@ library(broom)
 library(plotly)
 
 # 1. Generate an evenly spaced grid of points from the data
-grid <- babies %>%
+grid <- babies |>
   data_grid(
     gestation = seq_range(gestation, n = 50),
     age = seq_range(age, n = 50)
   )
 
 # 2. Feed generated grid values into model
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 # 3. Build the plane
 x <- unique(grid$gestation)
 y <- unique(grid$age)
 
-plane <- tidy_planes %>%
-  pull(.fitted) %>%
+plane <- tidy_planes |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 
 # 4. Visualize regression plane together with the data points
-plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6) %>%
-  add_markers(text = ~case, marker = list(size = 2)) %>%
+plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6) |>
+  add_markers(text = ~case, marker = list(size = 2)) |>
   add_surface(
     x = ~x, y = ~y, z = ~plane, 
     showscale = FALSE, 
@@ -279,7 +348,7 @@ mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 data_space <- ggplot(mariokart, aes(x = duration, y = start_pr)) + 
   geom_point(aes(color = total_pr))
   
-grid <- mariokart %>%
+grid <- mariokart |>
   data_grid(
     duration = seq_range(duration, by = 1), 
     start_pr = seq_range(start_pr, by = 0.01)
@@ -340,20 +409,20 @@ What follows is the code we've created as the preparation for your task:
 mariokart <- filter(mariokart, total_pr < 100)
 mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 
-grid <- mariokart %>%
+grid <- mariokart |>
   modelr::data_grid(
     duration = seq_range(duration, n = 70),
     start_pr = seq_range(start_pr, n = 70)
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$duration)
 y <- unique(grid$start_pr)
 
-plane <- tidy_planes %>%
-  pull(.fitted) %>%
+plane <- tidy_planes |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
@@ -361,27 +430,27 @@ plane <- tidy_planes %>%
 mariokart <- filter(mariokart, total_pr < 100)
 mod <- lm(total_pr ~ duration + start_pr, data = mariokart)
 
-grid <- mariokart %>%
+grid <- mariokart |>
   modelr::data_grid(
     duration = seq_range(duration, n = 70),
     start_pr = seq_range(start_pr, n = 70)
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$duration)
 y <- unique(grid$start_pr)
 
-plane <- tidy_planes %>%
-  pull(.fitted) %>%
+plane <- tidy_planes |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
 
 Much like `ggplot()`, the `plot_ly()` function will allow you to create a plot object with variables mapped to `x`, `y`, and `z` aesthetics. The `add_markers()` function is similar to `geom_point()` in that it allows you to add points to your 3D plot. 
 
-Note that `plot_ly` uses the pipe (`%>%`) operator to chain commands together.
+Note that `plot_ly` uses the pipe (`|>`) operator to chain commands together.
 
 - Run the `plot_ly` command to draw 3D scatterplot for `total_pr` as a function of `duration` and `start_pr` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Duration should be on the x-axis and starting price should be on the y-axis.
 - Use `add_surface()` to draw a plane through the cloud of points by setting `z = ~plane`.
@@ -391,11 +460,11 @@ Note that `plot_ly` uses the pipe (`%>%`) operator to chain commands together.
 library(plotly) 
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~ ____,x = ~____, y = ~____, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~ ____,x = ~____, y = ~____, opacity = 0.6) |>
   add_markers() 
   
 # draw the plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~_____, showscale = FALSE)
 ```
 
@@ -410,7 +479,7 @@ library(plotly)
 library(plotly) 
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
   add_markers() 
 ```
 
@@ -420,11 +489,11 @@ p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opac
 library(plotly) 
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
   add_markers() 
   
 # draw the plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE)
 ```
 
@@ -591,7 +660,7 @@ library(broom)
 library(modelr)
 library(plotly)
 
-grid <- babies %>%
+grid <- babies |>
   modelr::data_grid(
     gestation = seq_range(gestation, n = 50),
     age = seq_range(age, n = 50), 
@@ -600,31 +669,31 @@ grid <- babies %>%
 
 mod_bwt <- lm(bwt ~ gestation + age + smoke, data = babies)
 
-tidy_planes <- mod_bwt %>%
+tidy_planes <- mod_bwt |>
   augment(newdata = grid)
 
 x <- unique(grid$gestation)
 y <- unique(grid$age)
 
-plane0 <- tidy_planes %>%
-  filter(smoke == 0) %>%
-  pull(.fitted) %>%
+plane0 <- tidy_planes |>
+  filter(smoke == 0) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 
-plane1 <- tidy_planes %>%
-  filter(smoke == 1) %>%
-  pull(.fitted) %>%
+plane1 <- tidy_planes |>
+  filter(smoke == 1) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 
 color <- matrix(0, nrow = nrow(plane0), ncol = ncol(plane0))
 
-plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6, colors = c("black", "yellow")) %>%
-  add_markers(color = ~factor(smoke), text = ~case, marker = list(size = 2)) %>%
+plot_ly(data = babies, z = ~bwt, x = ~gestation, y = ~age, opacity = 0.6, colors = c("black", "yellow")) |>
+  add_markers(color = ~factor(smoke), text = ~case, marker = list(size = 2)) |>
   add_surface(
     x = ~x, y = ~y, z = ~plane0, showscale = FALSE, 
     cmin = 0, cmax = 1, cauto = FALSE,
     surfacecolor = color
-  ) %>%
+  ) |>
   add_surface(
     x = ~x, y = ~y, z = ~plane1, showscale = FALSE, 
     cmin = 0, cmax = 1, cauto = FALSE,
@@ -652,27 +721,27 @@ Let's focus now on the effect of smoking. The coefficient on smoke is -8.01 ounc
 ```{r ex5-mariokart-setup}
 mod <- lm(total_pr ~ duration + start_pr + cond, data = mariokart)
 
-grid <- mariokart %>%
+grid <- mariokart |>
   modelr::data_grid(
     duration = seq_range(duration, n = 70),
     start_pr = seq_range(start_pr, n = 70),
     cond
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$duration)
 y <- unique(grid$start_pr)
 
-plane0 <- tidy_planes %>%
-  filter(cond == "new") %>%
-  pull(.fitted) %>%
+plane0 <- tidy_planes |>
+  filter(cond == "new") |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
   
-plane1 <- tidy_planes %>%
-  filter(cond == "used") %>%
-  pull(.fitted) %>%
+plane1 <- tidy_planes |>
+  filter(cond == "used") |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
@@ -688,12 +757,12 @@ Draw a 3D plot for the `mariokart` model. Once again we have stored the `x` and 
 ___(plotly)
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
   add_markers(color = ~___) 
   
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
@@ -709,7 +778,7 @@ library(plotly)
 library(plotly)
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
   add_markers(color = ~cond) 
 ```
 
@@ -719,12 +788,12 @@ p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opac
 library(plotly)
 
 # draw the 3D scatterplot
-p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) %>%
+p <- plot_ly(data = mariokart, z = ~total_pr, x = ~duration, y = ~start_pr, opacity = 0.6) |>
   add_markers(color = ~cond) 
   
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
 ```
 
@@ -829,9 +898,11 @@ question("Choose the correct interpretation of the coefficient on the number of 
 )
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 8 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -860,3 +931,14 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

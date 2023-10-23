@@ -8,7 +8,6 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, message=FALSE, warning=FALSE, include=FALSE}
-
 library(learnr)
 library(tidyverse)
 library(openintro)
@@ -21,11 +20,82 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning = FALSE)
 
-anscombe <- datasets::anscombe %>%
-  mutate(id = 1:nrow(.)) %>%
-  gather(key = "key", value = "val", -id) %>%
-  separate(key, into = c("variable", "set"), sep = 1) %>%
+ansc_rows <- nrow(anscombe)
+
+anscombe <- datasets::anscombe |>
+  mutate(id = 1:ansc_rows) |>
+  gather(key = "key", value = "val", -id) |>
+  separate(key, into = c("variable", "set"), sep = 1) |>
   spread(key = variable, value = val)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Strength of bivariate relationships
@@ -54,8 +124,8 @@ mu <- c(mu1, mu2) # Mean
 
 cor_plot <- function(n, rho) {
   sigma <- matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2), 2) # Covariance matrix
-  sim <- MASS::mvrnorm(n, mu = mu, Sigma = sigma) %>%
-    as.data.frame() %>%
+  sim <- MASS::mvrnorm(n, mu = mu, Sigma = sigma) |>
+    as.data.frame() |>
     rename(y = V1, x = V2)
   ggplot(sim, aes(x = x, y = y)) + 
     geom_point() + 
@@ -111,7 +181,7 @@ cor_plot(n, rho = -0.5)
 It is crucial to remember that the correlation coefficient only captures the strength of the *linear* relationship between two variables. It is quite common to encounter variables that are strongly-related, but in a non-linear way. Blindly computing and reporting the correlation between such variables **does not** yield meaningful results. 
 
 ```{r plot2}
-sim <- data.frame(x = rnorm(n)) %>%
+sim <- data.frame(x = rnorm(n)) |>
   mutate(y = 5 * x^2 + rnorm(n, sd = 1))
 
 ggplot(sim, aes(x = x, y = y)) + 
@@ -127,16 +197,16 @@ Here, this scatterplot shows a clear, quadratic relationship. To simply interpre
 Here is an example of real data from a 10-mile run. The pace of the top 10 finishers in each age group are plotted against their age. Note how the relationship between the pace and age is non-linear: 25-year-olds tend to actually be faster than 20-year-olds, but as people age beyond their thirties, they tend to get slower. This pattern is present for both men and women. 
 
 ```{r code1}
-run09 %>%
-  filter(div_place <= 10) %>%
+run09 |>
+  filter(div_place <= 10) |>
   ggplot(aes(x = age, y = pace, color = gender)) + 
   geom_point()
 ```
 
 ```{r}
-cor <- run09 %>%
-  filter(div_place <= 10) %>%
-  summarize(cor(pace, age)) %>% 
+cor <- run09 |>
+  filter(div_place <= 10) |>
+  summarize(cor(pace, age)) |> 
   pull()
 ```
 
@@ -159,7 +229,7 @@ This is an alternative definition using only $x$'s and $y$'s, and their means: $
 
 
 $$
-  r(x,y) = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2 \cdot \sum_{i=1}^n (y_i - \bar{y})^2}
+  r(x,y) = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^n (x_i - \bar{x})^2 \cdot \sum_{i=1}^n (y_i - \bar{y})^2}}
 $$
 
 In practice, we always have R do these computations for us, so memorizing the formulas is not important. For some of you, the mathematics may help reinforce your intuition about what the correlation coefficient actually measures. For others, it may simply be a confusing blur of symbols that can be safely ignored. Having a solid conceptual understanding of correlation is the important thing.
@@ -211,36 +281,36 @@ Then, you will use `cor()` to compute the correlation between the birthweight (`
 
 ```{r ex1, exercise = TRUE}
 # Compute correlation of birthweight and mother's age
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___))
 
 # Compute correlation of birthweight and gestation for all non-missing pairs
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___, use = ___))
 ```
 
 ```{r ex1-hint-1}
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, mage))
 ```
 
 ```{r ex1-hint-2}
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(___, ___, use = "pairwise.complete.obs"))
 ```
 
 ```{r ex1-solution}
 # Compute correlation
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, mage))
 
 # Compute correlation for all non-missing pairs
-ncbirths %>%
+ncbirths |>
   summarize(N = n(), 
             r = cor(weight, weeks, use = "pairwise.complete.obs"))
 
@@ -263,8 +333,8 @@ Here we see four datasets, each having a very different graphical presentation. 
 The first set looks the most like "real data." Here we see a positive, linear, moderately strong relationship. As you gain experience working with real data, you will see lots of scatterplots that look similar to this one. Here, the correlation coefficient of 0.82 is giving us an accurate measurement of the strength of the linear relationship between $x$ and $y$. 
 
 ```{r ans2}
-anscombe %>%
-  filter(set == 1) %>%
+anscombe |>
+  filter(set == 1) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -272,8 +342,8 @@ anscombe %>%
 However, in the next set we see something quite different. The relationship here is clearly non-linear. But note also that while the value of the correlation coefficient is 0.82, the correlation---in an intuitive sense---is *perfect*. That is, knowing the value of $x$ tells you the value of $y$ exactly---there is no statistical noise. It's just that the relationship is not linear. 
 
 ```{r ans3}
-anscombe %>%
-  filter(set == 2) %>%
+anscombe |>
+  filter(set == 2) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -282,8 +352,8 @@ In the third data set, we have an outlier. Here again, our eyes tell us that wit
 
 
 ```{r ans4}
-anscombe %>%
-  filter(set == 3) %>%
+anscombe |>
+  filter(set == 3) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -291,8 +361,8 @@ anscombe %>%
 Finally, in the fourth data set we see a pathological example with almost the opposite problem. In the previous plot, we saw that the presence of a single outlier had lowered the correlation from 1 to 0.82. In this plot, the presence of a single outlier raises the correlation from undefined to 0.82. Note that here, with the exception of the outlier, knowing $x$ doesn't tell you anything about $y$. It is only the outlier that gives you the appearance of a correlation, but that correlation is very spurious! 
 
 ```{r ans5}
-anscombe %>%
-  filter(set == 4) %>%
+anscombe |>
+  filter(set == 4) |>
   ggplot(aes(x = x, y = y)) +
   geom_point()
 ```
@@ -325,8 +395,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 
 ```{r ex2, exercise = TRUE}
 # Compute properties of anscombe
- anscombe %>%
-  group_by(___) %>%
+ anscombe |>
+  group_by(___) |>
   summarize(
     N = ___, 
     mean_of_x = ___, 
@@ -338,14 +408,14 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 ```
 
 ```{r ex2-hint-1}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   ...
 ```
 
 ```{r ex2-hint-2}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     ...
@@ -353,8 +423,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 ```
 
 ```{r ex2-hint-3}
- anscombe %>%
-  group_by(set) %>%
+ anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     mean_of_x = mean(x), 
@@ -364,8 +434,8 @@ For each of the four `set`s of data points in the `anscombe` dataset, compute th
 
 ```{r ex2-solution}
 # Compute properties of anscombe
-anscombe %>%
-  group_by(set) %>%
+anscombe |>
+  group_by(set) |>
   summarize(
     N = n(), 
     mean_of_x = mean(x), 
@@ -405,28 +475,30 @@ We are going to recreate scatterplots from the previous tutorial, jot down your 
 
 First, we will start with the relationship between `obp` and `slg` for all players in the `mlbbat10` dataset.
 
-```{r ex3, exercise = TRUE}
+```{r ex3a, exercise = TRUE}
 # Run this and look at the plot
 ggplot(data = mlbbat10, aes(x = obp, y = slg)) +
   geom_point()
+```
 
+```{r ex3b, exercise = TRUE}
 # Find the correlation for all baseball players
-___ %>%
+___ |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3-hint-1}
-mlbbat10 %>%
+```{r ex3b-hint-1}
+mlbbat10 |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex3-hint-2}
-mlbbat10 %>%
+```{r ex3b-hint-2}
+mlbbat10 |>
   summarize(N = n(), r = cor(___, ___))
 ```
 
-```{r ex3-solution}
-mlbbat10 %>%
+```{r ex3b-solution}
+mlbbat10 |>
   summarize(N = n(), r = cor(obp, slg))
 ```
 
@@ -434,40 +506,42 @@ mlbbat10 %>%
 
 Next, let's look at the plot of the filtered `mlbbat10` data, with only the players with at least 200 at-bats.
 
-```{r ex4, exercise = TRUE}
+```{r ex4a, exercise = TRUE}
 # Run this and look at the plot
-mlbbat10 %>% 
-  filter(at_bat > 200) %>%
+mlbbat10 |> 
+  filter(at_bat > 200) |>
   ggplot(aes(x = obp, y = slg)) + 
   geom_point()
+```
 
+```{r ex4b, exercise = TRUE}
 # Correlation for all players with at least 200 ABs
-___ %>%
-  filter(___) %>%
+___ |>
+  filter(___) |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4-hint-1}
-mlbbat10 %>%
-  filter(___) %>%
+```{r ex4b-hint-1}
+mlbbat10 |>
+  filter(___) |>
   summarize(N = ___, r = cor(___, ___))
 ```
 
-```{r ex4-hint-2}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+```{r ex4b-hint-2}
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(, ___))
 ```
 
-```{r ex4-hint-3}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+```{r ex4b-hint-3}
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(obp, ___))
 ```
 
-```{r ex4-solution}
-mlbbat10 %>%
-  filter(at_bat >= 200) %>%
+```{r ex4b-solution}
+mlbbat10 |>
+  filter(at_bat >= 200) |>
   summarize(N = n(), r = cor(obp, slg))
 ```
 
@@ -481,36 +555,36 @@ ggplot(data = bdims, aes(x = hgt, y = wgt, color = as.factor(sex))) +
   geom_point() 
 
 # Correlation of body dimensions
-___ %>%
-  group_by(___) %>%
+___ |>
+  group_by(___) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-1}
-bdims %>%
-  group_by(___) %>%
+bdims |>
+  group_by(___) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-2}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = ___, 
             r = cor(___, ___))
 ```
 
 ```{r ex5-hint-3}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = n(), 
             r = cor(___, ___))
 ```
 
 ```{r ex5-solution}
-bdims %>%
-  group_by(sex) %>%
+bdims |>
+  group_by(sex) |>
   summarize(N = n(), 
             r = cor(hgt, wgt))
 ```
@@ -527,35 +601,35 @@ ggplot(data = mammals, aes(x = body_wt, y = brain_wt)) +
   scale_y_log10()
 
 # Correlation among mammals, with and without log
-___ %>%
+___ |>
   summarize(N = ___, 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-1}
-mammals %>%
+mammals |>
   summarize(N = ___, 
             r = cor(___, ___), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-2}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-hint-3}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(___), log(___)))
 ```
 
 ```{r ex6-solution}
-mammals %>%
+mammals |>
   summarize(N = n(), 
             r = cor(body_wt, brain_wt), 
             r_log = cor(log(body_wt), log(brain_wt)))
@@ -735,7 +809,7 @@ knitr::include_graphics("http://imgs.xkcd.com/comics/heatmap.png")
 In other cases it may not be so obvious what confounding variables are driving the spurious correlation. This plot shows that as the number of lemons imported into the U.S. from Mexico has increased over time, the number of U.S. highway fatalities has decreased. The relationship appears to be strong, but there is no plausible causative mechanism that could explain the relationship. 
 
 ```{r img11, out.width=500}
-knitr::include_graphics("http://www.tutor2u.net/_legacy/blog/files//blog-correlation-291209.gif")
+knitr::include_graphics("http://osu-wams-blogs-uploads.s3.amazonaws.com/blogs.dir/1015/files/2014/02/ci700332kn00001.gif")
 ```
 
 Now it's time for you to get your hands dirty with some truly spurious correlations.
@@ -779,8 +853,8 @@ ggplot(data = noise, aes(x = x, y = y)) +
 
 ```{r ex8, exercise = TRUE, exercise.setup="prepare-noise"}
 # Compute correlations for each dataset
-noise_summary <- noise %>%
-  group_by(___) %>%
+noise_summary <- noise |>
+  group_by(___) |>
   summarize(N = n(), 
             spurious_cor = cor(___, ___))
 
@@ -788,15 +862,15 @@ noise_summary
 ```
 
 ```{r ex8-hint-1}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(___, ___))
 ```
 
 ```{r ex8-hint-2}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(x, y))
 ```
@@ -804,31 +878,33 @@ noise_summary <- noise %>%
 3. Identify the datasets that show non-trivial correlation of greater than 0.2 in absolute value.
 
 ```{r prepare-noise-summary, exercise.setup="prepare-noise"}
-noise_summary <- noise %>%
-  group_by(z) %>%
+noise_summary <- noise |>
+  group_by(z) |>
   summarize(N = n(), 
             spurious_cor = cor(x, y))
 ```
 
 ```{r ex9, exercise = TRUE, exercise.setup="prepare-noise-summary"}
 # Isolate sets with correlations above 0.2 in absolute strength
-noise_summary %>%
+noise_summary |>
   filter(abs(___) > ___)
 ```
 
 ```{r ex9-hint}
-noise_summary %>%
+noise_summary |>
   filter(abs(spurious_cor) > ___)
 ```
 
 ```{r ex9-solution}
-noise_summary %>%
+noise_summary |>
   filter(abs(spurious_cor) > 0.2)
 ```
+
 
 ## Congratulations!
 
 You have successfully completed Lesson 2 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -857,3 +933,14 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

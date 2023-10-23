@@ -30,9 +30,77 @@ knitr::opts_chunk$set(fig.align = "center",
 set.seed(421398)
 
 # Calculate difference between before and after
-stem_cell <- stem_cell %>%
+stem_cell <- stem_cell |>
   mutate(change = after - before)
 
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Hypothesis testing for a differnece in two means via simulation
@@ -131,8 +199,8 @@ library(infer)
 We start with the data frame containing our variables of interest, and specify our model as response vs. explanatory. In our example the response variable is `change` and the explanatory variable is treatment (`trmt`) group.
 
 ```{r eval=FALSE, echo=TRUE}
-diff_ht_mean <- stem_cell %>%
-  specify(__) %>%   # Use the form: y-variable ~ x-variable
+diff_ht_mean <- stem_cell |>
+  specify(__) |>   # Use the form: y-variable ~ x-variable
 ```
 
 
@@ -140,9 +208,9 @@ diff_ht_mean <- stem_cell %>%
 
 We then declare the null hypothesis. For a difference in means, the null hypothesize should be specified as `"independence"`, which indicates that we are assuming the change in heart pumping capacity is independent of the treatment group the sheep was in. 
 ```{r eval=FALSE, echo=TRUE}
-diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                    # The same step from above! 
-  hypothesize(null = __) %>%         # Use a hypothesis of "independence" 
+diff_ht_mean <- stem_cell |>
+  specify(__) |>                    # The same step from above! 
+  hypothesize(null = __) |>         # Use a hypothesis of "independence" 
   
 ```
 
@@ -153,10 +221,10 @@ diff_ht_mean <- stem_cell %>%
 Then, using the data, the model we specified, and the null hypothesis we declared, we generate many new samples by permuting the labels of the two groups.
 
 ```{r eval=FALSE, echo=TRUE}
-diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                    # Same step from above!
-  hypothesize(null = __) %>%         # Same step from above!
-  generate(reps = __, type = __) %>% # Generate permutation ("permute") statistics and specify how many (at least 1000)
+diff_ht_mean <- stem_cell |>
+  specify(__) |>                    # Same step from above!
+  hypothesize(null = __) |>         # Same step from above!
+  generate(reps = __, type = __) |> # Generate permutation ("permute") statistics and specify how many (at least 1000)
   ...
 ```
 
@@ -168,10 +236,10 @@ Finally, we calculate the test statistic for each of our permutations. The stati
 Since we're testing for a difference, the order in which we subtract matters. We can specify it using the `order` argument in the `calculate()` function. For example, to achieve `group1 - group2` use `order = c("group1", "group2")`.
 
 ```{r eval=FALSE, echo=TRUE}
-diff_ht_mean <- stem_cell %>%
-  specify(__) %>%                     # Same step from above! 
-  hypothesize(null = __) %>%          # Same step from above! 
-  generate(reps = __, type = __) %>% # Same step from above! 
+diff_ht_mean <- stem_cell |>
+  specify(__) |>                     # Same step from above! 
+  hypothesize(null = __) |>          # Same step from above! 
+  generate(reps = __, type = __) |> # Same step from above! 
   calculate(stat = "diff in means", order = c("trmt", "ctrl")   # Specify to calculate a difference in means and what order of subtraction to use
 ```
 
@@ -198,17 +266,17 @@ First, use the `mutate()` function to add a column to `stem_cell` named `change`
 
 ```{r stem_cell, exercise=TRUE}
 # Calculate difference between before and after
-stem_cell <- stem_cell %>%
+stem_cell <- stem_cell |>
   ___(change = ___)
 ```
 
-<div id="stem_cell-hint">
-**Hint:** Call `mutate()`, setting `change` equal to `after` minus `before`.
-</div>
+```{r stem_cell-hint}
+ Call `mutate()`, setting `change` equal to `after` minus `before`.
+```
 
 ```{r stem_cell-solution}
 # Calculate difference between before and after
-stem_cell <- stem_cell %>%
+stem_cell <- stem_cell |>
   mutate(change = after - before)
 ```
 
@@ -224,13 +292,13 @@ Then, use the `calculate()` function to calculate the observed difference in mea
 
 ```{r stem_cell_2, exercise=TRUE}
 # From previous step
-stem_cell <- stem_cell %>%
+stem_cell <- stem_cell |>
   mutate(change = after - before)
   
 # Calculate observed difference in means
-diff_mean <- stem_cell %>%
+diff_mean <- stem_cell |>
   # Specify the response and explanatory variables
-  specify(___) %>%
+  specify(___) |>
   # Calculate observed difference in means 
   calculate(___)
 
@@ -238,11 +306,11 @@ diff_mean <- stem_cell %>%
 diff_mean
 ```
 
-<div id="stem_cell_2-hint">
-**Hint:**   
+```{r stem_cell_2-hint}
+   
 - Use `change ~ trmt` to specify the response and explanatory variables.   
 - Use `"diff in means"` to calculate the difference in means for each group, and `order = c("esc", "ctrl")` to get the correct order of subtraction. 
-</div>
+```
 
 ### 
 
@@ -254,9 +322,9 @@ Conduct the hypothesis test and compute the p-value for evaluating whether there
 
 ```{r stem_cell_3-setup, include=FALSE}
 # Calculate observed difference in means
-diff_mean <- stem_cell %>%
+diff_mean <- stem_cell |>
   # Specify the response and explanatory variables
-  specify(change ~ trmt) %>%
+  specify(change ~ trmt) |>
   # Calculate observed difference in means 
   calculate(stat = "diff in means", order = c("esc", "ctrl"))
 ```
@@ -273,34 +341,34 @@ First, generate 1000 differences in means via randomization (we can call it this
 
 ```{r stem_cell_3, exercise=TRUE}
 # Generate 1000 differences in means via randomization
-diff_mean_ht <- stem_cell %>%
+diff_mean_ht <- stem_cell |>
   # y ~ x
-  specify(___ ~ ___) %>% 
+  specify(___ ~ ___) |> 
   # Null = no difference between means
-  hypothesize(null = "___") %>% 
+  hypothesize(null = "___") |> 
   # Shuffle labels 1000 times
-  generate(reps = ___, type = "___") %>% 
+  generate(reps = ___, type = "___") |> 
   # Calculate test statistic
   calculate(stat = "___", order = c("esc", "___")) 
 ```
 
-<div id="stem_cell_3-hint">
-**Hint:**
+```{r stem_cell_3-hint}
+
 - Call `specify()`, setting `formula` to a formula with `change` as the response variable and `trmt` as the explanatory variable.
 - Call `hypothesize()`, setting `null` to `"independence"`.
 - Call `generate()`, setting `reps` to `n_replicates` and `type` to `"permute"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("esc", "ctrl")`.
-</div>
+```
 
 ```{r stem_cell_3-solution}
 # Generate 1000 differences in means via randomization
-diff_mean_ht <- stem_cell %>%
+diff_mean_ht <- stem_cell |>
   # y ~ x
-  specify(change ~ trmt) %>% 
+  specify(change ~ trmt) |> 
   # Null = no difference between means
-  hypothesize(null = "independence") %>%  
+  hypothesize(null = "independence") |>  
   # Shuffle labels 1000 times
-  generate(reps = 1000, type = "permute") %>% 
+  generate(reps = 1000, type = "permute") |> 
   # Calculate test statistic
   calculate(stat = "diff in means", order = c("esc", "ctrl")) 
 ```
@@ -314,33 +382,33 @@ Then, calculate the one-sided p-value. Use the `get_p_value()` function to surve
 
 ```{r stem_cell_4-setup, include=FALSE}
 # Calculate observed difference in means
-diff_mean <- stem_cell %>%
+diff_mean <- stem_cell |>
   # Specify the response and explanatory variables
-  specify(change ~ trmt) %>%
+  specify(change ~ trmt) |>
   # Calculate observed difference in means 
   calculate(stat = "diff in means", order = c("esc", "ctrl"))
 
 # Generate 1000 differences in means via randomization
-diff_mean_ht <- stem_cell %>%
+diff_mean_ht <- stem_cell |>
   # y ~ x
-  specify(change ~ trmt) %>% 
+  specify(change ~ trmt) |> 
   # Null = no difference between means
-  hypothesize(null = "independence") %>%  
+  hypothesize(null = "independence") |>  
   # Shuffle labels 1000 times
-  generate(reps = 1000, type = "permute") %>% 
+  generate(reps = 1000, type = "permute") |> 
   # Calculate test statistic
   calculate(stat = "diff in means", order = c("esc", "ctrl")) 
 
 ```
 
 ```{r stem_cell_4, exercise=TRUE}
-diff_mean_ht %>%
+diff_mean_ht |>
   get_p_value(___)   # use diff_mean as the observed statistic, and "greater" as the direction
 
 ```
 
 ```{r stem_cell_4-solution}
-diff_mean_ht %>%
+diff_mean_ht |>
   get_p_value(obs_stat = diff_mean, direction = "greater") 
 ```
 
@@ -376,7 +444,7 @@ Use the `is.na()` function to specify that you want values of `habit` that are n
 
 ```{r smoking, exercise=TRUE}
 # Filter for subjects with non-missing habit
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(___)
 ```
 
@@ -390,7 +458,7 @@ filter(!is.na(habit))
 
 ```{r smoking-solution}
 # Filter for subjects with non-missing habit
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 ```
 
@@ -401,31 +469,31 @@ Next, use `specify()` and `calculate()` to calculate observed difference in mean
 
 ```{r smoking_2-setup, include = FALSE}
 # From previous steps
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 ```
 
 ```{r smoking_2, exercise=TRUE}
 # Calculate observed difference in means
-diff_mean_obs <- ncbirths_complete_habit %>%
+diff_mean_obs <- ncbirths_complete_habit |>
   # Specify the response and explanatory variables
-  specify(___) %>%
+  specify(___) |>
   # Calculate the observed difference in means
   calculate(stat = " ", order = c("nonsmoker", " "))
 ```
 
-<div id="smoking_2-hint">
-**Hint:**   
+```{r smoking_2-hint}
+   
 - Use `weight ~ habit` to specify the response and explanatory variables.   
 - Use `"diff in means"` to calculate the difference in means for each group, and `order = c("nonsmoker", "smoker")` to get the correct order of subtraction. 
-</div>
+```
 
 ```{r smoking_2-solution}
 
 # Calculate observed difference in means
-diff_mean_obs <- ncbirths_complete_habit %>%
+diff_mean_obs <- ncbirths_complete_habit |>
   # Specify the response and explanatory variables
-  specify(weight ~ habit) %>%
+  specify(weight ~ habit) |>
   # Calculate the observed difference in means
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker"))
 ```
@@ -441,48 +509,48 @@ Then, generate 1000 differences in means via permutation and store as `diff_mean
 
 ```{r smoking_3-setup, include = FALSE}
 # From previous steps
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 
-diff_mean_obs <- ncbirths_complete_habit %>%
-  group_by(habit) %>%
-  summarize(mean_weight = mean(weight)) %>%
-  pull() %>%
+diff_mean_obs <- ncbirths_complete_habit |>
+  group_by(habit) |>
+  summarize(mean_weight = mean(weight)) |>
+  pull() |>
   diff()
 ```
 
 
 ```{r smoking_3, exercise=TRUE}
 # Generate 1000 differences in means via randomization
-diff_mean_ht <- ncbirths_complete_habit %>% 
+diff_mean_ht <- ncbirths_complete_habit |> 
   # Specify weight vs. habit
-  specify(___) %>% 
+  specify(___) |> 
   # Null = independence of variables
-  hypothesize(___) %>% 
+  hypothesize(___) |> 
   # Generate 1000 permutations
-  generate(___) %>%
+  generate(___) |>
   # Calculate test statistic, nonsmoker then smoker
   calculate(___)
 ```
 
-<div id="smoking_3-hint">
-**Hint:** 
+```{r smoking_3-hint}
+ 
 - Call `specify()`, passing a formula of `weight ~ habit`.
 - Call `hypothesize()`, setting `null` to `"independence"`.
 - Call `generate()`, setting `reps` to 1000 and `type` to `"permute"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 
 ```{r smoking_3-solution}
 # Generate 1000 differences in means via permutation
-diff_mean_ht <- ncbirths_complete_habit %>% 
+diff_mean_ht <- ncbirths_complete_habit |> 
   # Specify weight vs. habit
-  specify(weight ~ habit) %>% 
+  specify(weight ~ habit) |> 
   # Null = independence of variables
-  hypothesize(null = "independence") %>% 
+  hypothesize(null = "independence") |> 
   # Generate 1000 permutations
-  generate(reps = 1000, type = "permute") %>%
+  generate(reps = 1000, type = "permute") |>
   # Calculate test statistic, nonsmoker then smoker
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker")) 
 ```
@@ -498,19 +566,19 @@ And finally, calculate the p-value for the hypothesis test. Use the `get_p_value
 
 ```{r smoking_4-setup, include = FALSE}
 # From previous steps
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 
-diff_mean_obs <- ncbirths_complete_habit %>%
-  group_by(habit) %>%
-  summarize(mean_weight = mean(weight)) %>%
-  pull() %>%
+diff_mean_obs <- ncbirths_complete_habit |>
+  group_by(habit) |>
+  summarize(mean_weight = mean(weight)) |>
+  pull() |>
   diff()
 
-diff_mean_ht <- ncbirths_complete_habit %>% 
-  specify(weight ~ habit) %>% 
-  hypothesize(null = "independence") %>% 
-  generate(reps = 1000, type = "permute") %>%
+diff_mean_ht <- ncbirths_complete_habit |> 
+  specify(weight ~ habit) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker")) 
 ```
 
@@ -518,21 +586,21 @@ diff_mean_ht <- ncbirths_complete_habit %>%
 ```{r smoking_4, exercise=TRUE}
  
 # Calculate p-value
-  diff_mean_ht %>%
+  diff_mean_ht |>
   # use diff_mean as the observed statistic, and "two-sided" as the direction
   get_p_value(obs_stat = , direction = " ") 
 
 ```
 
-<div id="smoking_4-hint">
-**Hint:** 
+```{r smoking_4-hint}
+ 
 - Use `diff_mean_obs` as the input to `obs_stat`. 
 - Use a direction of `"two-sided"` for a two-sided hypothesis test. 
-</div>
+```
 
 ```{r smoking_4-solution}
 # Calculate p-value
-  diff_mean_ht %>%
+  diff_mean_ht |>
   # use diff_mean as the observed statistic, and "two-sided" as the direction
   get_p_value(obs_stat = diff_mean_obs, direction = "two-sided") 
 
@@ -579,36 +647,36 @@ First, generate 1500 bootstrap differences in means for birth weight by smoking 
 
 ```{r smoking_bs-setup, include=FALSE}
 # Remove subjects with missing habit
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 ```
 
 ```{r smoking_bs, exercise=TRUE}
 # Generate 1500 bootstrap difference in means
-diff_mean_ci <- ncbirths_complete_habit %>%
+diff_mean_ci <- ncbirths_complete_habit |>
   # Specify weight vs. habit
-  specify(___) %>%
+  specify(___) |>
   # Generate 1500 bootstrap replicates
-  generate(___) %>%
+  generate(___) |>
   # Calculate the difference in means, nonsmoker then smoker
   calculate(___)
 ```
 
-<div id="smoking_bs-hint">
-**Hint:**  
+```{r smoking_bs-hint}
+  
 
 - Call `specify()`, passing a formula of `weight ~ habit`.
 - Call `generate()`, setting `reps` to `1500` and `type` to `"bootstrap"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 ```{r smoking_bs-solution}
 # Generate 1500 bootstrap difference in means
-diff_mean_ci <- ncbirths_complete_habit %>%
+diff_mean_ci <- ncbirths_complete_habit |>
   # Specify weight vs. habit
-  specify(weight ~ habit) %>%
+  specify(weight ~ habit) |>
   # Generate 1500 bootstrap replicates
-  generate(reps = 1500, type = "bootstrap") %>%
+  generate(reps = 1500, type = "bootstrap") |>
   # Calculate the difference in means, nonsmoker then smoker
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker"))
 ```
@@ -619,39 +687,39 @@ Then, calculate a 95% confidence interval for the bootstrap difference in mean b
 
 ```{r smoking_bs_2-setup, include = FALSE}
 # Remove subjects with missing habit
-ncbirths_complete_habit <- ncbirths %>%
+ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
 
 # From previous step
-diff_mean_ci <- ncbirths_complete_habit %>%
-  specify(weight ~ habit) %>%
-  generate(reps = 1500, type = "bootstrap") %>%
+diff_mean_ci <- ncbirths_complete_habit |>
+  specify(weight ~ habit) |>
+  generate(reps = 1500, type = "bootstrap") |>
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker"))
 
 ```
 
 ```{r smoking_bs_2, exercise=TRUE}
 # Calculate the 95% CI via percentile method
-diff_mean_ci %>%
+diff_mean_ci |>
   get_confidence_interval(level = , type = " ")
 ```
 
-<div id="smoking_bs_2-hint">
-**Hint:**  
+```{r smoking_bs_2-hint}
+  
 
 - Specify the confidence `level` to be 0.95 for a 95% confidence interval. 
 - Specify the `type` of interval to be "percentile". 
-</div>
+```
 
 ```{r smoking_bs_2-solution}
 # From previous step
-diff_mean_ci <- ncbirths_complete_habit %>%
-  specify(weight ~ habit) %>%
-  generate(reps = 1500, type = "bootstrap") %>%
+diff_mean_ci <- ncbirths_complete_habit |>
+  specify(weight ~ habit) |>
+  generate(reps = 1500, type = "bootstrap") |>
   calculate(stat = "diff in means", order = c("nonsmoker", "smoker"))
   
 # Calculate the 95% CI via percentile method
-diff_mean_ci %>%
+diff_mean_ci |>
   get_confidence_interval(level = 0.95, type = "percentile")
 ```
 
@@ -670,19 +738,19 @@ Filter `ncbirths` for rows where __both__ smoking `habit` and length of pregnanc
 
 ```{r smoking_bs_3, exercise=TRUE}
 # Filter for non-missing habit & non-missing weeks
-ncbirths_complete_habit_weeks <- ncbirths %>%
+ncbirths_complete_habit_weeks <- ncbirths |>
   filter(___, ___) 
 ```
 
-<div id="smoking_bs_3-hint">
-**Hint:** Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `habit` and `weeks` are not `NA`.  
+```{r smoking_bs_3-hint}
+ Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `habit` and `weeks` are not `NA`.  
 
 Specifically, the conditions should look like: `!is.na(habit)` and `!is.na(weeks)`. These should be joined with a comma to indicate that they *both* need to be satisfied.  
-</div>
+```
 
 ```{r smoking_bs_3-solution}
 # Filter for non-missing habit & non-missing weeks
-ncbirths_complete_habit_weeks <- ncbirths %>%
+ncbirths_complete_habit_weeks <- ncbirths |>
   filter(!is.na(habit), !is.na(weeks))
 ```
 
@@ -696,36 +764,36 @@ Now that we've eliminated the missing data, generate 1500 bootstrap difference i
 
 ```{r smoking_bs_4-setup, include = FALSE}
 # Filter for non-missing habit & non-missing weeks
-ncbirths_complete_habit_weeks <- ncbirths %>%
+ncbirths_complete_habit_weeks <- ncbirths |>
   filter(!is.na(habit), !is.na(weeks))
 ```
 
 
 ```{r smoking_bs_4, exercise=TRUE}
 # Generate 1500 bootstrap difference in medians
-diff_med_ci <- ncbirths_complete_habit_weeks %>%
+diff_med_ci <- ncbirths_complete_habit_weeks |>
   # Specify weeks versus habit
-  specify(___) %>%
+  specify(___) |>
   # Generate 1500 bootstrap replicates
-  generate(___) %>%
+  generate(___) |>
   # Calculate the difference in medians, nonsmoker then smoker
   calculate(___)
 ```
 
-<div id="smoking_bs_4-hint">
-**Hint:** 
+```{r smoking_bs_4-hint}
+ 
 - Call `specify()`, passing a formula of `weeks` versus `habit`.
 - Call `generate()`, setting `reps` to `1500` and `type` to `"bootstrap"`.
 - Call `calculate()`, setting `stat` to `"diff in medians"` and `order` to `c("nonsmoker", "smoker")`.
-</div>
+```
 
 ```{r smoking_bs_4-solution}
 # Generate 1500 bootstrap difference in medians
-diff_med_ci <- ncbirths_complete_habit_weeks %>%
+diff_med_ci <- ncbirths_complete_habit_weeks |>
   # Specify weeks versus habit
-  specify(weeks ~ habit) %>%
+  specify(weeks ~ habit) |>
   # Generate 1500 bootstrap replicates
-  generate(reps = 1500, type = "bootstrap") %>%
+  generate(reps = 1500, type = "bootstrap") |>
   # Calculate the difference in medians, nonsmoker then smoker
   calculate(stat = "diff in medians", order = c("nonsmoker", "smoker"))
 ```
@@ -736,32 +804,32 @@ Then, calculate a 92% confidence interval for the bootstrap difference in median
 
 ```{r smoking_bs_5-setup, include = FALSE}
 # Filter for non-missing habit & non-missing weeks
-ncbirths_complete_habit_weeks <- ncbirths %>%
+ncbirths_complete_habit_weeks <- ncbirths |>
   filter(!is.na(habit), !is.na(weeks))
 
-diff_med_ci <- ncbirths_complete_habit_weeks %>%
-  specify(weeks ~ habit) %>%
-  generate(reps = 1500, type = "bootstrap") %>%
+diff_med_ci <- ncbirths_complete_habit_weeks |>
+  specify(weeks ~ habit) |>
+  generate(reps = 1500, type = "bootstrap") |>
   calculate(stat = "diff in medians", order = c("nonsmoker", "smoker"))
 ```
 
 
 ```{r smoking_bs_5, exercise=TRUE}
 # Calculate the 95% CI via percentile method
-diff_med_ci %>%
+diff_med_ci |>
   get_confidence_interval(level = , type = " ")
 ```
 
-<div id="smoking_bs_2-hint">
-**Hint:** 
+```{r smoking_bs_5-hint}
+ 
 - Specify the confidence `level` to be 0.92 for a 92% confidence interval. 
 - Specify the `type` of interval to be "percentile". 
-</div>
+```
 
 
 ```{r smoking_bs_5-solution}
 # Calculate the 95% CI via percentile method
-diff_med_ci %>%
+diff_med_ci |>
   get_confidence_interval(level = 0.92, type = "percentile")
 ```
 
@@ -786,7 +854,7 @@ One obvious measure of pay is annual income. However instead of comparing annual
 To do so we'll make the assumption that there are 52 weeks in a year, and calculate hourly rate as income divided by weekly hours times 52 weeks in the year.
 
 ```{r, echo = TRUE}
-acs12 <- acs12 %>%
+acs12 <- acs12 |>
   mutate(hrly_pay = income / (hrs_work * 52))
 ```
 
@@ -809,10 +877,10 @@ If $\mu$ is defined as average hourly pay in the population, the null hypothesis
 ### Summary statistics
 
 ```{r}
-acs12 %>%
-  filter(!is.na(hrly_pay)) %>%
-  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"), ) %>% 
-  group_by(citizen) %>%
+acs12 |>
+  filter(!is.na(hrly_pay)) |>
+  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"), ) |> 
+  group_by(citizen) |>
   summarise(x_bar = round(mean(hrly_pay), 2),
             s = round(sd(hrly_pay), 2),
             n = length(hrly_pay)) 
@@ -848,12 +916,12 @@ Here, our null hypothesis alternative hypothesis says that there is a difference
 ### 
 
 ```{r, echo = FALSE}
-acs12 <- acs12 %>%
+acs12 <- acs12 |>
   mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"))
 ```
 
 ```{r, echo=TRUE}
-acs12 %>%
+acs12 |>
 t_test(hrly_pay ~ citizen,  
        order = c("Citizen", "Non-citizen"), 
        alternative = "two-sided", 
@@ -900,19 +968,19 @@ First, filter `acs12` for rows where hourly pay (`hrly_pay`) and U.S. citizenshi
 
 ```{r citizens, exercise=TRUE}
 # Filter for non-missing hrly_pay and non-missing citizen
-acs12_complete_hrlypay_citizen <- acs12 %>%
+acs12_complete_hrlypay_citizen <- acs12 |>
   filter(___, ___)
 ```
 
-<div id="citizens-hint">
-**Hint:** Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `hrly_pay` and `citizen` are not `NA`.  
+```{r citizens-hint}
+ Call `filter()`, passing two conditions, using `!` and `is.na()` to keep only rows where `hrly_pay` and `citizen` are not `NA`.  
 
 Specifically, the arguments should look like: `!is.na(hrly_pay)` and `!is.na(citizen)`.  
-</div>
+```
 
 ```{r citizens-solution}
 # Filter for non-missing hrly_pay and non-missing citizen
-acs12_complete_hrlypay_citizen <- acs12 %>%
+acs12_complete_hrlypay_citizen <- acs12 |>
   filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
@@ -926,14 +994,14 @@ Next calculate summary statistics for citizens and non-citizens. To do this, use
 
 ```{r citizens_3-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
-acs12_complete_hrlypay_citizen <- acs12 %>% 
+acs12_complete_hrlypay_citizen <- acs12 |> 
   filter(!is.na(hrly_pay))
 ```
 
 ```{r citizens_3, exercise=TRUE}
-acs12_complete_hrlypay_citizen %>%
+acs12_complete_hrlypay_citizen |>
   # Group by citizen
-  group_by(___) %>%
+  group_by(___) |>
   summarize(
     # Calculate mean hourly pay
     mean_wage = ___,
@@ -944,17 +1012,17 @@ acs12_complete_hrlypay_citizen %>%
   )
 ```
 
-<div id="citizens_3-hint">
-**Hint:**   
+```{r citizens_3-hint}
+   
 
 - Call `group_by()`, passing `citizen` as the argument.
 - Call `summarize()`, using `mean()` to calculate the mean of `hrly_pay`, `sd()` to calculate the standard deviation of `hrly_pay`, and `n()` to find the number of observations in each group. 
-</div>
+```
 
 ```{r citizens_3-solution}
-acs12_complete_hrlypay_citizen %>%
+acs12_complete_hrlypay_citizen |>
   # Group by citizen
-  group_by(citizen) %>%
+  group_by(citizen) |>
   summarize(
     # Calculate mean hourly pay
     mean_wage = mean(hrly_pay),
@@ -975,13 +1043,13 @@ Finally, plot a histogram of the `hrly_pay`, faceted by citizenship status.
 
 ```{r citizens_4-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
-acs12_complete_hrlypay_citizen <- acs12 %>%
+acs12_complete_hrlypay_citizen <- acs12 |>
   filter(!is.na(hrly_pay), !is.na(citizen))
 
 ```
 
 ```{r citizens_4, exercise=TRUE}
-acs12_complete_hrlypay_citizen %>% 
+acs12_complete_hrlypay_citizen |> 
   # Using acs12_complete_hrlypay_citizen, plot hrly_pay
   ggplot(___) +
   # Add a histogram layer
@@ -989,18 +1057,18 @@ acs12_complete_hrlypay_citizen %>%
   facet_wrap(vars(___))
 ```
 
-<div id="citizens_4-hint">
-**Hint:**    
+```{r citizens_4-hint}
+    
 
 - Call ggplot() with `acs12_complete_hrlypay_citizen` as the dataset.
 - Inside `aes()`, map `x` to `hrly_pay`.
 - Add `geom_histogram()`, setting `binwidth` to 5.  
 - Use `facet_wrap(vars(citizen))` to facet the plots by citizenship status. 
-</div>
+```
 
 ```{r citizens_4-solution}
 # Using acs12_complete_hrlypay_citizen, plot hrly_pay
-acs12_complete_hrlypay_citizen %>% 
+acs12_complete_hrlypay_citizen |> 
 ggplot(aes(x = hrly_pay)) +
   # Add a histogram layer
   geom_histogram(binwidth = 5) +
@@ -1019,13 +1087,13 @@ The `acs12_complete_hrlypay_citizen` is already loaded for you.
 
 ```{r citizens_5-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
-acs12_complete_hrlypay_citizen <- acs12 %>%
+acs12_complete_hrlypay_citizen <- acs12 |>
   filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
 ```{r citizens_5, exercise=TRUE}
 # Construct 90% CI using a t-test
-test_results <- acs12_complete_hrlypay_citizen %>% 
+test_results <- acs12_complete_hrlypay_citizen |> 
   t_test(___ ~ ___, 
             order = c("Citizen", " "), 
             alternative = " ", 
@@ -1036,18 +1104,18 @@ test_results <- acs12_complete_hrlypay_citizen %>%
 test_results
 ```
 
-<div id="citizens_5-hint">
-**Hint:**   
+```{r citizens_5-hint}
+   
 
 - Use the formula of `hrly_pay ~ citizen` 
 - Add "Non-citizen" to the order of subtraction 
 - Specify the alternative to be "two-sided"  
 - Specify the confidence level to be 0.90
-</div>
+```
 
 ```{r citizens_5-solution}
 # Construct 90% CI using a t-test
-test_results <- acs12_complete_hrlypay_citizen %>% 
+test_results <- acs12_complete_hrlypay_citizen |> 
   t_test(hrly_pay ~ citizen, 
             order = c("Citizen", "Non-citizen"), 
             alternative = "two-sided", 
@@ -1059,9 +1127,11 @@ test_results
  
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 7 in Tutorial 5: Statistical inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -1086,3 +1156,16 @@ What's next?
 `r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

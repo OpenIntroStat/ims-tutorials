@@ -15,6 +15,9 @@ library(openintro)
 library(Stat2Data)
 library(tidyverse)
 library(emo)
+library(modelr)
+library(plotly)
+library(broom)
 
 # knitr options ----------------------------------------------------------------
 
@@ -29,6 +32,75 @@ knitr::opts_chunk$set(fig.align = "center",
 
 # https://gattonweb.uky.edu/sheather/book/docs/datasets/nyc.csv
 nyc <- read_csv("data/nyc.csv")
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 
@@ -78,8 +150,8 @@ Our data come in the form of Zagat reviews from 168 Italian restaurants in New Y
 
 
 ```{r nyc-pairs, echo=TRUE}
-nyc %>%
-  select(-Restaurant) %>%
+nyc |>
+  select(-Restaurant) |>
   pairs()
 ```
 
@@ -97,9 +169,9 @@ One quick technique for jump-starting EDA is to examine all of the pairwise scat
 
 ```
 
-<div id="ex1-hint">
-**Hint:** The `paris()` function is helpful for looking for pairs of variables that have high correlation.
-</div>
+```{r ex1-hint}
+ The `paris()` function is helpful for looking for pairs of variables that have high correlation.
+```
 
 ```{r ex1-solution}
 pairs(nyc)
@@ -197,8 +269,8 @@ knitr::include_graphics("images/dividing-city.jpg")
 
 
 ```{r echo=TRUE}
-nyc %>% 
-  group_by(East) %>% 
+nyc |> 
+  group_by(East) |> 
   summarize(mean_price = mean(Price))
 ```
 
@@ -233,9 +305,9 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 
 ```
 
-<div id="ex3-hint">
+```{r ex3-hint}
 *Hint:* What is the difference between the coefficients that are in both models?
-</div>
+```
 
 ```{r ex3-solution}
 lm(Price ~ Food + East, data = nyc)
@@ -277,20 +349,20 @@ Next, let's visually assess our model using `plotly`. The `x` and `y` vectors, a
 ```{r ex4-setup}
 mod <- lm(Price ~ Food + Service, data = nyc)
 
-grid <- nyc %>%
+grid <- nyc |>
   modelr::data_grid(
     Food = seq_range(Food, n = 50),
     Service = seq_range(Service, n = 50)
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$Food)
 y <- unique(grid$Service)
 
-plane <- tidy_planes %>%
-  pull(.fitted) %>%
+plane <- tidy_planes |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
 ```
 
@@ -299,28 +371,28 @@ plane <- tidy_planes %>%
 
 
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
   add_markers() 
 
 # draw a plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) 
 ```
 
-<div id="ex4-hint">
-**Hint:** Remember `add_surface()`?
-</div>
+```{r ex4-hint}
+ Remember `add_surface()`?
+```
 
 ```{r ex4-solution}
 # fit model
 lm(Price ~ Food + Service, data = nyc)
 
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
   add_markers() 
 
 # draw a plane
-p %>%
+p |>
   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
 ```
 
@@ -366,8 +438,8 @@ Consider for a moment what a full model that included all of these explanatory v
 
 
 ```{r echo=TRUE}
-nyc %>%
-  mutate(Price_cents = Price / 100) %>%
+nyc |>
+  mutate(Price_cents = Price / 100) |>
   summarize(cor_collinear = cor(Price, Price_cents))
 ```
 
@@ -462,27 +534,27 @@ Another way is to examine the impact of location in the context of the variabili
 ```{r ex6-setup}
 mod <- lm(Price ~ Food + Service + East, data = nyc)
 
-grid <- nyc %>%
+grid <- nyc |>
   modelr::data_grid(
     Food = seq_range(Food, n = 50),
     Service = seq_range(Service, n = 50),
     East
   )
 
-tidy_planes <- mod %>%
+tidy_planes <- mod |>
   augment(newdata = grid)
 
 x <- unique(grid$Food)
 y <- unique(grid$Service)
 
-plane0 <- tidy_planes %>%
-  filter(East == 0) %>%
-  pull(.fitted) %>%
+plane0 <- tidy_planes |>
+  filter(East == 0) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
   
-plane1 <- tidy_planes %>%
-  filter(East == 1) %>%
-  pull(.fitted) %>%
+plane1 <- tidy_planes |>
+  filter(East == 1) |>
+  pull(.fitted) |>
   matrix(nrow = length(x), byrow = TRUE)
   
 col1 <- c('#BF382A', '#0C4B8E')
@@ -491,27 +563,27 @@ col3 <- colorRamp(c("orange"))
 
 ```{r ex6, exercise=TRUE}
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~___, x = ~___, y = ~___, opacity = 0.6) |>
   add_markers(color = ~factor(East)) 
 
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~___, showscale = FALSE)
 ```
 
-<div id="ex6-hint">
-**Hint:** In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
-</div>
+```{r ex6-hint}
+ In `add_surface()` `z` should be `~plane0` in one layer and `~plane1` in the other.
+```
 
 ```{r ex6-solution}
 # draw 3D scatterplot
-p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) %>%
+p <- plot_ly(data = nyc, z = ~Price, x = ~Food, y = ~Service, opacity = 0.6) |>
   add_markers(color = ~factor(East)) 
 
 # draw two planes
-p %>%
-  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) %>%
+p |>
+  add_surface(x = ~x, y = ~y, z = ~plane0, showscale = FALSE) |>
   add_surface(x = ~x, y = ~y, z = ~plane1, showscale = FALSE)
 ```
 
@@ -552,9 +624,11 @@ question("Which of the following interpretations is invalid?
 ```
 
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 10 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 We hope that you've found this tutorial to be illuminating and useful. 
 
@@ -591,3 +665,15 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+

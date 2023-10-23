@@ -22,27 +22,96 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 twins <- read_csv("data/twins.csv")
 
 set.seed(4747)
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "slope") 
 
 set.seed(4747)
-BS_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+BS_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope") 
 
 set.seed(4747)
-manytwins_perm <- twins %>%
+manytwins_perm <- twins |>
   rep_sample_n(size=27, replace=FALSE, reps=100)
 
 set.seed(4747)
-manytwins_BS <- twins %>%
+manytwins_BS <- twins |>
   rep_sample_n(size=27, replace=TRUE, reps=100) 
 
 twin_lm <- lm(Foster ~ Biological, data = twins)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 
@@ -179,10 +248,10 @@ Note that the two permuted datasets are not identical.  Indeed, by permuting the
 ### Linear model on permuted data
 
 ```{r echo=TRUE, eval=TRUE}
-twins %>%
-   specify(Foster ~ Biological) %>%
-   hypothesize(null = "independence") %>%
-   generate(reps = 10, type = "permute") %>%
+twins |>
+   specify(Foster ~ Biological) |>
+   hypothesize(null = "independence") |>
+   generate(reps = 10, type = "permute") |>
    calculate(stat = "slope")
 ```
 
@@ -203,10 +272,10 @@ As you can see, sometimes the slope of the permuted data is positive, sometimes 
 ### Many permuted slopes
 
 ```{r echo=TRUE}
-perm_slope <- twins %>%
-   specify(Foster ~ Biological) %>%
-   hypothesize(null = "independence") %>%
-   generate(reps = 1000, type = "permute") %>%
+perm_slope <- twins |>
+   specify(Foster ~ Biological) |>
+   hypothesize(null = "independence") |>
+   generate(reps = 1000, type = "permute") |>
    calculate(stat = "slope") 
  
 ggplot(data=perm_slope, aes(x=stat)) + 
@@ -224,10 +293,10 @@ The permuted slopes can be visualized in a histogram.  We see that the permuted 
 
 
 ```{r echo=TRUE}
-obs_slope <- lm(Foster ~ Biological, data = twins) %>%
-   tidy() %>%   
-   filter(term == "Biological") %>%
-   dplyr::select(estimate) %>%   
+obs_slope <- lm(Foster ~ Biological, data = twins) |>
+   tidy() |>   
+   filter(term == "Biological") |>
+   dplyr::select(estimate) |>   
    pull()
 
 obs_slope
@@ -266,11 +335,11 @@ In this exercise you'll use the `pull()` function. This function takes a data fr
 ```{r exer20, exercise=TRUE}
 # Calculate the observed slope
 # Run a lin. reg. of Foster vs. Biological on the twins data
-obs_slope <- ___(___, ___) %>%
+obs_slope <- ___(___, ___) |>
   # Tidy the result
-  ___() %>%   
+  ___() |>   
   # Filter for rows where term equal Biological
-  ___(___) %>%
+  ___(___) |>
   # Pull out the estimate column
   ___(___) 
 
@@ -292,11 +361,11 @@ obs_slope
 ```{r exer20-solution}
 # Calculate the observed slope
 # Run a lin. reg. of Foster vs. Biological on the twins data
-obs_slope <- lm(Foster ~ Biological, data = twins) %>%
+obs_slope <- lm(Foster ~ Biological, data = twins) |>
   # Tidy the result
-  tidy() %>%   
+  tidy() |>   
   # Filter for rows where term equal Biological
-  filter(term == "Biological") %>%
+  filter(term == "Biological") |>
   # Pull out the estimate column
   pull(estimate)  
 
@@ -321,13 +390,13 @@ Simulate 10 slopes.
 set.seed(4747) 
 
 # Simulate 10 slopes with a permuted dataset
-perm_slope <- twins %>%
+perm_slope <- twins |>
   # Specify Foster vs. Biological
-  ___(___) %>%
+  ___(___) |>
   # Use a null hypothesis of independence
-  ___(___) %>%
+  ___(___) |>
   # Generate 10 permutation replicates
-  ___(___, ___) %>%
+  ___(___, ___) |>
   # Calculate the slope statistic
   ___(___)
 
@@ -351,13 +420,13 @@ perm_slope
 set.seed(4747) 
 
 # Simulate 10 slopes with a permuted dataset
-perm_slope <- twins %>%
+perm_slope <- twins |>
   # Specify Foster vs. Biological
-  specify(Foster ~ Biological) %>%
+  specify(Foster ~ Biological) |>
   # Use a null hypothesis of independence
-  hypothesize(null = "independence") %>%
+  hypothesize(null = "independence") |>
   # Generate 10 permutation replicates
-  generate(reps = 10, type = "permute") %>%
+  generate(reps = 10, type = "permute") |>
   # Calculate the slope statistic
   calculate(stat = "slope") 
 
@@ -386,13 +455,13 @@ Simulate 500 slopes.
 
 ```{r ex22, exercise=TRUE}
 # Simulate 500 slopes with a permuted dataset
-perm_slope <- twins %>%
+perm_slope <- twins |>
   # Specify Foster vs. Biological
-  ___ %>%
+  ___ |>
   # Use a null hypothesis of independence
-  ___ %>%
+  ___ |>
   # Generate 500 permutation replicates
-  ___ %>%
+  ___ |>
   # Calculate the slope statistic
   ___ 
 ```
@@ -409,13 +478,13 @@ perm_slope <- twins %>%
 
 ```{r ex22-solution}
 # Simulate 500 slopes with a permuted dataset
-perm_slope <- twins %>%
+perm_slope <- twins |>
   # Specify Foster vs. Biological
-  specify(Foster ~ Biological) %>%
+  specify(Foster ~ Biological) |>
   # Use a null hypothesis of independence
-  hypothesize(null = "independence") %>%
+  hypothesize(null = "independence") |>
   # Generate 500 permutation replicates
-  generate(reps = 500, type = "permute") %>%
+  generate(reps = 500, type = "permute") |>
   # Calculate the slope statistic
   calculate(stat = "slope") 
 ```
@@ -429,10 +498,10 @@ perm_slope <- twins %>%
 
 ```{r ex23, exercise=TRUE}
 # From previous step
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "slope")
 
 # Using perm_slope, plot stat
@@ -449,10 +518,10 @@ ___ +
 
 ```{r ex23-solution}
 # From previous step
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "slope")
 
 # Using perm_slope, plot stat
@@ -474,15 +543,15 @@ ggplot(perm_slope, aes(x = stat)) +
 
 ```{r ex24, exercise=TRUE}
 # From previous step
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "slope")
 
-perm_slope %>% 
+perm_slope |> 
   # Ungroup the dataset
-  ___ %>% 
+  ___ |> 
   # Calculate summary statistics
   ___(
     # Mean of stat
@@ -502,15 +571,15 @@ perm_slope %>%
 
 ```{r ex24-solution}
 # From previous step
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 500, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 500, type = "permute") |>
   calculate(stat = "slope")
 
-perm_slope %>% 
+perm_slope |> 
   # Ungroup the dataset
-  ungroup() %>% 
+  ungroup() |> 
   # Calculate summary statistics
   summarize(
     # Mean of stat
@@ -532,10 +601,10 @@ You can calculate the proportion of `TRUE` values in a logical vector using `mea
 ```{r echo=TRUE, eval=FALSE}
 
 set.seed(4747)
-perm_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  hypothesize(null = "independence") %>%
-  generate(reps = 1000, type = "permute") %>%
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
   calculate(stat = "slope") 
 ```
 
@@ -551,13 +620,13 @@ perm_slope <- twins %>%
 
 ```{r ex25, exercise=TRUE}
 # Run a lin. reg. of Foster vs. Biological on twins
-abs_obs_slope <- ___ %>%
+abs_obs_slope <- ___ |>
   # Tidy the result
-  ___ %>%   
+  ___ |>   
   # Filter for rows where term equals Biological
-  ___ %>%
+  ___ |>
   # Pull out the estimate
-  ___ %>%
+  ___ |>
   # Take the absolute value
   ___
 ```
@@ -575,13 +644,13 @@ abs_obs_slope <- ___ %>%
 
 ```{r ex25-solution}
 # Run a lin. reg. of Foster vs. Biological on twins
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) %>%
+abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
   # Tidy the result
-  tidy() %>%   
+  tidy() |>   
   # Filter for rows where term equals Biological
-  filter(term == "Biological") %>%
+  filter(term == "Biological") |>
   # Pull out the estimate
-  pull(estimate) %>%
+  pull(estimate) |>
   # Take the absolute value
   abs()
 ```
@@ -597,16 +666,16 @@ abs_obs_slope <- lm(Foster ~ Biological, data = twins) %>%
 
 ```{r ex26, exercise=TRUE}
 # From previous step
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) %>%
-  tidy() %>%   
-  filter(term == "Biological") %>%
-  pull(estimate) %>%
+abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
+  tidy() |>   
+  filter(term == "Biological") |>
+  pull(estimate) |>
   abs()
 
 # Compute the p-value  
-perm_slope %>% 
+perm_slope |> 
   # Add a column of the absolute value of the slope
-  ___ %>%
+  ___ |>
   # Calculate a summary statistic
   summarize(
     # Get prop. cases where abs. permuted slope is greater than or equal to abs. observed slope
@@ -622,16 +691,16 @@ perm_slope %>%
 
 ```{r ex26-solution}
 # From previous step
-abs_obs_slope <- lm(Foster ~ Biological, data = twins) %>%
-  tidy() %>%   
-  filter(term == "Biological") %>%
-  pull(estimate) %>%
+abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
+  tidy() |>   
+  filter(term == "Biological") |>
+  pull(estimate) |>
   abs()
 
 # Compute the p-value  
-perm_slope %>% 
+perm_slope |> 
   # Add a column of the absolute value of the slope
-  mutate(abs_perm_slope = abs(stat)) %>%
+  mutate(abs_perm_slope = abs(stat)) |>
   # Calculate a summary statistic
   summarize(
     # Get prop. cases where abs. permuted slope is greater than or equal to abs. observed slope
@@ -719,10 +788,10 @@ The main difference between these two plots is that the permuted slopes are all 
 #### Permutation:
 
 ```{r echo=TRUE, eval=FALSE}
-twins %>% 
-  specify(Foster ~ Biological) %>% 
-  hypothesize(null = "independence") %>% 
-  generate(reps = 100, type = "permute") %>% 
+twins |> 
+  specify(Foster ~ Biological) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 100, type = "permute") |> 
   calculate(stat = "slope")
 ```
 
@@ -730,9 +799,9 @@ twins %>%
 #### Bootstrap:
 
 ```{r echo=TRUE, eval=FALSE}
-twins %>% 
-  specify(Foster ~ Biological) %>%  
-  generate(reps = 100, type = "bootstrap") %>% 
+twins |> 
+  specify(Foster ~ Biological) |>  
+  generate(reps = 100, type = "bootstrap") |> 
   calculate(stat = "slope")
 ```
 
@@ -776,11 +845,11 @@ Use the **infer** steps to bootstrap the `twins` data 1000 times. You don't have
 set.seed(4747)
 
 # Calculate 1000 bootstrapped slopes
-boot_slope <- twins %>%
+boot_slope <- twins |>
   # Specify Foster vs. Biological
-  ___ %>%
+  ___ |>
   # Generate 1000 bootstrap replicates
-  ___ %>%
+  ___ |>
   # Calculate the slope statistic
   ___
 
@@ -801,11 +870,11 @@ boot_slope
 set.seed(4747)
 
 # Calculate 1000 bootstrapped slopes
-boot_slope <- twins %>%
+boot_slope <- twins |>
   # Specify Foster vs. Biological
-  specify(Foster ~ Biological) %>%
+  specify(Foster ~ Biological) |>
   # Generate 1000 bootstrap replicates
-  generate(reps = 1000, type = "bootstrap") %>%
+  generate(reps = 1000, type = "bootstrap") |>
   # Calculate the slope statistic
   calculate(stat = "slope") 
 
@@ -845,7 +914,7 @@ boot_slope <- ___
 
 # Create a confidence interval of stat
 # 2 std devs each side of the mean
-boot_slope %>% 
+boot_slope |> 
   summarize(
     lower = ___,
     upper = ___
@@ -868,14 +937,14 @@ set.seed(4747)
 # from 1000 bootstrap replicates of
 # the Foster vs. Biological model
 # of the twins dataset
-boot_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+boot_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope") 
 
 # Create a confidence interval of stat
 # 2 std devs each side of the mean
-boot_slope %>% 
+boot_slope |> 
   summarize(
     lower = mean(stat) - 2 * sd(stat),
     upper = mean(stat) + 2 * sd(stat)
@@ -901,9 +970,9 @@ The bootstrapped estimates of `slope`, `boot_slope`, are loaded in your workspac
 
 ```{r echo=TRUE, eval=FALSE}
 set.seed(4747)
-boot_slope <- twins %>%
-  specify(Foster ~ Biological) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+boot_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "slope")
 ```
 
@@ -919,7 +988,7 @@ p_lower <- ___
 p_upper <- ___
 
 # Create a confidence interval of stat using quantiles
-boot_slope %>% 
+boot_slope |> 
   ___
 ```
 
@@ -943,7 +1012,7 @@ p_lower <- alpha / 2
 p_upper <- 1 - alpha / 2
 
 # Create a confidence interval of stat using quantiles
-boot_slope %>% 
+boot_slope |> 
   summarize(
     lower = quantile(stat, p_lower), 
     upper = quantile(stat, p_upper)
@@ -977,9 +1046,11 @@ Remember the difference between the population slope and the estimated slope. Wh
 ```
 
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 2 in Tutorial 6: Inferential modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -998,3 +1069,16 @@ What's next?
 `r emo::ji("five")` [Tutorial 6 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-06-model-infer-05/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

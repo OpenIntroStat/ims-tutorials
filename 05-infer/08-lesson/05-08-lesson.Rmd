@@ -16,6 +16,7 @@ library(broom)
 library(emo)
 library(openintro)
 library(ggridges)
+library(magrittr)
 
 # knitr options ----------------------------------------------------------------
 
@@ -29,6 +30,75 @@ knitr::opts_chunk$set(fig.align = "center",
 # data prep --------------------------------------------------------------------
 
 gss <- read_csv("data/gss_wordsum_class.csv")
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Vocabulary score vs. self-identified social class
@@ -122,12 +192,12 @@ ggplot(data = ___, mapping = aes(___)) +
   facet_wrap(vars(___))
 ```
 
-<div id="vocabulary-hint">
-**Hint:** 
+```{r vocabulary-hint}
+ 
 - Use `gss` as the plot's `data` argument, then map `x` to `wordsum` in c`aes()`. 
 - Add a histogram layer with `geom_histogram()`. Vocabulary scores can only be whole numbers, so it doesn't make sense to have a `binwidth` narrower than one (1) point.
 - The faceting formula can be specified using `vars(class)`.
-</div>
+```
 
 ```{r vocabulary-solution}
 # Using gss, plot wordsum
@@ -234,7 +304,7 @@ Here is a look at what the parametric (theoretical) output of an ANOVA model loo
 
 
 ```{r echo=TRUE}
-aov(wordsum ~ class, gss) %>%
+aov(wordsum ~ class, gss) |>
   tidy()
 ```
 
@@ -270,17 +340,17 @@ These degrees of freedom are called the "numerator" and "denominator" degrees of
 A plot of the $F$-distribution used to calculate the p-value for this hypothesis test is shown below. 
 
 ```{r, echo = FALSE}
-values <- rf(100000, df1 = 3, df2 = 791) %>% 
+values <- data.frame(val=rf(100000, df1 = 3, df2 = 791)) |> 
   tibble()
 
-obs_stat <- aov(wordsum ~ class, gss) %>%
-  tidy() %>% 
-  filter(term == "class") %>% 
-    select(statistic) %>% 
+obs_stat <- aov(wordsum ~ class, gss) |>
+  tidy() |> 
+  filter(term == "class") |> 
+    select(statistic) |> 
   pull()
 
-values %>% 
-ggplot(aes(x = .)) + 
+values |> 
+ggplot(aes(x = val)) + 
   geom_density() + 
   xlim(c(0, 25)) + 
   labs(x = "F-statistic", 
@@ -298,7 +368,7 @@ The p-value is the area under the $F$-distribution beyond the observed $F$-stati
 
 
 ```{r}
-aov(wordsum ~ class, gss) %>%
+aov(wordsum ~ class, gss) |>
   tidy()
 ``` 
 
@@ -309,17 +379,17 @@ aov(wordsum ~ class, gss) %>%
 The same $F$-distribution as above is shown below, with the observed $F$-statistic is displayed in red. 
 
 ```{r, echo = FALSE}
-values <- rf(100000, df1 = 3, df2 = 791) %>% 
+values <- data.frame(val=rf(100000, df1 = 3, df2 = 791)) |> 
   tibble()
 
-obs_stat <- aov(wordsum ~ class, gss) %>%
-  tidy() %>% 
-  filter(term == "class") %>% 
-    select(statistic) %>% 
+obs_stat <- aov(wordsum ~ class, gss) |>
+  tidy() |> 
+  filter(term == "class") |> 
+    select(statistic) |> 
   pull()
 
-values %>% 
-ggplot(aes(x = .)) + 
+values |> 
+ggplot(aes(x = val)) + 
   geom_density() + 
   xlim(c(0, 25)) + 
   labs(x = "F-statistic", 
@@ -352,11 +422,11 @@ aov_evals_rank <- aov(___, data = ___)
 tidy(aov_evals_rank)
 ```
 
-<div id="vocabulary_2-hint">
-**Hint:** 
+```{r vocabulary_2-hint}
+ 
 - Call `aov()`, passing a formula of `score ~ rank`, using the `evals` dataset.
 - Call `tidy()`, passing the `aov_evals_rank` AOV model.
-</div>
+```
 
 
 ```{r vocabulary_2-solution}
@@ -445,23 +515,23 @@ Use these calculations to decide if it seems reasonable to assume that the group
 
 
 ```{r vocabulary_3, exercise=TRUE}
-gss %>%
+gss |>
   # Group by class
-  group_by(___) %>%
+  group_by(___) |>
   # Calculate the std dev of wordsum as std_dev_wordsum
   summarize(___ = ___)
 ```
 
-<div id="vocabulary_3-hint">
-**Hint:** 
+```{r vocabulary_3-hint}
+ 
 - Call `group_by()`, passing `class` as the argument.
 - Call `summarize()`, setting `std_dev_wordsum` to `sd(wordsum)`.
-</div>
+```
 
 ```{r vocabulary_3-solution}
-gss %>%
+gss |>
   # Group by class
-  group_by(class) %>%
+  group_by(class) |>
   # Calculate the std dev of wordsum as std_dev_wordsum
   summarize(sd_wordsum = sd(wordsum))
 ```
@@ -475,20 +545,20 @@ Let's see what these standard deviations *look* like.
 Create ridge plots of the distribution of `wordsum` across the different self-identified social `class`es.  
 
 ```{r vocabulary_4, exercise=TRUE}
-gss %>%
+gss |>
   # Map wordsum to the x-axis and class to the y-axis
   ggplot(aes(x = ___, y = ___)) +
   # Add density ridges to the plot! 
   geom_density_ridges()
 ```
 
-<div id="vocabulary_4-hint">
-**Hint:** 
+```{r vocabulary_4-hint}
+ 
 - Call `ggplot()`, passing `wordsum` to the `x` variable and `class` to the `y` variable. 
-</div>
+```
 
 ```{r vocabulary_4-solution}
-gss %>%
+gss |>
   # Map wordsum to the x-axis and class to the y-axis
   ggplot(aes(x = wordsum, y = class)) +
   # Add density ridges to the plot! 
@@ -511,8 +581,8 @@ In the case of an ANOVA, the statistic we are interested in is the F-statistic. 
 We can `calculate` the F-statistic using the tools from the infer package we are familiar with. The only part that is new is the `stat` that we calculate. Here, we use the `"F"` statistic. This is what this looks like: 
 
 ```{r, echo = TRUE}
-obs_stat <- gss %>% 
-  specify(wordsum ~ class) %>% 
+obs_stat <- gss |> 
+  specify(wordsum ~ class) |> 
   calculate(stat = "F")
 ```
 
@@ -535,10 +605,10 @@ Let's start with steps 1-4. Using the code below, fill in the missing pieces nec
 Once you've filled in the code, take a look at what the F-statistics stored inside of `null_dist` look like!
 
 ```{r anova-sim, exercise = TRUE}
-null_dist <- gss %>% 
-  specify(___ ~ ___) %>% 
-  hypothesize(null = "___") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+null_dist <- gss |> 
+  specify(___ ~ ___) |> 
+  hypothesize(null = "___") |> 
+  generate(reps = 1000, type = "permute") |> 
   calculate(stat = "___")
 
 ```
@@ -560,15 +630,15 @@ calculate(stat = "F")
 Now that we have our observed F-statistic and our null distribution, we can calculate our p-value! Let's visualize where the observed statistic lies on the null distribution first. 
 
 ```{r, include = FALSE}
-null_dist <- gss %>% 
-  specify(wordsum ~ class) %>% 
-  hypothesize(null = "independence") %>% 
-  generate(reps = 1000, type = "permute") %>% 
+null_dist <- gss |> 
+  specify(wordsum ~ class) |> 
+  hypothesize(null = "independence") |> 
+  generate(reps = 1000, type = "permute") |> 
   calculate(stat = "F")
 ```
 
 ```{r, echo = TRUE}
-null_dist %>% 
+null_dist |> 
   visualise() +
   shade_p_value(obs_stat = obs_stat, direction = "greater")
 ```
@@ -665,7 +735,7 @@ For this exercise, you are to conduct a pairwise t-test on vocabulary scores and
 
 
 ```{r vocabulary_5, exercise=TRUE}
-# Run a pairwise t-test on wordsum and class, without adjustment
+# Run a pairwise t-test on wordsum and class, with adjustment
 t_test_results <- gss %$%  
   pairwise.t.test(x = ___, g = ___, p.adjust.method = "___")
 
@@ -678,14 +748,14 @@ gss %$%
   pairwise.t.test(wordsum, class, p.adjust.method = "none")
 ```
 
-<div id="vocabulary_4-hint">
-**Hint:** 
+```{r vocabulary_5-hint}
+ 
 - Use `wordsum` as `x`, `class` as `g`, and set `p.adjust.method` to `"bonferroni"`.
 - Call `tidy()`, passing `t_test_results`.
-</div>
+```
 
 ```{r vocabulary_5-solution}
-# Run a pairwise t-test on wordsum and class, without adjustment
+# Run a pairwise t-test on wordsum and class, with adjustment
 t_test_results <- gss %$%  
   pairwise.t.test(x = wordsum, g = class, p.adjust.method = "bonferroni")
 
@@ -693,11 +763,11 @@ t_test_results <- gss %$%
 t_test_results <- pairwise.t.test(gss$wordsum, gss$class, p.adjust.method = "bonferroni")
 
 # Tidy the result
-tidy(___)
+tidy(t_test_results)
 
 ## Compare with un-adjusted pairwise t-tests
 gss %$% 
-  pairwise.t.test(wordsum, class, p.adjust.method = "none") %>% 
+  pairwise.t.test(wordsum, class, p.adjust.method = "none") |> 
   tidy()
 
 ```
@@ -709,9 +779,11 @@ Do the data provide convincing evidence of a difference in the average vocabular
 
 For which of the pairwise comparisons would you conclude that there is a "significant" difference between the group means?
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 8 in Tutorial 5: Statistical inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 You should now have a very good understanding of statistical inference for numerical data. In this tutorial you have learned about parametric procedures for conducing an analysis of variance (ANOVA). Specifically, you should now be familiar with the concepts of variability within and between groups, the $F$-distribution, and multiple comparison procedures. 
 
@@ -738,3 +810,15 @@ What's next?
 `r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

@@ -27,6 +27,75 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 tutorial_options(exercise.eval = FALSE)
 textbooks$course <- as.character(textbooks$course) 
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Data set-up
@@ -40,7 +109,7 @@ Data were collected on 73 textbooks required for a few randomly selected courses
 > What factors are associated with the price of each book at the UCLA bookstore?
 
 ```{r}
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(course_number = readr::parse_number(course))
 ```
 
@@ -55,7 +124,7 @@ One might suppose that more advanced books cost more. Our best guess for the lev
 
 
 ```{r 2, echo = TRUE}
-textbooks %>%
+textbooks |>
   ggplot(aes(x = course_number, y = ucla_new)) +
     geom_point()
 ```
@@ -113,7 +182,7 @@ When interpreting slope coefficients, one must pay careful attention to units an
 Here, we create a new variable for the price at Amazon in cents, and re-fit the model. Note that while the coefficient has changed, the underlying meaning has not. Here, we say that for each additional cent that a book costs on Amazon, the expected price at the UCLA bookstore increases by about 0.01199 dollars, or 1.2 cents. Thus, in both cases, the price of a book at the UCLA bookstore is about 20% higher, on average, than the corresponding price on Amazon.com. 
 
 ```{r 6, echo = TRUE}
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(amaz_new_cents = amaz_new * 100) 
 lm(ucla_new ~ amaz_new_cents, data = textbooks)
 ```
@@ -233,9 +302,9 @@ $$
 
 ```{r mc3}
 question("Which of the following statements is **incorrect**?",
-  answer("A person who is 170 cm tall is expected to weigh about 68 kg. ", message = "This answer is correct! If you plug in the values, a person who is 170 cm tall *is* expected to weigh about 68 kg: -105.011+ (1.018 * 170) = 60.049."),
+  answer("A person who is 170 cm tall is expected to weigh about 68 kg. ", message = "This answer is correct! If you plug in the values, a person who is 170 cm tall *is* expected to weigh about 68 kg: -105.011+ (1.018 * 170) = 68.049."),
   answer("Because the slope coefficient for `obp` is larger (1.110) than the slope coefficient for `hgt` (1.018), we can conclude that the association between `obp` and `slg` is stronger than the association between height and weight. ", message = "This answer is correct! If you plug in the values, then you will see that the association between `obp` and `slg` is `cor(mlbbat10$obp, mlbbat10$slg) ≈ 0.82` whereas the association between height and weight is only `cor(bdims$hgt, bdims$wgt) ≈ 0.72`."),
-  answer("None of the above.", correct = TRUE, message = "Yes, both of the above options are correct, e.g. none of the above is incorrect! For the first option we have `-105.011+ (1.018 * 170) = 60.049` and the association between `obp` and `slg` is `cor(mlbbat10$obp, mlbbat10$slg) ≈ 0.82` whereas the association between height and weight is only `cor(bdims$hgt, bdims$wgt) ≈ 0.72`.  'None of the above' is the **only wrong statement** in this question."),
+  answer("None of the above.", correct = TRUE, message = "Yes, both of the above options are correct, e.g. none of the above is incorrect! For the first option we have `-105.011+ (1.018 * 170) = 68.049` and the association between `obp` and `slg` is `cor(mlbbat10$obp, mlbbat10$slg) ≈ 0.82` whereas the association between height and weight is only `cor(bdims$hgt, bdims$wgt) ≈ 0.72`.  'None of the above' is the **only wrong statement** in this question."),
   allow_retry = TRUE
 )
 ```
@@ -338,9 +407,9 @@ hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
 # Show the full model output
 ```
 
-<div id="ex2-hint">
-**Hint:** Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
-</div>
+```{r ex2-hint}
+ Use `coef()` and `summary()` on the `hgt_wgt_mod` model object.
+```
 
 ```{r ex2-solution}
 # Show the coefficients
@@ -443,8 +512,8 @@ books_mod <- lm(ucla_new ~ amaz_new, data = textbooks)
 By examining the residuals, we can learn about whether particular textbooks appear to be under- or over-priced. In this case, the most overpriced book cost $197 at the UCLA bookstore, but just $131 on Amazon---a markup of $66! The model predicts a cost of $158, resulting in a residual of $39. 
 
 ```{r lm2, echo = TRUE}
-augment(books_mod) %>%
-  arrange(desc(.resid)) %>%
+augment(books_mod) |>
+  arrange(desc(.resid)) |>
   head()
 ```
 
@@ -453,7 +522,7 @@ augment(books_mod) %>%
 This turns out to be the management textbook "Financial Statement Analysis and Security Valuation". Does this qualify as irony? 
 
 ```{r lm3, echo = TRUE}
-textbooks %>%
+textbooks |>
   filter(ucla_new == 197)
 ```
 
@@ -545,8 +614,8 @@ Use `geom_abline()` to add a line defined in the `hgt_wgt_coefs` data frame to a
 
 ```{r ex7-setup}
 hgt_wgt_mod <- lm(wgt ~ hgt, data = bdims)
-hgt_wgt_coefs <- coef(hgt_wgt_mod) %>%
-  t() %>%
+hgt_wgt_coefs <- coef(hgt_wgt_mod) |>
+  t() |>
   as.data.frame()
 ```
 
@@ -575,9 +644,12 @@ ggplot(data = bdims, aes(x = hgt, y = wgt)) +
 ```
 
 
+
+
 ## Congratulations!
 
 You have successfully completed Lesson 4 in Tutorial 3: Regression modeling.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -606,3 +678,15 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
+

@@ -24,10 +24,79 @@ LAhomes <- read_csv("data/LAhomes.csv")
 restNYC <- read_csv("data/restNYC.csv")
 change <- read_csv("data/coins.csv")
 
-change <- change %>%
-  mutate(Small= Dimes + Nickels + Pennies) %>%
-  mutate(Amount = Dollars) %>%
+change <- change |>
+  mutate(Small= Dimes + Nickels + Pennies) |>
+  mutate(Amount = Dollars) |>
   dplyr::select(-Dollars)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 This lesson covers topics that build on the basic ideas of inference in linear models, including multicollinearity and inference for multiple regression models.
@@ -142,7 +211,7 @@ As you saw in the previous lesson, transforming the variables can often transfor
 
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
-LAhomes <- LAhomes %>%
+LAhomes <- LAhomes |>
    filter(bed > 0)
 
 ggplot(LAhomes, aes(bed, price)) +
@@ -168,10 +237,10 @@ ggplot(LAhomes, aes(bed, price)) +
 
 ```{r ex51-solution}
 # Create a tidy model
-lm(price ~ bed, data = LAhomes) %>% tidy()
+lm(price ~ bed, data = LAhomes) |> tidy()
 
 # Create a tidy model using the log of both variables
-lm(log(price) ~ log(bed), data = LAhomes) %>% tidy()
+lm(log(price) ~ log(bed), data = LAhomes) |> tidy()
 ```
 
 
@@ -185,7 +254,7 @@ Transforming variables is a powerful tool to use when running linear regressions
 
 You will need to run the linear model before answering the question:
 
-`lm(log(price) ~ log(sqft), data = LAhomes) %>% tidy()`
+`lm(log(price) ~ log(sqft), data = LAhomes) |> tidy()`
 
 ```{r ex1, exercise=TRUE}
 
@@ -249,7 +318,7 @@ The scatterplot on total amount of money versus total number of coins indicates 
 
 
 ```{r eval=FALSE, echo=TRUE}
-lm(Amount ~ Coins, data = change) %>% tidy()
+lm(Amount ~ Coins, data = change) |> tidy()
 #          term estimate std.error statistic  p.value
 # 1 (Intercept)   0.1449    0.0902      1.61 1.13e-01
 # 2       Coins   0.0945    0.0063     14.99 6.01e-22
@@ -274,7 +343,7 @@ Additionally, the amount of money also seems to be linearly related to the numbe
 
 
 ```{r echo=TRUE, eval=FALSE}
-lm(Amount ~ Small, data = change) %>% tidy()
+lm(Amount ~ Small, data = change) |> tidy()
 #          term estimate std.error statistic  p.value
 # 1 (Intercept)   0.4225    0.1244      3.40 1.22e-03
 # 2       Small   0.0989    0.0118      8.38 1.10e-11
@@ -292,7 +361,7 @@ The liner model on the number of small coins reinforces the previous plot with a
 $\hat{\text{Amount}} = -0.00554 + 0.25862 \cdot \text{Coins} - 0.21611 \cdot \text{Small Coins}$
 
 ```{r echo=TRUE, eval=FALSE}
-lm(Amount ~ Coins + Small, data = change) %>% tidy()
+lm(Amount ~ Coins + Small, data = change) |> tidy()
 #          term estimate std.error statistic  p.value
 # 1 (Intercept) -0.00554   0.02735    -0.202 8.40e-01
 # 2       Coins  0.25862   0.00682    37.917 3.95e-43
@@ -338,7 +407,7 @@ Call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
 
 ```{r ex52-solution}
 # Output the tidy model
-lm(log(price) ~ log(sqft), data = LAhomes) %>% tidy()
+lm(log(price) ~ log(sqft), data = LAhomes) |> tidy()
 ```
 
 
@@ -376,7 +445,7 @@ Call `lm()` with a formula and the dataset, then pass the model to `tidy()`.
 
 ```{r ex53-solution}
 # Output the tidy model
-lm(log(price) ~ log(bath), data = LAhomes) %>% tidy()
+lm(log(price) ~ log(bath), data = LAhomes) |> tidy()
 ```
 
 
@@ -411,7 +480,7 @@ ggpairs(LAhomes, columns = c("price", "sqft", "bath"))
 
 ```{r ex54-solution}
 # Output the tidy model
-lm(log(price) ~ log(sqft) + log(bath), data = LAhomes) %>% tidy()
+lm(log(price) ~ log(sqft) + log(bath), data = LAhomes) |> tidy()
 ```
 
 ## Multiple linear regression
@@ -421,13 +490,13 @@ You have seen multiple linear regression in previous tutorials. And throughout t
 ### Bathrooms negative coefficient
 
 ```{r echo=TRUE}
-lm(log(price) ~  log(bath), data=LAhomes) %>% tidy()
+lm(log(price) ~  log(bath), data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)    12.23    0.0280     437.2  0.00e+00
 # 2   log(bath)     1.43    0.0306      46.6 9.66e-300
 
 
-lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) %>% tidy()
+lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)    2.514    0.2619     9.601  2.96e-21
 # 2   log(sqft)    1.471    0.0395    37.221 1.19e-218
@@ -444,13 +513,13 @@ The reason for the switch in sign for the coefficients is similar to the example
 
 
 ```{r echo=TRUE}
-lm(log(price) ~  log(bath), data=LAhomes) %>% tidy()
+lm(log(price) ~  log(bath), data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)    12.23    0.0280     437.2  0.00e+00
 # 2   log(bath)     1.43    0.0306      46.6 9.66e-300
 
 
-lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) %>% tidy()
+lm(log(price) ~ log(sqft) + log(bath), data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)    2.514    0.2619     9.601  2.96e-21
 # 2   log(sqft)    1.471    0.0395    37.221 1.19e-218
@@ -473,7 +542,7 @@ We interpret the last p-value in the second model as information that the bathro
 
 
 ```{r echo=TRUE}
-lm(log(price) ~ log(bath) + bed, data=LAhomes) %>% tidy()
+lm(log(price) ~ log(bath) + bed, data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)   11.965    0.0384    311.67  0.00e+00
 # 2   log(bath)    1.076    0.0465     23.14 2.38e-102
@@ -490,7 +559,7 @@ Similarly, GIVEN THE NUMBER OF BEDROOMS IS IN THE MODEL, THE NUMBER OF BATHROOMS
 
 
 ```{r echo=TRUE}
-lm(log(price) ~ log(sqft) + log(bath) + bed, data=LAhomes) %>% tidy()
+lm(log(price) ~ log(sqft) + log(bath) + bed, data=LAhomes) |> tidy()
 #          term estimate std.error statistic   p.value
 # 1 (Intercept)   1.5364    0.2894     5.310  1.25e-07
 # 2   log(sqft)   1.6456    0.0454    36.215 6.27e-210
@@ -550,10 +619,10 @@ ggpairs(restNYC, columns = c("Price", "Service", "Food", "Decor"))
 
 ```{r ex55-solution}
 # Output the first model
-lm(Price ~ Service, data = restNYC) %>% tidy()
+lm(Price ~ Service, data = restNYC) |> tidy()
 
 # Output the second model
-lm(Price ~ Service + Food + Decor, data = restNYC) %>% tidy()
+lm(Price ~ Service + Food + Decor, data = restNYC) |> tidy()
 ```
 
 
@@ -565,7 +634,7 @@ What is the correct interpretation of the coefficient on `Service` in the linear
 
 
 You will need to run the linear model before answering the question:
-`lm(Price ~ Service + Food + Decor, data=restNYC) %>% tidy()`
+`lm(Price ~ Service + Food + Decor, data=restNYC) |> tidy()`
 
 
 ```{r ex56, exercise=TRUE}
@@ -611,9 +680,11 @@ As with the other inferential methods covered in this course sequence, the infer
 
 All are valid methods to use, and you should feel comfortable at this point using all of them.
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 5 in Tutorial 6: Inferential modeling. 
+If you need to generate a hash for submission, click "Next Topic".
 
 We hope you've had fun with inference on linear models and working through the examples.
 
@@ -634,3 +705,13 @@ What's next?
 `r emo::ji("five")` [Tutorial 6 - Lesson 5: Inference beyond the simple linear regression model](https://openintro.shinyapps.io/ims-06-model-infer-05/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

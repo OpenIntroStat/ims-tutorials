@@ -32,11 +32,80 @@ knitr::opts_chunk$set(
 
 # data prep --------------------------------------------------------------------
 
-SAT <- mosaicData::SAT %>%
+SAT <- mosaicData::SAT |>
   rename(total = sat)
 
-mariokart <- mariokart %>%
+mariokart <- mariokart |>
   filter(total_pr < 100)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## Evaluating and extending parallel slopes model
@@ -184,7 +253,7 @@ summary(mod)
 
 ```{r ex1-hint-2}
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
 ```
 
@@ -198,7 +267,7 @@ mod2 <- lm(total_pr ~ wheels + cond + noise, data = mariokart_noisy)
 summary(mod)
 
 # add random noise
-mariokart_noisy <- mariokart %>%
+mariokart_noisy <- mariokart |>
   mutate(noise = rnorm(n = nrow(mariokart)))
   
 # compute new model
@@ -222,7 +291,7 @@ The fitted model `mod` is already in your environment.
 - Compute the fitted values of the model as one column in a `data.frame` using `augment()`.
 
 
-```{r echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+```{r ex2-setup}
 mod <- lm(total_pr ~ wheels + cond, data = mariokart)
 ```
 
@@ -431,7 +500,7 @@ How about the percentage  (`frac`tion) of students eligible for taking the SAT? 
 First, we use the `cut()` function to add a new `sat_bin` variable to our data frame. Then we fit the parallel slopes model. 
 
 ```{r echo=TRUE}
-SAT_bin <- SAT %>%
+SAT_bin <- SAT |>
   mutate(sat_bin = cut(frac, 3))
 ``` 
 
@@ -499,11 +568,14 @@ A mild version of Simpson's paradox can be observed in the MarioKart auction dat
 
 However, a simple linear regression model reveals the opposite: longer auctions are associated with lower final prices. The problem is that all other things are *not* equal. In this case, the new MarioKarts - which people pay a premium for - were mostly sold in one-day auctions, while a plurality of the used MarioKarts were sold in the standard seven-day auctions. 
 
-```{r mariokart-plot, echo=TRUE}
+```{r ex5-setup}
 slr <- ggplot(mariokart, aes(y = total_pr, x = duration)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE)
 slr
+```
+
+```{r mariokart-plot, ref.label="ex5-setup", echo=TRUE}
 ```
 
 
@@ -536,9 +608,11 @@ lm(formula = total_pr ~ duration, data = mariokart)
 slr + aes(color = cond)
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 7 in Tutorial 3: Regression modeling. 
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -567,3 +641,14 @@ What's next?
 `r emo::ji("keycap_ten")` [Tutorial 3 - Lesson 10: Case study: Italian restaurants in NYC](https://openintro.shinyapps.io/ims-03-model-10/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```

@@ -1,17 +1,9 @@
-base
-methods
-datasets
-utils
-grDevices
-graphics
-stats
 shiny
 knitr
 gridExtra
 png
 gtable
 stringr
-grid
 learnr
 kableExtra
 tidyverse
@@ -24,3 +16,4 @@ dplyr
 forcats
 emo
 gt
+lubridate

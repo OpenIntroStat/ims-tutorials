@@ -28,11 +28,80 @@ knitr::opts_chunk$set(fig.align = "center",
 
 set.seed(20170801)
 
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 
-hsb2 <- hsb2 %>% 
+hsb2 <- hsb2 |> 
   mutate(diff = read - write)
+
+# Hash generation helpers
+# Should ideally be loaded from the imstutorials package when it exists
+is_server_context <- function(.envir) {
+  # We are in the server context if there are the follow:
+  # * input - input reactive values
+  # * output - shiny output
+  # * session - shiny session
+  #
+  # Check context by examining the class of each of these.
+  # If any is missing then it will be a NULL which will fail.
+  
+  inherits(.envir$input, "reactivevalues") &
+    inherits(.envir$output, "shinyoutput") &
+    inherits(.envir$session, "ShinySession")
+}
+
+check_server_context <- function(.envir) {
+  if (!is_server_context(.envir)) {
+    calling_func <- deparse(sys.calls()[[sys.nframe() - 1]])
+    err <- paste0("Function `", calling_func, "`", " must be called from an Rmd chunk where `context = \"server\"`")
+    stop(err, call. = FALSE)
+  }
+}
+encoder_logic <- function(strip_output = FALSE) {
+  p <- parent.frame()
+  check_server_context(p)
+  # Make this var available within the local context below
+  assign("strip_output", strip_output, envir = p)
+  # Evaluate in parent frame to get input, output, and session
+  local(
+    {
+      encoded_txt <- shiny::eventReactive(
+        input$hash_generate,
+        {
+          # shiny::getDefaultReactiveDomain()$userData$tutorial_state
+          state <- learnr:::get_tutorial_state()
+          shiny::validate(shiny::need(length(state) > 0, "No progress yet."))
+          shiny::validate(shiny::need(nchar(input$name) > 0, "No name entered."))
+          shiny::validate(shiny::need(nchar(input$studentID) > 0, "Please enter your student ID"))
+          user_state <- purrr::map_dfr(state, identity, .id = "label")
+          user_state <- dplyr::group_by(user_state, label, type, correct)
+          user_state <- dplyr::summarize(
+            user_state,
+            answer = list(answer),
+            timestamp = dplyr::first(timestamp),
+            .groups = "drop"
+          )
+          user_state <- dplyr::relocate(user_state, correct, .before = timestamp)
+          user_info <- tibble(
+            label = c("student_name", "student_id"),
+            type = "identifier",
+            answer = as.list(c(input$name, input$studentID)),
+            timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z", tz = "UTC")
+          )
+          learnrhash::encode_obj(bind_rows(user_info, user_state))
+        }
+      )
+      output$hash_output <- shiny::renderText(encoded_txt())
+    },
+    envir = p
+  )
+}
+
+hash_encoder_ui <- {
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+    input$caption
+  }), )
+}
 ```
 
 ## t-distribution
@@ -115,11 +184,11 @@ y > z
 y < z
 ```
 
-<div id="t-distribution-hint">
-**Hint:** 
+```{r t-distribution-hint}
+ 
 - Call `pt()` setting the quantile, `q`, to `3` and `df` to the number of degrees of freedom.
 - The total area under a probability distribution is 1.
-</div>
+```
 
 ```{r t-distribution-solution}
 # P(T < 3) for df = 10
@@ -169,11 +238,11 @@ y > z
 y < z
 ```
 
-<div id="t-distribution-hint">
-**Hint:** 
+```{r t-distribution-cutoffs-hint}
+ 
 - The first argument to the `qt()` function is the percentile you want find the cutoff for. For example, `qt(0.5, df = 5)` returns the 50th percentile of the t-distribution with 5 degrees of freedom.
 - The upper bound of the middle 95% is `0.975`.
-</div>
+```
 
 ```{r t-distribution-cutoffs-solution}
 # 95th percentile for df = 10
@@ -263,7 +332,7 @@ Let's use data from the 2010 General Social Survey to estimate the number of hou
 > Estimate the average number of hours Americans work during their "usual" schedule (variable: `hours`) using data from the 2010 General Social Survey (data: `gss`).
 
 ```{r echo=TRUE}
-gss %>% 
+gss |> 
   t_test(response = hours,
          conf_int = TRUE,
          conf_level = 0.95)
@@ -288,29 +357,29 @@ In the exercise below,
 
 ```{r Average_commute_time_of_Americans, exercise=TRUE}
 # Filter for employed respondents
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(___)
 
 # Construct 95% CI for avg time_to_work
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = ___, 
          conf_int = TRUE, 
          conf_level = ___)
 ```
 
-<div id="Average_commute_time_of_Americans-hint">
-**Hint:** 
+```{r Average_commute_time_of_Americans-hint}
+ 
 - Call `filter()` with the condition that `employment` is equal to (`==`) `"employed"`.
 - Call `t_test()`, using `time_to_work` as the `response` and using a confidence level of `0.95`.
-</div>
+```
 
 ```{r Average_commute_time_of_Americans-solution}
 # Filter for employed respondents
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 
 # Construct 95% CI for avg time_to_work
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = time_to_work, 
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -334,30 +403,30 @@ In this exercise,
 - *Compare the interval to the one obtained in the `gss` data. Do both intervals paint the same picture?*
 
 ```{r Average_number_of_hours_worked-setup, include = FALSE}
-acs12_emp <- acs12 %>%
+acs12_emp <- acs12 |>
   filter(employment == "employed")
 ```
 
 
 ```{r Average_number_of_hours_worked, exercise=TRUE}
 # Run a t-test on hrs_work and look at the CI
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = ___, 
          conf_int = ___, 
          conf_level = ___)
 ```
 
-<div id="Average_number_of_hours_worked-hint">
-**Hint:**   
+```{r Average_number_of_hours_worked-hint}
+   
 
 - Use `hrs_work` as the `response`.
 - Say you want a confidence interval by specifying `TRUE` for `conf_int`. 
 - Find a 95% confidence interval by setting `conf_level` to 0.95.
-</div>
+```
 
 ```{r Average_number_of_hours_worked-solution}
 # Run a t-test on hrs_work and look at the CI
-acs12_emp %>% 
+acs12_emp |> 
   t_test(response = hrs_work, 
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -422,7 +491,7 @@ Notice here we are talking about the "mean difference" rather than the "differen
 Implementation-wise there is not much new here. Our data is in a singe column, `diff`, so we simply build an interval for the mean of this single variable using the `t_test()` function.
 
 ```{r echo=TRUE}
-hsb2 %>% 
+hsb2 |> 
   t_test(response = diff,
          conf_int = TRUE, 
          conf_level = 0.95)
@@ -460,54 +529,54 @@ In this exercise you will:
 
 ```{r t-interval_at_various_levels-setup, include=FALSE}
 # Calculate diff
-textbooks <- textbooks %>%
+textbooks <- textbooks |>
   mutate(diff = ucla_new - amaz_new)
 ```
 
 
 ```{r t-interval_at_various_levels, exercise=TRUE}
 # Run a t-test on diff with a 90% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = TRUE,
          conf_level = ___)
 
 # Same with 95% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = ___,
          conf_level = ___)
 
 # Same with 99% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = ___,
          conf_int = ___,
          conf_level = ___)
 ```
 
-<div id="t-interval_at_various_levels-hint">
-**Hint:**  
+```{r t-interval_at_various_levels-hint}
+  
 
 - Use the `diff` column as the `response`. 
 - Turn the confidence interval on by setting `conf_int` to `TRUE`.  
 - Change the `conf_level` to the specified with (either 0.90, 0.95, or 0.99).
-</div>
+```
 
 ```{r t-interval_at_various_levels-solution}
 # Run a t-test on diff with a 90% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.90)
 
 # Same with 95% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.95)
 
 # Same with 99% CI
-textbooks %>% 
+textbooks |> 
   t_test(response = diff,
          conf_int = TRUE,
          conf.level = 0.99)
@@ -560,7 +629,7 @@ The alternative hypothesis, which follows from the research question, says that 
 ### Testing for a mean with a t-test
 
 ```{r, eval=FALSE, echo=TRUE}
-hsb2 %>% 
+hsb2 |> 
   t_test(response = diff,
          null = 0, 
          alternative = "two-sided", 
@@ -586,25 +655,25 @@ First, for the price differences, generate 1000 bootstrap replicates and calcula
 
 ```{r estimate_the_median_difference_in_textbook_prices, exercise=TRUE}
 # Calculate 1000 bootstrap medians of diff
-textdiff_med_ci <- textbooks %>%
-  sepecify(response = ___) %>%
-  generate(reps = ___, type = ___) %>%
+textdiff_med_ci <- textbooks |>
+  sepecify(response = ___) |>
+  generate(reps = ___, type = ___) |>
   calculate(stat = ___)
 ```
 
-<div id="estimate_the_median_difference_in_textbook_prices-hint">
-**Hint:**  
+```{r estimate_the_median_difference_in_textbook_prices-hint}
+  
 
 - Use `specify()`, setting `response` to `diff`.
 - Use `generate()`, setting `reps` to `1000` and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"median"`.
-</div>
+```
 
 ```{r estimate_the_median_difference_in_textbook_prices-solution}
 # Calculate 10000 bootstrap medians of diff
-textdiff_med_ci <- textbooks %>%
-  specify(response = diff) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+textdiff_med_ci <- textbooks |>
+  specify(response = diff) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "median")
 ```
 
@@ -614,9 +683,9 @@ Then, calculate a 95% confidence interval for the bootstrap median price differe
 
 ```{r estimate_the_median_difference_in_textbook_prices_2-setup, include = FALSE}
 # From previous step
-textdiff_med_ci <- textbooks %>%
-  specify(response = diff) %>%
-  generate(reps = 1000, type = "bootstrap") %>%
+textdiff_med_ci <- textbooks |>
+  specify(response = diff) |>
+  generate(reps = 1000, type = "bootstrap") |>
   calculate(stat = "median")
 
 ```
@@ -624,18 +693,18 @@ textdiff_med_ci <- textbooks %>%
 
 ```{r estimate_the_median_difference_in_textbook_prices_2, exercise=TRUE}
 # Calculate the 95% CI via percentile method
-textdiff_med_ci %>% 
+textdiff_med_ci |> 
   get_confidence_interval(level = ___, 
                           type = ___)
 ```
 
-<div id="estimate_the_median_difference_in_textbook_prices_2-hint">
-**Hint:** Set `level` equal to 0.95 and `type` equal to `"percentile"`. 
-</div>
+```{r estimate_the_median_difference_in_textbook_prices_2-hint}
+ Set `level` equal to 0.95 and `type` equal to `"percentile"`. 
+```
 
 ```{r estimate_the_median_difference_in_textbook_prices_2-solution}
 # Calculate the 95% CI via percentile method
-textdiff_med_ci %>% 
+textdiff_med_ci |> 
   get_confidence_interval(level = 0.95, 
                           type = "percentile")
  
@@ -656,17 +725,17 @@ First, add a column to `hsb2` named `diff` containing the `math` scores minus th
 
 ```{r test-for-a-difference-in-median-test-scores, exercise=TRUE}
 # Add a column, diff, of math minus science
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores-hint">
-**Hint:** Calculate `diff` as `math` minus `science`.
-</div>
+```{r test-for-a-difference-in-median-test-scores-hint}
+ Calculate `diff` as `math` minus `science`.
+```
 
 ```{r test-for-a-difference-in-median-test-scores-solution}
 # Add a column, diff, of math minus science
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 ```
 
@@ -681,7 +750,7 @@ Then,
 
 ```{r test-for-a-difference-in-median-test-scores_2-setup, include = FALSE}
 # From previous step
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 
 ```
@@ -689,26 +758,26 @@ hsb2 <- hsb2 %>%
 
 ```{r test-for-a-difference-in-median-test-scores_2, exercise=TRUE}
 # Generate 1000 bootstrap medians centered at null
-scorediff_med_ht <- hsb2 %>%
-  specify(response = ___) %>%
-  hypothesize(null = "point", med = ___) %>% 
-  generate(reps = ___, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = ___) |>
+  hypothesize(null = "point", med = ___) |> 
+  generate(reps = ___, type = "bootstrap") |> 
   calculate(stat = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores_2-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_2-hint}
+ 
 - Use `specify()`, setting `response` to `diff`.
 - Use `hypothesize()`, setting `null` to `"point"` and `mu` to `0`.
 - Use `generate()`, setting `reps` to 1000 and `type` to `"bootstrap"`.
 - Use `calculate()`, setting `stat` to `"median"`.
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_2-solution}
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 ```
 
@@ -717,13 +786,13 @@ scorediff_med_ht <- hsb2 %>%
 Next, find the observed median difference (`diff`) using the `summarize()` function.   
 
 ```{r test-for-a-difference-in-median-test-scores_3-setup, include = FALSE}
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
 
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 
 ```
@@ -731,7 +800,7 @@ scorediff_med_ht <- hsb2 %>%
 
 ```{r test-for-a-difference-in-median-test-scores_3, exercise=TRUE}
 # Calculate observed median of differences
-scorediff_med_obs <- hsb2 %>%
+scorediff_med_obs <- hsb2 |>
   summarize(median_diff = ___) 
 
 ## See what the value is 
@@ -739,15 +808,15 @@ scorediff_med_obs
 ```
 
 
-<div id="test-for-a-difference-in-median-test-scores_3-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_3-hint}
+ 
 
 - Set `median_diff` to the median of the observed `diff` column.
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_3-solution}
 # Calculate observed median of differences
-scorediff_med_obs <- hsb2 %>%
+scorediff_med_obs <- hsb2 |>
   summarize(median_diff = median(diff))
 
 ## See what the value is 
@@ -759,37 +828,37 @@ scorediff_med_obs
 And finally, calculate the two-sided p-value using the `get_p_value()` function. Remember, you need to specify what the observed median difference is (`scorediff_med_obs`) and the direction of the alternative hypothesis (`"two-sided"`). 
 
 ```{r test-for-a-difference-in-median-test-scores_4-setup, include = FALSE}
-hsb2 <- hsb2 %>%
+hsb2 <- hsb2 |>
   mutate(diff = math - science)
-scorediff_med_ht <- hsb2 %>%
-  specify(response = diff) %>%
-  hypothesize(null = "point", med = 0) %>% 
-  generate(reps = 1000, type = "bootstrap") %>% 
+scorediff_med_ht <- hsb2 |>
+  specify(response = diff) |>
+  hypothesize(null = "point", med = 0) |> 
+  generate(reps = 1000, type = "bootstrap") |> 
   calculate(stat = "median")
 
-scorediff_med_obs <- hsb2 %>%
-  summarize(median_diff = median(diff)) %>%
+scorediff_med_obs <- hsb2 |>
+  summarize(median_diff = median(diff)) |>
   pull()
 ```
 
 
 ```{r test-for-a-difference-in-median-test-scores_4, exercise=TRUE}
 # Calculate two-sided p-value
-scorediff_med_ht %>%
+scorediff_med_ht |>
   get_p_value(obs_stat = ___, 
               direction = ___)
 ```
 
-<div id="test-for-a-difference-in-median-test-scores_4-hint">
-**Hint:** 
+```{r test-for-a-difference-in-median-test-scores_4-hint}
+ 
 
 - Use `scorediff_med_obs` as the observed statistic. 
 - Use `"two-sided"` as the direction in the alternative. 
-</div>
+```
 
 ```{r test-for-a-difference-in-median-test-scores_4-solution}
 # Calculate two-sided p-value
-scorediff_med_ht %>%
+scorediff_med_ht |>
   get_p_value(obs_stat = scorediff_med_obs, 
               direction = "two-sided")
 ```
@@ -814,9 +883,11 @@ question("Which of the following is the correct definition of the p-value of thi
 )
 ```
 
+
 ## Congratulations!
 
 You have successfully completed Lesson 6 in Tutorial 5: Statistical inference.  
+If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
 
@@ -842,3 +913,14 @@ What's next?
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
+
+
+## Submit
+
+```{r, echo=FALSE, context="server"}
+encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+learnrhash::encoder_ui(ui_before = hash_encoder_ui)
+```
