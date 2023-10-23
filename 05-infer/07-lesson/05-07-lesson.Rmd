@@ -1039,7 +1039,7 @@ Finally, plot a histogram of the `hrly_pay`, faceted by citizenship status.
 
 - Using `acs12_complete_hrlypay_citizen` dataset, plot `hrly_pay` on the x axis.
 - Add a histogram layer with a `binwidth` of 5.
-- Facet by the `citizen`ship status, using the `vars()` function. 
+- Facet by the `citizen`ship status. 
 
 ```{r citizens_4-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
@@ -1054,7 +1054,7 @@ acs12_complete_hrlypay_citizen |>
   ggplot(___) +
   # Add a histogram layer
   geom_XXX___ +
-  facet_wrap(vars(___))
+  facet_wrap(~___)
 ```
 
 ```{r citizens_4-hint}
@@ -1063,7 +1063,7 @@ acs12_complete_hrlypay_citizen |>
 - Call ggplot() with `acs12_complete_hrlypay_citizen` as the dataset.
 - Inside `aes()`, map `x` to `hrly_pay`.
 - Add `geom_histogram()`, setting `binwidth` to 5.  
-- Use `facet_wrap(vars(citizen))` to facet the plots by citizenship status. 
+- Use `facet_wrap(~citizen)` to facet the plots by citizenship status. 
 ```
 
 ```{r citizens_4-solution}
@@ -1072,7 +1072,7 @@ acs12_complete_hrlypay_citizen |>
 ggplot(aes(x = hrly_pay)) +
   # Add a histogram layer
   geom_histogram(binwidth = 5) +
-  facet_wrap(vars(citizen))
+  facet_wrap(~citizen)
 ```
 
 ### Estimating the difference of two means using a t-interval

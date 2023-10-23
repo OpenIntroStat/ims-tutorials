@@ -189,14 +189,14 @@ ggplot(data = ___, mapping = aes(___)) +
   # Add a histogram layer
   ___ +
   # Facet by class
-  facet_wrap(vars(___))
+  facet_wrap(~___)
 ```
 
 ```{r vocabulary-hint}
  
 - Use `gss` as the plot's `data` argument, then map `x` to `wordsum` in c`aes()`. 
 - Add a histogram layer with `geom_histogram()`. Vocabulary scores can only be whole numbers, so it doesn't make sense to have a `binwidth` narrower than one (1) point.
-- The faceting formula can be specified using `vars(class)`.
+- The faceting formula can be specified using `~class`.
 ```
 
 ```{r vocabulary-solution}
@@ -205,7 +205,7 @@ ggplot(data = gss, mapping = aes(x = wordsum)) +
   # Add a histogram layer
   geom_histogram(binwidth = 1) +
   # Facet by class
-  facet_wrap(vars(class))
+  facet_wrap(~class)
 ```
 
 ### 

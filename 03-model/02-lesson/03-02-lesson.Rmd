@@ -846,7 +846,7 @@ ggplot(data = noise, aes(x = x, y = y)) +
 ```{r ex7-solution, fig.height=5, fig.width=7}
 ggplot(data = noise, aes(x = x, y = y)) +
   geom_point() + 
-  facet_wrap(vars(z))
+  facet_wrap(~z)
 ```
 
 2. Compute the correlation between each set of `x` and `y`.  

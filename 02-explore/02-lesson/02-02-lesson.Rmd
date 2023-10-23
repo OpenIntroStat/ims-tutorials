@@ -777,7 +777,7 @@ However, if we want to look at the distribution on a different subset of the dat
 ```{r hist-hwy-mpg-pickup}
 ggplot(data = cars, aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_wrap(vars(pickup))
+  facet_wrap(~pickup)
 ```
 
 There are two main methods for incorporating a second variable into the plots we've explored, (1) adding a facet, or (2) adding colors.
@@ -786,13 +786,12 @@ There are two main methods for incorporating a second variable into the plots we
 
 Let's use a histogram to look at the distribution of highway mileage, with separate plots for whether or not the car is a pickup truck. 
 We can make these separate plots by adding a `facet_wrap()` layer to our `ggplot()`. 
-The variable you want to facet by goes inside the `facet_wrap()` function, and needs to be specified with the `vars()` function.
-The `vars()` function selects variables from the dataset with the name provided. 
+The variable you want to facet by goes inside the `facet_wrap()` function.
 
 ```{r cars-hist-faceted, exercise = TRUE}
 ggplot(data = cars, aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_wrap(vars(pickup))
+  facet_wrap(~pickup)
 ```
 
 Based on the plot, it's clear that are many more non-pickups (values of `FALSE`) than pickups (values of `TRUE`).
@@ -806,21 +805,21 @@ Let's investigate the distribution of the fuel efficiency (`city_mpg`) faceted b
 # Create faceted histogram
 ggplot(data = cars, aes(x = ___)) +
   geom_histogram() +
-  facet_wrap(vars(___))
+  facet_wrap(___)
 ```
 
 ```{r ex1-hint-1}
 # Create faceted histogram
 ggplot(data = cars, aes(x = city_mpg)) +
   geom_histogram() +
-  facet_wrap(vars(___))
+  facet_wrap(___)
 ```
 
 ```{r ex1-solution}
 # Create faceted histogram
 ggplot(data = cars, aes(x = city_mpg)) +
   geom_histogram() +
-  facet_wrap(vars(suv))
+  facet_wrap(suv)
 ```
 
 ## Colored density plots
@@ -990,7 +989,7 @@ Similar to its `facet_wrap()` counterpart, the `facet_grid()` function creates s
 However, unlike the `facet_wrap()` function, `facet_grid()` can facet by more than one variable, creating a matrix of subplots.
 
 Let's see how this works by building a plot that explores `msrp`, the manufacturer's suggested retail price. Since that variable is numerical, there are several plots we could use, but let's go with a density plot.
-By adding a `facet_grid()` layer, we can break that distribution down by two categorical variables, each specified with the `vars()` function.
+By adding a `facet_grid()` layer, we can break that distribution down by two categorical variables, separated by `~` to indicate "versus".
 In the end, we will have multiple density plots of the `msrp` variable!
 
 The code for this would look something like:
@@ -1000,7 +999,7 @@ The code for this would look something like:
 cars |> 
   ggplot(aes(x = msrp)) +
   geom_density() +
-  facet_grid(vars(pickup), vars(rear_wheel))
+  facet_grid(pickup ~ rear_wheel)
 ```
 
 Within the `facet_wrap()` function, whichever variable you put first will go in the rows of the grid and the the one that you put last form the columns.
@@ -1067,22 +1066,21 @@ common_cyl <- filter(cars, ncyl %in% c(4, 6, 8))
 common_cyl |>
   ggplot(aes(x = ___)) +
   geom_histogram() +
-  facet_grid(vars(___), vars(___), labeller = ___)
+  facet_grid(___ ~ ___, labeller = ___)
 ```
 
 ```{r ex7-hint-1}
 common_cyl |>
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_grid(vars(___), vars(___), labeller = ___)
-
+  facet_grid(___ ~ ___, labeller = ___)
 ```
 
 ```{r ex7-hint-2}
 common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_grid(vars(ncyl), vars(___), labeller = ___)
+  facet_grid(ncyl ~ ___, labeller = ___)
 
 ```
 
@@ -1090,7 +1088,7 @@ common_cyl |>
 common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_grid(vars(ncyl), vars(suv), labeller = ___)
+  facet_grid(ncyl ~ suv, labeller = ___)
 
 ```
 
@@ -1099,7 +1097,7 @@ common_cyl |>
 common_cyl |> 
   ggplot(aes(x = hwy_mpg)) +
   geom_histogram() +
-  facet_grid(vars(ncyl), vars(suv), labeller = label_both)
+  facet_grid(ncyl ~ suv, labeller = label_both)
 ```
 
 ### Interpreting plots with three variables
