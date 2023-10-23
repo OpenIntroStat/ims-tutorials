@@ -903,7 +903,7 @@ question("Which of the following interpretations of the plot **is not** valid?",
   answer("The highest mileage cars have 4 cylinders.", message = "No. What color is the region on the right of the plot?"),
   answer("The typical 4 cylinder car gets better mileage than the typical 6 cylinder car, which gets better mileage than the typical 8 cylinder car.", message = "No. Look at the midpoint of each region."),
   answer("Most of the 4 cylinder cars get better mileage than even the most efficient 8 cylinder cars.", message = "No. Compare the position on the x-axis of the red region to the right of the blue region."),
-  answer("The variability in mileage of 8 cylinder cars is similar to the variability in mileage of 4 cylinder cars.", correct = TRUE, message = "Correct! The variability in mileage of 8 cylinder cars seem much smaller than that of 4 cylinder cars."),
+  answer("The variability in mileage of 8 cylinder cars is smaller than the variability in mileage of 4 cylinder cars.", correct = TRUE, message = "Correct! The variability in mileage of 8 cylinder cars seem much smaller than that of 4 cylinder cars."),
   allow_retry = TRUE
 )
 ```
