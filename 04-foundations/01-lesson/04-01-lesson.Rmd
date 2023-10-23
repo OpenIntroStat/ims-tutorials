@@ -431,7 +431,7 @@ Notice that the output gives a permuted difference of -0.02 as compared to the o
 
 By repeating the permuting and difference calculations five times, the permuted differences are seen to be sometimes positive, sometimes negative, sometimes close to zero, sometimes far from zero. However, five times isn't quite enough to capture all of the variability in the null differences. 
 
-The `rep_sample_n()` function performs repeated sampling of a dataset, where the `size` of the sample is specified in the first argument and the number of repetitions is specified in the `reps` argument. We notice that the sample `size` is the same size as the soda dataset, since it equals the number of rows in the original dataset. We are also specifying that the sampling of the datset should be done without replacement (`replace = FALSE`), since we want each row to only be selected once. You can think of this as creating five copies of the original `soda` dataset. 
+The `rep_sample_n()` function performs repeated sampling of a dataset, where the `size` of the sample is specified in the first argument and the number of repetitions is specified in the `reps` argument. We notice that the sample `size` is the same size as the soda dataset, since it equals the number of rows in the original dataset. We are also specifying that the sampling of the dataset should be done without replacement (`replace = FALSE`), since we want each row to only be selected once. You can think of this as creating five copies of the original `soda` dataset. 
 
 ```{r many_random_permutations, echo = TRUE}
 soda |>
