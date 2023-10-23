@@ -604,8 +604,7 @@ mean(fruits %in% c("banana", "cherry"))
 
 The dplyr, ggplot2, infer, and NHANES packages have been loaded for you.
 
-- From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to the dataset named `homes`.
-
+- From `NHANES`, select the `Gender` and `HomeOwn`ership columns, then filter the rows to keep individuals whose home ownership status is `"Own"` or `"Rent"`.  Save the result to the dataset named `homes`. Then, find the number of rows and columns in `homes` with `dim()`.
 
 ```{r statistic_of_interest, exercise=TRUE}
 homes <- NHANES |>
@@ -613,24 +612,55 @@ homes <- NHANES |>
   ___(___, ___) |>
   # Filter for HomeOwn equal to "Own" or "Rent"
   ___(___ %in% c("___", "___"))
+
+# Find the number of rows and columns of homes
+___(___)
 ```
 
 ```{r statistic_of_interest-hint-1}
 homes <- NHANES |>
+  # Select Gender and HomeOwn
   select(Gender, HomeOwn) |>
+  # Filter for HomeOwn equal to "Own" or "Rent"
   ___(___ %in% c("___", "___"))
+
+# Find the number of rows and columns of homes
+___(___)
 ```
 
 ```{r statistic_of_interest-hint-2}
 homes <- NHANES |>
+  # Select Gender and HomeOwn
   select(Gender, HomeOwn) |>
+  # Filter for HomeOwn equal to "Own" or "Rent"
   filter(___ %in% c("___", "___"))
+
+# Find the number of rows and columns of homes
+___(___)
 ```
 
 ```{r statistic_of_interest-hint-3}
 homes <- NHANES |>
+  # Select Gender and HomeOwn
   select(Gender, HomeOwn) |>
+  # Filter for HomeOwn equal to "Own" or "Rent"
   filter(HomeOwn %in% c("___", "___"))
+
+# Find the number of rows and columns of homes
+___(___)
+```
+
+
+```{r statistic_of_interest-hint-4}
+# Subset the data: homes
+homes <- NHANES |>
+  # Select Gender and HomeOwn
+  select(Gender, HomeOwn) |>
+  # Filter for HomeOwn equal to "Own" or "Rent"
+  filter(HomeOwn %in% c("Own", "Rent"))
+
+# Find the number of rows and columns of homes
+dim(___)
 ```
 
 ```{r statistic_of_interest-solution}
@@ -640,6 +670,9 @@ homes <- NHANES |>
   select(Gender, HomeOwn) |>
   # Filter for HomeOwn equal to "Own" or "Rent"
   filter(HomeOwn %in% c("Own", "Rent"))
+
+# Find the number of rows and columns of homes
+dim(homes)
 ```
 
 (2)
