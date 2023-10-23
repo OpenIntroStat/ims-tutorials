@@ -103,7 +103,6 @@ hash_encoder_ui <- {
 }
 ```
 
-
 ## Case Study: Italian restaurants in NYC
 
 Explore the relationship between price and the quality of food, service, and decor for Italian restaurants in NYC.
@@ -117,8 +116,6 @@ What are the factors that contribute to a price of a meal at Italian restaurants
 knitr::include_graphics("images/italian-restaurants.jpg")
 ```
 
-
-
 ### Zagat guide
 
 The Zagat guide is an influential review of restaurants. They are made famous by their use of selective quotes from actual diners to build a pithy description of each restaurant. But we won't be working with the text. Rather, we'll be working with the numeric reviews you see posted here. Each restaurant is rated on a scale of 0 to 30 for the quality of its food, decor, and service. The average price of a meal---which includes one drink and a tip---will be our response variable. How do these factors influence the average price of a meal?
@@ -128,26 +125,15 @@ The Zagat guide is an influential review of restaurants. They are made famous by
 knitr::include_graphics("images/zagat.jpg")
 ```
 
-
-
-
-
-
 ### Exploring the data
-
 
 ```{r echo=TRUE}
 glimpse(nyc)
 ```
 
-
-
-
 Our data come in the form of Zagat reviews from 168 Italian restaurants in New York City from 2001. The `glimpse()` function can help you get a sense of how the variables are encoded and what values they typically take on. The `East` variable records whether the restaurant is located east or west of Fifth Avenue, which historically divides the island of Manhattan.
 
-
 ### EDA
-
 
 ```{r nyc-pairs, echo=TRUE}
 nyc |>
@@ -155,14 +141,15 @@ nyc |>
   pairs()
 ```
 
-
 Before we can sensibly build models, we should spend some time exploring the data. How are the variables distributed? How are they related to one another? What patterns are present? The `pairs()` function can help us explore these relationships visually. It shows a grid of scatterplots for each pair of variables in the `nyc` data frame. It's easy to see that, for example, `Price` and `Decor` are strongly correlated, while `Case` and `Food` are uncorrelated.
 
 ### Exploratory data analysis
 
 Multiple regression can be an effective technique for understanding how a response variable changes as a result of changes to more than one explanatory variable. But it is not magic -- understanding the relationships among the explanatory variables is also necessary, and will help us build a better model. This process is often called **exploratory data analysis** (EDA) and is covered in the previous tutorial on Summarizing and Visualizing Data.
 
-One quick technique for jump-starting EDA is to examine all of the pairwise scatterplots in your data. This can be achieved using the `pairs()` function. Look for variables in the `nyc` data set that are strongly correlated, as those relationships will help us check for **multicollinearity** later on.  
+One quick technique for jump-starting EDA is to examine all of the pairwise scatterplots in your data. This can be achieved using the `pairs()` function. Look for variables in the `nyc` data set that are strongly correlated, as those relationships will help us check for **multicollinearity** later on.
+
+Create a pairs-plot for `nyc`, for all variables except for `Restaurant`.
 
 
 ```{r ex1, exercise=TRUE}
@@ -170,11 +157,13 @@ One quick technique for jump-starting EDA is to examine all of the pairwise scat
 ```
 
 ```{r ex1-hint}
- The `paris()` function is helpful for looking for pairs of variables that have high correlation.
+ The `pairs()` function is helpful for looking for pairs of variables that have high correlation.
 ```
 
 ```{r ex1-solution}
-pairs(nyc)
+nyc |>
+  select(-Restaurant) |>
+  pairs()
 ```
 
 ```{r mc1}
@@ -187,19 +176,14 @@ question("Which pairs of variables appear to be strongly correlated?",
 )
 ```
 
-
 ### SLR models
-
 
 Based on your knowledge of the restaurant industry, do you think that the quality of the food in a restaurant is an important determinant of the price of a meal at that restaurant? It would be hard to imagine that it wasn't. We'll start our modeling process by plotting and fitting a model for `Price` as a function of `Food`. 
 
 On your own, interpret these coefficients and examine the fit of the model. What does the coefficient of `Food` mean in plain English? "Each additional rating point of food quality is associated with a..."
 
-
 - Use `ggplot` to make a scatter plot for `Price` as a function of `Food`. 
 - Use `lm()` to fit a simple linear regression model for `Price` as a function of `Food`.
-
-
 
 ```{r ex2, exercise=TRUE}
 # Price by Food plot
@@ -229,8 +213,6 @@ lm(Price ~ Food, data = nyc)
 
 ## Incorporating another variable
 
-
-
 ### Fifth Avenue
 
 Fifth Avenue is one the most well-known streets in the world, renowned for its flagship stores for shopping, landmark hotels, and internationally-recognized sites. A walk down 5th Avenue from Central Park to Washington Square Park would take you past the Plaza Hotel, Trump Tower, Saks Fifth Avenue, the New York Public Library, the Empire State Building, and the Flatiron building.
@@ -249,24 +231,16 @@ It would also take you past the Graduate Center of the City University of New Yo
 knitr::include_graphics("images/cuny.jpg")
 ```
 
-
-
-
 ### Dividing the City
 
-
 5th Avenue divides the island of Manhattan vertically. The city's east side has historically been home to expensive residences and opulent attractions. Maybe everything is more expensive on the East side. Maybe even food is more expensive on the east side. Do Italian restaurants located on the east side of 5th Avenue tend to charge more? How much more?
-
 
 ```{r dividing-city, out.width = '60%'}
 # https://s-media-cache-ak0.pinimg.com/originals/0e/1b/aa/0e1baaa971bf23b610077ff05d43b79c.jpg
 knitr::include_graphics("images/dividing-city.jpg")
 ```
 
-
-
 ### The price of location
-
 
 ```{r echo=TRUE}
 nyc |> 
@@ -274,16 +248,11 @@ nyc |>
   summarize(mean_price = mean(Price))
 ```
 
-
-
 It's certainly true that the average price of a meal for restaurants located on the east side of Manhattan was higher than it was for restaurants on the west side. The table above shows that they charged about $3.58 more, on average. But does this figure really represent the premium for being on the east side? Could it be the case that the restaurants on the east side also had better food, and that is what was driving the increase in price? You'll explore this question in the exercises.
-
-
 
 ### Service
 
 Another important consideration in dining out is the quality of the service. Are people willing to pay more for higher quality service, even if the food doesn't taste any better? How much more? How does the average price of meal vary with respect to the quality of the food and the service? It's up to you to figure it out.
-
 
 ```{r service, out.width = '60%'}
 # http://www.coylehospitality.com//wp-content/uploads/2011/01/3114585_thumbnail.jpg
@@ -299,7 +268,6 @@ Let's expand our model into a parallel slopes model by including the `East` vari
 * Use `lm()` to fit a parallel slopes model for `Price` as a function of `Food` and `East`. 
 * Interpret the coefficients and the fit of the model. 
 * Can you explain the meaning of the coefficient on `East` in simple terms? Did the coefficient on `Food` change from the previous model? If so, why? Did it change by a lot or just a little? 
-
 
 ```{r ex3, exercise=TRUE}
 
@@ -325,22 +293,13 @@ allow_retry=TRUE
 )
 ```
 
-
-
-
-
-
-
 ### A plane in 3D
-
 
 One reason that many people go to a restaurant - apart from the food - is that they don't have to cook or clean up. Many people appreciate the experience of being waited upon, and we can all agree that the quality of the service at restaurants varies widely. Are people willing to pay more for better restaurant `Service`? More interestingly, are they willing to pay more for better service, after controlling for the quality of the food? 
 
 Multiple regression gives us a way to reason about these questions. Fit the model with `Food` and `Service` and interpret the coefficients and fit. Did the coefficient on `Food` change from the previous model? What do the coefficients on `Food` and `Service` tell you about how these restaurants set prices? 
 
 Next, let's visually assess our model using `plotly`. The `x` and `y` vectors, as well as the `plane` matrix, have been created for you.
-
-
 
 - Use `lm()` to fit a multiple regression model for `Price` as a function of `Food` and `Service`.
 - Use `plot_ly` to draw 3D scatterplot for `Price` as a function of `Food` and `Service` by mapping the `z` variable to the response and the `x` and `y` variables to the explanatory variables. Place the food quality on the x-axis and service rating on the y-axis.
@@ -396,12 +355,7 @@ p |>
   add_surface(x = ~x, y = ~y, z = ~plane, showscale = FALSE) 
 ```
 
-
-
-
 ## Higher dimensions
-
-
 
 ### Decor
 
@@ -411,8 +365,6 @@ The last criteria for the Zagat review is decor. This refers to the visual prese
 # https://static.pexels.com/photos/3498/italian-pizza-restaurant-italy.jpg
 knitr::include_graphics("images/italian-pizza-restaurant-italy.jpg")
 ```
-
-
 
 ### Building a full model
 
@@ -432,8 +384,6 @@ In what follows, you will build more complex models for the price of a meal at a
 
 Consider for a moment what a full model that included all of these explanatory variables would look like.
 
-
-
 ### Collinearity
 
 
@@ -449,16 +399,12 @@ Here we demonstrate collinearity between Price measured in dollars and Price mea
 
 Real data hardly ever lines up perfectly, so you'll rarely have perfect collinearity. However, variables that are highly correlated will be approximately collinear. Furthermore, the collinearity does not have to be one-to-one. It might be the case that one variable is collinear with a linear combination of several other variables. This can make it much harder to figure out which variable might be appropriate to drop.
 
-
-
 ### Multicollinearity
-
 
 - Explanatory variables are highly correlated
 - Unstable coefficient estimates 
 - Doesn't affect $R^2$ 
 - Be sceptical of surprising results 
-
 
 As we add more explanatory variables to our model, it becomes more likely that we will encounter multicollinearity. A full discussion of multicollinearity and how you can work around it is beyond the scope of this tutorial, but you should be familiar with the basic problem. 
 
@@ -472,9 +418,7 @@ We have explored models that included the quality of both food and service, as w
 
 Examine the coefficients closely. Do they make sense based on what you understand about these data so far? How did the coefficients change from the previous models that you fit?
 
-
 - Use `lm()` to fit a parallel planes model for `Price` as a function of `Food`, `Service`, and `East` from the dataset `nyc`.
-
 
 ```{r ex5, exercise=TRUE}
 # Price by Food and Service and East
@@ -492,20 +436,15 @@ lm(Price ~ Food + Service + East, data = nyc)
 
 ### Interpretation of location coefficient
 
-
 The fitted coefficients from the parallel planes model are listed below.
 
 ```{r}
 lm(Price ~ Food + Service + East, data = nyc)
 ```
 
-
-
-
 Reason about the magnitude of the `East` coefficient.
 
 *Hint:* Does being on the East side increase or decrease the price of a meal?
-
 
 ```{r mc3}
 question("Which of the following statements is **FALSE**?",
@@ -516,11 +455,7 @@ question("Which of the following statements is **FALSE**?",
 )
 ```
 
-
-
-
 ### Impact of location
-
 
 The impact of location brings us to a modeling question: should we keep this variable in our model? In a later tutorial, you will learn how we can conduct formal hypothesis tests to help us answer that question. In this tutorial, we will focus on the size of the effect. Is the impact of location big or small? 
 
@@ -623,8 +558,6 @@ question("Which of the following interpretations is invalid?
 )
 ```
 
-
-
 ## Congratulations!
 
 You have successfully completed Lesson 10 in Tutorial 3: Regression modeling.  
@@ -666,7 +599,6 @@ What's next?
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
 
-
 ## Submit
 
 ```{r, echo=FALSE, context="server"}
@@ -676,4 +608,3 @@ encoder_logic()
 ```{r encode, echo=FALSE}
 learnrhash::encoder_ui(ui_before = hash_encoder_ui)
 ```
-
