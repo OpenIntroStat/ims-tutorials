@@ -734,18 +734,10 @@ Next we'll visualize the relationship between two numerical variables from the `
 
 Recall that in the `ggplot()` function, the first argument is the dataset, then we map the aesthetic features of the plot to variables in the dataset, and finally the `geom_XXX()` layer informs how data are represented on the plot.
 
-Next, we will make a scatterplot by adding a `geom_point()` layer to the `ggplot()` call.
+Then, we will make a scatterplot by adding a `geom_point()` layer to the `ggplot()` call.
 
 - Create a scatterplot of number of exclamation points (`exclaim_mess`) on the y-axis vs. number of characters (`num_char`) on the x-axis.
 - Color points by whether or not the email is `spam`.
-
-Note that when you first make the plot, you will see a color gradient in place 
-of where you expected to see a legend like before. This gradient appears because
-`spam` is stored as a numerical variable (0 = no, 1 = yes). But, we want to use
-it as a categorical variable in this plot. To do this we can force R to think of
-`spam` as a factor, by temporarily converting it to a factor inside the `ggplot`. 
-To do this we insert the name of the variable we want to convert to a factor 
-(`spam`) into the the `factor()` function (e.g. `factor(spam)`). 
 
 ```{r email50-plot, exercise=TRUE}
 ggplot(email50, aes(x = ___, y = ___, color = ___)) +
@@ -763,12 +755,12 @@ ggplot(email50, aes(x = num_char, y = exclaim_mess, color = ___)) +
 ```
 
 ```{r email50-plot-hint-3}
-ggplot(email50, aes(x = num_char, y = exclaim_mess, color = factor(spam))) +
+ggplot(email50, aes(x = num_char, y = exclaim_mess, color = spam)) +
   {GEOM}
 ```
 
 ```{r email50-plot-solution}
-ggplot(email50, aes(x = num_char, y = exclaim_mess, color = factor(spam))) +
+ggplot(email50, aes(x = num_char, y = exclaim_mess, color = spam)) +
   geom_point()
 ```
 
