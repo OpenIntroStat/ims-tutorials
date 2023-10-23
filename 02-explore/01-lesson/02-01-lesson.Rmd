@@ -524,7 +524,6 @@ comics |>
       columns = vars(Bad),
       rows = Bad >= .20)
   )
-
 ```
 
 In the table, we see that the single largest category are characters that are bad and secret at about 29% of characters.
