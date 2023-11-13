@@ -148,7 +148,7 @@ knitr::include_graphics("images/4-1-2.png")
 
 ### Benford’s Law A.K.A. "the first digit law"
 
-Benford's Law appears when looking at broad collections of numbers, and paying attention to only to the first digit of each number. For example, consider the populations of every country on earth. This demographic data lives inside the gapminder package. We can restrict out attention to data from two thousand and seven and select off the country name and population variables. Now Benford's Law is only concerned with the first digit, so here we see that that Afghanistan, Albania, and Algeria all start with three, Angola starts with one, and so on. If we do this for all one hundred and forty two countries in this data set and visualize the distribution in a bar chart, what do you think it would look like? Would it be uniform?
+Benford's Law appears when looking at broad collections of numbers, and paying attention to only to the first digit of each number. For example, consider the populations of every country on earth. This demographic data lives inside the gapminder package. We can restrict our attention to data from two thousand and seven and select off the country name and population variables. Now Benford's Law is only concerned with the first digit, so here we see that that Afghanistan, Albania, and Algeria all start with three, Angola starts with one, and so on. If we do this for all one hundred and forty two countries in this data set and visualize the distribution in a bar chart, what do you think it would look like? Would it be uniform?
 
 ```{r out.width = "60%"}
 knitr::include_graphics("images/ch4v1-bar-plot-benford.png")
