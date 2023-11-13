@@ -1102,15 +1102,7 @@ null |>
   pull(two_tailed_pval)
 ```
 
-
-### Interpreting the test
-
-What is your conclusion regarding the association between sex and support for the death penalty? Recall that this code calculates the p-value:
-```{r eval=FALSE}
-# Compute two-tailed p-value
-null |>
-  summarize(pval = 2 * mean(stat <= d_hat))
-```
+Based on the p-value you obtained in the previous exercise, what is your conclusion regarding the association between sex and support for the death penalty? Recall that this code calculates the p-value:
 
 *Hint:* Recall that the null hypothesis you are testing is that there is no association between `cappun` and `sex`.
 
@@ -1139,6 +1131,7 @@ p_hats <- gss2016 |>
 
 # Compute difference in proportions
 d_hat <- diff(p_hats)
+
 # Visualize null
 ggplot(null, aes(x = stat)) +
   geom_density() +
