@@ -579,7 +579,7 @@ ggplot(boot_dist_consci, aes(x = ___)) +
   ___
 ```
 
-```{r ex6-hint, exercise=TRUE}
+```{r ex6-hint}
 ggplot(boot_dist_consci, aes(x = ___)) +
   geom_density()
 ```
