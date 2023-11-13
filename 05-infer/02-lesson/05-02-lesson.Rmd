@@ -124,7 +124,7 @@ knitr::include_graphics("images/2-1-1.png")
 
 ### 
 
-It captures how much uncertainty you have in your estimate. The more data that your estimate is based upon, the narrower this distribution and the confidence interval become.
+It captures how much uncertainty you have in your estimate. The more data that your estimate is based upon (i.e., the larger the sample size), the narrower this distribution and the confidence interval become.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-2.png")
