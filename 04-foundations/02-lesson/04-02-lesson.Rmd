@@ -1142,7 +1142,7 @@ This function has three arguments (inputs):
 2. the observed statistic (`obs_stat`) 
 3. the direction of the alternative hypothesis ("greater", "less", or "two-sided")
 
-We can also use the `visualize()` function to visualize where the observed statistic falls in the distribution of permuted statsitics, and shade the direction that the p-value was calculated from. 
+We can also use the `visualize()` function to visualize where the observed statistic falls in the distribution of permuted statistics, and shade the direction that the p-value was calculated from. 
 The `visualize()` function has many inputs (find out more by typing `?visualize` in your console), but the most important ones are the __same__ as the `get_p_value()` function!  
 
 Now, use the `visualize()` and `get_p_value()` functions for the original, small, and big datasets. 
