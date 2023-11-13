@@ -977,7 +977,7 @@ SE_small_n
 
 Now repeat the process of generating the bootstrap distribution for `gss2016_smaller` and save it to `boot_dist_smaller_n`. *Save yourself some time by copying and pasting the previous code block and swapping the dataset name.*
 
-```{r}
+```{r ex11-setup}
 set.seed(47)
 ```
 
