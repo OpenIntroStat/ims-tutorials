@@ -1077,7 +1077,7 @@ knitr::include_graphics("images/4-3-4.png")
 ```
 
 
-If we're comfortable with establishing election fraud by using Benford's law, then this analysis serves as evidence of fraud in the Iranian election, but before you embrace that real life conclusion, let's take a moment and think through a good sanity check. One way to check the viability of assessing electoral fraud using Benford's law is to look to an election that you think to be fair and run the same analysis.
+If we're comfortable with establishing election fraud by using Benford's law, then this analysis serves as evidence of fraud in the Iranian election, but before you embrace that real life conclusion, let's take a moment and think through a good sanity check. One way to check the viability of assessing electoral fraud using Benford's law is to look at an election that you think to be fair and run the same analysis.
 
 
 
