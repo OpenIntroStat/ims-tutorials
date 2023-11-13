@@ -636,7 +636,7 @@ Let $p$ be the proportion that believe in life after death.
 
 There are plenty of more pressing questions that just beg to be asked of this data, but they require that we look at more than just a single variable. We're curious to know: do men and women believe at different rates? 
 
-Let's let p be the true proportion that believe in life after death. 
+Let p be the true proportion of individuals who believe in life after death. 
 
 We can then phrase this question as the null hypothesis that the difference in the proportion of men that believe and the proportion of women that believe is zero. 
 
