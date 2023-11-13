@@ -114,7 +114,7 @@ encoder_logic <- function(strip_output = FALSE) {
 }
 
 hash_encoder_ui <- {
-  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", textInput("name", "What's your name?"), textInput("studentID", "What is your student ID?"), renderText({
+  shiny::div("If you have completed this tutorial and are happy with all of your", "solutions, please enter your identifying information, then click the button below to generate your hash", shiny::textInput("name", "What's your name?"), shiny::textInput("studentID", "What is your student ID?"), shiny::renderText({
     input$caption
   }), )
 }
@@ -122,7 +122,7 @@ hash_encoder_ui <- {
 
 ## Comparing many parameters: goodness of fit
 
-The tutorial wraps up with two case studies using election data. Here, you'll learn how to use a Chi-squared test to check goodness-of-fit. You'll study election results from Iran and Iowa and test if Benford's law applies to these datasets.
+The tutorial wraps up with two case studies using election data. Here, you'll learn how to use a Chi-squared test to check goodness-of-fit. You'll study election results from Iran and Iowa and test if Benford's Law applies to these datasets.
 
 ## Case study: election fraud
 
@@ -197,7 +197,7 @@ iran |>
 
 ###  
 
-In the following exercises, you'll have the chance to get your hands into this real election data and use Benford's law to evaluate the claim of voter fraud.
+In the following exercises, you'll have the chance to get your hands into this real election data and use Benford's Law to evaluate the claim of voter fraud.
 
 ### Getting to know the Iran data
 
@@ -750,33 +750,25 @@ chisq.test(tab, p = p_uniform)$stat
 
 Let's walk through an example with the gss data of using the Chi-squared to assess the goodness of fit. Here's the distribution of the party variable, a simple bar chart with three categories. Say we'd like to assess the distance between this distribution and the uniform distribution where each party is the same size. I've added a gold line to indicate what the bar heights would be if this was uniform. The first step in computing the chi-squared statistic is making a table  of the counts in the bar chart. Once we have that table of counts, we need to describe the uniform distribution as a named vector of three probabilities , each one being 1/3. With those two components, we can use the built-in chisq-dot-test function to calculate the chi-squared distance, which we find is about 15-point-8. The next question is: is this a big distance? That's a question for a hypothesis test, which at this point you have a lot of experience with. You can get a sense of the sort of data you would see under null hypothesis that the distribution is uniform by
 
-
 ### Simulating the null
-
-
 
 ```{r }
 gss2016 |>
   specify(response = party) |>
   hypothesize(null = "point", p = p_uniform) |>
-  generate(reps = 1, type = "simulate")
+  generate(reps = 1, type = "draw")
 ```
-
-
 
 simulating a single sample. Let's walk through how this code works. You take the gss 2016 dataset, specify that the variable you're interested in is "party", then hypothesize a null determined by the vector of probabilities corresponding to the uniform distribution. Since you're giving specific parameter values, this is called a "point" null hypothesis. That allows us to generate a single data set through simulation - essentially flipping many three-sided coins where each face is "D", "I", or "R". This yields a new data set under the null hypothesis. 
 I'd like to visualize this data, so we'll go ahead and save it to sim_1, then construct a bar plot.
 
-
-
 ### 
-
 
 ```{r }
 sim_1 <- gss2016 |>
    specify(response = party) |>
    hypothesize(null ="point",p = p_uniform) |>
-   generate(reps = 1, type = "simulate")
+   generate(reps = 1, type = "draw")
 ```
 
 ```{r }
@@ -788,8 +780,6 @@ ggplot(sim_1, aes(x = party)) +
 knitr::include_graphics("images/4-2-21.png")
 ```
 
-
-
 This one looks much closer to the uniform distribution, and we'd expect that the chi-squared distance is quite a bit less than 15-point-8. What we need to do next is repeat this many times to build up a null distribution of chi-squared statistics.
 
 ###  
@@ -797,7 +787,6 @@ This one looks much closer to the uniform distribution, and we'd expect that the
 So let's jump into the exercises and port this idea of a goodness of fit hypothesis test using the chi-squared back to your case study of evaluating Benford's Law's ability to describe voting data.
 
 ### Goodness of fit test
-
 
 The null hypothesis in a goodness of fit test is a list of specific parameter values for each proportion. In your analysis, the equivalent hypothesis is that Benford's Law applies to the distribution of first digits of total vote counts at the city level. You could write this as:
 
@@ -809,11 +798,9 @@ Where $p_1$ is the height of the first bar in the Benford's bar plot. The altern
 
 In this exercise, you'll use simulation to build up the null distribution of the sorts of chi-squared statistics that you'd observe if in fact these counts did follow Benford's Law.
 
-
 - Inspect `p_benford` by printing it to the screen.
-- Starting with `iran`, compute the chi-squared statistic by using `chisq_stat`. Note that you must specify the variable in the data frame that will serve as your response as well as the vector of probabilities that you wish to compare them to.
+- Starting with `iran`, compute the chi-squared statistic by using `observe()`. Note that you must specify the variable in the data frame that will serve as your response as well as the vector of probabilities that you wish to compare them to.
 - Construct a null distribution with 500 samples of the `Chisq` statistic via simulation under the `point` null hypothesis that the vector of proportions `p` is `p_benford`. Save the resulting statistics as `null`.
-
 
 ```{r message=FALSE, warning=FALSE}
 #p_benford <- 1:9 |> setNames(log10(1 + 1 / .), .)
@@ -832,14 +819,13 @@ iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
 ```
 
-
 ```{r ex6, exercise=TRUE}
 # Inspect p_benford
 p_benford
 
 # Compute observed stat
 chi_obs_stat <- ___
-  chisq_stat(response = ___, p = ___)
+  observe(response = ___, stat = ___, p = ___)
 
 # Form null distribution
 null <- ___
@@ -866,7 +852,7 @@ p_benford
 
 # Compute observed stat
 chi_obs_stat <- iran |>
-  chisq_stat(response = first_digit, p = p_benford)
+   observe(response = first_digit, stat = "Chisq", p = p_benford)
 
 # Form null distribution
 null <- iran |>
@@ -875,21 +861,16 @@ null <- iran |>
   # Set up the null hypothesis
   hypothesize(null = "point", p = p_benford) |>
   # Generate 500 reps
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   # Calculate statistics
   calculate(stat = "Chisq")
 ```
 
-
-
-
 ### A p-value, two ways
-
 
 You've seen before how there are usually two ways to get to the null distribution: through computation and through a mathematical approximation. The chi-squared goodness of fit test is no exception. The approximation distribution is again the "Chi-squared distribution" with degrees of freedom equal to the number of categories minus one.
 
 In this exercise you'll compare these two approaches to calculate a p-value that measures the consistency of the distribution of the Iran first digits with Benford's Law. Note that the observed statistic that you created in the last exercise is saved in your work space as `chi_obs_stat`.
-
 
 ```{r message=FALSE, warning=FALSE}
 set.seed(123)
@@ -913,20 +894,13 @@ tab <- iran |>
 null <- iran |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   calculate(stat = "Chisq")
 chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 ```
 
-
-
-
-
 - Compute the degrees of freedom of the chi-squared approximation by taking the `first_digit` vector from the `iran` data then calculating the number of categories using the `nlevels()` function then subtracting one.
 - Using `null`, plot the distribution of the chi-squared statistics using a density plot. Add a vertical line indicating the observed statistic, then overlay the curve of the chi-squared approximation with the degrees of freedom in blue.
-
-
-
 
 ```{r ex7, exercise=TRUE}
 # Compute degrees of freedom
@@ -970,12 +944,19 @@ ggplot(null, aes(x = stat)) +
   stat_function(fun = dchisq, args = list(df = degrees_of_freedom), color = "blue")
 ```
 
-
-
 - Compute the permutation p-value by summarizing the statistics with the proportion that are greater than the observed statistic.
 - Compute the approximation p-value using the `pchisq()` function. Recall that this will return the area under the curve to the *left* of the observed value, so you'll need to modify it to return the *right* tail.
 
+```{r ex8-setup, include = FALSE}
+iran <- iran |>
+  mutate(first_digit = get_first(total_votes_cast))
 
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
+
+chi_obs_stat <- iran |>
+  observe(response = first_digit, p = p_benford, stat = "Chisq") |>
+  pull()
+```
 
 ```{r ex8, exercise=TRUE}
 # From previous step
@@ -992,11 +973,9 @@ ___
 ```
 
 ```{r ex8-hint}
- 
 - The `mean()` function, when applied to a TRUE/FALSE operation (such as `obj_1 >= obj_2`), will yield a proportion.
 - Use `pchisq()` with the observed chi-squared stat and the calculated degrees of freedom, setting `lower.tail` to `FALSE` to find the area under the right tail.
 ```
-
 
 ```{r ex8-solution}
 # From previous step
@@ -1012,28 +991,22 @@ null |>
 pchisq(chi_obs_stat, df = degrees_of_freedom, lower.tail = FALSE)
 ```
 
-
-
 ### Is this evidence of fraud?
 
-*Hint:* Remember, the null hypothesis you're testing is that Benford's law describes the distribution of first digits in vote totals for the 2009 Iranian election.
+*Hint:* Remember, the null hypothesis you're testing is that Benford's Law describes the distribution of first digits in vote totals for the 2009 Iranian election.
 
 ```{r mc2, echo=FALSE}
 question("Based on your p-value of approximately 0.006, which of the following statements is FALSE?",
   answer("If the null hypothesis is true, the probability of observing a test statistic more extreme than the observed statistic is 0.006.", message = "Nope, this one is true. This is the definition of a p-value."),
-  answer("This data is consistent with a model in which Benford's law applies to vote totals from the 2009 Iranian election.", correct = TRUE, message = "Bingo! The low p-value suggests this data is inconsistent with the proportions expected by Benford's Law."),
-  answer("Benford's law has been suggested to apply to first digit counts from fair elections.", message = "Nope. Benford's Law has indeed been used for this purpose."),
+  answer("This data is consistent with a model in which Benford's Law applies to vote totals from the 2009 Iranian election.", correct = TRUE, message = "Bingo! The low p-value suggests this data is inconsistent with the proportions expected by Benford's Law."),
   answer("The p-value is a measure of the consistency between a data set and a particular hypothesis.", message = "Incorrect. This is a valid interpretation of a p-value."),
   allow_retry = TRUE
 )
 ```
 
-
 ## And now to US
 
-The goodness of fit test that you just conducted used as the null hypothesis that the first digits in the voting data were drawn from the digit distribution specified by Benford's law.
-
-
+The goodness of fit test that you just conducted used as the null hypothesis that the first digits in the voting data were drawn from the digit distribution specified by Benford's Law.
 
 ### Iran election fraud
 
@@ -1041,11 +1014,7 @@ The goodness of fit test that you just conducted used as the null hypothesis tha
 knitr::include_graphics("images/4-3-1.png")
 ```
 
-
-
 This corresponds to the notion that the 2009 presidential election in Iran was fair.
-
-
 
 ### 
 
@@ -1053,10 +1022,7 @@ This corresponds to the notion that the 2009 presidential election in Iran was f
 knitr::include_graphics("images/4-3-2.png")
 ```
 
-
-The alternative hypothesis was that the election was fraudulent, that Benford's law does not describe this voting data well.
-
-
+The alternative hypothesis was that the election was fraudulent, that Benford's Law does not describe this voting data well.
 
 ### 
 
@@ -1064,11 +1030,7 @@ The alternative hypothesis was that the election was fraudulent, that Benford's 
 knitr::include_graphics("images/4-3-3.png")
 ```
 
-
-
-Our results are well summarized by looking at the null distribution of the chi squared statistic either under a simulation or using the mathematical approximation. The two methods give a very similar answer, that the chi squared distance that we actually observed indicated by the vertical line is very unlikely if indeed Benford's law does hold.
-
-
+Our results are well summarized by looking at the null distribution of the chi squared statistic either under a simulation or using the mathematical approximation. The two methods give a very similar answer, that the chi squared distance that we actually observed indicated by the vertical line is very unlikely if indeed Benford's Law does hold.
 
 ### 
 
@@ -1076,22 +1038,15 @@ Our results are well summarized by looking at the null distribution of the chi s
 knitr::include_graphics("images/4-3-4.png")
 ```
 
-
-If we're comfortable with establishing election fraud by using Benford's law, then this analysis serves as evidence of fraud in the Iranian election, but before you embrace that real life conclusion, let's take a moment and think through a good sanity check. One way to check the viability of assessing electoral fraud using Benford's law is to look at an election that you think to be fair and run the same analysis.
-
-
+If we're comfortable with establishing election fraud by using Benford's Law, then this analysis serves as evidence of fraud in the Iranian election, but before you embrace that real life conclusion, let's take a moment and think through a good sanity check. One way to check the viability of assessing electoral fraud using Benford's Law is to look at an election that you think to be fair and run the same analysis.
 
 ### U.S.A. 2016 election
-
-
 
 $H\_{0}:$ the election was fair (Benford’s Law holds)
 
 $H\_{A}:$ the election was fraudulent (Benford’s Law does not hold)
 
-
-For that, let's turn to the voting data from the US presidential election of 2016 where the two primary party candidates were Donald Trump and Hilary Clinton. You'll use the same hypotheses and the same analytical approach, extracting first digits and seeing how well they conform to Benford's law. While you could consider this analysis at many different scales, let's focus in on a single state, Iowa.
-
+For that, let's turn to the voting data from the US presidential election of 2016 where the two primary party candidates were Donald Trump and Hilary Clinton. You'll use the same hypotheses and the same analytical approach, extracting first digits and seeing how well they conform to Benford's Law. While you could consider this analysis at many different scales, let's focus in on a single state, Iowa.
 
 ### Iowa vote totals
 
@@ -1099,20 +1054,14 @@ For that, let's turn to the voting data from the US presidential election of 201
 knitr::include_graphics("images/Iowa_in_United_States.svg")
 ```
 
-
-
 In the following exercises, you'll be working with the Iowa dataset.
 By TUBS [CC BY SA 3.0], from Wikimedia Commons
 
-
 ### 
-
-
 
 ```{r message=FALSE}
 iowa
 ```
-
 
 In substance, it contains the same vote total information as the Iran dataset, but form is a bit different.
 
@@ -1136,14 +1085,11 @@ question("Determine which of the following statements is FALSE",
 )
 ```
 
-
 ### Extracting the first digit II
-
 
 There are different levels at which we could consider looking at vote totals. We could look at precincts, or counties, or states, and each level might give us a slightly different picture of what's going on.
 
 For this analysis, look at totals at the *county* level in Iowa and focus on the votes for the two major party candidates: Republicans Trump / Pence and Democrats Clinton / Kaine.
-
 
 ```{r message=FALSE}
 get_first <- function(x) {
@@ -1157,11 +1103,7 @@ get_first <- function(x) {
 }
 ```
 
-
-
-
 Using the `iowa` data set, filter the rows so they contain only the two main party candidates, then group based on `county` and add up the votes to create a new column called `dem_rep_votes`. Save the resulting data frame to `iowa_county`.
-
 
 ```{r ex9, exercise=TRUE}
 # Get Iowa county vote totals
@@ -1318,12 +1260,7 @@ iowa_county <- iowa_county |>
   mutate(first_digit = get_first(dem_rep_votes))
 ```
 
-
-
-
-Starting with `iowa_county`, compute the observed chi-squared statistic using `chisq_stat()`.
-
-
+Starting with `iowa_county`, compute the observed chi-squared statistic using `observe()`.
 
 ```{r ex12, exercise=TRUE}
 # Compute observed stat
@@ -1332,21 +1269,16 @@ chi_obs_stat <- ___ |>
 ```
 
 ```{r ex12-hint}
- The two argument required of the `chisq_stat()` function are the `response` variable and vector of probabilities, `p`, which are already saved to your workspace as `p_benford.`
+The three argument required of the `observe()` function are the `response` variable, the `stat`istic of interest, and vector of probabilities, `p`, which are already saved to your workspace as `p_benford.`
 ```
 
 ```{r ex12-solution}
 # Compute observed stat
 chi_obs_stat <- iowa_county |>
-  chisq_stat(response = first_digit, p = p_benford)
+  observe(response = first_digit, stat = "Chisq", p = p_benford)
 ```
 
-
-
-
-
 Form the null distribution of chi-squared statistics via simulation under the point null hypothesis that these data come from the probabilities specified by Benford's Law. Save this distribution to `null`.
-
 
 ```{r ex13, exercise=TRUE}
 # Form null distribution
@@ -1362,7 +1294,7 @@ null <- ___
 ```
 
 ```{r ex13-hint}
- The data here is generated by `"simulate"`-ing from a ``"point"`` null hypothesis where `p = p_benford`.
+ The data here is generated by `"draw"`-ing from a ``"point"`` null hypothesis where `p = p_benford`.
 ```
 
 ```{r ex13-solution}
@@ -1373,7 +1305,7 @@ null <- iowa_county |>
   # Set up null
   hypothesize(null = "point", p = p_benford) |>
   # Generate 500 reps
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   # Calculate statistics
   calculate(stat = "Chisq")
 ```
@@ -1389,11 +1321,11 @@ Construct a density plot of the distribution of the `null` statistics and add a 
 ```{r ex14, exercise=TRUE}
 # From previous steps
 chi_obs_stat <- iowa_county |>
-  chisq_stat(response = first_digit, p = p_benford)
+  observe(response = first_digit, stat = "Chisq", p = p_benford)
 null <- iowa_county |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   calculate(stat = "Chisq")
 
 # Visualize null stat
@@ -1411,11 +1343,11 @@ ___
 ```{r ex14-solution}
 # From previous steps
 chi_obs_stat <- iowa_county |>
-  chisq_stat(response = first_digit, p = p_benford)
+  observe(response = first_digit, stat = "Chisq", p = p_benford)
 null <- iowa_county |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   calculate(stat = "Chisq")
 
 # Visualize null stat
@@ -1437,7 +1369,7 @@ question("Based on the null distribution that you constructed in the last exerci
   answer("Because the observed statistic is far into the tails of the null distribution, this indicates that your data is inconsistent with the null hypothesis that Benford's Law applies to vote totals in Iowa."),
   answer("The high p-value indicates a high probability that that our null hypothesis (that Benford's Law applies to vote totals in Iowa) is true.", correct = TRUE, message = "Bingo! Not only was the p-value not high, this is also an invalid interpretation of a p-value. It is *never* the probability that the null is true."),
   allow_retry = TRUE,
-  incorrect = "Remember, the null hypothesis is that Benford's law describes the distribution of the first digits in this data set."
+  incorrect = "Remember, the null hypothesis is that Benford's Law describes the distribution of the first digits in this data set."
 )
 ```
 
@@ -1471,29 +1403,21 @@ chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 null <- iowa |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>
-  generate(reps = 500, type = "simulate") |>
+  generate(reps = 500, type = "draw") |>
   calculate(stat = "Chisq")
 ```
 
-
 ## Election fraud in Iran and Iowa: debrief
-
 
 OK, at this point, you're probably thinking: wait, what?
 
-
 ### Iowa election fraud
-
 
 ```{r out.width = "60%"}
 knitr::include_graphics("images/4-4-1.png")
 ```
 
-
-
 Were officials in Iowa really altering vote totals?!
-
-
 
 ### 
 
@@ -1501,10 +1425,7 @@ Were officials in Iowa really altering vote totals?!
 knitr::include_graphics("images/4-4-2.png")
 ```
 
-
-
 Political scientists and election observers assure us that the answer to this question is: no. The 2016 presidential election was largely free of this sort of election fraud.
-
 
 ### 
 
@@ -1512,10 +1433,7 @@ Political scientists and election observers assure us that the answer to this qu
 knitr::include_graphics("images/4-4-3.png")
 ```
 
-
-
 So what happened? Why did your hypothesis test give you the wrong answer?
-
 
 ### What went wrong?
 
@@ -1523,11 +1441,7 @@ So what happened? Why did your hypothesis test give you the wrong answer?
 knitr::include_graphics("images/4-4-5.png")
 ```
 
-
-
 One possibility that you should always consider when you reject the null hypothesis is the possibility that you have made a Type I error, that is, rejecting the null hypothesis when it is true.
-
-
 
 ### 
 
@@ -1535,11 +1449,7 @@ One possibility that you should always consider when you reject the null hypothe
 knitr::include_graphics("images/4-4-6.png")
 ```
 
-
-
 If your test is performing properly, you know exactly the probability of this event, in fact you get to set it: it's your threshold for rejecting the null hypothesis, which we commonly set to 5%.
-
-
 
 ### 
 
@@ -1547,10 +1457,7 @@ If your test is performing properly, you know exactly the probability of this ev
 knitr::include_graphics("images/4-4-7.png")
 ```
 
-
 So you may have made a Type I error but a more fundamental issue might be at work here. To be very precise, you tested the hypothesis that the first digit distribution from Benford's Law is a good fit to the first digit distribution of your data.
-
-
 
 ### 
 
@@ -1558,9 +1465,7 @@ So you may have made a Type I error but a more fundamental issue might be at wor
 knitr::include_graphics("images/4-4-8.png")
 ```
 
-
 What if Benford's Law doesn't actually apply to this sort of data even when it's a free and fair election? To get that nicely shaped decaying distribution of first digits, the counts need to span many orders of magnitude and be uniformly distributed in their logarithms.
-
 
 ### 
 
@@ -1568,11 +1473,7 @@ What if Benford's Law doesn't actually apply to this sort of data even when it's
 knitr::include_graphics("images/4-4-9.png")
 ```
 
-
-
 Certain phenomena like populations of world cities fit these criteria and are a good fit for Benford's Law. But it's not clear that vote totals are a good fit for this distribution.
-
-
 
 ### Take-home lesson
 
@@ -1580,20 +1481,16 @@ Certain phenomena like populations of world cities fit these criteria and are a 
 knitr::include_graphics("images/Iowa_in_United_States.svg")
 ```
 
-
 The statistical tool must be appropriate for the task.
 
 ```{r out.width = "60%"}
 knitr::include_graphics("images/Iran_orthographic_projection.svg")
 ```
 
-
-
 This is an important lesson: you need to be certain of the appropriateness of a particular analytical method to the context of the data that you're studying before you put much weight in the result. When in doubt, one solution is to do as you've done here: do a sanity check with an analysis where you know the correct answer. In this case, your Iowa analysis should make you skeptical of the Iran analysis. Of course, there may be other, more convincing sources of evidence that the 2009 Iran Election was fraudulent, but this particular analysis, based on Benford's Law, can't really tell us much either way.
 
 - By TUBS [CC BY-SA 3.0], from Wikimedia Commons
 - By P30Carl [GFDL] or [CC BY-SA 3.0], from Wikimedia Commons
-
 
 ### Methods for categorical data
 
@@ -1615,18 +1512,13 @@ Alright, that's it, let's wrap up this tutorial. In case you've lost track, you'
 
 That might seem like a long list to remember, but really all you need to internalize are these steps every test follows:
 
-
-
 ### 
 
 ```{r out.width = "60%"}
 knitr::include_graphics("images/4-4-11.png")
 ```
 
-
 You specify the variable or variables of interest,
-
-
 
 ### 
 
@@ -1634,11 +1526,7 @@ You specify the variable or variables of interest,
 knitr::include_graphics("images/4-4-12.png")
 ```
 
-
-
 you propose your null hypothesis,
-
-
 
 ### 
 
@@ -1646,10 +1534,7 @@ you propose your null hypothesis,
 knitr::include_graphics("images/4-4-13.png")
 ```
 
-
-
 you generate data sets that would appear in a world where that hypothesis is true,
-
 
 ### 
 
@@ -1657,11 +1542,7 @@ you generate data sets that would appear in a world where that hypothesis is tru
 knitr::include_graphics("images/4-4-14.png")
 ```
 
-
-
 then you calculate an appropriate test statistic for each one of those data sets.
-
-
 
 ### 
 
@@ -1669,11 +1550,7 @@ then you calculate an appropriate test statistic for each one of those data sets
 knitr::include_graphics("images/4-4-15.png")
 ```
 
-
-
 The final step is to simply assess the distribution of these null statistics and see if the statistic that you actually observed is consistent or inconsistent with it.
-
-
 
 ## Congratulations!
 
@@ -1703,9 +1580,6 @@ What's next?
 `r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
-
-
-
 
 ## Submit
 
