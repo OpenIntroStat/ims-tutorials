@@ -148,7 +148,7 @@ ggplot(gss2016, aes(x = party, fill = natarms)) +
 ```
 
 
-We can construct that by putting party on the x-axis and fill the bars using natarms. To make it easy to compare proportions, we can add the position equals "fill" option. If we look at the two major parties, we learn that a much larger proportion of Republicans than Democrats think we spend too little on the military.
+We can construct that by putting party on the x-axis and filling the bars using natarms. To make it easy to compare proportions, we can add the position equals "fill" option. If we look at the two major parties, we learn that a much larger proportion of Republicans than Democrats think we spend too little on the military.
 
 This also jumps out. It appears that all people who listed "O" or "Other" think that spending is just about right. Can this be correct? Just how many people are in this other group?
 
