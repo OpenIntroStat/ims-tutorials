@@ -42,6 +42,14 @@ gss2016 <- read_rds("data/gss-sampled-2016.rds") |>
   filter(party != "Oth") |>
   droplevels()
 
+# custom function –-------------------------------------------------------------
+
+get_first <- function(x) {
+    substr(as.character(x), 1, 1) |>
+      as.numeric() |>
+      as.factor()
+}
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -214,7 +222,6 @@ question("Which of the following is FALSE regarding the `iran` data set?",
 The `iran` data set contains *all* of the votes cast in this election, meaning that you can find the victor by computing the total number of votes for each candidate. In addition to answering the question of who won nationwide, you can also see how the results differed by province.
 
 Along the way, you'll use a very useful function called `gather()`. This allows you to reshape your dataframe by taking information stored in variable names and moving it to live in its own column.
-
 
 ```{r message=FALSE}
 get_first <- function(x) {
