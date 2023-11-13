@@ -190,49 +190,11 @@ Here we see that there was only one person that listed other and that person tho
 
 It's very common to run across data presented in a table like this. It's a fine format for displaying data but it's awkward for analyzing data because the rows don't represent observations of data, they represent levels of a variable.
 
-
-
-### 
-
+To see the same counts, but in a data frame format, use `count()`:
 
 ```{r}
-tab <- gss2016 |>
-  select(natarms, party) |>
-  table()
-tab
-```
-
-
-
-```{r}
-tab |>
-  tidy()
-```
-
-
-
-To transform a contingency table back into a data frame, send it to the tidy function which reorganizes it so the variables are all across the columns. Note though, that the rows are still the aggregates counts for each group. To extend the set to the original dataset where each row is an individual person, we need to uncount this data frame.
-
-OK, now we're back to our original data frame, so we've gone from tidy to table and back again.
-
-
-
-### 
-
-
-
-```{r}
-tab <- gss2016 |>
-  select(natarms, party) |>
-  table()
-tab
-```
-
-
-```{r}
-tab |>
-  tidy() |>
-  uncount(n)
+gss2016 |>
+  count(party, natarms)
 ```
 
 ### Politics and Space
@@ -355,7 +317,6 @@ ___ <- ___
 ```
 
 ```{r ex4-hint}
- 
 - Select the `natspac` and `party` columns.
 - Call `table()` without arguments to make a contingency table.
 ```
@@ -367,44 +328,6 @@ Obs <- gss_party |>
   select(natspac, party) |>
   # Create table
   table()
-```
-
-
-
-Starting with your observed contingency table `Obs`, convert it to a tidy data frame and expand the counts.
-
-
-
-```{r ex5, exercise=TRUE}
-# From previous step
-Obs <- gss_party |>
-  select(natspac, party) |>
-  table()
-  
-# Convert table back to tidy df
-___
-  # Tidy the table
-  ___
-  # Expand out the counts
-  ___
-```
-
-```{r ex5-hint}
- Call `tidy()`, then find the name of the column that will provide the counts that you will `uncount()`.
-```
-
-```{r ex5-solution}
-# From previous step
-Obs <- gss_party |>
-  select(natspac, party) |>
-  table()
-  
-# Convert table back to tidy df
-Obs |>
-  # Tidy the table
-  tidy() |>
-  # Expand out the counts
-  uncount(n)
 ```
 
 ## Chi-squared test statistic
@@ -582,12 +505,7 @@ ggplot(perm_1, aes(x = party, fill = natarms)) +
   geom_bar()
 ```
 
-
-
-
-
 Calculate the chi-squared test statistic associated with by running the `gss_party` data through the `chisq_stat()` function and specifying the variables using the formula notation as you did in `specify()`.
-
 
 ```{r ex8, exercise=TRUE}
 # Compute chi-squared stat
