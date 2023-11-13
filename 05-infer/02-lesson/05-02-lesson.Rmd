@@ -712,7 +712,7 @@ Now to answer the question of whether this statistic is consistent with the null
 
 It's helpful to realize that we can restate in null hypothesis as "There is no association between belief in the afterlife and the sex of a subject." 
 
-We could also phrase it as "The variable postlife is independent from the variable sex." Well, if there truly is no association between our two variables, we should be able generate more data simply by shuffling or permuting the data.
+We could also phrase it as "The variable postlife is independent from the variable sex." Well, if there truly is no association between our two variables, we should be able to generate more data simply by shuffling or permuting the data.
 
 
 
