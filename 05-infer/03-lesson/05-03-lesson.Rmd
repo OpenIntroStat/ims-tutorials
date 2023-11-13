@@ -475,7 +475,7 @@ observed_counts
 table(gss_party$natspac, gss_party$party)
 ```
 
-What we'd like is a table of the counts that we could expect if these two variables were independent from one another. It's tempting to think that the counts of all cells should be equal, but keep in mind we have to respect the marginal distributions of both variables. For example, we need to be sure we're still expecting that there are more independents in our data set than republicans. Computing these expected counts while respecting the marginal distributions is a bit tedious, so we'll be relying upon R for this calculation. 
+What we'd like is a table of the counts that we could expect if these two variables were independent from one another. It's tempting to think that the counts of all cells in the table should be equal, but keep in mind we have to respect the marginal distributions of both variables. For example, we need to be sure we're still expecting that there are more independents in our data set than republicans. Computing these expected counts while respecting the marginal distributions is a bit tedious, so we'll be relying upon R for this calculation. 
 This is the appropriate table of expected counts if the variables were independent of one another, we'll call it "expected_counts". The question is, how can we summarize the difference between the expected table and the observed table in just a single number?
 
 ```{r eval=FALSE}
@@ -505,7 +505,7 @@ sum((observed_counts - expected_counts) ^ 2)
 sum((x$observed - x$expected)^2)
 ``` 
 
-One option would be to simply find the difference in the counts in each cell and add them all up. That does result in a single number, but realize that the positive differences and the negative differences will cancel one another out, which isn't good. We can fix that by squaring each of those differences so that they're now positive. That's a big improvement but notice that the cells that have very large counts to begin with will dominate this sum. To put the cells on more even footing, we could divide each squared difference by the expected count.
+One option would be to simply find the difference in the counts in each cell of the table and add them all up. That does result in a single number, but realize that the positive differences and the negative differences will cancel one another out, which isn't good. We can fix that by squaring each of those differences so that they're now positive. That's a big improvement but notice that the cells that have very large counts to begin with will dominate this sum. To put the cells on more even footing, we could divide each squared difference by the expected count.
 
 ### Chi-squared distance
 
