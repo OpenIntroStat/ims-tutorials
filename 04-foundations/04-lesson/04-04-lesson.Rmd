@@ -518,7 +518,7 @@ ggplot(both_ex_props, aes(stat, color = experiment)) +
   geom_density(bw = 0.1)
 ```
 
-Note that the curves are quite similar in shape.  The sampled $\hat{p}$ values are centered around the true (typically **unknown** parameter) parameter (black); the resampled $\hat{p}^*$ values are centered around the estimate from the very first poll (green). Great work!
+Note that the curves are quite similar in shape. The sampled $\hat{p}$ values are centered around the true (typically **unknown** parameter) parameter (green); the resampled $\hat{p}^*$ values are centered around the estimate from the very first poll (red). Great work!
 
 ### Always resample the original number of observations
 
