@@ -201,10 +201,10 @@ glimpse(iran)
 
 ```{r mc1, echo=FALSE}
 question("Which of the following is FALSE regarding the `iran` data set?",
-  answer("Each row refers to a single ballot cast.", correct = TRUE, message="Correct! Each row refers to the total ballots for a particular *city*."),
-  answer("The data set has 9 variables on 366 observations.", message="Incorrect. Those are the correct `dim()`ensions of this data set."),
-  answer("The variables contain vote counts for various candidates as well as categorical data for the city and province names.",  message="Incorrect. The data set indeed does contain vote totals as well as province and city names."),
-  answer("There appear to be four candidates represented in this data set.", message="Incorrect. Indeed there are four candidates: Ahmadinejad, Rezai, Karrubi, and Mousavi."),
+  answer("Each row refers to a single ballot cast.", correct = TRUE, message = "Correct! Each row refers to the total ballots for a particular *city*."),
+  answer("The data set has 9 variables on 366 observations.", message = "Incorrect. Those are the correct `dim()`ensions of this data set."),
+  answer("The variables contain vote counts for various candidates as well as categorical data for the city and province names.", message = "Incorrect. The data set indeed does contain vote totals as well as province and city names."),
+  answer("There appear to be four candidates represented in this data set.", message = "Incorrect. Indeed there are four candidates: Ahmadinejad, Rezai, Karrubi, and Mousavi."),
   allow_retry = TRUE
 )
 ```
@@ -1013,10 +1013,10 @@ pchisq(chi_obs_stat, df = degrees_of_freedom, lower.tail = FALSE)
 
 ```{r mc2, echo=FALSE}
 question("Based on your p-value of approximately 0.006, which of the following statements is FALSE?",
-  answer("If the null hypothesis is true, the probability of observing a test statistic more extreme than the observed statistic is 0.006.", message="Nope, this one is true. This is the definition of a p-value."),
-  answer("This data is consistent with a model in which Benford's law applies to vote totals from the 2009 Iranian election.", correct = TRUE, message="Bingo! The low p-value suggests this data is inconsistent with the proportions expected by Benford's Law."),
-  answer("Benford's law has been suggested to apply to first digit counts from fair elections.",  message="Nope. Benford's Law has indeed been used for this purpose."),
-  answer("The p-value is a measure of the consistency between a data set and a particular hypothesis.", message="Incorrect. This is a valid interpretation of a p-value."),
+  answer("If the null hypothesis is true, the probability of observing a test statistic more extreme than the observed statistic is 0.006.", message = "Nope, this one is true. This is the definition of a p-value."),
+  answer("This data is consistent with a model in which Benford's law applies to vote totals from the 2009 Iranian election.", correct = TRUE, message = "Bingo! The low p-value suggests this data is inconsistent with the proportions expected by Benford's Law."),
+  answer("Benford's law has been suggested to apply to first digit counts from fair elections.", message = "Nope. Benford's Law has indeed been used for this purpose."),
+  answer("The p-value is a measure of the consistency between a data set and a particular hypothesis.", message = "Incorrect. This is a valid interpretation of a p-value."),
   allow_retry = TRUE
 )
 ```
@@ -1121,10 +1121,10 @@ glimpse(iowa)
 
 ```{r mc3, echo=FALSE}
 question("Determine which of the following statements is FALSE",
-  answer("There are 1386 observations on 5 variables.", message="Incorrect. This one is true."),
-  answer("The columns contain the name of the office, the candidate, the party, the county, and the votes cast, all of which are categorical data.", correct = TRUE, message="Well done! Most, but not all, of those variables are categorical. Votes cast is numerical."),
-  answer("Each row refers to candidate pair (President/Vice President) in a single county.", message="Nope. This is the correct description of what each row refers to."),
-  answer("There appear to be 14 distinct categories in the `candidate` column.", message="Incorrect. There are indeed 14 distinct candidates."),
+  answer("There are 1386 observations on 5 variables.", message = "Incorrect. This one is true."),
+  answer("The columns contain the name of the office, the candidate, the party, the county, and the votes cast, all of which are categorical data.", correct = TRUE, message = "Well done! Most, but not all, of those variables are categorical. Votes cast is numerical."),
+  answer("Each row refers to candidate pair (President/Vice President) in a single county.", message = "Nope. This is the correct description of what each row refers to."),
+  answer("There appear to be 14 distinct categories in the `candidate` column.", message = "Incorrect. There are indeed 14 distinct candidates."),
   allow_retry = TRUE
 )
 ```
@@ -1428,7 +1428,7 @@ ggplot(null, aes(x = stat)) +
 question("Based on the null distribution that you constructed in the last exercise and the p-value (which you can compute using `null` and `chi_obs_stat` in your workspace here), which of the following statements is FALSE?",
   answer("The low p-value indicates that if in fact there *was* election fraud in Iowa, there would be a very small probability of observing this data or more extreme."),
   answer("Because the observed statistic is far into the tails of the null distribution, this indicates that your data is inconsistent with the null hypothesis that Benford's Law applies to vote totals in Iowa."),
-  answer("The high p-value indicates a high probability that that our null hypothesis (that Benford's Law applies to vote totals in Iowa) is true.", correct = TRUE, message="Bingo! Not only was the p-value not high, this is also an invalid interpretation of a p-value. It is *never* the probability that the null is true."),
+  answer("The high p-value indicates a high probability that that our null hypothesis (that Benford's Law applies to vote totals in Iowa) is true.", correct = TRUE, message = "Bingo! Not only was the p-value not high, this is also an invalid interpretation of a p-value. It is *never* the probability that the null is true."),
   allow_retry = TRUE,
   incorrect = "Remember, the null hypothesis is that Benford's law describes the distribution of the first digits in this data set."
 )
