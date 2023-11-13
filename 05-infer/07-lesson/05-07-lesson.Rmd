@@ -878,6 +878,7 @@ If $\mu$ is defined as average hourly pay in the population, the null hypothesis
 
 ```{r}
 acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) |>
   filter(!is.na(hrly_pay)) |>
   mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen"), ) |> 
   group_by(citizen) |>
@@ -966,6 +967,13 @@ Using the `acs12` data, and specifically the variables `income`, `hrs_work`, and
 
 First, filter `acs12` for rows where hourly pay (`hrly_pay`) and U.S. citizenship status (`citizen`) are __both__ non-missing.  
 
+```{r citizens-setup, include = FALSE}
+## Complete hourly pay and citizenship 
+acs12_complete_hrlypay_citizen <- acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) |>
+  filter(!is.na(hrly_pay), !is.na(citizen))
+```
+
 ```{r citizens, exercise=TRUE}
 # Filter for non-missing hrly_pay and non-missing citizen
 acs12_complete_hrlypay_citizen <- acs12 |>
@@ -994,8 +1002,10 @@ Next calculate summary statistics for citizens and non-citizens. To do this, use
 
 ```{r citizens_3-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
-acs12_complete_hrlypay_citizen <- acs12 |> 
-  filter(!is.na(hrly_pay))
+acs12_complete_hrlypay_citizen <- acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) |>
+  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen")) |>
+  filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
 ```{r citizens_3, exercise=TRUE}
@@ -1013,8 +1023,6 @@ acs12_complete_hrlypay_citizen |>
 ```
 
 ```{r citizens_3-hint}
-   
-
 - Call `group_by()`, passing `citizen` as the argument.
 - Call `summarize()`, using `mean()` to calculate the mean of `hrly_pay`, `sd()` to calculate the standard deviation of `hrly_pay`, and `n()` to find the number of observations in each group. 
 ```
@@ -1044,8 +1052,9 @@ Finally, plot a histogram of the `hrly_pay`, faceted by citizenship status.
 ```{r citizens_4-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
 acs12_complete_hrlypay_citizen <- acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) |>
+  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen")) |>
   filter(!is.na(hrly_pay), !is.na(citizen))
-
 ```
 
 ```{r citizens_4, exercise=TRUE}
@@ -1058,8 +1067,6 @@ acs12_complete_hrlypay_citizen |>
 ```
 
 ```{r citizens_4-hint}
-    
-
 - Call ggplot() with `acs12_complete_hrlypay_citizen` as the dataset.
 - Inside `aes()`, map `x` to `hrly_pay`.
 - Add `geom_histogram()`, setting `binwidth` to 5.  
@@ -1088,6 +1095,8 @@ The `acs12_complete_hrlypay_citizen` is already loaded for you.
 ```{r citizens_5-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
 acs12_complete_hrlypay_citizen <- acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) |>
+  mutate(citizen = if_else(citizen == "no", "Non-citizen", "Citizen")) |>
   filter(!is.na(hrly_pay), !is.na(citizen))
 ```
 
@@ -1105,8 +1114,6 @@ test_results
 ```
 
 ```{r citizens_5-hint}
-   
-
 - Use the formula of `hrly_pay ~ citizen` 
 - Add "Non-citizen" to the order of subtraction 
 - Specify the alternative to be "two-sided"  
@@ -1124,7 +1131,6 @@ test_results <- acs12_complete_hrlypay_citizen |>
 
 # See the results
 test_results
- 
 ```
 
 
