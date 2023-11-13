@@ -201,7 +201,7 @@ In the following exercises, you'll have the chance to get your hands into this r
 
 ### Getting to know the Iran data
 
-An important first step is to get a sense of the nature of the your data set by asking questions like: What does each row refer to? What variables do I have recorded? What type of variables are there? What are the dimensions of my data set?
+An important first step is to get a sense of the nature of your data set by asking questions like: What does each row refer to? What variables do I have recorded? What type of variables are there? What are the dimensions of my data set?
 
 ```{r echo=TRUE}
 glimpse(iran)
