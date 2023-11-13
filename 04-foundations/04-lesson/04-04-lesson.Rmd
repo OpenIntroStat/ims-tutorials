@@ -149,7 +149,7 @@ That is, the goal in creating a confidence interval is to calculate a range of p
 In November 2016, the voters elected a new president of the United States. Prior to the election, thousands of polls were taken to gauge the popularity of each of the candidates.  
 Leaving aside the idea that popular opinion changes over time, a poll can be thought of as a sample of individuals measured so as to estimate the proportion of all voters who will vote for each candidate (i.e. the population parameter).
 
-Consider an election in your home town that will take place in a week's time. You poll a randomly selected subset of the voters in your town and ask them if they plan to vote for Candidate X or Candidate Y. In this lesson, we will focus on *sampling variability*—the variability in sample proportions due to polling different randomly selected individuals from the population.
+Consider an election in your hometown that will take place in a week's time. You poll a randomly selected subset of the voters in your town and ask them if they plan to vote for Candidate X or Candidate Y. In this lesson, we will focus on *sampling variability*—the variability in sample proportions due to polling different randomly selected individuals from the population.
 
 ```{r quiz_1}
 quiz(
