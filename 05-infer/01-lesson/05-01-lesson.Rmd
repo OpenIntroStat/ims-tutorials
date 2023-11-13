@@ -1103,6 +1103,9 @@ Create the bootstrap distribution for the proportion of people that live in the 
 
 ```{r ex14-setup}
 set.seed(47)
+
+gss2016 <- gss2016 |>
+  mutate(meta_region = fct_collapse(region, pacific = "PACIFIC", other_level = "not pacific"))
 ```
 
 ```{r ex14, exercise=TRUE}
@@ -1297,6 +1300,11 @@ When building _any_ confidence interval, note that you use three ingredients: th
 - Calculate the sample size, `n`, which is the number of rows in the `gss2016` data frame.
 - Calculated the observed statistic, `p_hat`, as the proportion of people in the "pacific" meta-region.
 
+```{r ex15-setup, include=FALSE}
+gss2016 <- gss2016 |>
+  mutate(meta_region = fct_collapse(region, pacific = "PACIFIC", other_level = "not pacific"))
+```
+
 ```{r ex15, exercise=TRUE}
 # Calculate n as the number of rows
 n <- ___(gss2016)
@@ -1341,6 +1349,11 @@ Now we'll construct the confidence interval around this proportion.
 - Check the rules-of-thumb for the normal distribution being a decent approximation.
 - Calculate the standard error using the approximation formula $\sqrt{\frac{\hat{p} \times (1 - \hat{p})}{n}}$.
 - Use `SE_meta_approx` to form a confidence interval for `p_hat`. The limits should be two standard errors either side of `p_hat`.
+
+```{r ex16-setup, include=FALSE}
+gss2016 <- gss2016 |>
+  mutate(meta_region = fct_collapse(region, pacific = "PACIFIC", other_level = "not pacific"))
+```
 
 ```{r ex16, exercise=TRUE}
 # From previous step
