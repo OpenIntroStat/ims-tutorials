@@ -699,12 +699,14 @@ grid.lines(
 
 Using R, we can get the same quantile measurement that allow comparisons of the null statistics and the observed statistic. Given the previous simulations, we can see that 95% of the null differences are 0.208 or lower. These simulations give further evidence that the observed statistic is not consistent with the bulk of the null differences.
 
-The `quantile()` function often comes in handy! It is a function from "base R" that calculates the quantile of a numerical variable, where the quantile is specified by the `probs` argument. By specifying  `probs = 0.05`, you are telling R that you are interested in the value of `stat` where 5% of the are below it. Similarly for `probs = 0.95`, where 95% of the values of `stat` are below it. 
+The `quantile()` function often comes in handy! It is a function from "base R" that calculates the quantile of a numerical variable, where the quantile is specified by the `probs` argument. By specifying  `probs = 0.05`, you are telling R that you are interested in the value of `stat` where 5% of the data points are below it.. Similarly for `probs = 0.95`, where 95% of the values of `stat` are below it. 
 
 ```{r echo = TRUE}
 gender_discrimination_perm |>
-  summarize(q.05 = quantile(stat, probs = 0.05),
-            q.95 = quantile(stat, probs = 0.95))
+  summarize(
+    q.05 = quantile(stat, probs = 0.05),
+    q.95 = quantile(stat, probs = 0.95)
+  )
 ```
 
 ### Critical region
