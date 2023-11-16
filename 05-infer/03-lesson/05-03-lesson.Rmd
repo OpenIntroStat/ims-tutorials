@@ -704,7 +704,7 @@ knitr::include_graphics("images/categorical-inference-ch3v3-chisq-curve.png")
 
 
 
-In the case of the chi-squared statistic, the distribution is called, conveniently enough, the chi-squared distribution. You'll sometimes see it written out in words and other times given the Greek letter that looks like and X. The shape of this distribution is determined by one parameter called the degrees of freedom. Here are three different chi-squared distributions, with one, three, and five degrees of freedom. You'll note that they're all positive and they're all right skewed, but as the degrees of freedom increases, the mean increases. You can find the appropriate degrees of freedom for your test by taking the number of rows minus one and multiplying it by the number of columns minus one.
+In the case of the chi-squared statistic, the distribution is called, conveniently enough, the chi-squared distribution. You'll sometimes see it written out in words and other times given the Greek letter that looks like an X. The shape of this distribution is determined by one parameter called the degrees of freedom. Here are three different chi-squared distributions, with one, three, and five degrees of freedom. You'll note that they're all positive and they're all right skewed, but as the degrees of freedom increases, the mean increases. You can find the appropriate degrees of freedom for your test by taking the number of rows minus one and multiplying it by the number of columns minus one.
 
 
 ### 
@@ -761,7 +761,7 @@ knitr::include_graphics("images/ch3v3-htest-approx.png")
 
 
 
-Instead of using this null distribution, we could instead rely upon the chi-squared distribution. The number of rows in this table was three and the number of columns was three, so the appropriate chi-squared distribution to use is the one with four degrees of freedom. If we plot that on top of our null distribution, we see that the two very close. 
+Instead of using this null distribution, we could instead rely upon the chi-squared distribution. The number of rows in this table was three and the number of columns was three, so the appropriate chi-squared distribution to use is the one with four degrees of freedom. If we plot that on top of our null distribution, we see that the two are very close. 
 
 To find a p-value according to this distribution, ask for the proportion of the chisq distribution, pchisq, that is to the left of our observed statistic. We're interested in the right-tail, however, so the p-value is calculated as 1 minus this value. Not surprisingly, this is very close to the p-value from the permutation approach.
 
