@@ -267,7 +267,7 @@ We can exclude the missing data by calling `na.omit`:
 
 ```{r ex1-naomit, exercise=TRUE}
 gss2016_completecases <- gss2016 |>
-                          na.omit
+                          na.omit()
 # Using `gss2016`, plot postlife
 ggplot(gss2016_completecases, aes(x = postlife)) +
   # Add bar layer
