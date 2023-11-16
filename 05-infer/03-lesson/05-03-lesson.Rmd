@@ -45,6 +45,10 @@ gss_party <- gss2016 |>
   filter(party != "Oth") |>
   droplevels()
 
+# for ex9 and maybe others
+chi_obs_spac <- chisq_stat(gss_party, natspac ~ party)
+chi_obs_arms <- chisq_stat(gss_party, natarms ~ party)
+
 # set seed
 
 set.seed(12345)
@@ -554,7 +558,6 @@ ___ +
 ```
 
 ```{r ex9-hint}
- 
 - The `stat` you're after is the `"Chisq"`.
 - Use `geom_density()` to make a density plot.
 ```
