@@ -525,7 +525,6 @@ gss_party |>
 
 ### Building two null distributions
 
-
 To get a sense of the full distribution that the chi-squared test statistic can take under this hypothesis, you need to generate many more data sets.
 
 Do this by first adding onto your work from the previous exercise with the `natspac` variable, then conduct a second hypothesis test to see if `party` is independent of `natarms`. Once you have both null distributions, you can visualize them to see if they're consistent with your observed statistics.
@@ -537,8 +536,6 @@ chi_obs_arms <- chisq_stat(gss_party, natarms ~ party)
 
 - Extend your code from the previous exercise to generate 500 data sets under the null hypothesis that `natspac` is independent from `party`. Save this as `null_spac`.
 - Create a density plot of `null_spac` and add a vertical red line to indicate the location of the observed statistic (saved in your workspace as `chi_obs_spac`).
-
-
 
 ```{r ex9, exercise=TRUE}
 # Create null
@@ -578,13 +575,8 @@ ggplot(null_spac, aes(x = stat)) +
   geom_vline(xintercept = chi_obs_spac, color = "red")
 ```
 
-
-
-
 - Construct a similar null distribution under the hypothesis that `natarms` is independent from `party` using the `"Chisq"` statistic. Save this as `null_arms`.
 - Create a density plot of `null_arms` and add a vertical red line to indicate the location of the observed statistic (saved in your workspace as `chi_obs_arms`).
-
-
 
 ```{r ex10, exercise=TRUE}
 # Create null that natarms and party are indep
@@ -618,9 +610,7 @@ ggplot(null_arms, aes(x = stat)) +
   geom_vline(xintercept = chi_obs_arms, color = "red")
 ```
 
-
 ### Is the data consistent with the model?
-
 
 In general, it's a good idea to use *two-tailed* p-values, which you have calculated like this:
 
@@ -630,11 +620,9 @@ null |>
   summarize(pval = 2 * mean(stat <= d_hat))
 ```
 
-
 In the case of the chi-squared, however, you compute only the right tail, which makes it a *one-tailed* test. This is the tail with statistics that are more common when the hypothesis of independence is false.
 
 Using the objects that you created in the previous exercise (`null_spac`, `null_arms`, `chi_obs_spac`, and `chi_obs_arms`), compute the p-values of these two hypothesis tests and use them to select the correct answer below. Note that you'll have to tweak the code above to be sure to include only the right (greater than) tail in your p-values.
-
 
 ```{r}
 chi_obs_spac <- chisq_stat(gss_party, natspac ~ party)
@@ -666,16 +654,11 @@ question("Select the correct answer",
 )
 ```
 
-
-
 ## Alternate method: the chi-squared distribution
 
 Now you have some experience conducting a hypothesis test of independence using the chi-squared statistic and permutation.
 
-
-
 ### Approximation distributions: normal
-
 
 - Statistics: $\hat{p}, \hat{p}\_{1} - \hat{p}\_{2}$
 
@@ -683,16 +666,11 @@ Now you have some experience conducting a hypothesis test of independence using 
 knitr::include_graphics("images/categorical-inference-ch3v3-normal-curve.png")
 ```
 
-
-
 Next, you'll learn how to conduct the same test using an approximation method. This is the most commonly-used way to formulate the null distribution, so let's dive in.
 
 The approximation distribution that you're most familiar with is the Normal distribution. This can be used to approximate the null distribution when the statistic is a proportion or a difference in proportions and the sample size is large.
 
-
 ### 
-
-
 
 - Statistics: $\hat{x}^{2}$
 - Shape is determined by degrees of freedom {{1}}
@@ -702,13 +680,9 @@ The approximation distribution that you're most familiar with is the Normal dist
 knitr::include_graphics("images/categorical-inference-ch3v3-chisq-curve.png")
 ```
 
-
-
 In the case of the chi-squared statistic, the distribution is called, conveniently enough, the chi-squared distribution. You'll sometimes see it written out in words and other times given the Greek letter that looks like an X. The shape of this distribution is determined by one parameter called the degrees of freedom. Here are three different chi-squared distributions, with one, three, and five degrees of freedom. You'll note that they're all positive and they're all right skewed, but as the degrees of freedom increases, the mean increases. You can find the appropriate degrees of freedom for your test by taking the number of rows minus one and multiplying it by the number of columns minus one.
 
-
 ### 
-
 
 ```{r}
 null_spac <- gss_party |>
@@ -729,11 +703,7 @@ ggplot(null_spac, aes(x = stat)) +
   geom_vline(xintercept = chi_obs_spac, color = "red")
 ```
 
-
-
 In the last exercises, you conducted permutation test to assess if natspac was independent of party. The observed chi-squared statistic was 1.33, which you found to be not too far into the tails of your null distribution.
-
-
 
 ### H-test via approximation
 
@@ -743,31 +713,23 @@ gss_party |>
   table()
 ```
 
-
-
 ```{r}
 pchisq(chi_obs_spac, df = 4)
 ```
-
 
 ```{r}
 1 - pchisq(chi_obs_spac, df = 4)
 ```
 
-
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/ch3v3-htest-approx.png")
 ```
-
-
 
 Instead of using this null distribution, we could instead rely upon the chi-squared distribution. The number of rows in this table was three and the number of columns was three, so the appropriate chi-squared distribution to use is the one with four degrees of freedom. If we plot that on top of our null distribution, we see that the two are very close. 
 
 To find a p-value according to this distribution, ask for the proportion of the chisq distribution, pchisq, that is to the left of our observed statistic. We're interested in the right-tail, however, so the p-value is calculated as 1 minus this value. Not surprisingly, this is very close to the p-value from the permutation approach.
 
-
 ### The chi-squared distribution
-
 
 Becomes a good approximation when:
 
@@ -779,8 +741,6 @@ Becomes a good approximation when:
 knitr::include_graphics("images/categorical-inference-ch3v3-chisq-curve.png")
 ```
 
-
-
 Like the normal distribution, the chi-squared distribution only becomes a good approximation when the sample size is large. A good rule of thumb is that the expected counts in each cell should be five or greater. Another recommendation is to only use this distribution when the degrees of freedom is two or greater. If you have one degree of freedom, you're looking at a two by two table, which means you can just compare proportions using the normal distribution.
 
 ### Checking conditions
@@ -788,8 +748,6 @@ Like the normal distribution, the chi-squared distribution only becomes a good a
 There are three new data sets in your environment, `ds1`, `ds2`, and `ds3`, that all contain two columns of categorical data. You can test the independence of the two variables for all three data sets using a *permutation* chi-squared test, however the chi-squared *approximation* method will only be accurate for one of them. Which one?
 
 Note: since these data sets only have two columns, you can form a contingency table by simply running `table()` on the original data frame.
-
-
 
 ```{r}
 ds1 <- tibble(var1 = rep(c("A", "B"), times = c(22, 24)),
@@ -804,7 +762,6 @@ ds3 <- tibble(var1 = rep(c("A", "B"), times = c(47, 62)),
                      rep(c("X", "Y", "Z"), times = c(28, 20, 14))))
 ```
 
-
 *Hint:* Remember, the chi-squared approximation can be invalid if there are fewer than 5 observations in any cell of the contingency table. It is also suggested that the degrees of freedom be greater than 1 (that is, the table has greater than 2 rows and 2 columns). You can view the tables using `lapply(globalenv(), table)`.
 
 ```{r option-c, echo=FALSE}
@@ -816,14 +773,11 @@ question("The chi-squared *approximation* method will only be accurate for one o
 )
 ```
 
-
 ### The geography of happiness
-
 
 In addition to information regarding their opinions on policy issues, GSS survey respondents also provided the region of the United States in which they live. With this in hand, you can explore the question:
 
 *Does this data set provide evidence of an association between happiness and geography?*
-
 
 - Using `gss2016`,construct a bar plot of proportions capturing the relationship between `region` and `happy`. Plots like this are easier to read when the variable with the fewer number of levels is mapped to `fill`.
 - Use `chisq_stat()` to compute the observed chi-squared statistic associated with this bar plot and save it as `chi_obs`.
@@ -864,8 +818,6 @@ chi_obs
 ```
 
 
-
-
 ### A p-value two ways
 
 In this exercise you'll find out if the observed chi-squared statistic is unusually large under the following notion that,
@@ -874,15 +826,11 @@ $H_0$: Region is independent of Happy.
 
 The competing notion is the alternative hypothesis that there is an association between these variables. For the sake of comparison, you'll be finding the p-value first from the computational approach, then use the approximation.
 
-
 ```{r}
 chi_obs <- chisq_stat(gss2016, happy ~ region)
 ```
 
-
-
 Generate a distribution of the `"Chisq"` statistic under a null hypothesis of independence between `happy` and `region`. Save this object to `null`.
-
 
 ```{r ex12, exercise=TRUE}
 # Generate null distribution
@@ -916,12 +864,7 @@ null <- gss2016 |>
   calculate(stat = "Chisq")
 ```
 
-
-
-
 Create a density plot of `null`, add a vertical red line at `chi_obs`, and overlay the corresponding approximation from the Chi-squared distribution with the appropriate degrees of freedom.
-
-
 
 ```{r ex13, exercise=TRUE}
 # From previous step
@@ -963,11 +906,8 @@ ggplot(null, aes(x = stat)) +
   stat_function(fun = dchisq, args = list(df = 3), color = "blue")
 ```
 
-
-
 - Compute the permutation p-value.
 - Compute the approximation p-value. Recall that `pchisq()` will return the left tail of the distribution. To return the right tail, add an argument `lower.tail = FALSE`.
-
 
 ```{r ex14, exercise=TRUE}
 # From previous step
@@ -1007,20 +947,15 @@ null |>
 pchisq(chi_obs, df = 3, lower.tail = FALSE)
 ```
 
-
 ## Intervals for the chi-squared distribution
 
-
 At this point you should be familiar with this diagram
-
-
 
 ### Classic inference
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-2.png")
 ```
-
 
 which shows how we formulate the null distribution as the distribution of test statistics for data generated in a world where the null hypothesis is true. The procedure is the same when were testing independence using the chi squared statistic its just the shape of the null distribution that changes. To formulate a confidence interval for the chi squared, it makes sense to simply remove the step where we propose a null hypothesis and instead generate data simply through bootstrap resampling.
 
@@ -1031,7 +966,6 @@ that give us a sampling distribution
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-3.png")
 ```
-
 
 ### 
 
@@ -1074,8 +1008,6 @@ So we can just scratch this approach. There you have it. The shortest lesson eve
 knitr::include_graphics("images/3-4-7.png")
 ```
 
-
-
 ## Congratulations!
 
 You have successfully completed Lesson 3 in Tutorial 5: Statistical inference.  
@@ -1104,7 +1036,6 @@ What's next?
 `r emo::ji("eight")` [Tutorial 5 - Lesson 8: Comparing many means](https://openintro.shinyapps.io/ims-05-infer-08/)
 
 `r emo::ji("open_book")` [Learn more at Introduction to Modern Statistics](http://openintro-ims.netlify.app/)
-
 
 ## Submit
 
