@@ -45,10 +45,26 @@ gss2016 <- read_rds("data/gss-sampled-2016.rds") |>
 # custom function –-------------------------------------------------------------
 
 get_first <- function(x) {
-    substr(as.character(x), 1, 1) |>
-      as.numeric() |>
-      as.factor()
+  x |>
+    # Convert the numbers to strings
+    as.character() |>
+    # Extract the first digit
+    substr(1, 1) |>
+    # Make it a categorical variable, with levels from 1 to 9 
+    factor(levels = 1:9)
 }
+
+# p_benford ––------------------------------------------------------------------
+
+p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
+
+# iowa_county –-----------------------------------------------------------------
+
+iowa_county <- iowa |>
+  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") |>
+  group_by(county) |>
+  summarize(dem_rep_votes = sum(votes)) |>
+  mutate(first_digit = get_first(dem_rep_votes))
 
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
@@ -190,7 +206,7 @@ knitr::include_graphics("images/ahmedinejad-mousavi.png")
 
 One of the key points of evidence that was used in arguing fraud were the vote counts, which are available in a data set called Iran.
 
-```{r message=FALSE}
+```{r}
 iran |>
   select(city, ahmadinejad, mousavi, total_votes_cast)
 ```
@@ -221,15 +237,7 @@ question("Which of the following is FALSE regarding the `iran` data set?",
 
 The `iran` data set contains *all* of the votes cast in this election, meaning that you can find the victor by computing the total number of votes for each candidate. In addition to answering the question of who won nationwide, you can also see how the results differed by province.
 
-Along the way, you'll use a very useful function called `gather()`. This allows you to reshape your dataframe by taking information stored in variable names and moving it to live in its own column.
-
-```{r message=FALSE}
-get_first <- function(x) {
-    substr(as.character(x), 1, 1) |>
-      as.numeric() |>
-      as.factor()
-}
-```
+Along the way, you'll use a very useful function called `pivot_longer()`. This allows you to reshape your dataframe by taking information stored in variable names and moving them to live in their own columns in a *longer* data frame.
 
 - Using the `iran` data, compute the total votes for each candidate by `summarize()`ing each of the candidate count columns with their sum. Name each new column with the name of the candidate.
 - Print `totals` to your screen.
@@ -237,10 +245,12 @@ get_first <- function(x) {
 ```{r ex1, exercise=TRUE}
 # Compute and save candidate totals
 totals <- ___ |>
-  ___(ahmadinejad = ___,
-            rezai = ___,
-            karrubi = ___,
-            mousavi = ___)
+  ___(
+    ahmadinejad = ___,
+    rezai = ___,
+    karrubi = ___,
+    mousavi = ___
+  )
 
 # Inspect totals
 totals
@@ -253,77 +263,81 @@ totals
 ```{r ex1-solution}
 # Compute and save candidate totals
 totals <- iran |>
-  summarize(ahmadinejad = sum(ahmadinejad),
-            rezai = sum(rezai),
-            karrubi = sum(karrubi),
-            mousavi = sum(mousavi))
+  summarize(
+    ahmadinejad = sum(ahmadinejad),
+    rezai = sum(rezai),
+    karrubi = sum(karrubi),
+    mousavi = sum(mousavi)
+  )
 
 # Inspect totals
 totals
 ```
 
-
-
-
-
-
-
-- `gather()` the candidate names into a new column alongside their respective votes. The names of the previous columns are called the `key`, which you should rename `"candidate"` and the contents are cells are the `value`, which you should rename `"votes"`.
+- `pivot_longer()` the candidate names into a new column alongside their respective votes. The names of the previous columns go to a new column called `candidate` with the `names_to` argument and the values of the cells go to a new column called `votes` with the `values_to` argument. This function also expects you to specify the columns you're pivoting (`cols`) and since we're pivoting the entire dataset of `totals` we can set this argument to `everything()`.
 - Inspect the resulting data frame to understand its structure.
 
+```{r ex2-setup}
+totals <- iran |>
+  summarize(
+    ahmadinejad = sum(ahmadinejad),
+    rezai = sum(rezai),
+    karrubi = sum(karrubi),
+    mousavi = sum(mousavi)
+  )
+```
 
 ```{r ex2, exercise=TRUE}
-# From previous step
-totals <- iran |>
-  summarize(ahmadinejad = sum(ahmadinejad),
-            rezai = sum(rezai),
-            karrubi = sum(karrubi),
-            mousavi = sum(mousavi))
+# Longer totals
+totals_longer <- totals |>
+  pivot_longer(
+    cols = ___,
+    names_to = ___,
+    values_to = ___
+  )
 
-# Gather data
-gathered_totals <- totals |>
-  gather(key = ___, value = ___)
-
-# Inspect gathered totals
-gathered_totals
+# Inspect longer totals
+totals_longer
 ```
 
 ```{r ex2-hint}
- Set `key = "candidate"` and `value = "votes"`.
+ Set `cols = everything()`, `names_to = "candidate"`, and `values_to = "votes"`.
 ```
 
 ```{r ex2-solution}
-# From previous step
+# Longer totals
+totals_longer <- totals |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "candidate",
+    values_to = "votes"
+  )
+
+# Inspect longer totals
+totals_longer
+```
+
+- Use `totals_longer` to construct a bar plot of `votes` to visualize the overall election outcome. Since you already have the totals for each candidate, you need to map `candidate` to the `x`, `votes` to the `y`, then add a `geom_col()` layer.
+
+```{r ex-3-setup}
 totals <- iran |>
-  summarize(ahmadinejad = sum(ahmadinejad),
-            rezai = sum(rezai),
-            karrubi = sum(karrubi),
-            mousavi = sum(mousavi))
+  summarize(
+    ahmadinejad = sum(ahmadinejad),
+    rezai = sum(rezai),
+    karrubi = sum(karrubi),
+    mousavi = sum(mousavi)
+  )
 
-# Gather data
-gathered_totals <- totals |>
-  gather(key = "candidate", value = "votes")
-
-# Inspect gathered totals
-gathered_totals
+totals_longer <- totals |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "candidate",
+    values_to = "votes"
+  )
 ```
 
 
-
-
-- Use `gathered_totals` to construct a bar plot of `votes` to visualize the overall election outcome. Since you already have the totals for each candidate, you need to map `candidate` to the `x`, `votes` to the `y`, then add a `geom_col()` layer.
-
-
 ```{r ex3, exercise=TRUE}
-# From previous steps
-totals <- iran |>
-  summarize(ahmadinejad = sum(ahmadinejad),
-            rezai = sum(rezai),
-            karrubi = sum(karrubi),
-            mousavi = sum(mousavi))
-gathered_totals <- totals |>
-  gather(key = "candidate", value = "votes")
-
 # Plot total votes for each candidate
 ___ +
   # Add col layer
@@ -331,30 +345,17 @@ ___ +
 ```
 
 ```{r ex3-hint}
- Since the result will be a bar plot, it's tempting to use `geom_bar()`, but don't! Re-read the instructions for this step.
+Since the result will be a bar plot, it's tempting to use `geom_bar()`, but don't! Re-read the instructions for this step.
 ```
 
 ```{r ex3-solution}
-# From previous steps
-totals <- iran |>
-  summarize(ahmadinejad = sum(ahmadinejad),
-            rezai = sum(rezai),
-            karrubi = sum(karrubi),
-            mousavi = sum(mousavi))
-gathered_totals <- totals |>
-  gather(key = "candidate", value = "votes")
-
 # Plot total votes for each candidate
-ggplot(gathered_totals, aes(x = candidate, y = votes)) +
+ggplot(totals_longer, aes(x = candidate, y = votes)) +
   # Add col layer
   geom_col()
 ```
 
-
-
 ### Breaking it down by province
-
-
 
 Although the overall vote totals are the most important, you can dig deeper into this data by utilizing the geographic information. In this exercise, you'll see how the results differed by province.
 
@@ -364,21 +365,6 @@ Did Ahmadinejad win throughout the country, or were there provinces where the se
 - Start with `iran`, group by province, then summarize with two variables: the sum of the votes of the first place candidate and the sum of the votes of the second place candidate. Name each new column with the name of the candidate.
 - Inspect `province_totals`.
 - Filter `province_totals` for every row where the second-place candidate got more votes than the first-place candidate.
-
-
-
-```{r message=FALSE, warning=FALSE}
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-```
-
 
 ```{r ex4, exercise=TRUE}
 # Construct province-level dataset
@@ -434,20 +420,6 @@ Once you create a new variable containing only the first digit, you can get a se
 - Check to see that `get_first()` worked. From the `iran` data, select off the columns `total_votes_cast` and `first_digit` and print them to the screen.
 - Construct a bar plot to visualize the distribution of the first digit.
 
-
-```{r message=FALSE}
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-```
-
-
 ```{r ex5, exercise=TRUE}
 # Print get_first
 get_first
@@ -468,7 +440,6 @@ ___ +
 
 
 ```{r ex5-hint}
- 
 - Use `get_first(total_votes_cast)` to create `first_digit`.
 - After piping in the `iran` data, `select()` takes just two arguments: the names of the columns you'd like to peel off.
 - Map the `x` aesthetic to `first_digit` and use `geom_bar()` to create your bar plot.
@@ -802,19 +773,7 @@ In this exercise, you'll use simulation to build up the null distribution of the
 - Starting with `iran`, compute the chi-squared statistic by using `observe()`. Note that you must specify the variable in the data frame that will serve as your response as well as the vector of probabilities that you wish to compare them to.
 - Construct a null distribution with 500 samples of the `Chisq` statistic via simulation under the `point` null hypothesis that the vector of proportions `p` is `p_benford`. Save the resulting statistics as `null`.
 
-```{r message=FALSE, warning=FALSE}
-#p_benford <- 1:9 |> setNames(log10(1 + 1 / .), .)
-p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-
+```{r ex6-setup}
 iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
 ```
@@ -872,19 +831,8 @@ You've seen before how there are usually two ways to get to the null distributio
 
 In this exercise you'll compare these two approaches to calculate a p-value that measures the consistency of the distribution of the Iran first digits with Benford's Law. Note that the observed statistic that you created in the last exercise is saved in your work space as `chi_obs_stat`.
 
-```{r message=FALSE, warning=FALSE}
+```{r ex7-setup}
 set.seed(123)
-
-p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
 
 iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
@@ -906,7 +854,7 @@ chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
 # Compute degrees of freedom
 degrees_of_freedom <- ___ |>
   # Pull out first_digit vector
-  pull("first_digit") |> 
+  pull(first_digit) |> 
   # Calculate n levels and subtract 1
   ___
 
@@ -921,7 +869,6 @@ ___
 ```
 
 ```{r ex7-hint}
- 
 - Compute the degrees of freedom from the vector of digits using `nlevels() - 1`.
 - Use the argument `df = degrees_of_freedom` to plot `dchisq` in `stat_function()`.
 ```
@@ -950,8 +897,6 @@ ggplot(null, aes(x = stat)) +
 ```{r ex8-setup, include = FALSE}
 iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
-
-p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
 
 chi_obs_stat <- iran |>
   observe(response = first_digit, p = p_benford, stat = "Chisq") |>
@@ -1059,7 +1004,7 @@ By TUBS [CC BY SA 3.0], from Wikimedia Commons
 
 ### 
 
-```{r message=FALSE}
+```{r}
 iowa
 ```
 
@@ -1090,18 +1035,6 @@ question("Determine which of the following statements is FALSE",
 There are different levels at which we could consider looking at vote totals. We could look at precincts, or counties, or states, and each level might give us a slightly different picture of what's going on.
 
 For this analysis, look at totals at the *county* level in Iowa and focus on the votes for the two major party candidates: Republicans Trump / Pence and Democrats Clinton / Kaine.
-
-```{r message=FALSE}
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-```
 
 Using the `iowa` data set, filter the rows so they contain only the two main party candidates, then group based on `county` and add up the votes to create a new column called `dem_rep_votes`. Save the resulting data frame to `iowa_county`.
 
@@ -1182,23 +1115,10 @@ iowa_county <- iowa_county |>
 iowa_county
 ```
 
-
-
-
-
-
-Construct a bar plot of `first_digit`.
+Construct a bar plot of `first_digit` in `iowa_county`.
 
 
 ```{r ex11, exercise=TRUE}
-# From previous steps
-iowa_county <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") |>
-  group_by(county) |>
-  summarize(dem_rep_votes = sum(votes)) |>
-  mutate(first_digit = get_first(dem_rep_votes))
-  
 # Using iowa_county, plot first_digit
 ___
   # Add bar layer
@@ -1213,14 +1133,6 @@ iowa_county
 ```
 
 ```{r ex11-solution}
-# From previous steps
-iowa_county <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") |>
-  group_by(county) |>
-  summarize(dem_rep_votes = sum(votes)) |>
-  mutate(first_digit = get_first(dem_rep_votes))
-  
 # Using iowa_county, plot first_digit
 ggplot(iowa_county, aes(x = first_digit)) +
   # Add bar layer
@@ -1230,35 +1142,11 @@ ggplot(iowa_county, aes(x = first_digit)) +
 iowa_county
 ```
 
-
-
 ### Testing Iowa
-
 
 You probably noticed that the bar plot of first digits is alarming: it looks quite different from what Benford's Law prescribes! Before you get ahead of yourself, though, realize that those bars each only contained a handful of counties, so you don't actually have that much data.
 
 This is a prime example of when a hypothesis test is handy. It can tell you if the structure that you see (in this case, the deviation from Benford's Law) could just be due to the random variability of your small sample, or if it's indicative of a systematic difference.
-
-
-```{r message=FALSE}
-p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-
-iowa_county <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") |>
-  group_by(county) |>
-  summarize(dem_rep_votes = sum(votes))
-iowa_county <- iowa_county |>
-  mutate(first_digit = get_first(dem_rep_votes))
-```
 
 Starting with `iowa_county`, compute the observed chi-squared statistic using `observe()`.
 
@@ -1310,13 +1198,7 @@ null <- iowa_county |>
   calculate(stat = "Chisq")
 ```
 
-
-
-
-
-
 Construct a density plot of the distribution of the `null` statistics and add a vertical line indicating the location of the `chi_obs_stat`.
-
 
 ```{r ex14, exercise=TRUE}
 # From previous steps
@@ -1358,9 +1240,6 @@ ggplot(null, aes(x = stat)) +
   geom_vline(xintercept = chi_obs_stat)
 ```
 
-
-
-
 ### Fraud in Iowa?
 
 ```{r mc4, echo=FALSE}
@@ -1371,40 +1250,6 @@ question("Based on the null distribution that you constructed in the last exerci
   allow_retry = TRUE,
   incorrect = "Remember, the null hypothesis is that Benford's Law describes the distribution of the first digits in this data set."
 )
-```
-
-
-
-
-```{r message=FALSE, warning=FALSE}
-p_benford <- 1:9 |> (\(x) setNames(log10(1 + 1/x),x))()
-get_first <- function(x) {
-  x |>
-    # Convert the numbers to strings
-    as.character() |>
-    # Extract the first digit
-    substr(1, 1) |>
-    # Make it a categorical variable, with levels from 1 to 9 
-    factor(levels = 1:9)
-}
-
-iowa <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | candidate == "Donald Trump / Mike Pence") |>
-  group_by(county) |>
-  summarize(dem_rep_votes = sum(votes, na.rm = T))
-iowa <- iowa |>
-  mutate(first_digit = get_first(dem_rep_votes))
-tab <- iowa |>
-  select(first_digit) |>
-  table()
-chi_obs_stat <- chisq.test(tab, p = p_benford)$stat
-
-# Form null distribution
-null <- iowa |>
-  specify(response = first_digit) |>
-  hypothesize(null = "point", p = p_benford) |>
-  generate(reps = 500, type = "draw") |>
-  calculate(stat = "Chisq")
 ```
 
 ## Election fraud in Iran and Iowa: debrief
