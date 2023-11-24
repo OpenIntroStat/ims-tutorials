@@ -1109,6 +1109,7 @@ question("Which of the following combinations *increases* the variability in the
 )
 ```
 
+correct=TRUE, message="Right!  Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient."
 
 ## Congratulations!
 
