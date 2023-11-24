@@ -29,6 +29,12 @@ change <- change |>
   mutate(Amount = Dollars) |>
   dplyr::select(-Dollars)
 
+
+LAhomes <- LAhomes |>
+   filter(bed > 0)
+
+
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -260,26 +266,22 @@ You will need to run the linear model before answering the question:
 
 ```
 
-Consider data collected by Andrew Bray at Reed College on characteristics of LA Homes in 2010. The model is given below, and your task is to provide the appropriate interpretation of the coefficient on `log(sqft)`?  
+Consider data collected by Andrew Bray at Reed College on characteristics of LA Homes in 2010. The model is given below, and your task is to provide the appropriate interpretation of the coefficient on `log(sqft)`.
 
 Note: you must be careful to avoid causative interpretations. Additional square footage does not necessarily cause the price of a specific house to go up. The interpretation of the coefficient describes the estimate of the average price of homes at a given square footage.
 
 
-```{r ex, exercise=TRUE}
-
+```{r option-ex, echo=FALSE}
+question("What is the appropriate interpretation of the coefficient on `log(sqft)`?",
+  answer("Each additional square foot of house size produces an estimate of the average price which is $1.44 more.", message="No, the interpretation of a log-log model is different than a linear model."),
+  answer("Each additional square foot of house size produces an estimate of the average price which is $1,442 more.", message="No. Try again."),
+  answer("Each additional square foot of house size produces an estimate of the average price which is 1.44% higher.", message="No, remember that both Y and X have been log transformed."),
+  answer("Each additional 1% of square footage produces an estimate of the average price which is $1.44 more.", message="No, remember that both Y and X have been log transformed."),
+  answer("Each additional 1% of square footage produces an estimate of the average price which is 1.44% higher.", correct = TRUE, message="Right! After the log-log transformation, our slope estimates the percent change in Y for each 1% change in X"),
+  allow_retry = TRUE
+)
 ```
 
-```{r ex-hint}
-Remember that a log-log model has a special kind of interpretation.
-```
-
-```{r ex-solution}
-- Each additional square foot of house size produces an estimate of the average price which is $1.44 more.
-- Each additional square foot of house size produces an estimate of the average price which is $1,442 more.
-- Each additional square foot of house size produces an estimate of the average price which is 1.44% higher.
-- Each additional 1% of square footage produces an estimate of the average price which is $1.44 more.
-- Each additional 1% of square footage produces an estimate of the average price which is 1.44% higher.
-```
 
 
 
@@ -630,27 +632,25 @@ lm(Price ~ Service + Food + Decor, data = restNYC) |> tidy()
 ### Interpreting coefficients
 
 
-What is the correct interpretation of the coefficient on `Service` in the linear model which regresses `Price` on `Service`, `Food`, and `Decor`?
-
 
 You will need to run the linear model before answering the question:
 `lm(Price ~ Service + Food + Decor, data=restNYC) |> tidy()`
 
 
+
 ```{r ex56, exercise=TRUE}
-
+lm(Price ~ Service + Food + Decor, data=restNYC) |> tidy()
 ```
 
-```{r ex56-hint}
-You have to consider the interpretation of a single variable while holding the other variables constant.
-```
-
-
-```{r ex56-solution}
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135.
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, given fixed values of `Food` and `Decor`.
-- For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, for any possible value of `Food` and `Decor`.
-- Given that `Food` and `Decor` are in the model, `Service` is not significant, and we cannot know whether it has effect on modeling `Price`.
+```{r option-ex56, echo=FALSE}
+question("What is the correct interpretation of the coefficient on `Service` in the linear model which regresses `Price` on `Service`, `Food`, and `Decor`?
+?",
+  answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135.", message="No. You have to consider the interpretation of a single variable while holding the other variables constant."),
+  answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, given fixed values of `Food` and `Decor`.", message="This interpretation of the point estimate is correct, but consider the large amount of uncertainty in this estimate. There is a better answer."),
+  answer("For every one unit increase in `Service`, the predicted average `Price` is expected to increase by 0.135, for any possible value of `Food` and `Decor`.", message="No. You have to consider the interpretation of a single variable while holding the other variables constant. Remember that `Food`, `Decor`, and `Service` are all positively correlated: if you find a restaurant with better `Service`, it also likely has better `Food` and better `Decor`, so a fair comparison requires holding those other variables constant."),
+  answer("Given that `Food` and `Decor` are in the model, `Service` is not significant, and we cannot know whether it has effect on modeling `Price`", correct=TRUE, message="Right!"),
+  allow_retry = TRUE
+)
 ```
 
 
