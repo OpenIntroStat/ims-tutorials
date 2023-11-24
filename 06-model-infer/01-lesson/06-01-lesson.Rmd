@@ -1109,8 +1109,6 @@ question("Which of the following combinations *increases* the variability in the
 )
 ```
 
-correct=TRUE, message="Right!  Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient."
-
 ## Congratulations!
 
 You have successfully completed Lesson 1 in Tutorial 6: Inferential modeling.  
