@@ -1095,28 +1095,21 @@ ggplot(many_samples, aes(x = explanatory, y = response, group = replicate)) +
 
 
 
-The last three exercises have demonstrated how the variability in the slope coefficient can change based on changes to the population and the sample.  Which of the following combinations *increases* the variability in the sampling distribution of the slope coefficient?
+The last three exercises have demonstrated how the variability in the slope coefficient can change based on changes to the population and the sample.  
 
 
-```{r 111, exercise=TRUE}
-
+```{r option-111, echo=FALSE}
+question("Which of the following combinations *increases* the variability in the sampling distribution of the slope coefficient?",
+  answer("Bigger sample size, larger variability around the line, increased range of explanatory variable", message="No, larger sample sizes and increased variability in the explanatory variable both lead to less variability of the slope coefficient."),
+  answer("Bigger sample size, larger variability around the line, decreased range of explanatory variable.", message="No, larger sample sizes leads to less variability of the slope coefficient."),
+  answer("Smaller sample size, smaller variability around the line, increased range of explanatory variable.", message="No, less variability around the line and increased variability in the explanatory variable both lead to less variability of the slope coefficient."),
+  answer("Smaller sample size, larger variability around the line, decreased range of explanatory variable.", correct=TRUE, message="Right!  Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient."),
+  answer("Smaller sample size, smaller variability around the line, decreased range of explanatory variable.", message="No, less variability around the line leads to less variability of the slope coefficient."),
+  allow_retry = TRUE
+)
 ```
 
-
-
-```{r 111-hint}
-Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient.
-```
-
-
-```{r 111-solution}
-- Bigger sample size, larger variability around the line, increased range of explanatory variable.
-- Bigger sample size, larger variability around the line, decreased range of explanatory variable.
-- Smaller sample size, smaller variability around the line, increased range of explanatory variable.
-- Smaller sample size, larger variability around the line, decreased range of explanatory variable.
-- Smaller sample size, smaller variability around the line, decreased range of explanatory variable.
-```
-
+correct=TRUE, message="Right!  Recall the more variability in the response and less variability in the explanatory variable *both* increase the variability of the slope coefficient."
 
 ## Congratulations!
 
