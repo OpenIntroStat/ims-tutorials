@@ -82,6 +82,64 @@ starbucks3 <- starbucks |>
 starbucks_many <- starbucks |>
   rep_sample_n(size=20, replace=FALSE, reps=50)
 
+
+set.seed(4747)
+twins_perm <- twins |> rep_sample_n(size=nrow(twins), reps=500) |>
+  group_by(replicate) |>
+  mutate(Biological_perm = sample(Biological)) |>
+  do(tidy(lm(Foster ~ Biological_perm, data=.)))
+
+biological_perm <- twins_perm |>
+  filter(term == "Biological_perm")
+
+model <- lm(Foster ~ Biological, data = twins)
+
+biological_term <- model |> 
+  tidy() |> 
+  filter(term == "Biological")
+
+# Make sure all columns print
+options(tibble.width = Inf)
+
+
+set.seed(4747)
+perm_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  hypothesize(null = "independence") |>
+  generate(reps = 1000, type = "permute") |>
+  calculate(stat = "slope") 
+  
+obs_slope <- lm(Foster ~ Biological, data = twins) |>
+  tidy() |>   
+  filter(term == "Biological") |>
+  select(estimate) |>   
+  pull() 
+
+
+set.seed(4747)
+boot_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
+  calculate(stat = "slope")
+
+alpha <- 0.05
+degrees_of_freedom <- nrow(twins) - 2
+confidence_level <- 1 - alpha
+p_upper <- 1 - alpha / 2
+critical_value <- qt(p_upper, df = degrees_of_freedom)
+model <- lm(Foster ~ Biological, data = twins)
+new_twins <- data.frame(Biological = seq(70, 130, 15))
+augmented_model <- model |> augment(newdata = new_twins, se_fit = TRUE)
+
+predictions <- augmented_model |>
+  # Calculate a confidence interval on the predicted values
+  mutate(
+    lower_mean_prediction = .fitted - critical_value * .se.fit,
+    upper_mean_prediction = .fitted + critical_value * .se.fit
+  )
+
+
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -319,17 +377,6 @@ question("Why does it matter if the sampling distribution is accurate?",
 Using the permuted datasets (recall, the randomization forces the null hypothesis to be true), investigate the distribution of the standardized slope statistics (the slope, which has been divided by the standard error). Note that the distribution of the standardized slope is well described by a t-distribution.
 
 
-```{r echo=TRUE, message=FALSE, eval=FALSE}
-set.seed(4747)
-twins_perm <- twins |> rep_sample_n(size=nrow(twins), reps=500) |>
-  group_by(replicate) |>
-  mutate(Biological_perm = sample(Biological)) |>
-  do(tidy(lm(Foster ~ Biological_perm, data=.)))
-```
-
-
-
-
 - Filter `twins_perm` for rows where `term` equals `"Biological_perm"`.
 - Calculated the degrees of freedom of `twins`, as the number of its rows minus two.
 
@@ -496,16 +543,6 @@ The biological term from the model is available as `biological_term`.
 
 
 
-
-```{r echo=TRUE, eval=FALSE}
-model <- lm(Foster ~ Biological, data = twins)
-biological_term <- model |> 
-  tidy() |> 
-  filter(term == "Biological")
-
-# Make sure all columns print
-options(tibble.width = Inf)
-```
 
 
 ```{r ex35, exercise=TRUE}
@@ -802,6 +839,8 @@ p_upper <- 1 - alpha / 2
 
 # Find the critical value from the t-distribution
 critical_value <- qt(p_upper, df = degrees_of_freedom)
+
+critical_value
 ```
 
 
@@ -917,6 +956,9 @@ p_lower <- alpha / 2
 
 # ... and the upper one
 p_upper <- 1 - alpha / 2
+
+p_lower
+p_upper
 ```
 
 
