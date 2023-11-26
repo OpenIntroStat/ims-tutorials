@@ -739,19 +739,6 @@ question("What can we conclude based on the p-value associated with the twins da
 ```
 
 
-```{r ex27-hint}
-Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.
-```
-
-
-```{r ex27-solution}
-- 
-- 
--
-- 
-```
-
-
 
 
 ## Simulation-based CI for slope
