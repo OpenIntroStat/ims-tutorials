@@ -44,6 +44,13 @@ manytwins_BS <- twins |>
 
 twin_lm <- lm(Foster ~ Biological, data = twins)
 
+set.seed(4747)
+boot_slope <- twins |>
+  specify(Foster ~ Biological) |>
+  generate(reps = 1000, type = "bootstrap") |>
+  calculate(stat = "slope")
+
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -653,6 +660,8 @@ abs_obs_slope <- lm(Foster ~ Biological, data = twins) |>
   pull(estimate) |>
   # Take the absolute value
   abs()
+
+abs_obs_slope
 ```
 
 
@@ -706,6 +715,7 @@ perm_slope |>
     # Get prop. cases where abs. permuted slope is greater than or equal to abs. observed slope
     p_value = mean(abs_perm_slope >= abs_obs_slope)
   )
+
 ```
 
 
@@ -714,12 +724,20 @@ perm_slope |>
 ### Inference on slope
 
 
-#### What can we conclude based on the p-value associated with the twins data?
 
 
-```{r ex27, exercise=TRUE}
 
+
+```{r option-ex27, echo=FALSE}
+question("What can we conclude based on the p-value associated with the twins data?",
+  answer("If there were no association between foster and biological twin IQ (no nature) in the population, we would be extremely unlikely to have collected a sample of data like we did. ", correct=TRUE, message="Right! Remember that here the p-value is measuring the probability of estimated slope being as large as what we observed if the population slope really is 0."),
+  answer("A biological twin's IQ being higher causes a foster twin's IQ to be higher.", message="No. Remember that correlation does not prove causation"),
+  answer("Biological twins' IQs are higher than foster twins' IQs, on average.", message="No. Remember that we are looking at whether the IQs tend to vary in the same direction."),
+  answer("Given the data, the probability of biological and foster twins' IQs being unrelated is close to zero.", message="No. Remember that we are looking at the probability of these data given the null hypothesis being true, not the probability of the hypothesis given the data!"),
+  allow_retry = TRUE
+)
 ```
+
 
 ```{r ex27-hint}
 Rememeber that a p-value is the probability of seeing data this (or more) extreme, given the null hypothesis is true.
@@ -727,10 +745,10 @@ Rememeber that a p-value is the probability of seeing data this (or more) extrem
 
 
 ```{r ex27-solution}
-- If there were no association between foster and biological twin IQ (no nature) in the population, we would be extremely unlikely to have collected a sample of data like we did. 
-- A biological twin's IQ being higher causes a foster twin's IQ to be higher.
-- Biological twins' IQs are higher than foster twins' IQs, on average.
-- Given the data, the probability of biological and foster twins' IQs being unrelated is close to zero.
+- 
+- 
+-
+- 
 ```
 
 
@@ -1025,25 +1043,19 @@ boot_slope |>
 
 ### Inference from randomization and bootstrapped distributions
 
-Throughout this lesson we have investigated the slope associated with the regression of `Foster` twins on `Biological` twins.  The inference question was based on a randomization test assuming no relationship between the two types of twins (i.e., a slope of zero).  The confidence intervals investigated a research question associated with a 100% nature relationship (i.e., a slope of one).  What are the appropriate conclusions of this study?
+Throughout this lesson we have investigated the slope associated with the regression of `Foster` twins on `Biological` twins.  The inference question was based on a randomization test assuming no relationship between the two types of twins (i.e., a slope of zero).  The confidence intervals investigated a research question associated with a 100% nature relationship (i.e., a slope of one).  
 
 
-```{r ex211, exercise=TRUE}
-
+```{r option-ex211, echo=FALSE}
+question("What are the appropriate conclusions of this study?",
+  answer("Zero is not a plausible value for the population slope, one is a plausible value for the population slope.", correct=TRUE, message="Right! Remember that any value in the confidence interval is a 'plausible value' for the population slope. Any value outside of the confidence interval is 'not plausible'."),
+  answer("Zero is not a plausible value for the estimated slope, one is a plausible value for the estimated slope.", message="No. Remember that we know the exact value of the 'estimated slope'. The challenge lies in using this estimated slope to discover 'plausible values' for the population slope!"),
+  answer("Zero is a plausible value for the population slope, one is not a plausible value for the population slope.", message="No. Remember that any value in the confidence interval is a 'plausible value' for the population slope. Any value outside of the confidence interval is 'not plausible'."),
+  answer("Zero is a plausible value for the estimated slope, one not is a plausible value for the estimated slope.", message="No. Remember that we know the exact value of the 'estimated slope'. The challenge lies in using this estimated slope to discover 'plausible values' for the population slope!"),
+  allow_retry = TRUE
+)
 ```
 
-
-```{r ex211-hint}
-Remember the difference between the population slope and the estimated slope. What do the inferential procedures you've performed say about each one?
-```
-
-
-```{r ex211-solution}
-- Zero is not a plausible value for the population slope, one is a plausible value for the population slope.
-- Zero is not a plausible value for the estimated slope, one is a plausible value for the estimated slope.
-- Zero is a plausible value for the population slope, one is not a plausible value for the population slope.
-- Zero is a plausible value for the estimated slope, one not is a plausible value for the estimated slope.
-```
 
 
 
