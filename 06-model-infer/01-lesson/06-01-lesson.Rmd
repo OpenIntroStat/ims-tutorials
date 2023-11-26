@@ -61,7 +61,7 @@ response <- 40 + explanatory*2 + rnorm(1000,0,10)
 popdata <- data.frame(explanatory,response)
 
 manysamples <- popdata |>
-rep_sample_n(size=50, reps=100)
+  rep_sample_n(size=50, reps=100)
 
 set.seed(4747)
 explanatory <- rnorm(1000, 0, 5)
