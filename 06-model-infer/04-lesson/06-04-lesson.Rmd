@@ -1,9 +1,9 @@
 ---
-  title: "Lesson 4 - Inference for Linear Regression in R"
+title: "Lesson 4 - Inference for Linear Regression in R"
 output: 
   learnr::tutorial:
-  progressive: true
-allow_skip: true
+    progressive: true
+    allow_skip: true
 runtime: shiny_prerendered
 ---
   
@@ -282,13 +282,13 @@ ggplot(linear_lm,
 
 
 fitted value: 
-  $\hat{Y}_i = b_0 + b_1 X_i$
+$\hat{Y}_i = b_0 + b_1 X_i$
   
-  residual:
-  $e_i= Y_i - \hat{Y}_i$
+residual:
+$e_i= Y_i - \hat{Y}_i$
   
   
-  ```{r}
+```{r}
 ggplot(linear_lm, aes(x=.fitted, y=.resid)) + geom_point() +
   geom_hline(yintercept=0)
 ```
@@ -306,9 +306,9 @@ The residual plot here (fitted value plotted on the x-axis, residual values plot
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
   
-  $$\epsilon \sim N(0, \sigma_\epsilon)$$
+$$\epsilon \sim N(0, \sigma_\epsilon)$$
   
-  * L: linear model
+* L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
 * E: equal variability around the line for all values of the explanatory variable
@@ -322,10 +322,10 @@ The plot here demonstrates a clear violation of the linear model.  The variables
   
   
   
-  ### Not linear: residuals
+### Not linear: residuals
   
   
-  ```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE}
 nonlinear_lm <- augment(
   lm(response ~ explanatory, data = nonlineardata)
 )
@@ -338,13 +338,13 @@ ggplot(nonlinear_lm,
 
 
 fitted value: 
-  $\hat{Y}_i = b_0 + b_1 X_i$
+$\hat{Y}_i = b_0 + b_1 X_i$
   
-  residual:
-  $e_i= Y_i - \hat{Y}_i$
+residual:
+$e_i= Y_i - \hat{Y}_i$
   
   
-  The residuals associated with the quadratic model also look curved.  For the technical conditions to hold, you need a non-patterned scattering of points.  Just like the original scatter plot, the residual plot with fitted value on the x-axis, and residual on the y-axis continues to demonstrates a violation of the linear technical condition.
+The residuals associated with the quadratic model also look curved.  For the technical conditions to hold, you need a non-patterned scattering of points.  Just like the original scatter plot, the residual plot with fitted value on the x-axis, and residual on the y-axis continues to demonstrates a violation of the linear technical condition.
 
 
 
@@ -355,9 +355,9 @@ fitted value:
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
   
-  $$\epsilon \sim N(0, \sigma_\epsilon)$$
+$$\epsilon \sim N(0, \sigma_\epsilon)$$
   
-  * L: linear model
+* L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
 * E: equal variability around the line for all values of the explanatory variable
@@ -385,14 +385,15 @@ ggplot(nonnormal_lm,
   geom_point() +
   geom_hline(yintercept = 0) 
 ```
+
 fitted value: 
-  $\hat{Y}_i = b_0 + b_1 X_i$
+$\hat{Y}_i = b_0 + b_1 X_i$
   
-  residual:
-  $e_i= Y_i - \hat{Y}_i$
+residual:
+$e_i= Y_i - \hat{Y}_i$
   
   
-  The residual plot makes it even easier to see the violation of the technical condition related to normality.  If the residuals were normally distributed around the line, they would be equally far from the line in the positive and negative direction.  Here, the points below the line do not spread out nearly as far as the points above the line.
+The residual plot makes it even easier to see the violation of the technical condition related to normality.  If the residuals were normally distributed around the line, they would be equally far from the line in the positive and negative direction.  Here, the points below the line do not spread out nearly as far as the points above the line.
 
 
 
@@ -401,9 +402,9 @@ fitted value:
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
   
-  $$\epsilon \sim N(0, \sigma_\epsilon)$$
+$$\epsilon \sim N(0, \sigma_\epsilon)$$
   
-  * L: linear model
+* L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
 * E: equal variability around the line for all values of the explanatory variable
@@ -434,14 +435,14 @@ ggplot(nonequal_lm,
 
 fitted value:
   
-  $\hat{Y}_i = b_0 + b_1 X_i$
+$\hat{Y}_i = b_0 + b_1 X_i$
   
-  residual:
+residual:
   
-  $e_i= Y_i - \hat{Y}_i$
+$e_i= Y_i - \hat{Y}_i$
   
   
-  Once again, the residual plot accentuates the technical condition violation by demonstrating the increasing variability of the residuals around the line as the fitted value increases.
+Once again, the residual plot accentuates the technical condition violation by demonstrating the increasing variability of the residuals around the line as the fitted value increases.
 
 ###  
 
@@ -454,7 +455,7 @@ As mentioned previously, meeting the technical conditions will help to ensure th
 Which of the linear regression technical conditions are violated in the given figure?
   
   
-  ```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 require(mosaic)
 require(ggplot2)
 n = 100
@@ -470,12 +471,12 @@ Hint: These data do violate one of the technical conditions for *linear* regress
 
 ```{r option-a1, echo=FALSE}
 question("Which of the linear regression technical conditions are violated in the given figure?",
-         answer("*L*inearity",correct = TRUE, message="Right!  The variables do not show a linear relationship"),
-         answer("*I*ndependence of errors", message="No, this condition seems fine.  Try again."),
-         answer("*N*ormality of the response variable around the line", message="No, this condition seems fine.  Try again."),
-         answer("*E*qual variability around the entire line", message="No, this condition seems fine.  Try again."),
-         answer("No technical conditions are violated", message="The technical conditions are violated."),
-         allow_retry = TRUE
+  answer("*L*inearity",correct = TRUE, message="Right!  The variables do not show a linear relationship"),
+  answer("*I*ndependence of errors", message="No, this condition seems fine.  Try again."),
+  answer("*N*ormality of the response variable around the line", message="No, this condition seems fine.  Try again."),
+  answer("*E*qual variability around the entire line", message="No, this condition seems fine.  Try again."),
+  answer("No technical conditions are violated", message="The technical conditions are violated."),
+  allow_retry = TRUE
 )
 ```
 
@@ -488,7 +489,7 @@ Which of the linear regression technical conditions are violated in the given fi
   
   
   
-  ```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 require(mosaic)
 require(ggplot2)
 n = 100
@@ -506,12 +507,12 @@ Hint: These data do violate one of the conditions for linear regression. Look at
 
 ```{r option-c1, echo=FALSE}
 question("Which of the linear regression technical conditions are violated in the given figure?",
-         answer("*L*inearity", message="No, this condition seems fine.  Try again."),
-         answer("*I*ndependence of errors", message="No, this condition seems fine.  Try again."),
-         answer("*N*ormality of the response variable around the line", message="No, this condition seems fine.  Try again."),
-         answer("*E*qual variability around the entire line", message="Right!  The variability around the line increases as the explanatory variable (X) increases.", correct=TRUE),
-         answer("No technical conditions are violated", message="The technical conditions are violated."),
-         allow_retry = TRUE
+  answer("*L*inearity", message="No, this condition seems fine.  Try again."),
+  answer("*I*ndependence of errors", message="No, this condition seems fine.  Try again."),
+  answer("*N*ormality of the response variable around the line", message="No, this condition seems fine.  Try again."),
+  answer("*E*qual variability around the entire line", message="Right!  The variability around the line increases as the explanatory variable (X) increases.", correct=TRUE),
+  answer("No technical conditions are violated", message="The technical conditions are violated."),
+  allow_retry = TRUE
 )
 ```
 
@@ -696,7 +697,7 @@ The second method uses a randomization test which assumes that the observations 
 
 What happens if inferences is performed when the technical conditions are violated?
   
-  Hint: More than one thing can go wrong when the technical conditions for regression are violated.
+Hint: More than one thing can go wrong when the technical conditions for regression are violated.
 
 ```{r option-b1, echo=FALSE}
 question("What happens if inferences is performed when the technical conditions are violated?",
@@ -842,9 +843,9 @@ The data provided in this exercise (`hypdata_outlier`) has an extreme outlier.  
 
 - Filter `hypdata_outlier` to remove the outlier.
 - Update the plot, `p`, to add another smooth layer (use `geom_smooth`). 
-- Like the other ribbon, the update should use the linear regression method, and not draw the ribbon.
-- Unlike the other ribbon, the update should use the `data = hypdata_no_outlier` and be colored red.
-- For now, just use the smooth curve, and not the confidence bounds (`se = FALSE`).
+  - Like the other ribbon, the update should use the linear regression method, and not draw the ribbon.
+  - Unlike the other ribbon, the update should use the `data = hypdata_no_outlier` and be colored red.
+  - For now, just use the smooth curve, and not the confidence bounds (`se = FALSE`).
 
 
 
@@ -913,7 +914,7 @@ The datasets with and without the outlier are provided as `hypdata_outlier` and 
   
   
   
-  ```{r exer45, exercise=TRUE}
+```{r exer45, exercise=TRUE}
 # Model response vs. explanatory on hypdata_outlier and tidy it
 ___
 
@@ -995,11 +996,11 @@ Before we embark on what to do when the model technical assumptions are violated
 
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$ 
-  
-  where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
-  
-  Recall the linear model that we've been working with.  Note that X and Y have a linear relationship and the noise term gets added on.  Also, recall that the noise values come from a normal distribution centered around zero.  Transforming either the explanatory (X) or response (Y) variables will change the entire form of the model.  
+
+where $\epsilon \sim N(0, \sigma_\epsilon)$
+
+
+Recall the linear model that we've been working with.  Note that X and Y have a linear relationship and the noise term gets added on.  Also, recall that the noise values come from a normal distribution centered around zero.  Transforming either the explanatory (X) or response (Y) variables will change the entire form of the model.  
 
 In order to perform an inferential analysis to describe the variables, the technical conditions must be met.  That means, we need a linear relationship between x and y.  Sometimes, there doesn't exist a linear relationship between x and y but there does exist a linear relationship between a function of x or a function of y.
 
@@ -1007,11 +1008,11 @@ In order to perform an inferential analysis to describe the variables, the techn
 
 $Y = \beta_0 + \beta_1 \cdot X + \beta_2 \cdot X^2 + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
-  $Y = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
+$Y = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
-  $Y = \beta_0 + \beta_1 \cdot \sqrt{X} + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
+$Y = \beta_0 + \beta_1 \cdot \sqrt{X} + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
-  When the data come from a model which is a function of the explanatory variable, the model stays linear.  However, it becomes linear in a function of X instead of linear in X itself.  We say: y is a linear function of x and x-squared (together) or y is a linear function of the log of x.  ... of the square root.
+When the data come from a model which is a function of the explanatory variable, the model stays linear.  However, it becomes linear in a function of X instead of linear in X itself.  We say: y is a linear function of x and x-squared (together) or y is a linear function of the log of x.  ... of the square root.
 
 But importantly, changing the values of X do not change the values of the residuals, as they are still modeled to be normally distributed and centered around zero with constant variance.
 
@@ -1019,7 +1020,7 @@ But importantly, changing the values of X do not change the values of the residu
 
 ```{r echo=FALSE, eval=TRUE}
 ggplot(data=data_nonlin, 
-       aes(x=explanatory, y=response)) + 
+     aes(x=explanatory, y=response)) + 
   geom_point() +
   ggtitle("Non-linear data")
 ```
@@ -1027,7 +1028,7 @@ ggplot(data=data_nonlin,
 
 ```{r eval=TRUE, echo=FALSE}
 ggplot(data=data_nonlin, 
-       aes(x=explanatory^2, y=response))+ 
+     aes(x=explanatory^2, y=response))+ 
   geom_point() +
   ggtitle("Square transformation on explanatory variable")
 ```
@@ -1042,12 +1043,12 @@ When the true model is given by Y versus the squareroot of X, we can linearize t
 
 $Y^2 = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
-  $\ln(Y) = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
+$\ln(Y) = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
-  $\sqrt{Y} = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
+$\sqrt{Y} = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
   
   
-  Unlike transformations on the explanatory variable, when a response variable is transformed, the relationship between the linear model and the error terms is also changed.
+Unlike transformations on the explanatory variable, when a response variable is transformed, the relationship between the linear model and the error terms is also changed.
 
 
 
