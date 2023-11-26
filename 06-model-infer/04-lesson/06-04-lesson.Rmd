@@ -6,7 +6,7 @@ output:
     allow_skip: true
 runtime: shiny_prerendered
 ---
-  
+
 ```{r setup, include=FALSE}
 library(learnr)
 library(openintro)
@@ -283,11 +283,11 @@ ggplot(linear_lm,
 
 fitted value: 
 $\hat{Y}_i = b_0 + b_1 X_i$
-  
+
 residual:
 $e_i= Y_i - \hat{Y}_i$
-  
-  
+
+
 ```{r}
 ggplot(linear_lm, aes(x=.fitted, y=.resid)) + geom_point() +
   geom_hline(yintercept=0)
@@ -305,9 +305,9 @@ The residual plot here (fitted value plotted on the x-axis, residual values plot
 
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
-  
+
 $$\epsilon \sim N(0, \sigma_\epsilon)$$
-  
+
 * L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
@@ -319,12 +319,12 @@ ggplot(nonlineardata, aes(x=explanatory, y=response)) + geom_point()
 ```
 
 The plot here demonstrates a clear violation of the linear model.  The variables have a quadratic relationship, not a linear one!
-  
-  
-  
+
+
+
 ### Not linear: residuals
-  
-  
+
+
 ```{r echo=TRUE, eval=TRUE}
 nonlinear_lm <- augment(
   lm(response ~ explanatory, data = nonlineardata)
@@ -339,11 +339,11 @@ ggplot(nonlinear_lm,
 
 fitted value: 
 $\hat{Y}_i = b_0 + b_1 X_i$
-  
+
 residual:
 $e_i= Y_i - \hat{Y}_i$
-  
-  
+
+
 The residuals associated with the quadratic model also look curved.  For the technical conditions to hold, you need a non-patterned scattering of points.  Just like the original scatter plot, the residual plot with fitted value on the x-axis, and residual on the y-axis continues to demonstrates a violation of the linear technical condition.
 
 
@@ -354,9 +354,9 @@ The residuals associated with the quadratic model also look curved.  For the tec
 
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
-  
+
 $$\epsilon \sim N(0, \sigma_\epsilon)$$
-  
+
 * L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
@@ -378,7 +378,7 @@ The violation here is not as obvious as the non-linear violation.  In this plot,
 ```{r echo=TRUE, eval=FALSE}
 nonnormal_lm <- augment(
   lm(response ~ explanatory, data = nonnormaldata)
-)
+  )
 
 ggplot(nonnormal_lm, 
        aes(x = .fitted, y = .resid)) + 
@@ -388,11 +388,11 @@ ggplot(nonnormal_lm,
 
 fitted value: 
 $\hat{Y}_i = b_0 + b_1 X_i$
-  
+
 residual:
 $e_i= Y_i - \hat{Y}_i$
-  
-  
+
+
 The residual plot makes it even easier to see the violation of the technical condition related to normality.  If the residuals were normally distributed around the line, they would be equally far from the line in the positive and negative direction.  Here, the points below the line do not spread out nearly as far as the points above the line.
 
 
@@ -401,9 +401,9 @@ The residual plot makes it even easier to see the violation of the technical con
 
 
 $$Y = \beta_0 + \beta_1 \cdot X + \epsilon$$
-  
+
 $$\epsilon \sim N(0, \sigma_\epsilon)$$
-  
+
 * L: linear model
 * I: independent observations
 * N: points are normally distributed around the line
@@ -434,14 +434,14 @@ ggplot(nonequal_lm,
 ```
 
 fitted value:
-  
+
 $\hat{Y}_i = b_0 + b_1 X_i$
-  
+
 residual:
-  
+
 $e_i= Y_i - \hat{Y}_i$
-  
-  
+
+
 Once again, the residual plot accentuates the technical condition violation by demonstrating the increasing variability of the residuals around the line as the fitted value increases.
 
 ###  
@@ -453,8 +453,8 @@ As mentioned previously, meeting the technical conditions will help to ensure th
 
 
 Which of the linear regression technical conditions are violated in the given figure?
-  
-  
+
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 require(mosaic)
 require(ggplot2)
@@ -486,9 +486,9 @@ question("Which of the linear regression technical conditions are violated in th
 
 
 Which of the linear regression technical conditions are violated in the given figure?
-  
-  
-  
+
+
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 require(mosaic)
 require(ggplot2)
@@ -696,17 +696,17 @@ So far, you have implemented two approaches for performing inference assessment 
 The second method uses a randomization test which assumes that the observations are exchangeable under the null hypothesis. That is, when the null hypothesis (X is independent of Y) is true, the Y values can be swapped among the X values.  The technical conditions in the randomization setting are linear relationship, independent observations, and equal variances.  However, the normality assumption is not needed.
 
 What happens if inferences is performed when the technical conditions are violated?
-  
+
 Hint: More than one thing can go wrong when the technical conditions for regression are violated.
 
 ```{r option-b1, echo=FALSE}
 question("What happens if inferences is performed when the technical conditions are violated?",
-         answer("If the technical conditions are violated, the software will not compute a p-value", message="The software will always provide a p-value, even if the number is meaningless"),
-         answer("If the technical conditions are violated, the p-value will not represent the probability of the data given the null hypothesis is true.", message="True... but there is more."),
-         answer("If the technical conditions are violated, the CI procedure will not capture the true parameter in 95% of samples.", message="True... but there is more."),
-         answer("All of the above.", message="No. The p-value is always calculated, regardless of whether the distribution is appropriate."),
-         answer("Some of the above.", message="Yes, the probabilities for both the p-value and the CI are based an accurate sampling distribution.", correct=TRUE),
-         allow_retry = TRUE
+  answer("If the technical conditions are violated, the software will not compute a p-value", message="The software will always provide a p-value, even if the number is meaningless"),
+  answer("If the technical conditions are violated, the p-value will not represent the probability of the data given the null hypothesis is true.", message="True... but there is more."),
+  answer("If the technical conditions are violated, the CI procedure will not capture the true parameter in 95% of samples.", message="True... but there is more."),
+  answer("All of the above.", message="No. The p-value is always calculated, regardless of whether the distribution is appropriate."),
+  answer("Some of the above.", message="Yes, the probabilities for both the p-value and the CI are based an accurate sampling distribution.", correct=TRUE),
+  allow_retry = TRUE
 )
 ```
 
@@ -911,9 +911,9 @@ The datasets with and without the outlier are provided as `hypdata_outlier` and 
 - Run a linear regression of `response` vs. `explanatory` on `hypdata_outlier`, and extract the coefficient-level information.
 - Do the same for `hypdata_no_outlier`.
 - Look at the output. How do the coefficients and p-values differ?
-  
-  
-  
+
+
+
 ```{r exer45, exercise=TRUE}
 # Model response vs. explanatory on hypdata_outlier and tidy it
 ___
@@ -1007,11 +1007,11 @@ In order to perform an inferential analysis to describe the variables, the techn
 ### Transforming the explanatory variable
 
 $Y = \beta_0 + \beta_1 \cdot X + \beta_2 \cdot X^2 + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
+
 $Y = \beta_0 + \beta_1 \cdot \ln(X) + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
+
 $Y = \beta_0 + \beta_1 \cdot \sqrt{X} + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
+
 When the data come from a model which is a function of the explanatory variable, the model stays linear.  However, it becomes linear in a function of X instead of linear in X itself.  We say: y is a linear function of x and x-squared (together) or y is a linear function of the log of x.  ... of the square root.
 
 But importantly, changing the values of X do not change the values of the residuals, as they are still modeled to be normally distributed and centered around zero with constant variance.
@@ -1042,12 +1042,12 @@ When the true model is given by Y versus the squareroot of X, we can linearize t
 
 
 $Y^2 = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
+
 $\ln(Y) = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
+
 $\sqrt{Y} = \beta_0 + \beta_1 \cdot X + \epsilon$, where $\epsilon \sim N(0, \sigma_\epsilon)$
-  
-  
+
+
 Unlike transformations on the explanatory variable, when a response variable is transformed, the relationship between the linear model and the error terms is also changed.
 
 
@@ -1097,8 +1097,8 @@ In this first example, it appears as though the variables are not linearly relat
 - Run a linear regression of `response` versus `explanatory` on `hypdata_nonlinear`.
 - Get the observation-level information from the model.
 - Using `modeled_observations`, plot the residuals versus the fitted values.
-- Add a point layer.
-- Add a horizontal line at `y = 0` using `geom_hline()` and setting `yintercept` to `0`.
+  - Add a point layer.
+  - Add a horizontal line at `y = 0` using `geom_hline()` and setting `yintercept` to `0`.
 
 
 
@@ -1364,8 +1364,8 @@ In this last example, it appears as though the points are not normally distribut
 - Run a linear regression of `response` versus `explanatory` on `hypdata_nonnorm`.
 - Get the observation-level information from the model.
 - Using `modeled_observations`, plot the residuals versus the fitted values.
-- Add a point layer.
-- Add a horizontal line at `y = 0` using `geom_hline()` and setting `yintercept` to `0`.
+  - Add a point layer.
+  - Add a horizontal line at `y = 0` using `geom_hline()` and setting `yintercept` to `0`.
 
 
 ```{r ex411, exercise=TRUE}
@@ -1488,7 +1488,7 @@ You have successfully completed Lesson 4 in Tutorial 6: Inferential modeling.
 If you need to generate a hash for submission, click "Next Topic".
 
 What's next?
-  
+
 `r emo::ji("ledger")` [Full list of tutorials supporting OpenIntro::Introduction to Modern Statistics](https://openintrostat.github.io/ims-tutorials/)
 
 `r emo::ji("spiral_notepad")` [Tutorial 6: Inferential modeling](https://openintrostat.github.io/ims-tutorials/06-model-infer/)
