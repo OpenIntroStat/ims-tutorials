@@ -30,6 +30,9 @@ knitr::opts_chunk$set(fig.align = "center",
 manhattan <- read_csv("data/manhattan.csv")
 set.seed(20170801)
 
+ncbirths_complete_visits <- ncbirths |>
+  filter(!is.na(visits))
+
 # Hash generation helpers
 # Should ideally be loaded from the imstutorials package when it exists
 is_server_context <- function(.envir) {
@@ -731,12 +734,6 @@ Fantastic! Quick mental check before you move on: How would you interpret this i
 ### SD of number of doctor's visits
 
 Suppose now we're interested in the standard deviation of the number of doctor's visits throughout pregnancy.
-
-```{r doctor_4-setup, include=FALSE}
-# Remove NA visits
-ncbirths_complete_visits <- ncbirths |>
-  filter(!is.na(visits))
-```
 
 For the number of doctor's visits, first generate 15000 bootstrap replicates and calculate their standard deviations.
 
