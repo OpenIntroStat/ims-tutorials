@@ -299,7 +299,7 @@ Since the population standard deviation is often unknown, in practice, the stand
 
 And this additional uncertainty introduced by using the sample standard deviation is mitigated by using a t-distribution with degrees of freedom n - 1 since compared to the normal distribution the t-distribution is more conservative with thicker tails.
 
-And as with most theorems, this one also only applies if certain condition are mathematically met. However, it would be incredibly difficult to "prove" that these conditions are mathematically "met," so, instead, we will evaluate the degree to which it appears that these mathematical conditions are violated. 
+And as with most theorems, this one also only applies if certain conditions are mathematically met. However, it would be incredibly difficult to "prove" that these conditions are mathematically "met," so, instead, we will evaluate the degree to which it appears that these mathematical conditions are violated. 
 
 
 ### Conditions
@@ -456,7 +456,7 @@ It appears that the median writing score is slightly higher than the median read
 
 ### Independent scores?
 
-> Can reading and writing scores for a given student student assumed to be independent of each other?
+> Can reading and writing scores for a given student assumed to be independent of each other?
 > Probably not! 
 
 A student's reading score is likely not independent of their writing score. As both tests reflect students' knowledge, it is likely that they share information. 
@@ -516,13 +516,13 @@ Time to put this into practice.
 
 A random sample was taken of nearly 10% of UCLA courses. The most expensive textbook for each course was identified, and its price at the UCLA Bookstore and on Amazon.com were recorded. These data are recorded in the `textbooks` dataset. We want to test whether there is a difference between the average prices of textbooks sold in the UCLA bookstore vs. on Amazon. 
 
-Since the book price data are *paired* (the price of the same book at the two stores are not independent), rather than using individual variables for the prices from each store, you will look at the a single variables of the differences in price. The `diff` column can be calculated as the UCLA Bookstore price minus the Amazon.com price for each book.
+Since the book price data are *paired* (the price of the same book at the two stores are not independent), rather than using individual variables for the prices from each store, you will look at the single variable of the differences in price. The `diff` column can be calculated as the UCLA Bookstore price minus the Amazon.com price for each book.
 
 The data on these prices is stored in the `textbooks` dataset. The difference in prices has been calculated for you and stored in the `diff` column. 
 
 In this exercise you will: 
 
-- Construct a 90% confidence interval for the average difference in prices of the same textbook at at the UCLA bookstore and on Amazon.
+- Construct a 90% confidence interval for the average difference in prices of the same textbook at the UCLA bookstore and on Amazon.
 - Construct the same interval at the 95% confidence level.
 - And again at the 99% confidence level.
 - Take a note of the widths of the intervals. You'll need these for the next exercise.

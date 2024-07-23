@@ -629,7 +629,7 @@ Lastly, we calculate the interval using the percentile or the standard error met
 > 1. Take a bootstrap sample *of each sample* - a random sample taken with replacement from each of the original samples, of the same size as each of the original sample.
 > 2. Calculate the bootstrap statistic - a statistic such as *difference* in means, medians, proportion, etc. computed based on the bootstrap sample.
 > 3. Repeat steps (1) and (2) many times to create a bootstrap distribution - a sampling distribution of bootstrap statistics.
-> 4. Calculate the a confidence interval for the population parameter using the percentile or the standard error method.
+> 4. Calculate a confidence interval for the population parameter using the percentile or the standard error method.
 
 Now let's try some exercises.  
 
@@ -949,9 +949,9 @@ First, we need independence. But independence of what?
 
 Observations in each sample should be independent of each other. We discussed earlier that this is a difficult condition to check, but there are a few "simple" checks we can make. First, did the study use random sampling? If so, the observations can be assumed to be independent! Second, did the study use random assignment? If so, the observations between groups can be assumed to be independent. Third, did the study use random sampling without replacement (almost all observational studies do this) and is the sample less than 10% of their respective populations? If so, we can also be fairly comfortable assuming that the observations are independent. 
 
-The American Community Survey employs random sampling, and our sample sizes are definitely less than 10% of all citizens and non citizens in the US. Also, observations across the two samples should be independent of each other, as it would be impossible for an individual to be both a citizen and an non-citizen. 
+The American Community Survey employs random sampling, and our sample sizes are definitely less than 10% of all citizens and non-citizens in the US. Also, observations across the two samples should be independent of each other, as it would be impossible for an individual to be both a citizen and an non-citizen. 
 
-The distributions of each group's hourly rate appears skewed, but they do exhibit similar spread. Both groups have values from close to 0 to values close to 200. There is one observation in the citizen group with a pay of $300, but the condition is not violated from one observation! 
+The distributions of each group's hourly rate appear skewed, but they do exhibit similar spread. Both groups have values from close to 0 to values close to 200. There is one observation in the citizen group with a pay of $300, but the condition is not violated from one observation! 
 
 Lastly, we need to assess if the distributions of each group appear approximately normal. Indeed, there is a substantial skew to each distribution which may be concerning. However, for larger sample sizes, we can assume that the distribution of differences in means are normal, even if the distributions of the groups are not. Here, we have sample sizes of 58 (non-citizen) and 901 (citizen) which aids us in assuming that the distribution of difference in sample means can be assumed to be fairly normal.
 

@@ -320,7 +320,7 @@ In the previous tutorials you have already discussed percentile and standard err
 
 Here is our bootstrap distribution, comprised of 15000 bootstrap medians. Each observation in this plot is a median from a bootstrap sample. And remember that each bootstrap sample is a sample taken with replacement from the original sample, and of the same size as the original sample. 
 
-It's really important to  understand what "with replacement" means in this context, as well as the purpose it serves. Say w had a bag with 20 cards in it, each card showing the rent for one of the apartments in my original sample. Taking a bootstrap sample from this bag would mean picking a card, noting the rent on that card, and then putting the card back into the bag before selecting the next card. So the first card becomes a candidate for the second draw as well. Suppose that the first apartment we select from the sample has a rent of 2000 dollars. The idea behind sampling with replacement is that there may be many other such apartments in the population, so if we had the luxury to go back and sample from the population, we could conceivably get more such apartments in our sample.
+It's really important to  understand what "with replacement" means in this context, as well as the purpose it serves. Say we had a bag with 20 cards in it, each card showing the rent for one of the apartments in my original sample. Taking a bootstrap sample from this bag would mean picking a card, noting the rent on that card, and then putting the card back into the bag before selecting the next card. So the first card becomes a candidate for the second draw as well. Suppose that the first apartment we select from the sample has a rent of 2000 dollars. The idea behind sampling with replacement is that there may be many other such apartments in the population, so if we had the luxury to go back and sample from the population, we could conceivably get more such apartments in our sample.
 
 Using this bootstrap distribution we can calculate a confidence interval in one of two ways.
 
@@ -344,7 +344,7 @@ So the bounds of a 95% confidence interval are the 2.5th and the 97.5th percenti
 sample statistic $\pm$ $t\_{df = n - 1}^*$ $\times$ $SE\_{boot}$
 
 - $df$ for $t^*$ is $n - 1$, where $n$ is the sample size 
-- $SE_{boot}$ is the standard deviation of the bootstrap distribution distribution 
+- $SE_{boot}$ is the standard deviation of the bootstrap distribution  
 
 
 A second, and a more accurate, method is the standard error method. In this method we calculate the interval as the sample statistic plus or minus t-star times the bootstrap standard error.
