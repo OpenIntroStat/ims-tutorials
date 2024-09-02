@@ -1144,17 +1144,18 @@ This function has three arguments (inputs):
 2. the observed statistic (`obs_stat`) 
 3. the direction of the alternative hypothesis ("greater", "less", or "two-sided")
 
-We can also use the `visualize()` function to visualize where the observed statistic falls in the distribution of permuted statistics, and shade the direction that the p-value was calculated from. 
-The `visualize()` function has many inputs (find out more by typing `?visualize` in your console), but the most important ones are the __same__ as the `get_p_value()` function!  
+We can also use the `visualize()` and `shade_p_value()` functions to visualize where the observed statistic falls in the distribution of permuted statistics, and shade the direction that the p-value was calculated from. 
+The `shade_p_value()` function has many inputs (find out more by typing `?shade_p_value` in your console), but the most important ones are the __same__ as the `get_p_value()` function!  
 
-Now, use the `visualize()` and `get_p_value()` functions for the original, small, and big datasets. 
-First `visualize()` where the p-value lies on the distibution, and then calculate the p-value. 
+Now, use the `visualize()`, `shade_p_value()`, and `get_p_value()` functions for the original, small, and big datasets. 
+First use `shade_p_value()` to see where the p-value lies on the distribution, and then calculate the p-value. 
 
 - You can test out the different methods for calculating the p-value by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"`. 
 
 ```{r pvalue, exercise=TRUE}
 # Visualize and calculate the p-value for the original dataset
 gender_discrimination_perm |>
+  visualize() +
   ___(obs_stat = ___, direction = "___")
 
 gender_discrimination_perm |>
@@ -1162,6 +1163,7 @@ gender_discrimination_perm |>
 
 # Visualize and calculate the p-value for the small dataset
 ___ |>
+  visualize() +
   ___(___, ___)
 
 ___ |>
@@ -1169,6 +1171,7 @@ ___ |>
 
 # Visualize and calculate the p-value for the big dataset
 ___ |>
+  visualize() +
   ___(___, ___)
 
 ___ |>
@@ -1176,27 +1179,30 @@ ___ |>
 ```
 
 ```{r pvalue-hint}
- Argument of the both functions should be `obs_stat = diff_orig, direction = "greater"`, but remember to use the correct dataset! 
+ Arguments of both `shade_p_value()` and `get_p_value()` functions should be `obs_stat = diff_orig, direction = "greater"`, but remember to use the correct dataset! 
 ```
 
 ```{r pvalue-solution}
 # Visualize and calculate the p-value for the original dataset
 gender_discrimination_perm |>
-  visualize(obs_stat = diff_orig, direction = "greater")
+  visualize() +
+  shade_p_value(obs_stat = diff_orig, direction = "greater")
 
 gender_discrimination_perm |>
   get_p_value(obs_stat = diff_orig, direction = "greater")
 
 # Visualize and calculate the p-value for the small dataset
 gender_discrimination_small_perm |>
-  visualize(obs_stat = diff_orig_small, direction = "greater")
+  visualize() +
+  shade_p_value(obs_stat = diff_orig_small, direction = "greater")
 
 gender_discrimination_small_perm |>
   get_p_value(obs_stat = diff_orig_small, direction = "greater")
 
 # Visualize and calculate the p-value for the big dataset
 gender_discrimination_big_perm |>
-  visualize(obs_stat = diff_orig_big, direction = "greater")
+  visualize() +
+  shade_p_value(obs_stat = diff_orig_big, direction = "greater")
 
 gender_discrimination_big_perm |>
   get_p_value(obs_stat = diff_orig_big, direction = "greater")
