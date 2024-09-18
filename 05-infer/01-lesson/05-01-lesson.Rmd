@@ -235,7 +235,7 @@ p_hat_happy
 
 We learn that around 77% of our sample is "happy". If this were a simple random sample from the American population, this would be a good estimate of the percent of all Americans that are very happy, but it's not a sure thing since we only asked a small proportion of them.
 
-## How is does the GSS select respondents?
+## How does the GSS select respondents?
 
 Remember that not all randomly sampled data is the same -- a sample can be a simple random sample, a stratified sample, a cluster sample, or something more complex. The respondents to the GSS come from a complex survey design and appropriate inference for these data would account for this survey design. 
 
@@ -853,7 +853,7 @@ In the following exercises you'll get the chance to explore these factors and ho
 
 We learned that for a 95% confidence interval (a confidence level of .95), if we were to take many samples of the same size and compute many intervals, we would expect 95% of the resulting intervals to contain the parameter. Based on the set of confidence intervals plotted here, what is your best guess at the confidence level used in these intervals?
 
-The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from it's p-hat. Intervals that capture the true value are in green; those that miss it are in red.
+The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from its p-hat. Intervals that capture the true value are in green; those that miss it are in red.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/gssMany-happy-nocapture_65.png")
@@ -1036,18 +1036,24 @@ boot_dist_smaller_n <- gss2016_smaller |>
 SE_smaller_n <- ___ |>
   ___ |>
   ___
+
+SE_smaller_n
 ```
 
-```{r ex12-hint, exercise=TRUE}
+```{r ex12-hint}
 SE_smaller_n <- boot_dist_smaller_n |>
   summarize(se = sd(stat)) |>
   ___
+
+SE_smaller_n
 ```
 
-```{r ex12-solution, exercise=TRUE}
+```{r ex12-solution}
 SE_smaller_n <- boot_dist_smaller_n |>
   summarize(se = sd(stat)) |>
   pull()
+
+SE_smaller_n
 ```
 
 ### 
@@ -1083,7 +1089,7 @@ SE_small_n > SE_smaller_n
 
 ### SE with different p
 
-You just saw the effect that _sample size_ can have on inference, but that's not the only variable in play here. Let's return now to our full data set and see what happens to the SE when we consider a category that has a different _population proportion_, p.
+You just saw the effect that _sample size_ can have on inference, but that's not the only variable at play here. Let's return now to our full data set and see what happens to the SE when we consider a category that has a different _population proportion_, p.
 
 Remember that the proportion of "High" confidence in science in 2016 was pretty close to 0.50.
 
@@ -1114,7 +1120,7 @@ boot_dist_low_p <- gss2016 |>
   generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_low_p <- boot_dist |>
+SE_low_p <- boot_dist_low_p |>
   ___(se = ___) |>
   ___
 
@@ -1245,7 +1251,7 @@ SE_happy_approx
 
 ### Calculating standard error: computation
 
-How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for p-hat, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.032. Those are remarkably similar values! Let's go a step farther.
+How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for $\hat{p}$, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.035. Those are remarkably similar values! Let's go a step farther.
 
 ```{r echo=TRUE}
 boot_dist_happy <- gss2016 |>
@@ -1260,14 +1266,12 @@ SE_happy_boot
 
 ### Shape of sampling distributions
 
-Let's also take a look at the shape of this bootstrap distribution. A density plot suggests that it's unimodal and symmetric. Let's add a layer to this plot that contains the normal curve that's centered at p-hat has uses the equation to find the standard deviation. And yes, let's make that curve purple.
+Let's also take a look at the shape of this bootstrap distribution. A density plot suggests that it's unimodal and symmetric. 
 
 ```{r echo=TRUE}
 ggplot(boot_dist_happy, aes(x = stat)) +
   geom_density()
 ``` 
-
-We see that the normal approximation looks fairly similar to the density curve of our bootstrap distribution. This will be a recurring theme: that when an approximation method exists, it will tend to give very similar results to the computational method when the assumptions of that approximation are reasonable.
 
 ### 
 

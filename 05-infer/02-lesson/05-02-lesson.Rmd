@@ -140,7 +140,7 @@ knitr::include_graphics("images/2-1-3.png")
 
 ### 
 
-We assert this hypothesis, this model of the true state of the world, using hypothesize.
+We assert this hypothesis, this model of the true state of the world, using `hypothesize`.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-4.png")
@@ -148,7 +148,7 @@ knitr::include_graphics("images/2-1-4.png")
 
 ### 
 
-The insertion of this command will cause generate to now generate data sets according to the world as set out in hypothesize.
+The insertion of this command will cause `generate` to now generate data sets according to the world as set out in `hypothesize.`
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-5.png")
@@ -164,9 +164,9 @@ knitr::include_graphics("images/2-1-6.png")
 
 ### Do half of Americans favor capital punishment?
 
-Let’s use a hypothesis test to study another question on the gss. Respondents were asked if they favor or oppose capital punishment, also called the death penalty, for the crime of murder. You can look at the distribution of answers by forming a bar chart. You see that of the 150 respondents, more than half answered favor.
+Let’s use a hypothesis test to study another question on the gss. Respondents were asked if they favor or oppose capital punishment, also called the death penalty, for the crime of murder. You can look at the distribution of answers by forming a bar chart. You see that of the 150 respondents, more than half answered in favor.
 
-You can calculate that proportion, p-hat, CL more precisely using the summarize command, and you learn that the proportion is about 0.57.
+You can calculate that proportion, p-hat, more precisely using the `summarize` command, and you learn that the proportion is about 0.57.
 
 ```{r echo=TRUE}
 p_hat <- gss2016 |>
@@ -181,9 +181,9 @@ Is this data consistent with a world in which only half of Americans favor the d
 
 Next, you hypothesize that the true proportion that favor is 0.5. This is an example of a "point" null hypothesis - you are fixing a particular point value for a parameter. 
 
-Next, we generate through "simulation", 500 data sets that might occur under this hypothesis, and calculate the proportion that favor for each. We’ll save this data frame under the name null.
+Next, we generate through "simulation", 500 data sets that might occur under this hypothesis, and calculate the proportion that favor for each. We’ll save this data frame under the name `null`.
 
-If you print out the top of the null data frame, you’ll see in the stat column you have 500 examples of the type of p-hats that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the p-hat that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
+If you print out the top of the null data frame, you’ll see in the `stat` column you have 500 examples of the type of p-hats that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the p-hat that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
 
 ```{r include=FALSE}
 set.seed(12345)
@@ -280,6 +280,7 @@ Compute the proportion of respondents that do believe in life after death and sa
 ```{r ex2, exercise=TRUE}
 # Calculate and save proportion that believe
 p_hat <- ___ |>
+  ___() |>
   summarize(prop_yes = ___) |>
   pull()
 
@@ -459,6 +460,8 @@ ___ <- gss2016 |>
   generate(reps = ___, type = "draw") |>
   # Calculate proportions
   ___(stat = ___)
+
+null
 ```
 
 ```{r ex6-hint}
@@ -474,6 +477,8 @@ null <- gss2016 |>
   generate(reps = 500, type = "draw") |>
   # Calculate proportions
   calculate(stat = "prop")
+
+null
 ```
 
 Visualize the null distribution by creating a density plot of the statistics. Using `geom_vline()`, add a vertical line at the value of `p_hat` (from the last exercise), colored `"red"`. 
@@ -520,7 +525,7 @@ ggplot(null, aes(x = stat)) +
 ```
 
 - Compute the one-tailed p-value by finding the proportion of null values that are greater than or equal to your observed `p_hat`. 
-- Compute the two-tailed p-value (where the proportion of null values is equal to or more extreme than the observed `p_hat`) from this by multiplying by 2.
+- Compute the two-tailed p-value (where the proportion of null values is equal to or more extreme than the observed `p_hat`) by multiplying the one-tailed p-value by 2.
 
 ```{r ex8, exercise=TRUE, exercise.setup="testing_a_claim_setup"}
 null <- gss2016 |>
@@ -693,7 +698,7 @@ d_hat
 ```
 
 
-We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a group_by line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the diff function and save it as d-hats, which we learn is 0.147.
+We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a `group_by` line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the `diff` function and save it as `d-hats`, which we learn is 0.147.
 
 
 
@@ -731,7 +736,7 @@ gss2016 |>
 ```
 
 
-To see how this generation works, let's start up our inference chain just like before, with specify feeding into hypothesize feeding into generate. We're looking to explain postlife based on the subjects sex, so we'll add that as an explanatory variable. The type of null that we're specifying is one of independence which allows us to generate data via permutation.
+To see how this generation works, let's start up our inference chain just like before, with `specify` feeding into `hypothesize` feeding into `generate.` We're looking to explain `postlife` based on the subjects `sex`, so we'll add that as an explanatory variable. The type of `null` that we're specifying is one of `"independence"` which allows us to `generate` data via permutation.
 
 This code will work, but before we run it we'll make one change.
 
@@ -766,9 +771,9 @@ Null Hypothesis:  independence
 ``` 
 
 
-and that is to specify the variables via the formula notation like this. It can be read as, "I'd like to explain postlife as a function of sex".
+and that is to specify the variables via the formula notation like this. It can be read as, "I'd like to explain `postlife` as a function of `sex`".
 
-When we run this code, we see it generates a data set with these two columns but where the postlife column has been shuffled or permuted. Let's keep track: the six rows show YES and the seventh shows NO.
+When we run this code, we see it generates a data set with these two columns but where the `postlife` column has been shuffled or permuted. Let's keep track: the six rows show `YES` and the seventh shows `NO`.
 
 
 
@@ -807,7 +812,7 @@ Null Hypothesis:  independence
 
 So if we run this code again we'll get a different permutation. 
 
-One with the second and third being NO and the rest being YES. Both are examples of data sets similar to the one that we observed, but generated as if from a world where there was no association between these variables.
+One with the second and third being `NO` and the rest being `YES`. Both are examples of data sets similar to the one that we observed, but generated as if from a world where there was no association between these variables.
 
 Let's use this method to build up a full null distribution.
 
@@ -830,7 +835,7 @@ Warning message:
 Removed 13 rows containing missing values. 
 ``` 
 
-The inference chain should look familiar but now we're going to generate 500 data sets and calculate a difference in proportions for each one. We need to specify the order of that difference, so we'll look at proportion of female minus proportion of male so that it's in the same order as the d-hat that we calculated from our data. 
+The inference chain should look familiar but now we're going to generate 500 data sets and calculate a difference in proportions for each one. We need to specify the order of that difference, so we'll look at proportion of female minus proportion of male so that it's in the same order as the `d-hat` that we calculated from our data. 
 
 You'll see a warning message pop up here. That's just to let us know that we have some missing data that have been excluded from our analysis. Earlier, we explicitly excluded such missing data by specifying `na.omit`.
 
@@ -964,7 +969,7 @@ d_hat
 ### Hypothesis test on the difference in proportions
 
 
-In the last exercise you learned that about 52% of women favor the death penalty while about 63% of men do, a difference of about 11 percentage points. That seems like a large difference, but what if it's just due to chance and in fact there is no relationship between sex and support for the death penalty? Find out by testing the null hypothesis that sex and support for the death penalty are independent of one another.
+In the last exercise you learned that about 53% of women favor the death penalty while about 63% of men do, a difference of about 10 percentage points. That seems like a large difference, but what if it's just due to chance and in fact there is no relationship between sex and support for the death penalty? Find out by testing the null hypothesis that sex and support for the death penalty are independent of one another.
 
 The `stat`istic that you'll be using in this exercise is a `"diff in props"`, which requires that you specify the order of the difference by adding an argument, `order = c("FIRST", "SECOND")`, where first and second refer to the group names. This results in the calculation: FIRST - SECOND.
 
@@ -1019,7 +1024,7 @@ null <- gss2016 |>
 
 
 
-Construct a density plot to visualize the statistics stored in the `null` distribution and add a vertical red line to indicate the observed test statistic `d_hat` that you calculated in the last exercise.
+Construct a density plot to visualize the `stat`istics stored in the `null` distribution and add a vertical red line to indicate the observed test statistic `d_hat` that you calculated in the last exercise.
 
 
 ```{r ex13, exercise=TRUE, exercise.setup="d_hat_difference"}
@@ -1108,7 +1113,7 @@ Based on the p-value you obtained in the previous exercise, what is your conclus
 
 ```{r mc2, echo=FALSE}
 question("",
-  answer("The data are consistent with the hypothesis that there is no association.",correct = TRUE, message="Bingo! Despite the difference that we found between men and women in our sample, it quite possible it's simply an artifact of the process of drawing a random sample."),
+  answer("The data are consistent with the hypothesis that there is no association.",correct = TRUE, message="Bingo! Despite the difference that we found between men and women in our sample, it's quite possible it's simply an artifact of the process of drawing a random sample."),
   answer("The data are strong evidence that there is an association.", message="Incorrect. If the data constituted strong evidence against the null, it would be farther into the tails of the null distribution."),
   answer("The data are not suitable to answer this particular question.", message="Incorrect. The survey is a representative sample of Americans and the questions directly address the association between sex and support for the death penalty."),
   allow_retry = TRUE
@@ -1150,7 +1155,7 @@ null <- gss2016 |>
    specify(cappun ~ sex, success = "FAVOR") |>
    hypothesize(null = "independence") |>
    generate(reps = 500, type = "permute") |>
-   calculate(stat = "diff in props", order = c("FEMALE", "MALE"))`
+   calculate(stat = "diff in props", order = c("FEMALE", "MALE"))
 ```
 
 
@@ -1320,7 +1325,7 @@ knitr::include_graphics("images/2-3-10.png")
 
 ### 
 
-This is formalized by checking to see if the statistic falls within the area of the tails that account for some proportion, alpha, of the total distribution. It's most common to set alpha to point-0-5.
+This is formalized by checking to see if the statistic falls within the area of the tails that account for some proportion, alpha, of the total distribution. It's most common to set alpha to 0.05.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-11.png")
@@ -1336,7 +1341,7 @@ knitr::include_graphics("images/2-3-12.png")
 
 ### 
 
-If you use alpha equal to point-0-5, you're resigning yourself to incorrectly rejecting the null hypothesis 5% of the time.
+If you use alpha equal to 0.05, you're resigning yourself to incorrectly rejecting the null hypothesis 5% of the time.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-13.png")

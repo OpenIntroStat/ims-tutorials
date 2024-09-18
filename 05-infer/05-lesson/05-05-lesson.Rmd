@@ -168,7 +168,7 @@ ___ |>                               # start with data frame
   specify(response = ___) |>         # specify the variable of interest
 ```
 
-Next let's discuss is implementing bootstrapping in R using the infer package. We can construct the bootstrap distribution in one pipe.
+Next let's discuss is implementing bootstrapping in R using the `infer` package. We can construct the bootstrap distribution in one pipe.
 
 We start with our data frame, and first specify the variable of interest, which in this case is rent.
 
@@ -225,7 +225,7 @@ Now let's put what you've learned so far to use.
 
 When building a bootstrap distribution for a single statistic, we first generate a series of bootstrap resamples, and then record the relevant statistic (in this case, the median) of each distribution. 
 
-In this exercise, the **tidyverse** packages, including **ggplot2** have been loaded for you, as has **infer**.
+In this exercise, the `tidyverse` packages, including `ggplot2` have been loaded for you, as has `infer`.
 
 ### 
 
@@ -299,7 +299,7 @@ ggplot(___, aes(___)) +
 ```{r bootstrap_medians-hint, echo = FALSE}
  
 - Use `ggplot()` with `rent_med_ci` as the dataset.
-- Inside `aes()`, map `x` to `stat`.
+- Inside `aes()`, map `stat` to `x`.
 - Add `geom_histogram()`, setting `binwidth` to `50`.
 ```
 
@@ -341,7 +341,7 @@ So the bounds of a 95% confidence interval are the 2.5th and the 97.5th percenti
 ### Standard error method
 
 
-sample statistic $\pm$ $t\_{df = n - 1}^*$ $\times$ $SE\_{boot}$
+sample statistic $\pm$ $t_{df = n - 1}^*$ $\times$ $SE\_{boot}$
 
 - $df$ for $t^*$ is $n - 1$, where $n$ is the sample size 
 - $SE_{boot}$ is the standard deviation of the bootstrap distribution  
