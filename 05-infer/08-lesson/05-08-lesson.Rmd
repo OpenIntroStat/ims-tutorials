@@ -317,14 +317,14 @@ These values measure the variability attributed to the two components: the varia
 
 The sum of these two values makes up sum of squares total, which measures the total variability in the response variable, in this case this would be the total variability of the vocabulary scores. 
 
-This value is calculated similarly to the variance, except that it's not scaled it by the sample size. More specifically, this is calculated as the total squared deviation from the mean of the response variable.
+This value is calculated similarly to the variance, except that it's not scaled by the sample size. More specifically, this is calculated as the total squared deviation from the mean of the response variable.
 
 One statistic not presented on the ANOVA table that might be of interest is the percentage of the variability in vocabulary scores explained by the social class variable. We can find this as the ratio of the sum of squares for class divided by the total sum of squares.  
 
 > - $SST = 236.5644 + 2869.8003 = 3106.365$ -- Measures the total variability in the response variable 
 > - Percentage of explained variability = $\frac{236.5644}{3106.365} = 7.6\%$ 
 
-In this case, 7.6% of the variability in vocabulary scores is explained by self-identified social class. This is the same as the $R^2$ value we would obtain if instead performed a linear regression, explaining vocabulary score with self-identified social class.
+In this case, 7.6% of the variability in vocabulary scores is explained by self-identified social class. This is the same as the $R^2$ value we would obtain if we performed a linear regression instead, explaining vocabulary score with self-identified social class.
 
 
 ### F-distribution
@@ -465,7 +465,7 @@ Next we'll discuss each condition in more detail.
 
 Let's start with the independence condition.
 
-Within groups we want the samples observations to be independent. We can assume this is the case if we have random sampling. For experiments with random assignment but without random sampling, researchers would need to carefully consider if any of the observations could be related. For studies with small sample sizes, we need to be sure that the each sample size is less than 10% of its respective population. This condition is always important, but can be difficult to check if we don't have sufficient information on how the study was designed and data were collected.
+Within groups we want the sample observations to be independent. We can assume this is the case if we have random sampling. For experiments with random assignment but without random sampling, researchers would need to carefully consider if any of the observations could be related. For studies with small sample sizes, we need to be sure that the each sample size is less than 10% of its respective population. This condition is always important, but can be difficult to check if we don't have sufficient information on how the study was designed and data were collected.
 
 Between groups we want the groups to be independent of each other. This requires carefully considering whether there is a paired structure between the groups. If the answer is yes, this is not the end of the world, but it requires a different, slightly more advanced version of ANOVA. 
 
@@ -576,7 +576,7 @@ All of the other steps for creating the null distribution are the same! Let's se
 
 ### Calculating the observed statistic
 
-In the case of an ANOVA, the statistic we are interested in is the F-statistic. While we can plot this statistic on an $F$-distribution, is really is just another statistic that we can calculate (like the mean or median). We like this statistic because it allows for us to summarize how different multiple means are from each other, relative to how variable the observations are within each group. 
+In the case of an ANOVA, the statistic we are interested in is the F-statistic. While we can plot this statistic on an $F$-distribution, it really is just another statistic that we can calculate (like the mean or median). We like this statistic because it allows for us to summarize how different multiple means are from each other, relative to how variable the observations are within each group. 
 
 We can `calculate` the F-statistic using the tools from the infer package we are familiar with. The only part that is new is the `stat` that we calculate. Here, we use the `"F"` statistic. This is what this looks like: 
 
@@ -713,8 +713,8 @@ We can compute all of the pairwise $t$-tests for our 4 social classes using the 
 
 There are two ways to handle this,  
 
-1. Extract the columns you are interested in using a `$` and use as the inputs to the `pairwise.t.test()` function.  
-2. Use a modified pipe operator to extract the columns (`%$%`), when piping the data into the `pairwise.t.test()` function. 
+1. Extract the columns you are interested in with a `$` and use them as the inputs to the `pairwise.t.test()` function.  
+2. Use a modified pipe operator (`%$%`) to extract the columns when piping the data into the `pairwise.t.test()` function. 
 
 We will present the modified pipe operator option, but both methods will be displayed in the solution. 
 
@@ -729,7 +729,7 @@ Additionally, the `pairwise.t.test()` function takes three main inputs,
 For this exercise, you are to conduct a pairwise t-test on vocabulary scores and social class.
 
 - Use the `pairwise.t.test()` function to obtain the pairwise $t$-tests. 
-- Set the `p.adjust.method` to `"Bonferroni"` to obtain the Bonferroni corrected p-values.
+- Set the `p.adjust.method` to `"bonferroni"` to obtain the Bonferroni corrected p-values.
 - Tidy the resulting table. 
 - Compare the adjusted p-values to the un-adjusted p-values. Which p-values are smaller? 
 

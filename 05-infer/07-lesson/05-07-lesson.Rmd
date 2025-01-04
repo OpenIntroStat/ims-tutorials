@@ -103,7 +103,7 @@ hash_encoder_ui <- {
 }
 ```
 
-## Hypothesis testing for a differnece in two means via simulation
+## Hypothesis testing for a difference in two means via simulation
 
 In this lesson we demonstrate setting up and conducting a hypothesis test to compare means from two independent distributions using simulation.
 
@@ -112,7 +112,7 @@ In this lesson we demonstrate setting up and conducting a hypothesis test to com
 
 > Does a treatment using embryonic stem cells help improve heart function following a heart attack more so than traditional therapy? 
 
-Let's try to answer using the `stem_cell` data from the **openintro** package.
+Let's try to answer using the `stem_cell` data from the `openintro` package.
 
 |trmt | before| after|
 |:----|:-----:|:----:|
@@ -122,8 +122,6 @@ Let's try to answer using the `stem_cell` data from the **openintro** package.
 |...  |   ... |  ... |
 |esc  |  53.75| 51.00|
 
-
-The motivating question is whether use of embryonic stem cells help improve heart function following a heart attack. The data can be found in the openintro package.
 
 These data were collected as part of a study in which sheep that have had a heart attack were randomly assigned to the embryonic stem cell therapy (labeled as `"esc"` in the data) or to a traditional therapy as a control (labeled as `"ctrl"`). The researchers measured the heart pumping capacity of these sheep before and after the study. If a sheep's heart pumping capacity increased from before to after the study, this indicates a stronger recovery. In our analysis we want to evaluate the effect of the embryonic stem cell therapy on heart pumping capacity relative to the control group.
 
@@ -334,7 +332,7 @@ diff_mean <- stem_cell |>
 First, generate 1000 differences in means via randomization (we can call it this because the treatment was randomly assigned).
 
 - `specify()` the response and explanatory variables.
-- `hypothesize()` that the treatment and the response are `"independent"`. 
+- `hypothesize()` the `"independence"` of the treatment and the response. 
 - Generate 1000 `reps` via permutation (`"permute"`).
 - Calculate the permuted difference in means (`esc` first, then `ctrl`).
 
@@ -356,7 +354,7 @@ diff_mean_ht <- stem_cell |>
 
 - Call `specify()`, setting `formula` to a formula with `change` as the response variable and `trmt` as the explanatory variable.
 - Call `hypothesize()`, setting `null` to `"independence"`.
-- Call `generate()`, setting `reps` to `n_replicates` and `type` to `"permute"`.
+- Call `generate()`, setting `reps` to `1000` and `type` to `"permute"`.
 - Call `calculate()`, setting `stat` to `"diff in means"` and `order` to `c("esc", "ctrl")`.
 ```
 
@@ -403,7 +401,7 @@ diff_mean_ht <- stem_cell |>
 
 ```{r stem_cell_4, exercise=TRUE}
 diff_mean_ht |>
-  get_p_value(___)   # use diff_mean as the observed statistic, and "greater" as the direction
+  get_p_value(___)   # use diff_mean for the obs_stat, and "greater" as the direction
 
 ```
 
@@ -642,7 +640,7 @@ Let's construct a bootstrap interval for the difference in mean weights of babie
 First, generate 1500 bootstrap differences in means for birth weight by smoking habit.
 
 - `specify()` birth `weight` as the response and smoking `habit` as the explanatory variable.
-- `generate()` 1500 bootstrap resamples.
+- `generate()` 1500 `"bootstrap"` resamples.
 - `calculate()` the difference in means, with order `"nonsmoker"` then `"smoker"`.
 
 ```{r smoking_bs-setup, include=FALSE}
@@ -815,7 +813,7 @@ diff_med_ci <- ncbirths_complete_habit_weeks |>
 
 
 ```{r smoking_bs_5, exercise=TRUE}
-# Calculate the 95% CI via percentile method
+# Calculate the 92% CI via percentile method
 diff_med_ci |>
   get_confidence_interval(level = , type = " ")
 ```
@@ -828,7 +826,7 @@ diff_med_ci |>
 
 
 ```{r smoking_bs_5-solution}
-# Calculate the 95% CI via percentile method
+# Calculate the 92% CI via percentile method
 diff_med_ci |>
   get_confidence_interval(level = 0.92, type = "percentile")
 ```
@@ -887,7 +885,7 @@ acs12 |>
             n = length(hrly_pay)) 
 ```
 
-Let's take a look at the relevant summary statistics. To do so, we group the data by citizenship status and then calculate mean, standard deviation, and sample size for each group. The observed average hourly rates for non-citizens and non-citizens are indeed different, but we want to know how they compare in the population, not just in this sample.
+Let's take a look at the relevant summary statistics. To do so, we group the data by citizenship status and then calculate mean, standard deviation, and sample size for each group. The observed average hourly rates for citizens and non-citizens are indeed different, but we want to know how they compare in the population, not just in this sample.
 
 
 ### Conducting the test
@@ -912,7 +910,7 @@ We can use the `t_test` function from the infer package to conduct this test. Th
 
 5. what confidence level should be used for the confidence interval 
 
-Here, our null hypothesis alternative hypothesis says that there is a difference between the two groups means, which coincides with a `"two-sided"` hypothesis test. 
+Here, our alternative hypothesis says that there is a difference between the two groups means, which coincides with a `"two-sided"` hypothesis test. 
 
 ### 
 
@@ -969,9 +967,8 @@ First, filter `acs12` for rows where hourly pay (`hrly_pay`) and U.S. citizenshi
 
 ```{r citizens-setup, include = FALSE}
 ## Complete hourly pay and citizenship 
-acs12_complete_hrlypay_citizen <- acs12 |>
-  mutate(hrly_pay = income / (hrs_work * 52)) |>
-  filter(!is.na(hrly_pay), !is.na(citizen))
+acs12 <- acs12 |>
+  mutate(hrly_pay = income / (hrs_work * 52)) 
 ```
 
 ```{r citizens, exercise=TRUE}

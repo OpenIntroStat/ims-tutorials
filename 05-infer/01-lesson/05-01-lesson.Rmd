@@ -235,7 +235,7 @@ p_hat_happy
 
 We learn that around 77% of our sample is "happy". If this were a simple random sample from the American population, this would be a good estimate of the percent of all Americans that are very happy, but it's not a sure thing since we only asked a small proportion of them.
 
-## How is does the GSS select respondents?
+## How does the GSS select respondents?
 
 Remember that not all randomly sampled data is the same -- a sample can be a simple random sample, a stratified sample, a cluster sample, or something more complex. The respondents to the GSS come from a complex survey design and appropriate inference for these data would account for this survey design. 
 
@@ -342,7 +342,7 @@ knitr::include_graphics("images/boot-11.png")
 
 To implement this, we start with our gss2016 data and then *specify* that we will focus on the happy column. Next we *generate* 500 replicate data sets through bootstrapping and for each one *calculate* the proportion that are "happy". 
 
-When we print this new object, we see we now have a data frame that contains 500 p-hats.
+When we print this new object, we see we now have a data frame that contains 500 $\hat{p}\text{s}$ (p-hats). 
 
 ```{r echo = TRUE}
 boot_dist_happy <- gss2016 |>
@@ -512,7 +512,7 @@ boot_1_consci |>
 
 ### Constructing the CI
 
-You've seen one example of how p-hat can vary upon resampling, but we need to do this many many times to get a good estimate of its variability.  Here you will compute a full bootstrap distribution to estimate the standard error (SE) that will be used to form a confidence interval. You'll use an additional verb from infer, `calculate()`, to streamline this process of calculating many statistics from many data sets.
+You've seen one example of how $\hat{p}$ can vary upon resampling, but we need to do this many many times to get a good estimate of its variability.  Here you will compute a full bootstrap distribution to estimate the standard error (SE) that will be used to form a confidence interval. You'll use an additional verb from infer, `calculate()`, to streamline this process of calculating many statistics from many data sets.
 
 Take a moment to inspect the output of calculate. This function reduces your data frame to just two columns: one for the "stat"s and another for the "replicate" they correspond to.
 
@@ -665,7 +665,7 @@ Let's look deeper into this by starting with the confidence interval that we've 
 
 ### Happiness in 2016
 
-The data from which this interval was constructed is from 2016, and we can plot both p-hat and the resulting interval on a number line here. To understand what is meant by confident, we need to consider how this interval fits into the big picture.
+The data from which this interval was constructed is from 2016, and we can plot both $\hat{p}$ and the resulting interval on a number line here. To understand what is meant by confident, we need to consider how this interval fits into the big picture.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/confidence-interval.png")
@@ -713,7 +713,7 @@ knitr::include_graphics("images/p-05.png")
 
 ### 
 
-of the same size from that population and come up with a new p-hat and a new interval. It wouldn't be the same as our first, but it'd likely be similar.
+of the same size from that population and come up with a new $\hat{p}$ and a new interval. It wouldn't be the same as our first, but it'd likely be similar.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/p-06.png")
@@ -729,7 +729,7 @@ knitr::include_graphics("images/p-07.png")
 
 ### 
 
-a new p-hat and a new interval.
+a new $\hat{p}$ and a new interval.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/p-08.png")
@@ -853,7 +853,7 @@ In the following exercises you'll get the chance to explore these factors and ho
 
 We learned that for a 95% confidence interval (a confidence level of .95), if we were to take many samples of the same size and compute many intervals, we would expect 95% of the resulting intervals to contain the parameter. Based on the set of confidence intervals plotted here, what is your best guess at the confidence level used in these intervals?
 
-The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from it's p-hat. Intervals that capture the true value are in green; those that miss it are in red.
+The population proportion is represented by the p in the cloud and the dotted line and each confidence interval is represented by a segment that extends out from its $\hat{p}$. Intervals that capture the true value are in green; those that miss it are in red.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/gssMany-happy-nocapture_65.png")
@@ -1036,18 +1036,24 @@ boot_dist_smaller_n <- gss2016_smaller |>
 SE_smaller_n <- ___ |>
   ___ |>
   ___
+
+SE_smaller_n
 ```
 
-```{r ex12-hint, exercise=TRUE}
+```{r ex12-hint}
 SE_smaller_n <- boot_dist_smaller_n |>
   summarize(se = sd(stat)) |>
   ___
+
+SE_smaller_n
 ```
 
-```{r ex12-solution, exercise=TRUE}
+```{r ex12-solution}
 SE_smaller_n <- boot_dist_smaller_n |>
   summarize(se = sd(stat)) |>
   pull()
+
+SE_smaller_n
 ```
 
 ### 
@@ -1083,7 +1089,7 @@ SE_small_n > SE_smaller_n
 
 ### SE with different p
 
-You just saw the effect that _sample size_ can have on inference, but that's not the only variable in play here. Let's return now to our full data set and see what happens to the SE when we consider a category that has a different _population proportion_, p.
+You just saw the effect that _sample size_ can have on inference, but that's not the only variable at play here. Let's return now to our full data set and see what happens to the SE when we consider a category that has a different _population proportion_, p.
 
 Remember that the proportion of "High" confidence in science in 2016 was pretty close to 0.50.
 
@@ -1114,7 +1120,7 @@ boot_dist_low_p <- gss2016 |>
   generate(reps = 500, type = "bootstrap") |>
   calculate(stat = "prop")
 
-SE_low_p <- boot_dist |>
+SE_low_p <- boot_dist_low_p |>
   ___(se = ___) |>
   ___
 
@@ -1156,7 +1162,7 @@ c(SE_low_p, SE_consci)
 
 You calculated two new standard errors.
 
-One when there was less data, and the other where p-hat was low. 
+One when there was less data, and the other where $\hat{p}$ was low. 
 
 The different values that you observed demonstrate some important properties of standard errors: they will increase  when n is small and also when p is close to 0.5.
 
@@ -1199,7 +1205,7 @@ A.K.A the "bell curve".
 knitr::include_graphics("images/normal-curve.png")
 ```
 
-That approximation is the normal distribution, also known as the bell curve. A useful result in mathematics says that if you have independent observations and a sufficiently large sample size, then p-hat will follow a normal distribution with a known standard deviation. This distribution is called the sampling distribution of p-hat and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
+That approximation is the normal distribution, also known as the bell curve. A useful result in mathematics says that if you have independent observations and a sufficiently large sample size, then $\hat{p}$ will follow a normal distribution with a known standard deviation. This distribution is called the sampling distribution of $\hat{p}$ and it's very similar to the bootstrap distribution in that it captures the variability of our estimate across many possible data sets.
 
 ### Standard deviation
 
@@ -1218,13 +1224,13 @@ What does "n is large" mean?
 - $n \times \hat{p} \gt 10$ 
 - $n \times(1 - \hat{p}) \gt 10$ 
 
-When applying this result in practice, it's important to be sure that the assumptions of independence and a large sample aren't wildly off base. To assess independence, you need to consider the method by which the data was collected. A handy rule of thumb to determine if your sample size is large enough is to check that n times p-hat and n times 1 - p-hat are both greater than or equal to 10.
+When applying this result in practice, it's important to be sure that the assumptions of independence and a large sample aren't wildly off base. To assess independence, you need to consider the method by which the data was collected. A handy rule of thumb to determine if your sample size is large enough is to check that n times $\hat{p}$ and n times 1 - $\hat{p}$ are both greater than or equal to 10.
 
 ### Calculating standard error: approximation
 
-OK, let's try our hand at using this shortcut to find the standard error for the proportion of people that were happy. Let's recompute p-hat, then ask the number of rows in the `gss2016`. That's the sample size, `n`. 
+OK, let's try our hand at using this shortcut to find the standard error for the proportion of people that were happy. Let's recompute $\hat{p}$, then ask the number of rows in the `gss2016`. That's the sample size, `n`. 
 
-Let's check the rule-of-thumb to see if our sample size is large enough by multiplying n times p-hat and n times 1 minus p-hat. This gives 116 and 35, so our sample size should be sufficiently large. We also know that the gss uses random sampling to draw these observations, so is safe to assume that one person's answer is independent of the next. 
+Let's check the rule-of-thumb to see if our sample size is large enough by multiplying n times $\hat{p}$ and n times 1 minus $\hat{p}$. This gives 116 and 35, so our sample size should be sufficiently large. We also know that the gss uses random sampling to draw these observations, so is safe to assume that one person's answer is independent of the next. 
 
 ```{r echo=TRUE}
 p_hat_happy <- gss2016 |>
@@ -1245,7 +1251,7 @@ SE_happy_approx
 
 ### Calculating standard error: computation
 
-How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for p-hat, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.032. Those are remarkably similar values! Let's go a step farther.
+How does it compare to our original computational approach using the bootstrap? Well, if we construct the bootstrap distribution for $\hat{p}$, then summarize it by finding it's standard deviation, we estimate a standard error of about 0.035. Those are remarkably similar values! Let's go a step farther.
 
 ```{r echo=TRUE}
 boot_dist_happy <- gss2016 |>
@@ -1260,18 +1266,16 @@ SE_happy_boot
 
 ### Shape of sampling distributions
 
-Let's also take a look at the shape of this bootstrap distribution. A density plot suggests that it's unimodal and symmetric. Let's add a layer to this plot that contains the normal curve that's centered at p-hat has uses the equation to find the standard deviation. And yes, let's make that curve purple.
+Let's also take a look at the shape of this bootstrap distribution. A density plot suggests that it's unimodal and symmetric. 
 
 ```{r echo=TRUE}
 ggplot(boot_dist_happy, aes(x = stat)) +
   geom_density()
 ``` 
 
-We see that the normal approximation looks fairly similar to the density curve of our bootstrap distribution. This will be a recurring theme: that when an approximation method exists, it will tend to give very similar results to the computational method when the assumptions of that approximation are reasonable.
-
 ### 
 
-Let's add a layer to this plot that contains the normal curve that's centered at p-hat has uses the equation to find the standard deviation. And yes, let's make that curve purple.
+Let's add a layer to this plot that contains the normal curve that's centered at $\hat{p}$ has uses the equation to find the standard deviation. And yes, let's make that curve purple.
 
 ```{r echo=TRUE}
 ggplot(boot_dist_happy, aes(x = stat)) +
@@ -1347,7 +1351,7 @@ p_hat_meta
 Now we'll construct the confidence interval around this proportion.
 
 - Check the rules-of-thumb for the normal distribution being a decent approximation.
-- Calculate the standard error using the approximation formula $\sqrt{\frac{\hat{p} \times (1 - \hat{p})}{n}}$.
+- Calculate the standard error using the approximation formula $\sqrt{\frac{\hat{p} (1 - \hat{p})}{n}}$.
 - Use `SE_meta_approx` to form a confidence interval for `p_hat`. The limits should be two standard errors either side of `p_hat`.
 
 ```{r ex16-setup, include=FALSE}

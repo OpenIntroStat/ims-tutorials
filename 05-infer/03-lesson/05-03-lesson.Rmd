@@ -168,7 +168,7 @@ ggplot(gss2016, aes(x = party, fill = natarms)) +
 
 One way to find out is to remove this position equals "fill" argument so that the height of the bars is just the count of people. When we make this change we see that that group is very tiny. To figure out just how tiny this group is, we can represent this data as a contingency table.
 
-This process of moving between a data frame involves working with untidy data, so let's load the broom package to help keep things clean.
+This process of moving between a data frame involves working with untidy data, so let's load the `broom` package to help keep things clean.
 
 
 ### Tables and tidy data
@@ -448,7 +448,7 @@ With this statistic in hand, you can return to the hypothesis test to answer the
 
 The key to generating data under a null hypothesis of independence is *permutation*. Generate just a single data set to see what sort of chi-squared statistic you might observe when in fact these two variables are independent of one another.
 
-Using `gss_party`, first specify that you'd like to study `natarms` as a function of `party`, create a null hypothesis of independence, then generate a single data set via permutation. Save this as `perm_1`.
+Using `gss_party`, first specify that you'd like to study `natspace` as a function of `party`, create a null hypothesis of independence, then generate a single data set via permutation. Save this as `perm_1`.
 
 
 ```{r ex6, exercise=TRUE}
@@ -470,19 +470,19 @@ ___ <- ___
 # Create one permuted data set
 perm_1 <- gss_party |>
   # Specify the variables of interest
-  specify(natarms ~ party) |>
+  specify(natspace ~ party) |>
   # Set up the null
   hypothesize(null = "independence") |>
   # Generate a single permuted data set
   generate(reps = 1, type = "permute")
 ```
 
-Using `perm_1`, visualize the relationship between `natarms` and `party` by constructing a stacked bar plot of counts.
+Using `perm_1`, visualize the relationship between `natspace` and `party` by constructing a stacked bar plot of counts.
 
 ```{r ex7, exercise=TRUE}
 # From previous step
 perm_1 <- gss_party |>
-  specify(natarms ~ party) |>
+  specify(natspace ~ party) |>
   hypothesize(null = "independence") |>
   generate(reps = 1, type = "permute")
   
@@ -493,13 +493,13 @@ ___ +
 ```
 
 ```{r ex7-hint}
- Map `x` to `party` and `fill` to `natarms` to make your bar plot.
+ Map `x` to `party` and `fill` to `natspace` to make your bar plot.
 ```
 
 ```{r ex7-solution}
 # From previous step
 perm_1 <- gss_party |>
-  specify(natarms ~ party) |>
+  specify(natspace ~ party) |>
   hypothesize(null = "independence") |>
   generate(reps = 1, type = "permute")
   
@@ -509,7 +509,7 @@ ggplot(perm_1, aes(x = party, fill = natarms)) +
   geom_bar()
 ```
 
-Calculate the chi-squared test statistic associated with by running the `gss_party` data through the `chisq_stat()` function and specifying the variables using the formula notation as you did in `specify()`.
+Calculate the associated chi-squared test statistic by running the `gss_party` data through the `chisq_stat()` function and specifying the variables using the formula notation as you did in `specify()`.
 
 ```{r ex8, exercise=TRUE}
 # Compute chi-squared stat
@@ -518,13 +518,13 @@ gss_party |>
 ```
 
 ```{r ex8-hint}
- To get the statistic, add the argument that specifies the variables: `natarms ~ party`.
+ To get the statistic, add the argument that specifies the variables: `natspace ~ party`.
 ```
 
 ```{r ex8-solution}
 # Compute chi-squared stat
 gss_party |>
-  chisq_stat(natarms ~ party)
+  chisq_stat(natspace ~ party)
 ```
 
 ### Building two null distributions
@@ -649,9 +649,9 @@ null_arms <- gss_party |>
 ```{r option-b, echo=FALSE}
 question("Select the correct answer",
   answer("Since both p-values are above 0.05, we fail to reject the hypotheses that both military spending and spending on space exploration are independent of political party.", message="Incorrect. The p-value corresponding to chi_obs_arms is very small."),
-  answer("The data set is consistent with the hypothesis that there is no relationship between political party and space exploration spending, but does suggestion a relationship between party and spending on the military.", correct = TRUE, message="Yep! These it seems that spending on the military is a partisan issue, while spending on space exploration is not."),
+  answer("The data set is consistent with the hypothesis that there is no relationship between political party and space exploration spending, but does suggest a relationship between party and spending on the military.", correct = TRUE, message="Yep! These it seems that spending on the military is a partisan issue, while spending on space exploration is not."),
   answer("The data set is inconsistent with the hypothesis that there is no relationship between both military spending and party as well as spending for space exploration and party.", message="Incorrect. The p-value corresponding to chi_obs_spac is actually fairly large, indicating consistency with the null."),
-  answer("The data set is consistent with the hypothesis that there is no relationship between political party and military spending, but does suggestion a relationship between party and spending on space exploration.
+  answer("The data set is consistent with the hypothesis that there is no relationship between political party and military spending, but does suggest a relationship between party and spending on space exploration.
 ", message="Incorrect. A low p-value indicates that the data is inconsistent with the null hypothesis of no relationship."),
   allow_retry = TRUE
 )
@@ -673,11 +673,11 @@ Next, you'll learn how to conduct the same test using an approximation method. T
 
 The approximation distribution that you're most familiar with is the Normal distribution. This can be used to approximate the null distribution when the statistic is a proportion or a difference in proportions and the sample size is large.
 
-### 
+### Approximation distributions: chi-squared
 
-- Statistics: $\hat{x}^{2}$
-- Shape is determined by degrees of freedom {{1}}
-- $df = (nrows - 1) \times (ncols - 1)$  {{2}}
+- Statistics: $\hat{\chi}^{2}$
+- Shape is determined by degrees of freedom 
+- $df = (nrows - 1) \times (ncols - 1)$ 
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/categorical-inference-ch3v3-chisq-curve.png")
@@ -706,7 +706,7 @@ ggplot(null_spac, aes(x = stat)) +
   geom_vline(xintercept = chi_obs_spac, color = "red")
 ```
 
-In the last exercises, you conducted permutation test to assess if natspac was independent of party. The observed chi-squared statistic was 1.33, which you found to be not too far into the tails of your null distribution.
+In the last exercises, you conducted permutation test to assess if `natspac` was independent of `party.` The observed chi-squared statistic was 1.33, which you found to be not too far into the tails of your null distribution.
 
 ### H-test via approximation
 
@@ -736,7 +736,7 @@ To find a p-value according to this distribution, ask for the proportion of the 
 
 Becomes a good approximation when:
 
-- $expected\\\_count >= 5$
+- $expected\text{_} count >= 5$
 
 - $df >= 2$
 
@@ -789,7 +789,9 @@ In addition to information regarding their opinions on policy issues, GSS survey
 # Visualize distribution of region and happy
 ___ +
   # Add bar layer of proportions
-  ___
+  ___ + 
+  # Re-position x-axis values for readability
+  theme(axis.text = element_text(angle = 45, hjust = 1))
   
 # Calculate and save observed statistic
 chi_obs <- ___ |>
@@ -810,7 +812,9 @@ chi_obs
 # Visualize distribution of region and happy
 ggplot(gss2016, aes(x = region, fill = happy)) +
   # Add bar layer of proportions
-  geom_bar(position = "fill")
+  geom_bar(position = "fill") + 
+  # Re-position x-axis values for readability
+  theme(axis.text = element_text(angle = 45, hjust = 1))
   
 # Calculate and save observed statistic
 chi_obs <- gss2016 |>
@@ -910,7 +914,7 @@ ggplot(null, aes(x = stat)) +
 ```
 
 - Compute the permutation p-value.
-- Compute the approximation p-value. Recall that `pchisq()` will return the left tail of the distribution. To return the right tail, add an argument `lower.tail = FALSE`.
+- Compute the approximation p-value using `pchisq()`. Note that `pchisq()` will return the left tail of the distribution. To return the right tail, add an argument `lower.tail = FALSE`.
 
 ```{r ex14, exercise=TRUE}
 # From previous step
@@ -989,7 +993,7 @@ knitr::include_graphics("images/3-4-5.png")
 
 ### 
 
-to capture the true chi squared parameter but hold on
+to capture the true chi squared parameter. But hold on...
 
 ```{r echo=FALSE, out.width = '60%'}
 knitr::include_graphics("images/3-4-6.png")

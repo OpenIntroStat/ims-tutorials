@@ -329,8 +329,6 @@ Let's use data from the 2010 General Social Survey to estimate the number of hou
 
 ### 
 
-> Estimate the average number of hours Americans work during their "usual" schedule (variable: `hours`) using data from the 2010 General Social Survey (data: `gss`).
-
 ```{r echo=TRUE}
 gss |> 
   t_test(response = hours,
@@ -338,7 +336,7 @@ gss |>
          conf_level = 0.95)
 ```
 
-We can create the confidence interval using the `t_test()` -- don't worry about the word "test" for now -- by using the variable we're interested in as the `response`, specifying that we are interested in a confidence interval by setting `conf_int` to `TRUE`, and setting the confidence level as 0.95 (or 95%).
+We can create the confidence interval using the `t_test()` function -- don't worry about the word "test" for now -- by using the variable we're interested in as the `response`, specifying that we are interested in a confidence interval by setting `conf_int` to `TRUE`, and setting the confidence level as 0.95 (or 95%).
 
 Based on this output, we are 95% confident that the average number of hours per week Americans work in their usual schedule is between 40.1 and 42.7. 
 
@@ -352,7 +350,7 @@ By default, when given one argument, `t_test()` tests whether the population mea
 
 In the exercise below, 
 
-- Filter the `acs12` dataset for individuals whose employment status is `"employed"`, and save this new dataset as `acs12_emp`.
+- Filter the `acs12` dataset for individuals whose `employment` status is `"employed"`, and save this new dataset as `acs12_emp`.
 - Use `t_test()` to construct a 95% confidence interval for the average commute time of Americans, recorded as the variable `time_to_work`.
 
 ```{r Average_commute_time_of_Americans, exercise=TRUE}
@@ -387,7 +385,7 @@ acs12_emp |>
 
 ### 
 
-And now you know a range of values you would expect for the true commute time for *all* Americans to take on. Furthermore, if you constructed these intervals for multiple different samples, you would expect that, on average, with 95% of them would capture this true commute time.
+And now you know a range of values you would expect for the true commute time for *all* Americans to take on. Furthermore, if you constructed these intervals for multiple different samples, you would expect that, on average, 95% of them would capture this true commute time.
 
 
 ### Average number of hours worked
@@ -456,7 +454,7 @@ It appears that the median writing score is slightly higher than the median read
 
 ### Independent scores?
 
-> Can reading and writing scores for a given student assumed to be independent of each other?
+> Can reading and writing scores for a given student be assumed to be independent of each other?
 > Probably not! 
 
 A student's reading score is likely not independent of their writing score. As both tests reflect students' knowledge, it is likely that they share information. 
@@ -651,12 +649,12 @@ Suppose instead of the mean, we want to estimate the median difference in prices
 
 ### 
 
-First, for the price differences, generate 1000 bootstrap replicates and calculate their medians. Remember, for the test of a single mean you only need to `specify()` a `response` variable. 
+First, for the price differences, generate 1000 bootstrap replicates and calculate their medians. Remember, for the test of a single median you only need to `specify()` a `response` variable. 
 
 ```{r estimate_the_median_difference_in_textbook_prices, exercise=TRUE}
 # Calculate 1000 bootstrap medians of diff
 textdiff_med_ci <- textbooks |>
-  sepecify(response = ___) |>
+  specify(response = ___) |>
   generate(reps = ___, type = ___) |>
   calculate(stat = ___)
 ```

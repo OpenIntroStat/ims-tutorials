@@ -164,7 +164,9 @@ knitr::include_graphics("images/4-1-2.png")
 
 ### Benford’s Law A.K.A. "the first digit law"
 
-Benford's Law appears when looking at broad collections of numbers, and paying attention to only to the first digit of each number. For example, consider the populations of every country on earth. This demographic data lives inside the gapminder package. We can restrict our attention to data from two thousand and seven and select off the country name and population variables. Now Benford's Law is only concerned with the first digit, so here we see that that Afghanistan, Albania, and Algeria all start with three, Angola starts with one, and so on. If we do this for all one hundred and forty two countries in this data set and visualize the distribution in a bar chart, what do you think it would look like? Would it be uniform?
+Benford's Law appears when looking at broad collections of numbers, and paying attention to only to the first digit of each number. For example, consider the populations of every country on earth. This demographic data lives inside the `gapminder` package. We can restrict our attention to data from the year 2007 and select the `country` name and `pop`ulation variables. Now, Benford's Law is only concerned with the first digit, so here we see that that the populations of Afghanistan, Albania, and Algeria all start with three, Angola starts with one, and so on. If we do this for all 142 countries in this data set and visualize the distribution in a bar chart, what do you think it would look like? Would it be uniform?
+
+###
 
 ```{r out.width = "60%"}
 knitr::include_graphics("images/ch4v1-bar-plot-benford.png")
@@ -174,7 +176,7 @@ knitr::include_graphics("images/ch4v1-bar-plot-benford.png")
 knitr::include_graphics("images/ch4v1-country-population-bar-plots.png")
 ```
 
-It turns out it's not, not by a long shot. The most common number is one, the second most common is two, and so on with the higher numbers being less common. This decaying distribution of first digits is what is captured precisely by Benford's Law. It proposes, for example, that exactly thirty-point-one percent of the first digits should be one, seventeen-point-six percent should be two, and so on.
+It turns out it's not, not by a long shot. The most common number is one, the second most common is two, and so on with the higher numbers being less common. This decaying distribution of first digits is what is captured precisely by Benford's Law. It proposes, for example, that exactly 30.1% of the first digits should be one, 17.6% should be two, and so on.
 
 ### 
 
@@ -274,7 +276,7 @@ totals <- iran |>
 totals
 ```
 
-- `pivot_longer()` the candidate names into a new column alongside their respective votes. The names of the previous columns go to a new column called `candidate` with the `names_to` argument and the values of the cells go to a new column called `votes` with the `values_to` argument. This function also expects you to specify the columns you're pivoting (`cols`) and since we're pivoting the entire dataset of `totals` we can set this argument to `everything()`.
+- `pivot_longer()` the candidate names into a new column alongside their respective votes. The names of the previous columns go to a new column called `"candidate"` with the `names_to` argument and the values of the cells go to a new column called `"votes"` with the `values_to` argument. This function also expects you to specify the columns you're pivoting (`cols`) and since we're pivoting the entire dataset of `totals` we can set this argument to `everything()`.
 - Inspect the resulting data frame to understand its structure.
 
 ```{r ex2-setup}
@@ -319,7 +321,7 @@ totals_longer
 
 - Use `totals_longer` to construct a bar plot of `votes` to visualize the overall election outcome. Since you already have the totals for each candidate, you need to map `candidate` to the `x`, `votes` to the `y`, then add a `geom_col()` layer.
 
-```{r ex-3-setup}
+```{r ex3-setup}
 totals <- iran |>
   summarize(
     ahmadinejad = sum(ahmadinejad),
@@ -416,7 +418,7 @@ Once you create a new variable containing only the first digit, you can get a se
 
 
 - Take a look at how `get_first()` works by simply typing the name of the function (with no parentheses). All it does is fiddle with the output from `substr()` so that it's a factor.
-- Mutate a new column in the `iran` data frame called `first_digit` that contains the first digit of city by city total votes cast.
+- Mutate a new column in the `iran` data frame called `first_digit` that contains the first digit of city-by-city total votes cast.
 - Check to see that `get_first()` worked. From the `iran` data, select off the columns `total_votes_cast` and `first_digit` and print them to the screen.
 - Construct a bar plot to visualize the distribution of the first digit.
 
@@ -762,7 +764,7 @@ So let's jump into the exercises and port this idea of a goodness of fit hypothe
 The null hypothesis in a goodness of fit test is a list of specific parameter values for each proportion. In your analysis, the equivalent hypothesis is that Benford's Law applies to the distribution of first digits of total vote counts at the city level. You could write this as:
 
 $$
-H\_0: p\_1 = .30, p\_2 = .18, \ldots, p\_9 = .05
+H_0: p_1 = .30, p_2 = .18, \ldots, p_9 = .05
 $$
 
 Where $p_1$ is the height of the first bar in the Benford's bar plot. The alternate hypothesis is that at least one of these proportions is different; that the first digit distribution *doesn't* follow Benford's Law.
@@ -895,9 +897,15 @@ ggplot(null, aes(x = stat)) +
 - Compute the approximation p-value using the `pchisq()` function. Recall that this will return the area under the curve to the *left* of the observed value, so you'll need to modify it to return the *right* tail.
 
 ```{r ex8-setup, include = FALSE}
+set.seed(123)
+
 iran <- iran |>
   mutate(first_digit = get_first(total_votes_cast))
-
+null <- iran |>
+  specify(response = first_digit) |>
+  hypothesize(null = "point", p = p_benford) |>
+  generate(reps = 500, type = "draw") |>
+  calculate(stat = "Chisq")
 chi_obs_stat <- iran |>
   observe(response = first_digit, p = p_benford, stat = "Chisq") |>
   pull()
@@ -1082,8 +1090,7 @@ Extract the first digit from the `dem_rep_votes` column using the custom functio
 ```{r ex10, exercise=TRUE}
 # From previous step
 iowa_county <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") |>
+  filter(candidate %in% c("Donald Trump / Mike Pence", "Hillary Clinton / Tim Kaine")) |>
   group_by(county) |>
   summarize(dem_rep_votes = sum(votes)) 
   
@@ -1102,8 +1109,7 @@ iowa_county
 ```{r ex10-solution}
 # From previous step
 iowa_county <- iowa |>
-  filter(candidate == "Hillary Clinton / Tim Kaine" | 
-         candidate == "Donald Trump / Mike Pence") |>
+  filter(candidate %in% c("Donald Trump / Mike Pence", "Hillary Clinton / Tim Kaine")) |>
   group_by(county) |>
   summarize(dem_rep_votes = sum(votes)) 
   
@@ -1157,7 +1163,7 @@ chi_obs_stat <- ___ |>
 ```
 
 ```{r ex12-hint}
-The three argument required of the `observe()` function are the `response` variable, the `stat`istic of interest, and vector of probabilities, `p`, which are already saved to your workspace as `p_benford.`
+The three arguments required of the `observe()` function are the `response` variable, the `stat`istic of interest, and vector of probabilities, `p`, which are already saved to your workspace as `p_benford.`
 ```
 
 ```{r ex12-solution}
@@ -1203,7 +1209,8 @@ Construct a density plot of the distribution of the `null` statistics and add a 
 ```{r ex14, exercise=TRUE}
 # From previous steps
 chi_obs_stat <- iowa_county |>
-  observe(response = first_digit, stat = "Chisq", p = p_benford)
+  observe(response = first_digit, stat = "Chisq", p = p_benford) |>
+  pull()
 null <- iowa_county |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>
@@ -1225,7 +1232,8 @@ ___
 ```{r ex14-solution}
 # From previous steps
 chi_obs_stat <- iowa_county |>
-  observe(response = first_digit, stat = "Chisq", p = p_benford)
+  observe(response = first_digit, stat = "Chisq", p = p_benford) |>
+  pull()
 null <- iowa_county |>
   specify(response = first_digit) |>
   hypothesize(null = "point", p = p_benford) |>

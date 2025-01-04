@@ -132,7 +132,7 @@ knitr::include_graphics("images/2-1-2.png")
 
 ### Hypothesis test
 
-A hypothesis test on a proportion asks the question: what sort of p-hats would you observe if the true parameter p held a particular value?
+A hypothesis test on a proportion asks the question: what sort of $\hat{p}\text{s}$ would you observe if the true parameter p held a particular value?
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-3.png")
@@ -140,7 +140,7 @@ knitr::include_graphics("images/2-1-3.png")
 
 ### 
 
-We assert this hypothesis, this model of the true state of the world, using hypothesize.
+We assert this hypothesis, this model of the true state of the world, using `hypothesize`.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-4.png")
@@ -148,7 +148,7 @@ knitr::include_graphics("images/2-1-4.png")
 
 ### 
 
-The insertion of this command will cause generate to now generate data sets according to the world as set out in hypothesize.
+The insertion of this command will cause `generate` to now generate data sets according to the world as set out in `hypothesize.`
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-5.png")
@@ -156,7 +156,7 @@ knitr::include_graphics("images/2-1-5.png")
 
 ### 
 
-Thus the sampling distribution, now called the null distribution, captures the variability in p-hat that you might observe in a world where H0 is true.
+Thus the sampling distribution, now called the null distribution, captures the variability in $\hat{p}$ that you might observe in a world where $H_0$ is true.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-1-6.png")
@@ -164,9 +164,9 @@ knitr::include_graphics("images/2-1-6.png")
 
 ### Do half of Americans favor capital punishment?
 
-Let’s use a hypothesis test to study another question on the gss. Respondents were asked if they favor or oppose capital punishment, also called the death penalty, for the crime of murder. You can look at the distribution of answers by forming a bar chart. You see that of the 150 respondents, more than half answered favor.
+Let’s use a hypothesis test to study another question on the gss. Respondents were asked if they favor or oppose capital punishment, also called the death penalty, for the crime of murder. You can look at the distribution of answers by forming a bar chart. You see that of the 150 respondents, more than half answered in favor.
 
-You can calculate that proportion, p-hat, CL more precisely using the summarize command, and you learn that the proportion is about 0.57.
+You can calculate that proportion, $\hat{p}$, more precisely using the `summarize` command, and you learn that the proportion is about 0.57.
 
 ```{r echo=TRUE}
 p_hat <- gss2016 |>
@@ -181,9 +181,9 @@ Is this data consistent with a world in which only half of Americans favor the d
 
 Next, you hypothesize that the true proportion that favor is 0.5. This is an example of a "point" null hypothesis - you are fixing a particular point value for a parameter. 
 
-Next, we generate through "simulation", 500 data sets that might occur under this hypothesis, and calculate the proportion that favor for each. We’ll save this data frame under the name null.
+Next, we generate through "simulation", 500 data sets that might occur under this hypothesis, and calculate the proportion that favor for each. We’ll save this data frame under the name `null`.
 
-If you print out the top of the null data frame, you’ll see in the stat column you have 500 examples of the type of p-hats that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the p-hat that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
+If you print out the top of the null data frame, you’ll see in the `stat` column you have 500 examples of the type of $\hat{p}\text{s}$ that might occur if in fact the true parameter is 0.5. Recall that in the confidence interval setting, these are clustered around the $\hat{p}$ that was found in the original `gss2016` data set, whereas here they are clustered around the null value 0.5.
 
 ```{r include=FALSE}
 set.seed(12345)
@@ -201,7 +201,7 @@ null
 
 ### 
 
-The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed p-hat, 0.57. The curve represents the sort of p-hats you would see if p was 0.50 and the red line is the p-hat that you actually observed. If your p-hat is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
+The distribution of those statistics can be visualized using a density plot. We’ll add in `geom_vline` to overlay a vertical red line at the location of our observed $\hat{p}$, 0.57. The curve represents the sort of $\hat{p}\text{s}$ you would see if p was 0.50 and the red line is the $\hat{p}$ that you actually observed. If your $\hat{p}$ is in the main part of the null distribution, then it is consistent with the null hypothesis. If it’s far into the tails, though, it’s deemed very unlikely if the null hypothesis were true. 
 
 ```{r eval=TRUE}
 ggplot(null, aes(x = stat)) +
@@ -212,7 +212,7 @@ ggplot(null, aes(x = stat)) +
   )
 ```
 
-This is formalized by computing the p-value, the proportion of generated p-hats that were more extreme than the observed p-hat. In other words, we want to summarize the column of statistics by finding the proportion that are greater than 0.57. We multiply that number by two to account for the left tail of the null distribution, which also contained p-hats that were farther from the center of the distribution than 0.57.
+This is formalized by computing the p-value, the proportion of generated $\hat{p}\text{s}$ that were more extreme than the observed $\hat{p}$. In other words, we want to summarize the column of statistics by finding the proportion that are greater than 0.57. We multiply that number by two to account for the left tail of the null distribution, which also contained $\hat{p}\text{s}$ that were just as far from the center of the distribution, in the opposite direction.
 
 ```{r eval=TRUE, echo=TRUE}
 null |>
@@ -230,7 +230,7 @@ null |>
 
 To recap, the hypothesis test is formulated around a null hypothesis that states a theory about the way the world works, in this case the particular point value taken by a proportion. 
 
-The null distribution provides a sense of the statistics, the p-hats, that would be calculated if you were to generate many data sets according to the null hypothesis. The p-value tells you where your actual observed p-hat falls into that distribution. 
+The null distribution provides a sense of the statistics, the $\hat{p}\text{s}$, that would be calculated if you were to generate many data sets according to the null hypothesis. The p-value tells you where your actual observed $\hat{p}$ falls into that distribution. 
 
 If it's in the body of the distribution, the p-value will be high, indicating consistency between your data and the null hypothesis. 
 
@@ -280,6 +280,7 @@ Compute the proportion of respondents that do believe in life after death and sa
 ```{r ex2, exercise=TRUE}
 # Calculate and save proportion that believe
 p_hat <- ___ |>
+  ___() |>
   summarize(prop_yes = ___) |>
   pull()
 
@@ -305,7 +306,7 @@ p_hat <- gss2016 |>
 p_hat
 ```
 
-### Generating from H0
+### Generating from $H_0$
 
 Imagine that when reading the newspaper, you come across someone who makes the following claim: "3/4 of all Americans believe in life after death". This can be interpreted as a _point_ null hypothesis that the population proportion has a value of 0.75.
 
@@ -319,7 +320,7 @@ Using `gss2016`,
 
 
 ```{r ex3, exercise=TRUE}
-# Generate one data set under H0
+# Generate one data set under $H_0$
 sim1 <- gss2016 |>
   # Specify the response and success
   ___(response = ___, success = ___) |>
@@ -340,7 +341,7 @@ sim1
 ```
 
 ```{r ex3-solution}
-# Generate one data set under H0
+# Generate one data set under $H_0$
 sim1 <- gss2016 |>
   # Explicitly exclude missing data
   na.omit() |> 
@@ -431,7 +432,7 @@ sim1 |>
 
 ### Testing a claim
 
-In the last exercise, you got a sense of what a single simulated p-hat might be if in fact the true proportion of believers was 0.75. That p-hat was likely different from the p-hat in `gss2016`, but was that a fluke or is there a systematic inconsistency between that claim and the data in the GSS?
+In the last exercise, you got a sense of what a single simulated $\hat{p}$ might be if in fact the true proportion of believers was 0.75. That $\hat{p}$ was likely different from the $\hat{p}$ in `gss2016`, but was that a fluke or is there a systematic inconsistency between that claim and the data in the GSS?
 
 In this exercise, you'll settle this question.
 
@@ -448,7 +449,7 @@ p_hat <- gss2016 |>
     pull()
 ```
 
-Extend your code for the last exercise to `calculate()` sample proportions of believers in 500 generated data sets. Save this collection of p-hats to `null`.
+Extend your code for the last exercise to `calculate()` sample proportions of believers in 500 generated data sets. Save this collection of $\hat{p}\text{s}$ to `null`.
 
 ```{r ex6, exercise=TRUE}
 # Generate null distribution
@@ -459,6 +460,8 @@ ___ <- gss2016 |>
   generate(reps = ___, type = "draw") |>
   # Calculate proportions
   ___(stat = ___)
+
+null
 ```
 
 ```{r ex6-hint}
@@ -474,6 +477,8 @@ null <- gss2016 |>
   generate(reps = 500, type = "draw") |>
   # Calculate proportions
   calculate(stat = "prop")
+
+null
 ```
 
 Visualize the null distribution by creating a density plot of the statistics. Using `geom_vline()`, add a vertical line at the value of `p_hat` (from the last exercise), colored `"red"`. 
@@ -520,7 +525,7 @@ ggplot(null, aes(x = stat)) +
 ```
 
 - Compute the one-tailed p-value by finding the proportion of null values that are greater than or equal to your observed `p_hat`. 
-- Compute the two-tailed p-value (where the proportion of null values is equal to or more extreme than the observed `p_hat`) from this by multiplying by 2.
+- Compute the two-tailed p-value (where the proportion of null values is equal to or more extreme than the observed `p_hat`) by multiplying the one-tailed p-value by 2.
 
 ```{r ex8, exercise=TRUE, exercise.setup="testing_a_claim_setup"}
 null <- gss2016 |>
@@ -636,7 +641,7 @@ Let $p$ be the proportion that believe in life after death.
 
 There are plenty of more pressing questions that just beg to be asked of this data, but they require that we look at more than just a single variable. We're curious to know: do men and women believe at different rates? 
 
-Let p be the true proportion of individuals who believe in life after death. 
+Let $p$ be the true proportion of individuals who believe in life after death. 
 
 We can then phrase this question as the null hypothesis that the difference in the proportion of men that believe and the proportion of women that believe is zero. 
 
@@ -693,11 +698,11 @@ d_hat
 ```
 
 
-We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a group_by line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the diff function and save it as d-hats, which we learn is 0.147.
+We can calculate the difference in these proportions by using our normal summarize method of calculating a proportion, but add in a `group_by` line to indicate we want to calculate that proportion for men and women separately. The result is a vector of two proportions. We take their difference with the `diff` function and save it as `d-hats`, which we learn is 0.147.
 
 
 
-### Generating data from H0
+### Generating data from $H_0$
 
 
 - $H\_{0} : p\_{female} - p\_{male} = 0$
@@ -731,7 +736,7 @@ gss2016 |>
 ```
 
 
-To see how this generation works, let's start up our inference chain just like before, with specify feeding into hypothesize feeding into generate. We're looking to explain postlife based on the subjects sex, so we'll add that as an explanatory variable. The type of null that we're specifying is one of independence which allows us to generate data via permutation.
+To see how this generation works, let's start up our inference chain just like before, with `specify` feeding into `hypothesize` feeding into `generate.` We're looking to explain `postlife` based on the subjects `sex`, so we'll add that as an explanatory variable. The type of `null` that we're specifying is one of `"independence"` which allows us to `generate` data via permutation.
 
 This code will work, but before we run it we'll make one change.
 
@@ -766,9 +771,9 @@ Null Hypothesis:  independence
 ``` 
 
 
-and that is to specify the variables via the formula notation like this. It can be read as, "I'd like to explain postlife as a function of sex".
+and that is to specify the variables via the formula notation like this. It can be read as, "I'd like to explain `postlife` as a function of `sex`".
 
-When we run this code, we see it generates a data set with these two columns but where the postlife column has been shuffled or permuted. Let's keep track: the six rows show YES and the seventh shows NO.
+When we run this code, we see it generates a data set with these two columns but where the `postlife` column has been shuffled or permuted. Let's keep track: the six rows show `YES` and the seventh shows `NO`.
 
 
 
@@ -807,7 +812,7 @@ Null Hypothesis:  independence
 
 So if we run this code again we'll get a different permutation. 
 
-One with the second and third being NO and the rest being YES. Both are examples of data sets similar to the one that we observed, but generated as if from a world where there was no association between these variables.
+One with the second and third being `NO` and the rest being `YES`. Both are examples of data sets similar to the one that we observed, but generated as if from a world where there was no association between these variables.
 
 Let's use this method to build up a full null distribution.
 
@@ -830,7 +835,7 @@ Warning message:
 Removed 13 rows containing missing values. 
 ``` 
 
-The inference chain should look familiar but now we're going to generate 500 data sets and calculate a difference in proportions for each one. We need to specify the order of that difference, so we'll look at proportion of female minus proportion of male so that it's in the same order as the d-hat that we calculated from our data. 
+The inference chain should look familiar but now we're going to generate 500 data sets and calculate a difference in proportions for each one. We need to specify the order of that difference, so we'll look at proportion of female minus proportion of male so that it's in the same order as the `d-hat` that we calculated from our data. 
 
 You'll see a warning message pop up here. That's just to let us know that we have some missing data that have been excluded from our analysis. Earlier, we explicitly excluded such missing data by specifying `na.omit`.
 
@@ -964,7 +969,7 @@ d_hat
 ### Hypothesis test on the difference in proportions
 
 
-In the last exercise you learned that about 52% of women favor the death penalty while about 63% of men do, a difference of about 11 percentage points. That seems like a large difference, but what if it's just due to chance and in fact there is no relationship between sex and support for the death penalty? Find out by testing the null hypothesis that sex and support for the death penalty are independent of one another.
+In the last exercise you learned that about 53% of women favor the death penalty while about 63% of men do, a difference of about 10 percentage points. That seems like a large difference, but what if it's just due to chance and in fact there is no relationship between sex and support for the death penalty? Find out by testing the null hypothesis that sex and support for the death penalty are independent of one another.
 
 The `stat`istic that you'll be using in this exercise is a `"diff in props"`, which requires that you specify the order of the difference by adding an argument, `order = c("FIRST", "SECOND")`, where first and second refer to the group names. This results in the calculation: FIRST - SECOND.
 
@@ -1019,7 +1024,7 @@ null <- gss2016 |>
 
 
 
-Construct a density plot to visualize the statistics stored in the `null` distribution and add a vertical red line to indicate the observed test statistic `d_hat` that you calculated in the last exercise.
+Construct a density plot to visualize the `stat`istics stored in the `null` distribution and add a vertical red line to indicate the observed test statistic `d_hat` that you calculated in the last exercise.
 
 
 ```{r ex13, exercise=TRUE, exercise.setup="d_hat_difference"}
@@ -1108,7 +1113,7 @@ Based on the p-value you obtained in the previous exercise, what is your conclus
 
 ```{r mc2, echo=FALSE}
 question("",
-  answer("The data are consistent with the hypothesis that there is no association.",correct = TRUE, message="Bingo! Despite the difference that we found between men and women in our sample, it quite possible it's simply an artifact of the process of drawing a random sample."),
+  answer("The data are consistent with the hypothesis that there is no association.",correct = TRUE, message="Bingo! Despite the difference that we found between men and women in our sample, it's quite possible it's simply an artifact of the process of drawing a random sample."),
   answer("The data are strong evidence that there is an association.", message="Incorrect. If the data constituted strong evidence against the null, it would be farther into the tails of the null distribution."),
   answer("The data are not suitable to answer this particular question.", message="Incorrect. The survey is a representative sample of Americans and the questions directly address the association between sex and support for the death penalty."),
   allow_retry = TRUE
@@ -1150,7 +1155,7 @@ null <- gss2016 |>
    specify(cappun ~ sex, success = "FAVOR") |>
    hypothesize(null = "independence") |>
    generate(reps = 500, type = "permute") |>
-   calculate(stat = "diff in props", order = c("FEMALE", "MALE"))`
+   calculate(stat = "diff in props", order = c("FEMALE", "MALE"))
 ```
 
 
@@ -1304,7 +1309,7 @@ knitr::include_graphics("images/2-3-8.png")
 
 ### 
 
-The distribution of the differences in p-hats that you might observe in a given sample if the null is true.
+The distribution of the differences in $\hat{p}\text{s}$ that you might observe in a given sample if the null is true.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-9.png")
@@ -1320,7 +1325,7 @@ knitr::include_graphics("images/2-3-10.png")
 
 ### 
 
-This is formalized by checking to see if the statistic falls within the area of the tails that account for some proportion, alpha, of the total distribution. It's most common to set alpha to point-0-5.
+This is formalized by checking to see if the statistic falls within the area of the tails that account for some proportion, alpha, of the total distribution. It's most common to set alpha to 0.05.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-11.png")
@@ -1336,7 +1341,7 @@ knitr::include_graphics("images/2-3-12.png")
 
 ### 
 
-If you use alpha equal to point-0-5, you're resigning yourself to incorrectly rejecting the null hypothesis 5% of the time.
+If you use alpha equal to 0.05, you're resigning yourself to incorrectly rejecting the null hypothesis 5% of the time.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-13.png")
@@ -1344,7 +1349,7 @@ knitr::include_graphics("images/2-3-13.png")
 
 ### 
 
-There's a second type of error to be aware of when conducting hypothesis tests, one that occurs when in fact H0 is false and some other model we'll call HA is the true model.
+There's a second type of error to be aware of when conducting hypothesis tests, one that occurs when in fact $H_0$ is false and some other model we'll call $H_A$ is the true model.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-14.png")
@@ -1352,7 +1357,7 @@ knitr::include_graphics("images/2-3-14.png")
 
 ### 
 
-One hopes that after looking at your data and computing a p-value you would decide to reject H0.
+One hopes that after looking at your data and computing a p-value you would decide to reject $H_0$.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-15.png")
@@ -1360,7 +1365,7 @@ knitr::include_graphics("images/2-3-15.png")
 
 ### 
 
-If you fail to reject H0, you've committed what's called a Type II error.
+If you fail to reject $H_0$, you've committed what's called a Type II error.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-16.png")
@@ -1368,7 +1373,7 @@ knitr::include_graphics("images/2-3-16.png")
 
 ### 
 
-To visualize a Type II error, you have to start by realizing that H0 is no longer the model that is generating your data. Now, it's coming from HA.
+To visualize a Type II error, you have to start by realizing that $H_0$ is no longer the model that is generating your data. Now, it's coming from $H_A$.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-17.png")
@@ -1376,7 +1381,7 @@ knitr::include_graphics("images/2-3-17.png")
 
 ### 
 
-However, you are using the same thresholds, those dotted gray lines, for the reject and fail-to-reject regions, so you will retain H0 whenever you observe a statistic in this region.
+However, you are using the same thresholds, those dotted gray lines, for the reject and fail-to-reject regions, so you will retain $H_0$ whenever you observe a statistic in this region.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-18.png")
@@ -1384,13 +1389,13 @@ knitr::include_graphics("images/2-3-18.png")
 
 ### 
 
-The probability of that event corresponds to the area shaded here, which is usually given the Greek letter beta.
+The probability of that event corresponds to the area shaded here, which is usually given the Greek letter $\beta$.
 
 ```{r echo=FALSE, out.width = "60%"}
 knitr::include_graphics("images/2-3-19.png")
 ```
 
-The other potion of the area under this curve, 1 - Beta, is called the power. The statistical power of the test is the probability that it will reject H0 if in fact it is false. Said another way, it's your power to detect an effect if it exists. This is an extremely important property of a statistical test. In general, you can affect and increase in the power in two ways. First is to increase the size of the reject region by increasing alpha. This has a trade-off though: now you're increased the Type I error rate. The second is to increase your sample size. This will have the effect of shrinking the variance of these curves, which would increase the area of the curve that is in the reject region.
+The other potion of the area under this curve, 1 - $\beta$, is called the power. The statistical power of the test is the probability that it will reject $H_0$ if in fact it is false. Said another way, it's your power to detect an effect if it exists. This is an extremely important property of a statistical test. In general, you can affect and increase in the power in two ways. First is to increase the size of the reject region by increasing alpha. This has a trade-off though: now you're increased the Type I error rate. The second is to increase your sample size. This will have the effect of shrinking the variance of these curves, which would increase the area of the curve that is in the reject region.
 
 ### When the null is true
 
