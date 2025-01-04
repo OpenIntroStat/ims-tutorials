@@ -1033,7 +1033,7 @@ Great work! The observed difference is consistent with differences you would see
 
 Using the randomization distributions with the small and big datasets, calculate different cutoffs for significance. Remember, you are most interested in a large positive difference in promotion rates, so you are calculating the upper quantiles of 0.90, 0.95, and 0.99.
 
-A function for calculating these quantiles, `calc_upper_quantiles()` is sown in the script. 
+A function for calculating these quantiles, `calc_upper_quantiles()` is shown in the script. 
 We don't expect for you to learn how to write a function in R! Instead, the function is intended to demonstrate how we can automate the process of finding the 90%, 95%, and 99% quantiles of a test statistic. When you click on the "Run Code" button, you are able to use the function, simply by typing its name (`calc_upper_quantiles()`).  
 
 - As a reference point, run the call to `calc_upper_quantiles()` to calculate the relevant quantiles associated with the original dataset of 1000 permuted differences, `gender_discrimination_perm`.
