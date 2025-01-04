@@ -428,9 +428,9 @@ Now that you've created the randomization distribution, you'll use it to assess 
 
 The permuted dataset and the original observed statistic are available in your workspace as `opp_perm` and `diff_obs` respectively.
 
-`visualize()` and `get_p_value()` using the built in infer functions. Remember that the null statistics are above the original difference, so the p-value (which represents how often a null value is more *extreme*) is calculated by counting the number of null values which are `less` than the original difference.
+`visualize()`, `shade_p_value()`, and `get_p_value()` using the built-in infer functions. Remember that the null statistics are above the original difference, so the p-value (which represents how often a null value is more *extreme*) is calculated by counting the number of null values which are `less` than the original difference.
 
-- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"`.
+- First `visualize()` the sampling distribution of the permuted statistics indicating the place where `obs_stat = diff_obs`, and coloring in values below with the command `direction = "less"` using `shade_p_value()`.
 - Then `get_p_value()` is calculated as the proportion of permuted statistics which are `direction = "less"` than `obs_stat = diff_obs`.
 - As an alternative way to calculate the p-value, use `summarize()` and `mean()` to find the proportion of times the permuted differences in `opp_perm` (called `stat`) are less than or equal to the observed difference (called `diff_obs`).
 - You can test your knowledge by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"` before submitting your answer to both `visualize()` and `get_p_value()`.
@@ -438,6 +438,7 @@ The permuted dataset and the original observed statistic are available in your w
 ```{r summarizing_opportunity_cost, exercise=TRUE}
 # Visualize the statistic 
 opp_perm |>
+  ___() +
   ___(___, ___)
 
 # Calculate the p-value using `get_p_value()`
@@ -451,7 +452,8 @@ opp_perm |>
 
 ```{r summarizing_opportunity_cost-hint-1}
 opp_perm |>
-  visualize(obs_stat = diff_obs, direction = "less")
+  visualize() +
+  shade_p_value(obs_stat = diff_obs, direction = "less")
 ```
 
 ```{r summarizing_opportunity_cost-hint-2}
@@ -462,7 +464,8 @@ opp_perm |>
 ```{r summarizing_opportunity_cost-solution}
 # Visualize the statistic 
 opp_perm |>
-  visualize(obs_stat = diff_obs, direction = "less")
+  visualize() +
+  shade_p_value(obs_stat = diff_obs, direction = "less")
 
 # Calculate the p-value using `get_p_value()`
 opp_perm |>

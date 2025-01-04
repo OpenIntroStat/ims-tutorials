@@ -943,7 +943,7 @@ percentile_ci
  (3)
 
 
-- Finally, use the `visualize()` function to plot the distribution of bootstrapped proportions with the middle 95 percent highlighted.  
+- Finally, use the `visualize()` function together with `shade_confidence_interval()` to plot the distribution of bootstrapped proportions with the middle 95 percent highlighted.  
     - Set the `endpoints` argument to be `percentile_ci`.
     - Set the `direction` of the shading to `"between"`, to highlight in-between those endpoints.
 
@@ -955,11 +955,12 @@ percentile_ci <- one_poll_boot |>
   
 one_poll_boot |> 
   # Visualize in-between the endpoints given by percentile_ci
-  ___
+  ___() +
+  ___(endpoints = ___, direction = ___)
 ```
 
 ```{r bootstrap_percentile_3-hint}
- After the pipe, visualize the interval by calling `visualize()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
+ After the pipe, visualize the distribution by calling `visualize()` and the interval using `shade_confidence_interval()`, setting `endpoints` to `percentile_ci` and `direction` to `"between"`.
 ```
 
 ```{r bootstrap_percentile_3-solution}
@@ -969,7 +970,8 @@ percentile_ci <- one_poll_boot |>
   
 one_poll_boot |> 
   # Visualize in-between the endpoints given by percentile_ci
-  visualize(endpoints = percentile_ci, direction = "between")
+  visualize() +
+  shade_confidence_interval(endpoints = percentile_ci, direction = "between")
 ```
 
 Excellent! Again, the same caveat applies: because the two intervals were created using different methods, the intervals are expected to be a bit different as well. In the long run, however, the intervals should provide the same information.
