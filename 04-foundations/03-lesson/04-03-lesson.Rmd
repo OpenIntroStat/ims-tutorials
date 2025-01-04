@@ -435,10 +435,6 @@ The permuted dataset and the original observed statistic are available in your w
 - As an alternative way to calculate the p-value, use `summarize()` and `mean()` to find the proportion of times the permuted differences in `opp_perm` (called `stat`) are less than or equal to the observed difference (called `diff_obs`).
 - You can test your knowledge by trying out: `direction = "greater"`, `direction = "two_sided"`, and `direction = "less"` before submitting your answer to both `visualize()` and `get_p_value()`.
 
-```{r summarizing_opportunity_cost-setup}
-opp_perm <- read_rds("data/opp_perm2.rds") 
-```
-
 ```{r summarizing_opportunity_cost, exercise=TRUE}
 # Visualize the statistic 
 opp_perm |>
