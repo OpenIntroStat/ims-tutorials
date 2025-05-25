@@ -842,12 +842,12 @@ In this lesson we return to the American Community Survey data and compare avera
 ### A (more) standard measure of pay
 
 
-Instead of comparing average annual `income`, let's compare average `hrly_rate`. We'll calculate this by:
+Instead of comparing average annual `income`, let's compare average `hrly_pay`. We'll calculate this by:
 
 > - assuming there is 52 weeks in a year 
-> - using the formula `hrly_rate = income / (hrs_work * 52)`
+> - using the formula `hrly_pay = income / (hrs_work * 52)`
 
-One obvious measure of pay is annual income. However instead of comparing annual incomes directly, we should adjust for the number of hours worked, and compare average hourly rates. So first, we'll create a new variable called `hrly_rate`. 
+One obvious measure of pay is annual income. However instead of comparing annual incomes directly, we should adjust for the number of hours worked, and compare average hourly rates. So first, we'll create a new variable called `hrly_pay`. 
 
 To do so we'll make the assumption that there are 52 weeks in a year, and calculate hourly rate as income divided by weekly hours times 52 weeks in the year.
 
