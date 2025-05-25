@@ -465,7 +465,7 @@ ncbirths_complete_habit <- ncbirths |>
 
 Next, use `specify()` and `calculate()` to calculate observed difference in mean baby `weight` between smoking habit groups. Use $\bar{x}_{nonsmoker} - \bar{x}_{smoker}$. 
 
-```{r smoking_2-setup, include = FALSE}
+```{r smoking_2-setup}
 # From previous steps
 ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
@@ -505,7 +505,7 @@ Then, generate 1000 differences in means via permutation and store as `diff_mean
 - `generate()` 1000 samples via permutation.
 - `calculate()` the difference in means for each permutation. The order should have `"nonsmoker"`s first, then `"smoker"`s.
 
-```{r smoking_3-setup, include = FALSE}
+```{r smoking_3-setup}
 # From previous steps
 ncbirths_complete_habit <- ncbirths |>
   filter(!is.na(habit))
@@ -965,7 +965,7 @@ Using the `acs12` data, and specifically the variables `income`, `hrs_work`, and
 
 First, filter `acs12` for rows where hourly pay (`hrly_pay`) and U.S. citizenship status (`citizen`) are __both__ non-missing.  
 
-```{r citizens-setup, include = FALSE}
+```{r citizens-setup}
 ## Complete hourly pay and citizenship 
 acs12 <- acs12 |>
   mutate(hrly_pay = income / (hrs_work * 52)) 
@@ -997,7 +997,7 @@ Next calculate summary statistics for citizens and non-citizens. To do this, use
 1. `group_by()` citizenship status. 
 2. Use `summarize()` to calculate the mean of `hrly_pay`, the standard deviation of `hrly_pay`, and the number of observations in that citizenship group.
 
-```{r citizens_3-setup, include = FALSE}
+```{r citizens_3-setup}
 ## Complete hourly pay and citizenship 
 acs12_complete_hrlypay_citizen <- acs12 |>
   mutate(hrly_pay = income / (hrs_work * 52)) |>
@@ -1046,7 +1046,7 @@ Finally, plot a histogram of the `hrly_pay`, faceted by citizenship status.
 - Add a histogram layer with a `binwidth` of 5.
 - Facet by the `citizen`ship status. 
 
-```{r citizens_4-setup, include = FALSE}
+```{r citizens_4-setup}
 ## Complete hourly pay and citizenship 
 acs12_complete_hrlypay_citizen <- acs12 |>
   mutate(hrly_pay = income / (hrs_work * 52)) |>
