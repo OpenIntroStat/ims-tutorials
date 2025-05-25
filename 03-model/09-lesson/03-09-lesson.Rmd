@@ -468,7 +468,7 @@ Note that the left hand side is the expected probability $y$ of being accepted t
 
 
 
-```{r}
+```{r ex5-setup}
 mod <- glm(Acceptance ~ GPA, data = MedGPA, family = binomial)
 
 gpa_bins <- quantile(MedGPA$GPA, probs = 0:6/6)
