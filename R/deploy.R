@@ -31,7 +31,7 @@ tutorial_dirs <- dir_info(recurse = 1) |>
 
 # tutorials to deploy ----------------------------------------------------------
 
-which_tutorials <- 5
+which_tutorials <- 6
 which_tutorials_chr <- paste0("0", which_tutorials)
 which_tutorials_regex <-paste0("^", which_tutorials_chr, collapse = "|")
 dirs_to_deploy <- str_subset(tutorial_dirs, which_tutorials_regex)
@@ -46,7 +46,7 @@ tutorials <- tibble(dir_to_deploy = dirs_to_deploy, lesson = dirs_to_deploy) |>
 # deploy all -------------------------------------------------------------------
 
 #for(i in 1:length(dirs_to_deploy)){
-for(i in c(7,8)){
+for(i in c(2)){
   deployApp(
     appDir = tutorials$dir_to_deploy[i],
     appName = tutorials$title[i],
