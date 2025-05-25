@@ -1089,7 +1089,7 @@ The `acs12_complete_hrlypay_citizen` is already loaded for you.
 
 **Remember** the `t_test()` function behaves similarly to the `calculate()` function! 
 
-```{r citizens_5-setup, include = FALSE}
+```{r citizens_5-setup}
 ## Complete hourly pay and citizenship 
 acs12_complete_hrlypay_citizen <- acs12 |>
   mutate(hrly_pay = income / (hrs_work * 52)) |>
